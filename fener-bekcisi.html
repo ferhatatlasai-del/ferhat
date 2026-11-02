@@ -1,0 +1,577 @@
+<title>Fener Bekçisi</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: full-bleed night sea canvas; HUD floats at the top edge; dialogs sit centered over the water */
+:root {
+  --night: #06111c;
+  --deep: #0d2a3a;
+  --foam: #d6e6e4;
+  --lamp: #ffc96b;
+  --ember: #e2553a;
+  --mist: #86a2ab;
+  --display: 'Bricolage Grotesque', 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--night); color: var(--foam); font-family: var(--mono); overflow: hidden; }
+#c { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: crosshair; }
+
+.hud {
+  position: fixed; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+  padding-top: calc(14px + env(safe-area-inset-top, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  pointer-events: none; font-variant-numeric: tabular-nums;
+}
+.stat { display: grid; gap: 4px; }
+.stat.right { text-align: right; justify-items: end; }
+.k { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--mist); }
+.v { font-family: var(--display); font-weight: 800; font-size: 30px; line-height: 1; color: var(--foam); }
+.lives { display: flex; gap: 6px; height: 30px; align-items: center; }
+.life { width: 10px; height: 22px; border-radius: 3px 3px 1px 1px; background: var(--lamp); box-shadow: 0 0 12px var(--lamp); }
+.life.off { background: transparent; box-shadow: none; outline: 1px solid var(--mist); opacity: .45; }
+
+.panel {
+  position: fixed; inset: 0; display: grid; place-items: center;
+  padding-block: 24px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  background: color-mix(in srgb, var(--night) 55%, transparent);
+}
+.card {
+  width: 100%; max-width: 440px; display: grid; gap: 18px;
+  padding: 28px 24px; border-radius: 6px;
+  background: color-mix(in srgb, var(--night) 88%, transparent);
+  border: 1px solid color-mix(in srgb, var(--lamp) 30%, transparent);
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+}
+.eyebrow { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--mist); }
+h1 { margin: 0; font-family: var(--display); font-weight: 800; font-size: clamp(42px, 11vw, 64px); line-height: .95; letter-spacing: -.02em; color: var(--lamp); text-wrap: balance; }
+p { margin: 0; font-size: 13px; line-height: 1.6; color: var(--foam); }
+.rules { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; font-size: 13px; }
+.rules li { display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; align-items: center; }
+.rules b { font-weight: 500; }
+.pts { font-variant-numeric: tabular-nums; color: var(--mist); }
+.dot { width: 12px; height: 12px; border-radius: 50%; justify-self: center; }
+.dot.m { background: var(--lamp); box-shadow: 0 0 8px var(--lamp); }
+.dot.p { background: var(--ember); box-shadow: 0 0 8px var(--ember); }
+.dot.r { background: #3d4d52; border-radius: 3px; transform: rotate(20deg); }
+.hint { font-size: 12px; color: var(--mist); }
+.big { font-family: var(--display); font-weight: 800; font-size: 56px; line-height: 1; color: var(--foam); font-variant-numeric: tabular-nums; }
+button {
+  font: 600 17px/1 var(--display); letter-spacing: .01em;
+  padding: 15px 20px; border-radius: 4px; border: 0; cursor: pointer;
+  background: var(--lamp); color: var(--night);
+}
+button:hover { filter: brightness(1.08); }
+button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
+.toast {
+  position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
+  font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--mist);
+  pointer-events: none; white-space: nowrap;
+}
+</style>
+
+<canvas id="c" aria-label="Fener Bekçisi oyun alanı"></canvas>
+
+<div class="hud" id="hud" lang="tr" hidden>
+  <div class="stat"><span class="k">Puan</span><span class="v" id="score">0</span></div>
+  <div class="stat"><span class="k">Can</span><div class="lives" id="lives"></div></div>
+  <div class="stat right"><span class="k">En iyi</span><span class="v" id="best">0</span></div>
+</div>
+<div class="toast" id="night" lang="tr" hidden></div>
+
+<div class="panel" id="menu" lang="tr">
+  <div class="card">
+    <span class="eyebrow">Bir gece nöbeti</span>
+    <h1>Fener Bekçisi</h1>
+    <p>Kayalıklı bir koyda fenerin başındasın. Gemiler karanlıkta limanı arıyor. Işığı çevir, onları kayaların arasından geçir.</p>
+    <ul class="rules">
+      <li><span class="dot m"></span><span><b>Tüccar gemisi.</b> Işıkla, limana gelsin.</span><span class="pts">+10</span></li>
+      <li><span class="dot p"></span><span><b>Korsan.</b> Karanlıkta bırak, kayaya çarpsın.</span><span class="pts">+5</span></li>
+      <li><span class="dot r"></span><span><b>Kaya.</b> Işıksız gemi çarparsa batar.</span><span class="pts">−1 can</span></li>
+    </ul>
+    <p class="hint">Fareyi gezdir ya da parmağını sürükle. ← → tuşları da çalışır. Işık bir gemiden ayrılınca rehberliği yavaşça söner.</p>
+    <button id="start" type="button">Nöbete başla</button>
+  </div>
+</div>
+
+<div class="panel" id="over" lang="tr" hidden>
+  <div class="card">
+    <span class="eyebrow" id="overReason">Fener söndü</span>
+    <div class="big" id="final">0</div>
+    <p id="overText"></p>
+    <button id="again" type="button">Yeniden yak</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  const TAU = Math.PI * 2;
+  const BEAM_HALF = 0.21;      // radians
+  const BEAM_SPEED = 3.4;      // radians per second
+  const ISLAND_R = 0.11;       // world units
+  const DOCK_R = 0.155;
+  const SHIP_R = 0.022;
+
+  const cv = document.getElementById('c');
+  const ctx = cv.getContext('2d');
+  const fog = document.createElement('canvas');
+  const fctx = fog.getContext('2d');
+  const $ = id => document.getElementById(id);
+
+  let W = 0, H = 0, DPR = 1, U = 1, CX = 0, CY = 0, FAR = 1.6;
+  let seaGrad = null, waves = [];
+
+  const S = {
+    mode: 'menu', score: 0, lives: 3, t: 0, ships: [], rocks: [], fx: [], texts: [],
+    beam: -Math.PI / 2, target: -Math.PI / 2, spawnT: 0.6, best: 0, keys: 0, night: 1,
+    wrecked: 0, docked: 0, pirates: 0,
+  };
+  try { S.best = parseInt(localStorage.getItem('fener-best') || '0', 10) || 0; } catch (e) {}
+
+  const angDiff = (a, b) => ((a - b + Math.PI) % TAU + TAU) % TAU - Math.PI;
+  const rand = (a, b) => a + Math.random() * (b - a);
+
+  function resize() {
+    DPR = Math.min(2, window.devicePixelRatio || 1);
+    W = window.innerWidth; H = window.innerHeight;
+    for (const c of [cv, fog]) { c.width = Math.round(W * DPR); c.height = Math.round(H * DPR); }
+    U = Math.min(W, H) / 2 * 0.94;
+    CX = W / 2; CY = H / 2;
+    FAR = Math.hypot(W, H) / 2 / U + 0.1;
+    seaGrad = ctx.createRadialGradient(CX, CY, 0, CX, CY, Math.hypot(W, H) / 2);
+    seaGrad.addColorStop(0, '#123a4c');
+    seaGrad.addColorStop(0.55, '#0b2433');
+    seaGrad.addColorStop(1, '#06111c');
+    waves = [];
+    const n = Math.round(W * H / 5200);
+    for (let i = 0; i < n; i++) waves.push({ x: Math.random() * W, y: Math.random() * H, p: Math.random() * TAU, s: rand(4, 8) });
+  }
+
+  function genRocks() {
+    const r = [];
+    let tries = 0;
+    while (r.length < 22 && tries < 4000) {
+      tries++;
+      const a = Math.random() * TAU, d = rand(0.36, 0.92), rad = rand(0.032, 0.068);
+      const x = Math.cos(a) * d, y = Math.sin(a) * d;
+      if (r.every(o => Math.hypot(o.x - x, o.y - y) > o.r + rad + 0.085)) {
+        const pts = [];
+        const k = 7 + Math.floor(Math.random() * 3);
+        for (let i = 0; i < k; i++) pts.push(0.72 + Math.random() * 0.32);
+        r.push({ x, y, r: rad, pts, rot: Math.random() * TAU });
+      }
+    }
+    return r;
+  }
+
+  function spawn() {
+    const a = Math.random() * TAU;
+    const x = Math.cos(a) * FAR, y = Math.sin(a) * FAR;
+    const toIsland = Math.atan2(-y, -x);
+    const pirate = S.t > 15 && Math.random() < Math.min(0.34, 0.14 + S.t / 500);
+    const speed = rand(0.075, 0.105) * (1 + Math.min(0.7, S.t / 220));
+    const off = pirate ? (Math.random() < 0.5 ? -1 : 1) * rand(0.18, 0.45) : rand(-0.15, 0.15);
+    S.ships.push({ x, y, h: toIsland + off, base: toIsland + off, sp: speed, light: 0, lit: false, pirate, wob: Math.random() * TAU, age: 0 });
+  }
+
+  function addText(x, y, txt, col) { S.texts.push({ x, y, txt, col, t: 0 }); }
+  function burst(x, y, col, n) {
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * TAU, v = rand(0.05, 0.25);
+      S.fx.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: rand(0.6, 1.2), max: 1.2, col });
+    }
+  }
+
+  function loseLife(msg, x, y) {
+    if (S.mode !== 'play') return;
+    S.lives--;
+    addText(x, y, msg, '#e2553a');
+    renderLives();
+    if (S.lives <= 0) endGame(msg);
+  }
+
+  function updateShips(dt) {
+    const play = S.mode === 'play';
+    for (let i = S.ships.length - 1; i >= 0; i--) {
+      const s = S.ships[i];
+      s.age += dt;
+      const d = Math.hypot(s.x, s.y);
+      const ang = Math.atan2(s.y, s.x);
+      s.lit = d > ISLAND_R && Math.abs(angDiff(ang, S.beam)) < BEAM_HALF;
+      s.light = s.lit ? Math.min(1, s.light + dt * 3.2) : Math.max(0, s.light - dt * 0.42);
+      const guided = s.light > 0;
+
+      let desired;
+      if (guided || !s.pirate) {
+        desired = Math.atan2(-s.y, -s.x);
+        if (!guided) desired += Math.sin(s.age * 0.85 + s.wob) * 0.6;
+      } else {
+        desired = s.base + Math.sin(s.age * 0.5 + s.wob) * 0.25;
+      }
+
+      if (guided) {
+        let vx = Math.cos(desired), vy = Math.sin(desired);
+        for (const r of S.rocks) {
+          const dx = s.x - r.x, dy = s.y - r.y, dd = Math.hypot(dx, dy);
+          const reach = r.r + 0.17;
+          if (dd < reach) {
+            const w = (reach - dd) / 0.17 * 2.4;
+            const ax = dx / dd, ay = dy / dd;
+            let tx = -ay, ty = ax;
+            if (tx * vx + ty * vy < 0) { tx = -tx; ty = -ty; }
+            vx += (ax * 0.6 + tx) * w; vy += (ay * 0.6 + ty) * w;
+          }
+        }
+        desired = Math.atan2(vy, vx);
+      }
+
+      const turn = angDiff(desired, s.h);
+      const maxTurn = (guided ? 2.6 : 1.1) * dt;
+      s.h += Math.max(-maxTurn, Math.min(maxTurn, turn));
+      s.x += Math.cos(s.h) * s.sp * dt;
+      s.y += Math.sin(s.h) * s.sp * dt;
+
+      let gone = false;
+      for (const r of S.rocks) {
+        const dx = s.x - r.x, dy = s.y - r.y, dd = Math.hypot(dx, dy);
+        if (dd < r.r + SHIP_R) {
+          if (guided) {
+            s.x = r.x + dx / dd * (r.r + SHIP_R);
+            s.y = r.y + dy / dd * (r.r + SHIP_R);
+          } else {
+            burst(s.x, s.y, s.pirate ? '#e2553a' : '#ffc96b', 22);
+            if (s.pirate) {
+              if (play) { S.score += 5; S.pirates++; addText(s.x, s.y, 'Korsan battı +5', '#86a2ab'); }
+            } else {
+              S.wrecked++;
+              loseLife('Gemi battı', s.x, s.y);
+            }
+            gone = true;
+          }
+          break;
+        }
+      }
+
+      if (!gone && Math.hypot(s.x, s.y) < DOCK_R) {
+        if (s.pirate) {
+          burst(s.x, s.y, '#e2553a', 16);
+          loseLife('Korsan limana girdi', s.x, s.y);
+        } else {
+          if (play) { S.score += 10; S.docked++; addText(s.x, s.y, '+10', '#ffc96b'); }
+          burst(s.x, s.y, '#d6e6e4', 10);
+        }
+        gone = true;
+      }
+      if (!gone && s.age > 4 && Math.hypot(s.x, s.y) > FAR + 0.3) gone = true;
+      if (gone) S.ships.splice(i, 1);
+    }
+  }
+
+  function update(dt) {
+    S.t += dt;
+    if (S.mode === 'menu' || S.mode === 'over') {
+      S.target = S.beam + 0.8;
+    } else if (S.keys) {
+      S.target = S.beam + S.keys * 0.6;
+    }
+    const diff = angDiff(S.target, S.beam);
+    const step = (S.mode === 'play' ? BEAM_SPEED : 0.7) * dt;
+    S.beam += Math.max(-step, Math.min(step, diff));
+
+    S.spawnT -= dt;
+    if (S.spawnT <= 0) {
+      spawn();
+      const base = S.mode === 'play' ? Math.max(0.95, 3.1 - S.t / 45) : 2.6;
+      S.spawnT = base * rand(0.8, 1.2);
+    }
+    updateShips(dt);
+
+    for (let i = S.fx.length - 1; i >= 0; i--) {
+      const p = S.fx[i];
+      p.life -= dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= 0.96; p.vy *= 0.96;
+      if (p.life <= 0) S.fx.splice(i, 1);
+    }
+    for (let i = S.texts.length - 1; i >= 0; i--) {
+      S.texts[i].t += dt;
+      if (S.texts[i].t > 1.6) S.texts.splice(i, 1);
+    }
+
+    if (S.mode === 'play') {
+      $('score').textContent = S.score;
+      const n = 1 + Math.floor(S.t / 45);
+      if (n !== S.night) {
+        S.night = n;
+        const el = $('night');
+        el.textContent = n + '. saat · rüzgâr sertleşiyor';
+        el.hidden = false;
+        clearTimeout(el._t);
+        el._t = setTimeout(() => { el.hidden = true; }, 2600);
+      }
+    }
+  }
+
+  // ---------- drawing ----------
+  const sx = x => CX + x * U;
+  const sy = y => CY + y * U;
+
+  function drawRock(r) {
+    const x = sx(r.x), y = sy(r.y), rad = r.r * U;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.beginPath();
+    ctx.arc(0, 0, rad * 1.35, 0, TAU);
+    ctx.fillStyle = 'rgba(214,230,228,0.07)';
+    ctx.fill();
+    ctx.rotate(r.rot);
+    ctx.beginPath();
+    r.pts.forEach((k, i) => {
+      const a = i / r.pts.length * TAU;
+      const px = Math.cos(a) * rad * k, py = Math.sin(a) * rad * k;
+      i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+    });
+    ctx.closePath();
+    ctx.fillStyle = '#34454a';
+    ctx.fill();
+    ctx.strokeStyle = '#56696c';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawIsland() {
+    const x = CX, y = CY, r = ISLAND_R * U;
+    ctx.beginPath(); ctx.arc(x, y, r * 1.5, 0, TAU);
+    ctx.fillStyle = 'rgba(214,230,228,0.08)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(x, y, r, 0, TAU);
+    ctx.fillStyle = '#2b3d40'; ctx.fill();
+    ctx.beginPath(); ctx.arc(x, y, r * 0.78, 0, TAU);
+    ctx.fillStyle = '#3a4f4f'; ctx.fill();
+    // pier
+    ctx.save(); ctx.translate(x, y); ctx.rotate(S.t * 0);
+    ctx.restore();
+    // tower
+    const tr = r * 0.42;
+    ctx.beginPath(); ctx.arc(x, y, tr, 0, TAU);
+    ctx.fillStyle = '#e9e2d4'; ctx.fill();
+    ctx.lineWidth = tr * 0.28; ctx.strokeStyle = '#b8402c';
+    ctx.beginPath(); ctx.arc(x, y, tr * 0.7, 0, TAU); ctx.stroke();
+  }
+
+  function drawShip(s) {
+    const k = Math.max(8, U * 0.03);
+    const x = sx(s.x), y = sy(s.y);
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(s.h);
+    // wake
+    ctx.strokeStyle = 'rgba(214,230,228,0.18)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(-k * 1.1, -k * 0.3); ctx.lineTo(-k * 3, -k * 0.9);
+    ctx.moveTo(-k * 1.1, k * 0.3); ctx.lineTo(-k * 3, k * 0.9);
+    ctx.stroke();
+    // hull
+    ctx.beginPath();
+    ctx.moveTo(k * 1.3, 0);
+    ctx.quadraticCurveTo(k * 0.4, -k * 0.55, -k * 1.1, -k * 0.42);
+    ctx.lineTo(-k * 1.1, k * 0.42);
+    ctx.quadraticCurveTo(k * 0.4, k * 0.55, k * 1.3, 0);
+    ctx.fillStyle = s.pirate ? '#1d1517' : '#5a3d2b';
+    ctx.fill();
+    // sail
+    ctx.beginPath();
+    ctx.moveTo(-k * 0.05, -k * 0.95);
+    ctx.quadraticCurveTo(k * 0.45, 0, -k * 0.05, k * 0.95);
+    ctx.lineTo(-k * 0.25, k * 0.95);
+    ctx.quadraticCurveTo(k * 0.2, 0, -k * 0.25, -k * 0.95);
+    ctx.closePath();
+    ctx.fillStyle = s.pirate ? '#8e2219' : '#efe4cc';
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawFog() {
+    fctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    fctx.globalCompositeOperation = 'source-over';
+    fctx.clearRect(0, 0, W, H);
+    fctx.fillStyle = 'rgba(3,8,14,0.8)';
+    fctx.fillRect(0, 0, W, H);
+    fctx.globalCompositeOperation = 'destination-out';
+    const len = Math.hypot(W, H);
+    fctx.save();
+    fctx.translate(CX, CY);
+    fctx.rotate(S.beam);
+    for (const [half, alpha] of [[BEAM_HALF * 1.45, 0.35], [BEAM_HALF, 0.75]]) {
+      const g = fctx.createRadialGradient(0, 0, 0, 0, 0, len * 0.75);
+      g.addColorStop(0, `rgba(0,0,0,${alpha})`);
+      g.addColorStop(0.7, `rgba(0,0,0,${alpha * 0.85})`);
+      g.addColorStop(1, `rgba(0,0,0,${alpha * 0.55})`);
+      fctx.beginPath(); fctx.moveTo(0, 0); fctx.arc(0, 0, len, -half, half); fctx.closePath();
+      fctx.fillStyle = g; fctx.fill();
+    }
+    fctx.restore();
+    const glow = (x, y, r, a) => {
+      const g = fctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, `rgba(0,0,0,${a})`); g.addColorStop(1, 'rgba(0,0,0,0)');
+      fctx.fillStyle = g; fctx.beginPath(); fctx.arc(x, y, r, 0, TAU); fctx.fill();
+    };
+    glow(CX, CY, ISLAND_R * U * 2.6, 0.9);
+    for (const s of S.ships) glow(sx(s.x), sy(s.y), U * (0.06 + s.light * 0.07), 0.35 + s.light * 0.45);
+  }
+
+  function draw() {
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = seaGrad; ctx.fillRect(0, 0, W, H);
+
+    ctx.lineWidth = 1;
+    for (const w of waves) {
+      const a = 0.05 + 0.05 * Math.sin(S.t * 0.9 + w.p);
+      const dx = Math.sin(S.t * 0.4 + w.p) * 3;
+      ctx.strokeStyle = `rgba(214,230,228,${a})`;
+      ctx.beginPath();
+      ctx.moveTo(w.x - w.s + dx, w.y);
+      ctx.quadraticCurveTo(w.x - w.s / 2 + dx, w.y - 2.5, w.x + dx, w.y);
+      ctx.quadraticCurveTo(w.x + w.s / 2 + dx, w.y + 2.5, w.x + w.s + dx, w.y);
+      ctx.stroke();
+    }
+
+    for (const r of S.rocks) drawRock(r);
+    drawIsland();
+    for (const s of S.ships) drawShip(s);
+
+    drawFog();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.drawImage(fog, 0, 0);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+    // warm beam tint
+    ctx.globalCompositeOperation = 'lighter';
+    const len = Math.hypot(W, H);
+    ctx.save(); ctx.translate(CX, CY); ctx.rotate(S.beam);
+    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, len * 0.6);
+    g.addColorStop(0, 'rgba(255,201,107,0.28)');
+    g.addColorStop(0.35, 'rgba(255,201,107,0.09)');
+    g.addColorStop(1, 'rgba(255,201,107,0)');
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, len, -BEAM_HALF, BEAM_HALF); ctx.closePath();
+    ctx.fillStyle = g; ctx.fill();
+    ctx.restore();
+
+    // lamp
+    const lr = ISLAND_R * U;
+    const lg = ctx.createRadialGradient(CX, CY, 0, CX, CY, lr * 1.4);
+    lg.addColorStop(0, 'rgba(255,230,170,0.95)');
+    lg.addColorStop(0.25, 'rgba(255,201,107,0.6)');
+    lg.addColorStop(1, 'rgba(255,201,107,0)');
+    ctx.fillStyle = lg; ctx.beginPath(); ctx.arc(CX, CY, lr * 1.4, 0, TAU); ctx.fill();
+
+    // lanterns
+    for (const s of S.ships) {
+      const x = sx(s.x), y = sy(s.y);
+      const col = s.pirate ? '226,85,58' : '255,201,107';
+      const r = Math.max(10, U * 0.03) * (1.1 + s.light * 0.8);
+      const gg = ctx.createRadialGradient(x, y, 0, x, y, r);
+      gg.addColorStop(0, `rgba(${col},0.9)`);
+      gg.addColorStop(1, `rgba(${col},0)`);
+      ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill();
+    }
+    ctx.globalCompositeOperation = 'source-over';
+
+    // guidance rings
+    for (const s of S.ships) {
+      if (s.light <= 0) continue;
+      const x = sx(s.x), y = sy(s.y), r = Math.max(13, U * 0.045);
+      ctx.strokeStyle = s.pirate ? 'rgba(226,85,58,0.9)' : 'rgba(255,201,107,0.9)';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(x, y, r, -Math.PI / 2, -Math.PI / 2 + s.light * TAU); ctx.stroke();
+    }
+
+    for (const p of S.fx) {
+      ctx.globalAlpha = Math.max(0, p.life / p.max);
+      ctx.fillStyle = p.col;
+      ctx.fillRect(sx(p.x) - 1.5, sy(p.y) - 1.5, 3, 3);
+    }
+    ctx.globalAlpha = 1;
+
+    ctx.textAlign = 'center';
+    ctx.font = '600 15px "Bricolage Grotesque", system-ui, sans-serif';
+    for (const t of S.texts) {
+      ctx.globalAlpha = Math.max(0, 1 - t.t / 1.6);
+      ctx.fillStyle = t.col;
+      ctx.fillText(t.txt, sx(t.x), sy(t.y) - 18 - t.t * 22);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // ---------- flow ----------
+  function renderLives() {
+    $('lives').innerHTML = [0, 1, 2].map(i => `<span class="life${i < S.lives ? '' : ' off'}"></span>`).join('');
+  }
+
+  function startGame() {
+    Object.assign(S, { mode: 'play', score: 0, lives: 3, t: 0, ships: [], fx: [], texts: [], spawnT: 1.2, night: 1, wrecked: 0, docked: 0, pirates: 0 });
+    S.rocks = genRocks();
+    S.target = S.beam;
+    $('menu').hidden = true; $('over').hidden = true; $('hud').hidden = false;
+    $('best').textContent = S.best;
+    renderLives();
+    cv.focus();
+  }
+
+  function endGame(reason) {
+    S.mode = 'over';
+    const newBest = S.score > S.best;
+    if (newBest) {
+      S.best = S.score;
+      try { localStorage.setItem('fener-best', String(S.best)); } catch (e) {}
+    }
+    $('best').textContent = S.best;
+    $('final').textContent = S.score;
+    $('overReason').textContent = newBest ? 'Yeni rekor' : reason;
+    const mins = Math.floor(S.t / 60), secs = Math.floor(S.t % 60);
+    $('overText').textContent = `${S.docked} gemiyi limana soktun, ${S.pirates} korsanı batırdın. Nöbet ${mins} dk ${secs} sn sürdü.`;
+    setTimeout(() => { $('over').hidden = false; $('again').focus(); }, 700);
+  }
+
+  function aim(e) {
+    if (S.mode !== 'play') return;
+    const rect = cv.getBoundingClientRect();
+    S.target = Math.atan2(e.clientY - rect.top - CY, e.clientX - rect.left - CX);
+  }
+  cv.tabIndex = 0;
+  cv.addEventListener('pointermove', aim);
+  cv.addEventListener('pointerdown', aim);
+  window.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft' || e.key === 'a') { S.keys = -1; e.preventDefault(); }
+    if (e.key === 'ArrowRight' || e.key === 'd') { S.keys = 1; e.preventDefault(); }
+    if ((e.key === 'Enter' || e.key === ' ') && S.mode !== 'play' && document.activeElement?.tagName !== 'BUTTON') startGame();
+  });
+  window.addEventListener('keyup', e => {
+    if (['ArrowLeft', 'ArrowRight', 'a', 'd'].includes(e.key)) { S.keys = 0; if (S.mode === 'play') S.target = S.beam; }
+  });
+  $('start').addEventListener('click', startGame);
+  $('again').addEventListener('click', startGame);
+  window.addEventListener('resize', resize);
+
+  resize();
+  S.rocks = genRocks();
+  for (let i = 0; i < 4; i++) { spawn(); const s = S.ships[i], f = rand(0.45, 0.85); s.x *= f; s.y *= f; s.light = i % 2 ? 0.7 : 0; }
+
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    update(dt);
+    draw();
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
