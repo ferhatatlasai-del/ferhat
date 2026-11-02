@@ -37,14 +37,14 @@ body { margin: 0; background: var(--night); color: var(--foam); font-family: var
 .life.off { background: transparent; box-shadow: none; outline: 1px solid var(--mist); opacity: .45; }
 
 .panel {
-  position: fixed; inset: 0; display: grid; place-items: center; overflow-y: auto;
+  position: fixed; inset: 0; display: grid; overflow-y: auto;
   padding-block: calc(16px + env(safe-area-inset-top, 0px)) calc(16px + env(safe-area-inset-bottom, 0px));
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   background: color-mix(in srgb, var(--night) 55%, transparent);
 }
 .card {
-  width: 100%; max-width: 520px; display: grid; gap: 16px;
+  width: 100%; max-width: 520px; display: grid; gap: 16px; margin: auto;
   padding: 24px 20px; border-radius: 6px; box-sizing: border-box;
   background: color-mix(in srgb, var(--night) 90%, transparent);
   border: 1px solid color-mix(in srgb, var(--lamp) 30%, transparent);
@@ -99,6 +99,22 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
   font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--mist);
   pointer-events: none; white-space: nowrap;
 }
+.sound.fixed {
+  position: fixed; z-index: 5;
+  right: max(16px, env(safe-area-inset-right, 0px));
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+}
+.sound {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  font: 500 12px/1 var(--mono); letter-spacing: .08em; color: var(--foam);
+  padding: 9px 12px; border-radius: 4px; cursor: pointer;
+  background: color-mix(in srgb, var(--night) 80%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mist) 40%, transparent);
+}
+.sound svg { width: 16px; height: 16px; }
+.sound[aria-pressed="false"] { color: var(--mist); }
+.sound[aria-pressed="false"] .waves { display: none; }
+.sound[aria-pressed="true"] .cross { display: none; }
 @media (max-width: 380px) {
   .keeper .blurb { display: none; }
 }
@@ -125,8 +141,9 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
       <li><span class="dot p"></span><span><b>Korsan.</b> Uzak dur, karanlıkta kayaya çarpsın.</span><span class="pts">+5</span></li>
       <li><span class="dot r"></span><span><b>Kaya.</b> Işıksız gemi çarparsa batar.</span><span class="pts">−1 can</span></li>
     </ul>
-    <p class="hint">Kayık fareyi ya da parmağını izler. WASD ve ok tuşları da çalışır.</p>
-    <button class="btn" id="start" type="button">Nöbete başla</button>
+    <p class="hint">Kayık fareyi ya da parmağını izler. WASD ve ok tuşları da çalışır. M tuşu sesi açıp kapatır.</p>
+    <div class="actions"><button class="btn" id="start" type="button">Nöbete başla</button></div>
+    <button class="sound" id="soundMenu" type="button" aria-pressed="true" lang="tr"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6h3l4-3v10l-4-3H2z" fill="currentColor"/><path class="waves" d="M11.5 5.5a3.5 3.5 0 0 1 0 5M13.5 3.5a6.5 6.5 0 0 1 0 9"/><path class="cross" d="M11 6l4 4M15 6l-4 4"/></svg><span class="soundLabel">Ses açık</span></button>
   </div>
 </div>
 
@@ -142,6 +159,15 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
   </div>
 </div>
 
+<button class="sound fixed" id="sound" type="button" aria-pressed="true" lang="tr" hidden>
+  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M2 6h3l4-3v10l-4-3H2z" fill="currentColor"/>
+    <path class="waves" d="M11.5 5.5a3.5 3.5 0 0 1 0 5M13.5 3.5a6.5 6.5 0 0 1 0 9"/>
+    <path class="cross" d="M11 6l4 4M15 6l-4 4"/>
+  </svg>
+  <span class="soundLabel">Ses açık</span>
+</button>
+
 <script>
 (() => {
   const TAU = Math.PI * 2;
@@ -156,7 +182,7 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
     { id: 'nuri',  name: 'Nuri',  role: 'Kanocu', blurb: 'Kanosu çok hızlı, feneri küçük.',
       speed: 0.66, radius: 0.15, hold: 1.0, stats: [3, 1, 1] },
     { id: 'leyla', name: 'Leyla', role: 'Fenerci', blurb: 'Sandalı ağır, feneri kocaman.',
-      speed: 0.36, radius: 0.27, hold: 1.0, stats: [1, 3, 1] },
+      speed: 0.42, radius: 0.27, hold: 1.0, stats: [1, 3, 1] },
     { id: 'bora',  name: 'Bora',  role: 'Kaptan', blurb: 'Gösterdiği yol uzun süre unutulmaz.',
       speed: 0.48, radius: 0.19, hold: 2.2, stats: [2, 2, 3] },
   ];
@@ -187,6 +213,119 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
 
   const angDiff = (a, b) => ((a - b + Math.PI) % TAU + TAU) % TAU - Math.PI;
   const rand = (a, b) => a + Math.random() * (b - a);
+
+  // ---------- sound: everything is synthesized with Web Audio, no files ----------
+  const A = { ctx: null, master: null, noise: null, muted: false, lastPing: 0 };
+  try { A.muted = localStorage.getItem('fener-muted') === '1'; } catch (e) {}
+
+  function audioInit() {
+    if (A.ctx) { if (A.ctx.state === 'suspended') A.ctx.resume(); return; }
+    try { A.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }
+    const ac = A.ctx;
+    A.master = ac.createGain();
+    A.master.gain.value = A.muted ? 0 : 0.8;
+    A.master.connect(ac.destination);
+    const len = ac.sampleRate * 2;
+    A.noise = ac.createBuffer(1, len, ac.sampleRate);
+    const d = A.noise.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+
+    // the sea: looping noise through a slowly breathing low-pass filter
+    const src = ac.createBufferSource(); src.buffer = A.noise; src.loop = true;
+    const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 420; lp.Q.value = 0.4;
+    const g = ac.createGain(); g.gain.value = 0.07;
+    const swell = ac.createOscillator(); swell.frequency.value = 0.11;
+    const swellAmt = ac.createGain(); swellAmt.gain.value = 0.045;
+    swell.connect(swellAmt); swellAmt.connect(g.gain);
+    const sweep = ac.createOscillator(); sweep.frequency.value = 0.07;
+    const sweepAmt = ac.createGain(); sweepAmt.gain.value = 220;
+    sweep.connect(sweepAmt); sweepAmt.connect(lp.frequency);
+    src.connect(lp); lp.connect(g); g.connect(A.master);
+    src.start(); swell.start(); sweep.start();
+  }
+
+  function tone(f, dur, o = {}) {
+    if (!A.ctx || A.muted) return;
+    const ac = A.ctx, t = ac.currentTime + (o.at || 0);
+    const osc = ac.createOscillator();
+    osc.type = o.type || 'sine';
+    osc.frequency.setValueAtTime(f, t);
+    if (o.to) osc.frequency.exponentialRampToValueAtTime(o.to, t + dur);
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(o.vol || 0.15, t + (o.attack || 0.005));
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    let node = osc;
+    if (o.lp) { const f2 = ac.createBiquadFilter(); f2.type = 'lowpass'; f2.frequency.value = o.lp; osc.connect(f2); node = f2; }
+    node.connect(g); g.connect(A.master);
+    osc.start(t); osc.stop(t + dur + 0.05);
+  }
+
+  function hiss(dur, o = {}) {
+    if (!A.ctx || A.muted) return;
+    const ac = A.ctx, t = ac.currentTime + (o.at || 0);
+    const src = ac.createBufferSource(); src.buffer = A.noise;
+    const f = ac.createBiquadFilter(); f.type = o.type || 'bandpass'; f.Q.value = o.q || 1;
+    f.frequency.setValueAtTime(o.freq || 1000, t);
+    if (o.to) f.frequency.exponentialRampToValueAtTime(o.to, t + dur);
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(o.vol || 0.2, t + (o.attack || 0.01));
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    src.connect(f); f.connect(g); g.connect(A.master);
+    src.start(t, Math.random() * 1.5, dur + 0.1);
+  }
+
+  const sfx = {
+    select(kp) { tone({ nuri: 784, leyla: 659, bora: 440 }[kp.id], 0.18, { type: 'triangle', vol: 0.12 }); },
+    start() { [523, 659, 784].forEach((f, i) => tone(f, 0.35, { type: 'triangle', vol: 0.1, at: i * 0.09 })); },
+    dock() {
+      tone(880, 1.4, { vol: 0.14 });
+      tone(1760, 0.8, { vol: 0.035 });
+      tone(1109, 1.3, { vol: 0.1, at: 0.11 });
+      tone(1319, 1.2, { vol: 0.08, at: 0.22 });
+    },
+    guide() {
+      if (!A.ctx || A.ctx.currentTime - A.lastPing < 0.12) return;
+      A.lastPing = A.ctx.currentTime;
+      tone(1568, 0.3, { vol: 0.035 }); tone(2093, 0.25, { vol: 0.02, at: 0.04 });
+    },
+    wreck() {
+      tone(120, 0.7, { type: 'triangle', vol: 0.35, to: 38 });
+      hiss(0.18, { freq: 2200, vol: 0.28, q: 0.7 });
+      hiss(0.9, { type: 'lowpass', freq: 900, to: 120, vol: 0.32, at: 0.05 });
+    },
+    pirateSunk() {
+      hiss(0.6, { freq: 1200, to: 300, vol: 0.22, q: 0.8 });
+      tone(392, 0.16, { type: 'square', vol: 0.04, lp: 1800, at: 0.1 });
+      tone(587, 0.3, { type: 'square', vol: 0.04, lp: 1800, at: 0.22 });
+    },
+    pirateDock() {
+      tone(98, 1.1, { type: 'sawtooth', vol: 0.14, lp: 600, attack: 0.04 });
+      tone(104, 1.1, { type: 'sawtooth', vol: 0.12, lp: 600, attack: 0.04 });
+      tone(147, 0.8, { type: 'sawtooth', vol: 0.08, lp: 700, at: 0.15 });
+    },
+    stroke(kp) {
+      if (kp.id === 'bora') {
+        hiss(0.5, { type: 'lowpass', freq: 500, to: 250, vol: 0.06, attack: 0.15 });
+      } else {
+        hiss(kp.id === 'nuri' ? 0.14 : 0.24, { freq: rand(600, 950), q: 1.4, vol: kp.id === 'nuri' ? 0.07 : 0.09, attack: 0.02 });
+      }
+    },
+    foghorn() {
+      tone(73, 2.4, { type: 'sawtooth', vol: 0.13, lp: 260, attack: 0.35 });
+      tone(110, 2.4, { type: 'sawtooth', vol: 0.07, lp: 300, attack: 0.35 });
+    },
+    gameOver() { [392, 330, 262, 196].forEach((f, i) => tone(f, 0.6, { type: 'triangle', vol: 0.12, at: 0.2 + i * 0.22 })); },
+  };
+
+  function setMuted(m) {
+    A.muted = m;
+    try { localStorage.setItem('fener-muted', m ? '1' : '0'); } catch (e) {}
+    if (A.master) A.master.gain.setTargetAtTime(m ? 0 : 0.8, A.ctx.currentTime, 0.05);
+    document.querySelectorAll('.sound').forEach(b => b.setAttribute('aria-pressed', String(!m)));
+    document.querySelectorAll('.soundLabel').forEach(l => { l.textContent = m ? 'Ses kapalı' : 'Ses açık'; });
+  }
 
   function resize() {
     DPR = Math.min(2, window.devicePixelRatio || 1);
@@ -277,6 +416,10 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
     p.x += p.vx * dt; p.y += p.vy * dt;
     const sp = Math.hypot(p.vx, p.vy);
     p.moving = sp > 0.04;
+    if (S.mode === 'play' && p.moving) {
+      S.strokeT -= dt;
+      if (S.strokeT <= 0) { sfx.stroke(kp); S.strokeT = { nuri: 0.3, leyla: 0.6, bora: 0.95 }[kp.id]; }
+    }
     if (sp > 0.02) p.h += angDiff(Math.atan2(p.vy, p.vx), p.h) * Math.min(1, dt * 8);
 
     // keep clear of rocks, the island and the screen edges
@@ -298,13 +441,15 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
       const s = S.ships[i];
       s.age += dt;
       s.lit = Math.hypot(s.x - p.x, s.y - p.y) < kp.radius;
+      const wasDark = s.light === 0;
       s.light = s.lit ? Math.min(1, s.light + dt * 3.2) : Math.max(0, s.light - dt * decay);
+      if (play && wasDark && s.light > 0) sfx.guide();
       const guided = s.light > 0;
 
       let desired;
       if (guided || !s.pirate) {
         desired = Math.atan2(-s.y, -s.x);
-        if (!guided) desired += Math.sin(s.age * 0.85 + s.wob) * 0.6;
+        if (!guided) desired += Math.sin(s.age * 0.85 + s.wob) * 0.38;
       } else {
         desired = s.base + Math.sin(s.age * 0.5 + s.wob) * 0.25;
       }
@@ -341,9 +486,10 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
           } else {
             burst(s.x, s.y, s.pirate ? '#e2553a' : '#ffc96b', 22);
             if (s.pirate) {
-              if (play) { S.score += 5; S.pirates++; addText(s.x, s.y, 'Korsan battı +5', '#86a2ab'); }
+              if (play) { S.score += 5; S.pirates++; addText(s.x, s.y, 'Korsan battı +5', '#86a2ab'); sfx.pirateSunk(); }
             } else {
               S.wrecked++;
+              if (play) sfx.wreck();
               loseLife('Gemi battı', s.x, s.y);
             }
             gone = true;
@@ -355,9 +501,10 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
       if (!gone && Math.hypot(s.x, s.y) < DOCK_R) {
         if (s.pirate) {
           burst(s.x, s.y, '#e2553a', 16);
+          if (play) sfx.pirateDock();
           loseLife('Korsan limana girdi', s.x, s.y);
         } else {
-          if (play) { S.score += 10; S.docked++; addText(s.x, s.y, '+10', '#ffc96b'); }
+          if (play) { S.score += 10; S.docked++; addText(s.x, s.y, '+10', '#ffc96b'); sfx.dock(); }
           burst(s.x, s.y, '#d6e6e4', 10);
         }
         gone = true;
@@ -398,6 +545,7 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
         const el = $('night');
         el.textContent = n + '. saat · rüzgâr sertleşiyor';
         el.hidden = false;
+        sfx.foghorn();
         clearTimeout(el._t);
         el._t = setTimeout(() => { el.hidden = true; }, 2600);
       }
@@ -789,9 +937,10 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
       btn.addEventListener('click', () => selectKeeper(kp));
       btn.addEventListener('dblclick', () => { selectKeeper(kp); startGame(); });
     });
-    selectKeeper(S.keeper);
+    selectKeeper(S.keeper, true);
   }
-  function selectKeeper(kp) {
+  function selectKeeper(kp, quiet) {
+    if (!quiet) { audioInit(); sfx.select(kp); }
     S.keeper = kp;
     try { localStorage.setItem('fener-keeper', kp.id); } catch (e) {}
     document.querySelectorAll('.keeper').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.id === kp.id)));
@@ -819,11 +968,13 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
   }
 
   function startGame() {
-    Object.assign(S, { mode: 'play', score: 0, lives: 3, t: 0, ships: [], fx: [], texts: [], spawnT: 1.4, night: 1, wrecked: 0, docked: 0, pirates: 0, aim: null });
+    audioInit();
+    sfx.start();
+    Object.assign(S, { mode: 'play', score: 0, lives: 3, t: 0, ships: [], fx: [], texts: [], spawnT: 1.4, night: 1, wrecked: 0, docked: 0, pirates: 0, aim: null, strokeT: 0 });
     S.keys.clear();
     S.rocks = genRocks();
     Object.assign(S.p, { x: 0, y: 0.2, vx: 0, vy: 0, h: -Math.PI / 2 });
-    $('menu').hidden = true; $('over').hidden = true; $('hud').hidden = false;
+    $('menu').hidden = true; $('over').hidden = true; $('hud').hidden = false; $('sound').hidden = false;
     $('best').textContent = S.best;
     renderLives();
     cv.focus();
@@ -831,13 +982,14 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
 
   function showMenu() {
     S.mode = 'menu';
-    $('over').hidden = true; $('hud').hidden = true; $('menu').hidden = false;
+    $('over').hidden = true; $('hud').hidden = true; $('sound').hidden = true; $('menu').hidden = false;
     document.getElementById('keeper-' + S.keeper.id).focus();
   }
 
   function endGame(reason) {
     S.mode = 'over';
     S.aim = null;
+    sfx.gameOver();
     const newBest = S.score > S.best;
     if (newBest) {
       S.best = S.score;
@@ -864,6 +1016,7 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
   const KEYMAP = { ArrowLeft: 'left', a: 'left', A: 'left', ArrowRight: 'right', d: 'right', D: 'right',
                    ArrowUp: 'up', w: 'up', W: 'up', ArrowDown: 'down', s: 'down', S: 'down' };
   window.addEventListener('keydown', e => {
+    if (e.key === 'm' || e.key === 'M') { audioInit(); setMuted(!A.muted); return; }
     const dir = KEYMAP[e.key];
     if (dir && S.mode === 'play') { S.keys.add(dir); e.preventDefault(); }
     if (S.mode === 'menu' && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
@@ -878,8 +1031,15 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
   $('start').addEventListener('click', startGame);
   $('again').addEventListener('click', startGame);
   $('change').addEventListener('click', showMenu);
+  document.querySelectorAll('.sound').forEach(b => b.addEventListener('click', () => { audioInit(); setMuted(!A.muted); }));
+  document.addEventListener('visibilitychange', () => {
+    if (!A.ctx) return;
+    if (document.hidden) A.ctx.suspend(); else A.ctx.resume();
+  });
+  setMuted(A.muted);
   window.addEventListener('resize', resize);
 
+  if (location.hash === '#debug') window.fenerDebug = { S, U: () => U, CX: () => CX, CY: () => CY };
   resize();
   S.rocks = genRocks();
   buildKeepers();
