@@ -65,7 +65,7 @@ p { margin: 0; font-size: 13px; line-height: 1.6; color: var(--foam); }
 }
 .keeper:hover { border-color: color-mix(in srgb, var(--lamp) 55%, transparent); filter: none; }
 .keeper[aria-pressed="true"] { border-color: var(--lamp); background: color-mix(in srgb, var(--lamp) 12%, var(--night)); box-shadow: 0 0 0 1px var(--lamp) inset; }
-.keeper canvas { width: 64px; height: 64px; }
+.keeper canvas { width: 80px; height: 80px; }
 .keeper .name { font-family: var(--display); font-weight: 800; font-size: 18px; line-height: 1; }
 .keeper .role { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--mist); }
 .keeper .blurb { font-size: 11px; line-height: 1.4; color: var(--foam); opacity: .85; min-height: 2.8em; }
@@ -153,12 +153,12 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
 
   // speed: world units/s · radius: lantern reach · hold: how long guidance lasts after leaving the light
   const KEEPERS = [
-    { id: 'nuri',  name: 'Nuri',  role: 'Kürekçi', blurb: 'Hızlı kayık, küçük fener.',
-      speed: 0.66, radius: 0.15, hold: 1.0, coat: '#3f86b0', hull: '#7a4a2c', stats: [3, 1, 1] },
-    { id: 'leyla', name: 'Leyla', role: 'Fenerci', blurb: 'Kocaman ışık, ağır kayık.',
-      speed: 0.36, radius: 0.27, hold: 1.0, coat: '#c9653d', hull: '#5b3a28', stats: [1, 3, 1] },
-    { id: 'bora',  name: 'Bora',  role: 'Kılavuz', blurb: 'Gösterdiği yol uzun süre unutulmaz.',
-      speed: 0.48, radius: 0.19, hold: 2.2, coat: '#5f9a5c', hull: '#6d5034', stats: [2, 2, 3] },
+    { id: 'nuri',  name: 'Nuri',  role: 'Kanocu', blurb: 'Kanosu çok hızlı, feneri küçük.',
+      speed: 0.66, radius: 0.15, hold: 1.0, stats: [3, 1, 1] },
+    { id: 'leyla', name: 'Leyla', role: 'Fenerci', blurb: 'Sandalı ağır, feneri kocaman.',
+      speed: 0.36, radius: 0.27, hold: 1.0, stats: [1, 3, 1] },
+    { id: 'bora',  name: 'Bora',  role: 'Kaptan', blurb: 'Gösterdiği yol uzun süre unutulmaz.',
+      speed: 0.48, radius: 0.19, hold: 2.2, stats: [2, 2, 3] },
   ];
   const STAT_NAMES = ['Hız', 'Işık', 'Kalıcılık'];
 
@@ -408,36 +408,161 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
   const sx = x => CX + x * U;
   const sy = y => CY + y * U;
 
-  // Top-down rowboat with the keeper aboard; shared by the game and the selection cards.
+  // Top-down view of each keeper in their own boat. Bow points along +x.
+  const circle = (c, x, y, r, fill) => { c.beginPath(); c.arc(x, y, r, 0, TAU); c.fillStyle = fill; c.fill(); };
   function drawKeeper(c, x, y, k, h, kp, t, moving) {
     c.save();
     c.translate(x, y);
     c.rotate(h);
-    const sw = moving ? Math.sin(t * 9) : 0.3;
-    c.strokeStyle = '#c9b48a';
-    c.lineWidth = Math.max(1.5, k * 0.11);
     c.lineCap = 'round';
-    for (const side of [-1, 1]) {
+    const sw = moving ? Math.sin(t * 9) : 0.25;
+
+    if (kp.id === 'nuri') {
+      // long red canoe, double-bladed paddle
       c.beginPath();
-      c.moveTo(-k * 0.1, side * k * 0.3);
-      c.lineTo(-k * 0.1 + sw * k * 0.55, side * k * 1.2);
-      c.stroke();
+      c.moveTo(k * 1.55, 0);
+      c.quadraticCurveTo(k * 0.3, -k * 0.42, -k * 1.45, 0);
+      c.quadraticCurveTo(k * 0.3, k * 0.42, k * 1.55, 0);
+      c.fillStyle = '#b8432c'; c.fill();
+      c.lineWidth = Math.max(1, k * 0.07); c.strokeStyle = '#5e1f12'; c.stroke();
+      c.beginPath(); c.ellipse(-k * 0.05, 0, k * 0.42, k * 0.17, 0, 0, TAU);
+      c.fillStyle = '#3b1a12'; c.fill();
+      c.save();
+      c.rotate(Math.PI / 2 + sw * 0.6);
+      c.strokeStyle = '#d8c8a0'; c.lineWidth = Math.max(1.5, k * 0.09);
+      c.beginPath(); c.moveTo(0, -k * 1.15); c.lineTo(0, k * 1.15); c.stroke();
+      c.fillStyle = '#e9dcb8';
+      for (const s of [-1, 1]) { c.beginPath(); c.ellipse(0, s * k * 1.2, k * 0.13, k * 0.26, 0, 0, TAU); c.fill(); }
+      c.restore();
+      // striped shirt + curly black hair
+      c.beginPath(); c.ellipse(-k * 0.08, 0, k * 0.2, k * 0.34, 0, 0, TAU); c.fillStyle = '#1f3d6b'; c.fill();
+      c.strokeStyle = '#f2ede1'; c.lineWidth = Math.max(1, k * 0.05);
+      for (const o of [-0.18, 0, 0.18]) { c.beginPath(); c.moveTo(-k * 0.2, o * k); c.lineTo(k * 0.04, o * k); c.stroke(); }
+      for (let i = 0; i < 6; i++) { const a = i / 6 * TAU; circle(c, -k * 0.04 + Math.cos(a) * k * 0.1, Math.sin(a) * k * 0.1, k * 0.09, '#17110e'); }
+      circle(c, -k * 0.04, 0, k * 0.11, '#241a14');
+      circle(c, k * 1.2, 0, k * 0.1, '#ffe2a6');
+    } else if (kp.id === 'leyla') {
+      // wide round dinghy, two oars, lantern on a pole
+      for (const side of [-1, 1]) {
+        c.strokeStyle = '#c9b48a'; c.lineWidth = Math.max(1.5, k * 0.11);
+        c.beginPath(); c.moveTo(-k * 0.1, side * k * 0.45); c.lineTo(-k * 0.1 + sw * k * 0.55, side * k * 1.35); c.stroke();
+      }
+      c.beginPath(); c.ellipse(0, 0, k * 1.05, k * 0.66, 0, 0, TAU);
+      c.fillStyle = '#7a5134'; c.fill();
+      c.lineWidth = Math.max(1, k * 0.09); c.strokeStyle = '#3a2416'; c.stroke();
+      c.beginPath(); c.ellipse(0, 0, k * 0.84, k * 0.48, 0, 0, TAU); c.fillStyle = '#a77a52'; c.fill();
+      c.strokeStyle = '#7a5134'; c.lineWidth = Math.max(1, k * 0.06);
+      for (const o of [-0.45, 0.35]) { c.beginPath(); c.moveTo(o * k, -k * 0.46); c.lineTo(o * k, k * 0.46); c.stroke(); }
+      // yellow raincoat with hood, auburn braid
+      c.beginPath(); c.ellipse(-k * 0.12, 0, k * 0.26, k * 0.38, 0, 0, TAU); c.fillStyle = '#e3ae1e'; c.fill();
+      c.strokeStyle = '#8a3b1f'; c.lineWidth = Math.max(1.5, k * 0.1);
+      c.beginPath(); c.moveTo(-k * 0.2, 0); c.quadraticCurveTo(-k * 0.45, k * 0.15, -k * 0.5, k * 0.32); c.stroke();
+      circle(c, -k * 0.08, 0, k * 0.17, '#f0c53a');
+      circle(c, -k * 0.04, 0, k * 0.1, '#9a4524');
+      // lantern pole at the bow
+      c.strokeStyle = '#3a2416'; c.lineWidth = Math.max(1, k * 0.07);
+      c.beginPath(); c.moveTo(k * 0.55, 0); c.lineTo(k * 0.95, 0); c.stroke();
+      circle(c, k * 0.98, 0, k * 0.2, '#ffe9b8');
+      circle(c, k * 0.98, 0, k * 0.11, '#fff6dc');
+    } else {
+      // small sailboat with a captain at the tiller
+      c.beginPath();
+      c.moveTo(k * 1.35, 0);
+      c.quadraticCurveTo(k * 0.55, -k * 0.6, -k * 1.0, -k * 0.42);
+      c.lineTo(-k * 1.0, k * 0.42);
+      c.quadraticCurveTo(k * 0.55, k * 0.6, k * 1.35, 0);
+      c.fillStyle = '#e6e0d2'; c.fill();
+      c.lineWidth = Math.max(1, k * 0.08); c.strokeStyle = '#24395c'; c.stroke();
+      c.beginPath(); c.ellipse(-k * 0.05, 0, k * 0.8, k * 0.3, 0, 0, TAU); c.fillStyle = '#8f6a45'; c.fill();
+      // boom + sail, swinging a little with the wind
+      const swing = 0.55 + Math.sin(t * 1.3) * 0.12;
+      c.save();
+      c.translate(k * 0.35, 0);
+      c.rotate(Math.PI - swing);
+      c.beginPath(); c.moveTo(0, 0); c.lineTo(k * 1.15, 0); c.quadraticCurveTo(k * 0.6, -k * 0.5, 0, 0);
+      c.fillStyle = 'rgba(244,238,224,0.95)'; c.fill();
+      c.strokeStyle = '#5a4630'; c.lineWidth = Math.max(1, k * 0.07);
+      c.beginPath(); c.moveTo(0, 0); c.lineTo(k * 1.15, 0); c.stroke();
+      c.restore();
+      circle(c, k * 0.35, 0, k * 0.09, '#5a4630');
+      // captain: green sweater, navy cap with gold badge
+      c.beginPath(); c.ellipse(-k * 0.62, 0, k * 0.2, k * 0.3, 0, 0, TAU); c.fillStyle = '#3d5c3a'; c.fill();
+      circle(c, -k * 0.58, 0, k * 0.17, '#1d2a44');
+      c.beginPath(); c.ellipse(-k * 0.42, 0, k * 0.07, k * 0.15, 0, 0, TAU); c.fillStyle = '#0f1626'; c.fill();
+      circle(c, -k * 0.58, 0, k * 0.05, '#e0b04a');
+      circle(c, k * 1.12, 0, k * 0.1, '#ffe2a6');
     }
-    c.beginPath();
-    c.moveTo(k * 1.15, 0);
-    c.quadraticCurveTo(k * 0.5, -k * 0.62, -k * 0.95, -k * 0.38);
-    c.quadraticCurveTo(-k * 1.15, 0, -k * 0.95, k * 0.38);
-    c.quadraticCurveTo(k * 0.5, k * 0.62, k * 1.15, 0);
-    c.fillStyle = kp.hull; c.fill();
-    c.lineWidth = Math.max(1, k * 0.08); c.strokeStyle = '#2b1b12'; c.stroke();
-    c.beginPath(); c.ellipse(0, 0, k * 0.78, k * 0.3, 0, 0, TAU);
-    c.fillStyle = '#9a7350'; c.fill();
-    c.beginPath(); c.arc(-k * 0.12, 0, k * 0.32, 0, TAU);
-    c.fillStyle = kp.coat; c.fill();
-    c.beginPath(); c.arc(-k * 0.06, 0, k * 0.17, 0, TAU);
-    c.fillStyle = '#e6c49c'; c.fill();
-    c.beginPath(); c.arc(k * 0.78, 0, k * 0.14, 0, TAU);
-    c.fillStyle = '#ffe2a6'; c.fill();
+    c.restore();
+  }
+
+  // Front-facing bust for the selection cards, drawn in a 100×100 box.
+  function drawPortrait(c, kp, t, sel) {
+    const blink = (Math.sin(t * 1.7 + kp.radius * 40) > 0.985) ? 0.15 : 1;
+    const bob = Math.sin(t * 2 + kp.speed * 10) * (sel ? 1.6 : 0.8);
+    const eyes = (y, col) => {
+      for (const s of [-1, 1]) { c.beginPath(); c.ellipse(50 + s * 6.5, y, 1.8, 2.2 * blink, 0, 0, TAU); c.fillStyle = col; c.fill(); }
+    };
+    const shoulders = fill => {
+      c.beginPath(); c.moveTo(12, 104); c.bezierCurveTo(14, 76, 30, 70, 50, 70); c.bezierCurveTo(70, 70, 86, 76, 88, 104); c.closePath();
+      c.fillStyle = fill; c.fill();
+    };
+    c.save();
+    c.translate(0, bob);
+    if (kp.id === 'nuri') {
+      shoulders('#1f3d6b');
+      c.save(); c.beginPath(); c.moveTo(12, 104); c.bezierCurveTo(14, 76, 30, 70, 50, 70); c.bezierCurveTo(70, 70, 86, 76, 88, 104); c.closePath(); c.clip();
+      c.fillStyle = '#f2ede1'; for (let y = 76; y < 104; y += 8) c.fillRect(0, y, 100, 4);
+      c.restore();
+      c.beginPath(); c.moveTo(40, 68); c.lineTo(60, 68); c.lineTo(50, 82); c.closePath(); c.fillStyle = '#c63a2a'; c.fill();
+      c.fillStyle = '#b77c52'; c.fillRect(45, 58, 10, 12);
+      circle(c, 50, 46, 16, '#c48a5c');
+      for (let i = 0; i < 11; i++) { const a = Math.PI + i / 10 * Math.PI; circle(c, 50 + Math.cos(a) * 15, 42 + Math.sin(a) * 13, 6, '#17110e'); }
+      circle(c, 50, 33, 7, '#17110e');
+      eyes(47, '#1a120d');
+      c.strokeStyle = '#6e3b22'; c.lineWidth = 1.6;
+      c.beginPath(); c.arc(50, 52, 5, 0.2 * Math.PI, 0.8 * Math.PI); c.stroke();
+    } else if (kp.id === 'leyla') {
+      circle(c, 50, 46, 22, '#c9951a');           // hood behind the head
+      shoulders('#e3ae1e');
+      c.strokeStyle = '#b8870f'; c.lineWidth = 1.4;
+      c.beginPath(); c.moveTo(50, 76); c.lineTo(50, 104); c.stroke();
+      for (const y of [84, 94]) circle(c, 53.5, y, 1.5, '#7a5a0a');
+      c.fillStyle = '#e2b48c'; c.fillRect(45, 58, 10, 12);
+      circle(c, 50, 46, 15.5, '#ecc39d');
+      c.beginPath(); c.arc(50, 44, 16.5, Math.PI * 1.05, Math.PI * 1.95); c.quadraticCurveTo(52, 36, 36, 46); c.fillStyle = '#8a3b1f'; c.fill();
+      for (let i = 0; i < 5; i++) { c.beginPath(); c.ellipse(32 - i * 0.6, 56 + i * 6, 3.8, 4.4, 0.3, 0, TAU); c.fillStyle = i % 2 ? '#7a321a' : '#8f4123'; c.fill(); }
+      eyes(47, '#2a1a10');
+      circle(c, 42, 52, 2.6, 'rgba(226,120,100,0.35)'); circle(c, 58, 52, 2.6, 'rgba(226,120,100,0.35)');
+      c.strokeStyle = '#8e4a34'; c.lineWidth = 1.5;
+      c.beginPath(); c.arc(50, 52, 4, 0.15 * Math.PI, 0.85 * Math.PI); c.stroke();
+      // lantern in hand
+      const fl = 0.85 + Math.sin(t * 13) * 0.08 + Math.sin(t * 7.3) * 0.06;
+      const g = c.createRadialGradient(78, 88, 0, 78, 88, 18);
+      g.addColorStop(0, `rgba(255,214,140,${0.75 * fl})`); g.addColorStop(1, 'rgba(255,201,107,0)');
+      c.fillStyle = g; c.beginPath(); c.arc(78, 88, 18, 0, TAU); c.fill();
+      c.fillStyle = '#2b2b2b'; c.fillRect(73, 80, 10, 2); c.fillRect(73, 95, 10, 2);
+      c.fillStyle = `rgba(255,230,170,${fl})`; c.fillRect(74, 82, 8, 13);
+      c.strokeStyle = '#2b2b2b'; c.lineWidth = 1.2; c.beginPath(); c.arc(78, 80, 4, Math.PI, 0); c.stroke();
+    } else {
+      shoulders('#3d5c3a');
+      c.beginPath(); c.ellipse(50, 72, 15, 5, 0, 0, TAU); c.fillStyle = '#2f4a2d'; c.fill();
+      c.strokeStyle = '#2f4a2d'; c.lineWidth = 1;
+      for (let x = 24; x <= 76; x += 6) { c.beginPath(); c.moveTo(x, 80); c.lineTo(x, 104); c.stroke(); }
+      circle(c, 50, 47, 15.5, '#d6a37a');
+      // beard and moustache
+      c.beginPath(); c.moveTo(35, 48); c.quadraticCurveTo(36, 70, 50, 72); c.quadraticCurveTo(64, 70, 65, 48);
+      c.quadraticCurveTo(58, 56, 50, 55); c.quadraticCurveTo(42, 56, 35, 48); c.fillStyle = '#eceae4'; c.fill();
+      c.beginPath(); c.ellipse(45, 54, 5, 2.4, 0.25, 0, TAU); c.ellipse(55, 54, 5, 2.4, -0.25, 0, TAU); c.fillStyle = '#f4f2ec'; c.fill();
+      eyes(46, '#1a120d');
+      c.strokeStyle = '#f4f2ec'; c.lineWidth = 2.2;
+      for (const s of [-1, 1]) { c.beginPath(); c.moveTo(50 + s * 3.5, 41.5); c.lineTo(50 + s * 10, 40.5); c.stroke(); }
+      // captain's cap
+      c.beginPath(); c.ellipse(50, 32, 19, 7, 0, 0, TAU); c.fillStyle = '#1d2a44'; c.fill();
+      c.fillStyle = '#1d2a44'; c.fillRect(34, 32, 32, 6);
+      c.beginPath(); c.ellipse(50, 38.5, 17, 3.4, 0, 0, Math.PI); c.fillStyle = '#0c1220'; c.fill();
+      c.fillStyle = '#e0b04a'; c.fillRect(34, 35, 32, 1.6);
+      circle(c, 50, 31, 3.2, '#e0b04a');
+    }
     c.restore();
   }
 
@@ -650,7 +775,7 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
     const wrap = $('keepers');
     wrap.innerHTML = KEEPERS.map(k => `
       <button class="keeper" type="button" id="keeper-${k.id}" data-id="${k.id}" aria-pressed="false">
-        <canvas width="128" height="128" aria-hidden="true"></canvas>
+        <canvas width="160" height="160" aria-hidden="true"></canvas>
         <span class="name">${k.name}</span>
         <span class="role">${k.role}</span>
         <span class="blurb">${k.blurb}</span>
@@ -675,14 +800,16 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
   function drawPortraits() {
     for (const { c, kp } of portraits) {
       c.setTransform(1, 0, 0, 1, 0, 0);
-      c.clearRect(0, 0, 128, 128);
+      c.clearRect(0, 0, 160, 160);
       const sel = kp === S.keeper;
-      const g = c.createRadialGradient(64, 64, 0, 64, 64, 64);
-      g.addColorStop(0, sel ? 'rgba(255,201,107,0.35)' : 'rgba(255,201,107,0.12)');
+      const g = c.createRadialGradient(80, 80, 0, 80, 80, 80);
+      g.addColorStop(0, sel ? 'rgba(255,201,107,0.35)' : 'rgba(255,201,107,0.10)');
       g.addColorStop(1, 'rgba(255,201,107,0)');
-      c.fillStyle = g; c.beginPath(); c.arc(64, 64, 64, 0, TAU); c.fill();
-      const bob = Math.sin(S.t * 2 + kp.speed * 10) * 2;
-      drawKeeper(c, 64, 66 + bob, 30, -Math.PI / 2 + Math.sin(S.t * 0.8 + kp.radius * 20) * 0.15, kp, S.t, sel);
+      c.fillStyle = g; c.beginPath(); c.arc(80, 80, 80, 0, TAU); c.fill();
+      c.setTransform(1.6, 0, 0, 1.6, 0, 0);
+      c.save(); c.beginPath(); c.arc(50, 50, 50, 0, TAU); c.clip();
+      drawPortrait(c, kp, S.t, sel);
+      c.restore();
     }
   }
 
