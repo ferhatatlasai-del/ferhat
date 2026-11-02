@@ -56,6 +56,15 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 .btn:focus-visible, .lvl:focus-visible { outline: 3px solid var(--leaf); outline-offset: 3px; }
 .row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 .small { font-size: .85rem; opacity: .8; }
+.who { display: grid; gap: 8px; border-top: 3px dashed color-mix(in srgb, var(--bark) 40%, transparent); padding-top: 12px; }
+.who label { font-family: var(--display); font-size: 1.1rem; letter-spacing: .02em; }
+#nameInput { font-family: var(--display); font-size: 1.35rem; text-align: center; color: var(--bark); background: #fff; border: 3px solid var(--bark); border-radius: 12px; padding: 6px 10px; width: 100%; max-width: 16rem; box-sizing: border-box; justify-self: center; }
+#nameInput:focus-visible { outline: 3px solid var(--leaf); outline-offset: 2px; }
+.pick { display: flex; gap: 12px; justify-content: center; }
+.pk { display: grid; justify-items: center; gap: 2px; padding: 6px 12px 8px; background: var(--cream); color: var(--bark); border: 3px solid color-mix(in srgb, var(--bark) 35%, transparent); border-radius: 14px; cursor: pointer; font-family: var(--display); font-size: 1rem; letter-spacing: .03em; }
+.pk canvas { width: 72px; height: 72px; }
+.pk[aria-checked="true"] { border-color: var(--bark); background: var(--honey); box-shadow: 0 4px 0 var(--bark); }
+.pk:focus-visible { outline: 3px solid var(--leaf); outline-offset: 3px; }
 
 .levels { display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 10px; }
 .lvl {
@@ -112,8 +121,16 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 
 <div class="panel" id="pTitle">
   <div class="card">
-    <h1>Pofuduk'un Bal Macerası</h1>
-    <p>Kırmızı atkılı ayı Pofuduk'un balları beş bölgeye dağılmış. Bal ve bozuk para topla, iki boss'u yen, bal kulübesine ulaş!</p>
+    <h1 id="titleName">Pofuduk'un Bal Macerası</h1>
+    <p>Ayımızın balları beş bölgeye dağılmış. Bal ve bozuk para topla, iki boss'u yen, bal kulübesine ulaş!</p>
+    <div class="who">
+      <label for="nameInput">Ayının adı</label>
+      <input id="nameInput" type="text" maxlength="14" autocomplete="off" spellcheck="false" placeholder="Pofuduk">
+      <div class="pick" role="radiogroup" aria-label="Karakter seç">
+        <button type="button" class="pk" id="pickBoy" role="radio" aria-checked="true" data-g="boy"><canvas width="144" height="144" aria-hidden="true"></canvas><span>Erkek</span></button>
+        <button type="button" class="pk" id="pickGirl" role="radio" aria-checked="false" data-g="girl"><canvas width="144" height="144" aria-hidden="true"></canvas><span>Kız</span></button>
+      </div>
+    </div>
     <div class="keys">
       <b>← →</b><span>Koş (A / D)</span>
       <b>Boşluk</b><span>Zıpla, havadayken bir daha bas: çift zıplama</span>
@@ -137,6 +154,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
       <button class="btn" id="buyHeart" type="button">Kalp al</button>
       <p class="small" id="shopNote"></p>
     </div>
+    <button class="btn alt" id="backBtn" type="button">Karakteri değiştir</button>
   </div>
 </div>
 
@@ -167,7 +185,7 @@ addEventListener('resize', fit); fit();
 
 /* ---------- save ---------- */
 const PRICES = [20, 40, 65]; // 4th, 5th, 6th heart
-let save = { unlocked: 0, coins: 0, maxHp: 3, best: [0, 0, 0, 0, 0] };
+let save = { unlocked: 0, coins: 0, maxHp: 3, best: [0, 0, 0, 0, 0], name: 'Pofuduk', gender: 'boy' };
 try { const s = JSON.parse(localStorage.getItem('pofuduk-save') || 'null'); if (s) save = Object.assign(save, s); } catch (e) {}
 function saveGame() { try { localStorage.setItem('pofuduk-save', JSON.stringify(save)); } catch (e) {} }
 
@@ -834,6 +852,48 @@ function drawShots() {
     }
   }
 }
+// bear art, origin at the feet centre, facing right
+function bearArt(g, o) {
+  const R = (x, y, w, h, r) => { g.beginPath(); g.roundRect(x, y, w, h, r); };
+  const brown = o.girl ? '#9a6234' : '#8b5a2b', light = '#e0ab74', dark = '#5c3a1c';
+  const scarf = o.girl ? '#ff5fa2' : '#e63946';
+  const walk = o.walk, air = o.air;
+  g.fillStyle = dark;
+  R(-11 + (air ? -2 : walk * 0.6), -12, 9, 12, 4); g.fill();
+  R(2 - (air ? -2 : walk * 0.6), -12, 9, 12, 4); g.fill();
+  g.fillStyle = brown; g.beginPath(); g.ellipse(0, -18, 14, 13, 0, 0, 7); g.fill();
+  g.fillStyle = light; g.beginPath(); g.ellipse(2, -16, 8, 8, 0, 0, 7); g.fill();
+  g.fillStyle = brown;
+  const arm = air ? -9 : walk * 0.8;
+  g.save(); g.translate(9, -22); g.rotate(air ? -1.4 : arm * 0.08); R(-3, 0, 7, 12, 3.5); g.fill(); g.restore();
+  g.save(); g.translate(-10, -22); g.rotate(air ? 1.2 : -arm * 0.08); R(-3, 0, 7, 12, 3.5); g.fill(); g.restore();
+  g.fillStyle = brown;
+  g.beginPath(); g.arc(-9, -45, 6, 0, 7); g.arc(8, -45, 6, 0, 7); g.fill();
+  g.fillStyle = light; g.beginPath(); g.arc(-9, -45, 3, 0, 7); g.arc(8, -45, 3, 0, 7); g.fill();
+  g.fillStyle = brown; g.beginPath(); g.arc(0, -35, 13, 0, 7); g.fill();
+  g.fillStyle = light; g.beginPath(); g.ellipse(6, -31, 7, 5.5, 0, 0, 7); g.fill();
+  g.fillStyle = '#22160c'; g.beginPath(); g.ellipse(10, -33, 3, 2.3, 0, 0, 7); g.fill();
+  if (o.hurt) { g.strokeStyle = '#22160c'; g.lineWidth = 2; g.beginPath(); g.moveTo(1, -42); g.lineTo(6, -38); g.moveTo(6, -42); g.lineTo(1, -38); g.stroke(); }
+  else {
+    g.beginPath(); g.arc(4, -40, 2.4, 0, 7); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(4.8, -40.8, 0.9, 0, 7); g.fill();
+    if (o.girl) { g.strokeStyle = '#22160c'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(2, -42); g.lineTo(0.5, -44.5); g.moveTo(4, -42.6); g.lineTo(3.8, -45.5); g.moveTo(6, -42); g.lineTo(7.5, -44.5); g.stroke(); }
+  }
+  g.fillStyle = o.girl ? '#ff8fb8' : '#f08a8a'; g.beginPath(); g.arc(-3, -32, o.girl ? 3 : 2.5, 0, 7); g.fill();
+  g.fillStyle = scarf; R(-12, -27, 24, 6, 3); g.fill();
+  const flap = o.flap;
+  g.beginPath(); g.moveTo(-10, -26); g.lineTo(-22 - flap, -24 + o.wave); g.lineTo(-20 - flap, -18); g.lineTo(-8, -22); g.fill();
+  g.fillStyle = '#ffffff90'; g.fillRect(-6, -26, 3, 4); g.fillRect(2, -26, 3, 4);
+  if (o.girl) { // bow between the ears
+    g.save(); g.translate(1, -49); g.rotate(-0.2);
+    g.fillStyle = '#4a2c17';
+    g.beginPath(); g.moveTo(0, 0); g.lineTo(-10, -7); g.lineTo(-10, 7); g.closePath(); g.moveTo(0, 0); g.lineTo(10, -7); g.lineTo(10, 7); g.closePath(); g.fill();
+    g.fillStyle = '#ff5fa2';
+    g.beginPath(); g.moveTo(0, 0); g.lineTo(-8, -5); g.lineTo(-8, 5); g.closePath(); g.moveTo(0, 0); g.lineTo(8, -5); g.lineTo(8, 5); g.closePath(); g.fill();
+    g.fillStyle = '#4a2c17'; g.beginPath(); g.arc(0, 0, 3.4, 0, 7); g.fill();
+    g.fillStyle = '#ffd1e3'; g.beginPath(); g.arc(0, 0, 2, 0, 7); g.fill();
+    g.restore();
+  }
+}
 function drawBear() {
   if (P.inv > 0 && !P.dead && Math.floor(P.inv / 5) % 2) return;
   const cx = P.x + P.w / 2 - cam, by = P.y + P.h;
@@ -841,31 +901,12 @@ function drawBear() {
   ctx.save(); ctx.translate(cx, by); ctx.scale(P.face * sx, sy);
   if (P.spin > 0) { ctx.translate(0, -18); ctx.rotate((1 - P.spin / 22) * Math.PI * 2); ctx.translate(0, 18); }
   if (P.dead) { ctx.translate(0, -18); ctx.rotate(Math.PI); ctx.translate(0, 18); }
-  const brown = '#8b5a2b', light = '#d9a066', dark = '#5c3a1c';
-  const walk = P.onGround ? Math.sin(P.anim) * 6 : 0, air = !P.onGround;
-  ctx.fillStyle = dark;
-  rr(-11 + (air ? -2 : walk * 0.6), -12, 9, 12, 4); ctx.fill();
-  rr(2 - (air ? -2 : walk * 0.6), -12, 9, 12, 4); ctx.fill();
-  ctx.fillStyle = brown; ctx.beginPath(); ctx.ellipse(0, -18, 14, 13, 0, 0, 7); ctx.fill();
-  ctx.fillStyle = light; ctx.beginPath(); ctx.ellipse(2, -16, 8, 8, 0, 0, 7); ctx.fill();
-  ctx.fillStyle = brown;
-  const arm = air ? -9 : walk * 0.8;
-  ctx.save(); ctx.translate(9, -22); ctx.rotate(air ? -1.4 : arm * 0.08); rr(-3, 0, 7, 12, 3.5); ctx.fill(); ctx.restore();
-  ctx.save(); ctx.translate(-10, -22); ctx.rotate(air ? 1.2 : -arm * 0.08); rr(-3, 0, 7, 12, 3.5); ctx.fill(); ctx.restore();
-  ctx.fillStyle = brown;
-  ctx.beginPath(); ctx.arc(-9, -45, 6, 0, 7); ctx.arc(8, -45, 6, 0, 7); ctx.fill();
-  ctx.fillStyle = light; ctx.beginPath(); ctx.arc(-9, -45, 3, 0, 7); ctx.arc(8, -45, 3, 0, 7); ctx.fill();
-  ctx.fillStyle = brown; ctx.beginPath(); ctx.arc(0, -35, 13, 0, 7); ctx.fill();
-  ctx.fillStyle = light; ctx.beginPath(); ctx.ellipse(6, -31, 7, 5.5, 0, 0, 7); ctx.fill();
-  ctx.fillStyle = '#22160c'; ctx.beginPath(); ctx.ellipse(10, -33, 3, 2.3, 0, 0, 7); ctx.fill();
-  if (P.dead || P.inv > 70) { ctx.strokeStyle = '#22160c'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(1, -42); ctx.lineTo(6, -38); ctx.moveTo(6, -42); ctx.lineTo(1, -38); ctx.stroke(); }
-  else { ctx.beginPath(); ctx.arc(4, -40, 2.4, 0, 7); ctx.fill(); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(4.8, -40.8, 0.9, 0, 7); ctx.fill(); }
-  ctx.fillStyle = '#f08a8a'; ctx.beginPath(); ctx.arc(-3, -32, 2.5, 0, 7); ctx.fill();
-  ctx.fillStyle = '#e63946'; rr(-12, -27, 24, 6, 3); ctx.fill();
-  const flap = Math.sin(frame * 0.3) * 3 + (Math.abs(P.vx) > 1 ? 4 : 0);
-  ctx.beginPath(); ctx.moveTo(-10, -26); ctx.lineTo(-22 - flap, -24 + Math.sin(frame * 0.4) * 2); ctx.lineTo(-20 - flap, -18); ctx.lineTo(-8, -22); ctx.fill();
-  ctx.fillStyle = '#ffffff90'; ctx.fillRect(-6, -26, 3, 4); ctx.fillRect(2, -26, 3, 4);
+  bearArt(ctx, {
+    girl: save.gender === 'girl', walk: P.onGround ? Math.sin(P.anim) * 6 : 0, air: !P.onGround,
+    hurt: !!P.dead || P.inv > 70, flap: Math.sin(frame * 0.3) * 3 + (Math.abs(P.vx) > 1 ? 4 : 0), wave: Math.sin(frame * 0.4) * 2,
+  });
   ctx.restore();
+  if (state === 'play' && banner > 0) { ctx.globalAlpha = Math.min(1, banner / 30); txt(save.name, cx, P.y - 30, 18, '#ffffff', 'center'); ctx.globalAlpha = 1; }
 }
 function drawFlag(cp) {
   const x = cp.x - cam, y = cp.y;
@@ -918,7 +959,7 @@ function drawHud() {
   if (banner > 0) {
     ctx.globalAlpha = Math.min(1, banner / 30);
     txt(L.def.name, VW / 2, 200, 56, '#ffb627', 'center');
-    txt(`Bölge ${lvlIdx + 1}`, VW / 2, 240, 26, '#fff4dc', 'center');
+    txt(`${save.name} · Bölge ${lvlIdx + 1}`, VW / 2, 240, 26, '#fff4dc', 'center');
     ctx.globalAlpha = 1;
   }
   if (bossBanner > 0) {
@@ -969,10 +1010,33 @@ function showMsg(title, text, b1, a1, b2, a2) {
 function setPlaying() { state = 'play'; hideAll(); touchUi.hidden = !isTouch; pauseBtn.hidden = false; pauseBtn.textContent = 'II'; }
 msgBtn.onclick = () => { audio(); if (act1) act1(); };
 msgBtn2.onclick = () => { audio(); if (act2) act2(); };
-$('startBtn').onclick = () => { audio(); showSelect(); };
+function genitive(n) { // Turkish possessive suffix: Ali'nin, Mert'in, Pofuduk'un
+  const v = (n.toLocaleLowerCase('tr').match(/[aeıioöuü]/g) || ['e']).pop();
+  const h = { a: 'ı', ı: 'ı', e: 'i', i: 'i', o: 'u', u: 'u', ö: 'ü', ü: 'ü' }[v];
+  return n + "'" + (/[aeıioöuü]$/i.test(n.toLocaleLowerCase('tr')) ? 'n' : '') + h + 'n';
+}
+const nameInput = $('nameInput');
+function cleanName() { return nameInput.value.trim().replace(/\s+/g, ' ').slice(0, 14) || 'Pofuduk'; }
+function refreshWho() {
+  $('titleName').textContent = genitive(cleanName()) + ' Bal Macerası';
+  document.querySelectorAll('.pk').forEach(b => {
+    const on = b.dataset.g === save.gender; b.setAttribute('aria-checked', on);
+    const c = b.querySelector('canvas'), g = c.getContext('2d');
+    g.clearRect(0, 0, c.width, c.height); g.save(); g.translate(72, 128); g.scale(2.1, 2.1);
+    bearArt(g, { girl: b.dataset.g === 'girl', walk: 0, air: false, hurt: false, flap: 2, wave: 0 });
+    g.restore();
+  });
+}
+nameInput.value = save.name === 'Pofuduk' ? '' : save.name;
+nameInput.addEventListener('input', refreshWho);
+nameInput.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') $('startBtn').click(); });
+document.querySelectorAll('.pk').forEach(b => b.onclick = () => { save.gender = b.dataset.g; refreshWho(); saveGame(); });
+refreshWho();
+$('backBtn').onclick = () => { hideAll(); pTitle.hidden = false; refreshWho(); setTimeout(() => nameInput.focus(), 50); };
+$('startBtn').onclick = () => { audio(); save.name = cleanName(); saveGame(); showSelect(); };
 pauseBtn.onclick = () => togglePause();
 function togglePause() {
-  if (state === 'play') { state = 'pause'; keys.left = keys.right = keys.jump = keys.down = false; showMsg('Duraklatıldı', `${L.def.name} · ${honey} bal · ${save.coins} para`, 'Devam et', setPlaying, 'Bölüm seç', () => { saveGame(); showSelect(); }); }
+  if (state === 'play') { state = 'pause'; keys.left = keys.right = keys.jump = keys.down = false; showMsg('Duraklatıldı', `${save.name} · ${L.def.name} · ${honey} bal · ${save.coins} para`, 'Devam et', setPlaying, 'Bölüm seç', () => { saveGame(); showSelect(); }); }
   else if (state === 'pause') setPlaying();
 }
 
@@ -1002,7 +1066,7 @@ function renderSelect() {
   $('coinCount').textContent = save.coins;
   $('heartRow').innerHTML = Array.from({ length: 6 }, (_, i) => `<span class="${i < save.maxHp ? 'on' : 'off'}">♥</span>`).join('');
   const price = PRICES[save.maxHp - 3], buy = $('buyHeart'), note = $('shopNote');
-  if (price === undefined) { buy.textContent = 'Kalpler dolu'; buy.disabled = true; note.textContent = 'Pofuduk en fazla 6 kalp taşıyabilir. Hepsi senin!'; }
+  if (price === undefined) { buy.textContent = 'Kalpler dolu'; buy.disabled = true; note.textContent = `${save.name} en fazla 6 kalp taşıyabilir. Hepsi senin!`; }
   else {
     buy.textContent = `Kalp al · ${price} para`; buy.disabled = save.coins < price;
     note.textContent = save.coins < price ? `${price - save.coins} para daha lazım. Paraları bölümlerde, ? kutularında, sandıklarda ve yendiğin düşmanlarda bulursun.` : 'Her yeni kalp, her bölüme bir kalp fazlasıyla başlamanı sağlar.';
@@ -1021,14 +1085,14 @@ function levelDone() {
   saveGame();
   const honeyAll = L.items.filter(h => h.kind === 'honey').length, honeyGot = L.items.filter(h => h.kind === 'honey' && h.got).length;
   if (lvlIdx >= 4) {
-    showMsg('Bal kulübesi dolu!', `Kraliçe Vızvız yenildi ve Pofuduk beş bölgeyi de geçti. Bu bölümde ${honey} bal topladın, cebinde ${save.coins} para var.`, 'Bölüm seç', showSelect);
+    showMsg('Bal kulübesi dolu!', `Kraliçe Vızvız yenildi ve ${save.name} beş bölgeyi de geçti. Bu bölümde ${honey} bal topladın, cebinde ${save.coins} para var.`, 'Bölüm seç', showSelect);
   } else {
     showMsg(`${L.def.name} tamam!`, `${honeyAll} kavanozun ${honeyGot} tanesini buldun. Cebinde ${save.coins} para var. Sıradaki: ${LEVELS[lvlIdx + 1].name}.`, 'Sonraki bölüm', () => startLevel(lvlIdx + 1), 'Bölüm seç', showSelect);
   }
 }
 function gameOver() {
   state = 'over'; saveGame();
-  showMsg('Pofuduk yoruldu', `Canların bitti. Topladığın paralar cebinde kaldı; dükkândan kalp alıp yeniden deneyebilirsin.`, 'Tekrar dene', () => startLevel(lvlIdx), 'Bölüm seç', showSelect);
+  showMsg(`${save.name} yoruldu`, `Canların bitti. Topladığın paralar cebinde kaldı; dükkândan kalp alıp yeniden deneyebilirsin.`, 'Tekrar dene', () => startLevel(lvlIdx), 'Bölüm seç', showSelect);
 }
 
 /* ---------- loop ---------- */
