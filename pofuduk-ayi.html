@@ -65,6 +65,21 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 .pk canvas { width: 72px; height: 72px; }
 .pk[aria-checked="true"] { border-color: var(--bark); background: var(--honey); box-shadow: 0 4px 0 var(--bark); }
 .pk:focus-visible { outline: 3px solid var(--leaf); outline-offset: 3px; }
+.wardHead { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.ward { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 16px; text-align: left; }
+.stage { display: grid; justify-items: center; align-content: start; gap: 6px; background: linear-gradient(color-mix(in srgb, var(--honey) 35%, var(--cream)), var(--cream)); border: 3px solid var(--bark); border-radius: 16px; padding: 8px; }
+.stage canvas { width: 160px; height: 160px; max-width: 100%; }
+.wname { font-family: var(--display); font-size: 1.1rem; text-align: center; }
+.wcol { display: grid; gap: 8px; align-content: start; min-width: 0; }
+.opts { display: grid; grid-template-columns: repeat(auto-fill, minmax(82px, 1fr)); gap: 8px; }
+.opt { display: grid; justify-items: center; gap: 1px; padding: 4px 4px 6px; background: var(--cream); color: var(--bark); border: 3px solid color-mix(in srgb, var(--bark) 30%, transparent); border-radius: 12px; cursor: pointer; font-family: var(--body); }
+.opt canvas { width: 56px; height: 56px; }
+.opt .on { font-weight: 800; font-size: .74rem; line-height: 1.1; text-align: center; }
+.opt .pr { font-family: var(--display); font-size: .78rem; letter-spacing: .03em; opacity: .85; font-variant-numeric: tabular-nums; }
+.opt .pr.cost { color: var(--honey-deep); opacity: 1; }
+.opt[aria-pressed="true"] { border-color: var(--bark); background: var(--honey); box-shadow: 0 3px 0 var(--bark); }
+.opt:focus-visible { outline: 3px solid var(--leaf); outline-offset: 2px; }
+@media (max-width: 600px) { .ward { grid-template-columns: 1fr; } }
 
 .levels { display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 10px; }
 .lvl {
@@ -137,7 +152,10 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
       <b>↓</b><span>Havada bas: yere çakıl, sandıkları kır</span>
       <b>P</b><span>Duraklat</span>
     </div>
-    <button class="btn primary" id="startBtn" type="button">Oyna</button>
+    <div class="row">
+      <button class="btn primary" id="startBtn" type="button">Oyna</button>
+      <button class="btn alt" id="wardBtn1" type="button">Dolap</button>
+    </div>
   </div>
 </div>
 
@@ -154,7 +172,30 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
       <button class="btn" id="buyHeart" type="button">Kalp al</button>
       <p class="small" id="shopNote"></p>
     </div>
-    <button class="btn alt" id="backBtn" type="button">Karakteri değiştir</button>
+    <div class="row">
+      <button class="btn alt" id="backBtn" type="button">Adı değiştir</button>
+      <button class="btn alt" id="wardBtn2" type="button">Dolap: karakter ve kıyafet</button>
+    </div>
+  </div>
+</div>
+
+<div class="panel" id="pWard" hidden>
+  <div class="card wide">
+    <div class="wardHead"><h2>Dolap</h2><div class="wallet"><span class="coin" aria-hidden="true"></span><span id="wCoins">0</span></div></div>
+    <div class="ward">
+      <div class="stage"><canvas id="wPrev" width="320" height="320" aria-hidden="true"></canvas><p class="wname" id="wName"></p></div>
+      <div class="wcol">
+        <h3>Karakter</h3>
+        <div class="opts" id="spOpts"></div>
+        <h3>Kıyafet</h3>
+        <div class="opts" id="ofOpts"></div>
+      </div>
+    </div>
+    <p class="small" id="wNote"></p>
+    <div class="row">
+      <button class="btn" id="wBuy" type="button" hidden></button>
+      <button class="btn primary" id="wDone" type="button">Tamam</button>
+    </div>
   </div>
 </div>
 
@@ -185,7 +226,7 @@ addEventListener('resize', fit); fit();
 
 /* ---------- save ---------- */
 const PRICES = [20, 40, 65]; // 4th, 5th, 6th heart
-let save = { unlocked: 0, coins: 0, maxHp: 3, best: [0, 0, 0, 0, 0], name: 'Pofuduk', gender: 'boy' };
+let save = { unlocked: 0, coins: 0, maxHp: 3, best: [0, 0, 0, 0, 0], name: 'Pofuduk', gender: 'boy', species: 'brown', outfit: 'none', owned: ['none'] };
 try { const s = JSON.parse(localStorage.getItem('pofuduk-save') || 'null'); if (s) save = Object.assign(save, s); } catch (e) {}
 function saveGame() { try { localStorage.setItem('pofuduk-save', JSON.stringify(save)); } catch (e) {} }
 
@@ -852,38 +893,66 @@ function drawShots() {
     }
   }
 }
+const SPECIES = {
+  brown: { name: 'Boz Ayı', fur: '#8b5a2b', furG: '#9a6234', limb: '#5c3a1c', earIn: '#e0ab74', muzzle: '#e0ab74', belly: '#e0ab74' },
+  panda: { name: 'Panda', fur: '#f5f2ea', limb: '#26221f', arm: '#26221f', ear: '#26221f', earIn: '#3a3532', muzzle: '#ffffff', belly: '#ffffff', patch: true },
+  polar: { name: 'Kutup Ayısı', fur: '#eef4fa', limb: '#c9d6e3', earIn: '#c9d6e3', muzzle: '#ffffff', belly: '#ffffff' },
+  sun: { name: 'Güneş Ayısı', fur: '#3b2b22', limb: '#24180f', earIn: '#6b4a35', muzzle: '#e8b56a', belly: '#f3b45a', ring: true },
+};
+const OUTFITS = [
+  { id: 'none', name: 'Sadece atkı', price: 0 },
+  { id: 'cap', name: 'Beyzbol şapkası', price: 15 },
+  { id: 'flower', name: 'Çiçek tacı', price: 20 },
+  { id: 'glasses', name: 'Güneş gözlüğü', price: 25 },
+  { id: 'pirate', name: 'Korsan şapkası', price: 35 },
+  { id: 'viking', name: 'Viking miğferi', price: 40 },
+  { id: 'cape', name: 'Süper pelerin', price: 45 },
+  { id: 'wizard', name: 'Büyücü şapkası', price: 50 },
+  { id: 'crown', name: 'Altın taç', price: 60 },
+];
+const HATS = new Set(['cap', 'flower', 'pirate', 'viking', 'wizard', 'crown']);
 // bear art, origin at the feet centre, facing right
 function bearArt(g, o) {
   const R = (x, y, w, h, r) => { g.beginPath(); g.roundRect(x, y, w, h, r); };
-  const brown = o.girl ? '#9a6234' : '#8b5a2b', light = '#e0ab74', dark = '#5c3a1c';
+  const sp = SPECIES[o.species] || SPECIES.brown, of = o.outfit || 'none';
+  const fur = o.girl && sp.furG ? sp.furG : sp.fur, ear = sp.ear || fur, arms = sp.arm || fur;
   const scarf = o.girl ? '#ff5fa2' : '#e63946';
   const walk = o.walk, air = o.air;
-  g.fillStyle = dark;
+  if (of === 'cape') {
+    g.fillStyle = '#4a2c17'; g.beginPath(); g.moveTo(-5, -28); g.quadraticCurveTo(-22 - o.flap, -20, -27 - o.flap, -1 + o.wave * 0.5); g.lineTo(-3, -3); g.closePath(); g.fill();
+    g.fillStyle = '#6a3fd1'; g.beginPath(); g.moveTo(-5, -26); g.quadraticCurveTo(-20 - o.flap, -19, -24 - o.flap, -3 + o.wave * 0.5); g.lineTo(-4, -5); g.closePath(); g.fill();
+    g.fillStyle = '#ffd23f'; g.beginPath(); g.arc(-13 - o.flap * 0.5, -13, 2.6, 0, 7); g.fill();
+  }
+  g.fillStyle = sp.limb;
   R(-11 + (air ? -2 : walk * 0.6), -12, 9, 12, 4); g.fill();
   R(2 - (air ? -2 : walk * 0.6), -12, 9, 12, 4); g.fill();
-  g.fillStyle = brown; g.beginPath(); g.ellipse(0, -18, 14, 13, 0, 0, 7); g.fill();
-  g.fillStyle = light; g.beginPath(); g.ellipse(2, -16, 8, 8, 0, 0, 7); g.fill();
-  g.fillStyle = brown;
+  g.fillStyle = fur; g.beginPath(); g.ellipse(0, -18, 14, 13, 0, 0, 7); g.fill();
+  g.fillStyle = sp.belly; g.beginPath(); g.ellipse(2, -16, 8, 8, 0, 0, 7); g.fill();
+  g.fillStyle = arms;
   const arm = air ? -9 : walk * 0.8;
   g.save(); g.translate(9, -22); g.rotate(air ? -1.4 : arm * 0.08); R(-3, 0, 7, 12, 3.5); g.fill(); g.restore();
   g.save(); g.translate(-10, -22); g.rotate(air ? 1.2 : -arm * 0.08); R(-3, 0, 7, 12, 3.5); g.fill(); g.restore();
-  g.fillStyle = brown;
+  g.fillStyle = ear;
   g.beginPath(); g.arc(-9, -45, 6, 0, 7); g.arc(8, -45, 6, 0, 7); g.fill();
-  g.fillStyle = light; g.beginPath(); g.arc(-9, -45, 3, 0, 7); g.arc(8, -45, 3, 0, 7); g.fill();
-  g.fillStyle = brown; g.beginPath(); g.arc(0, -35, 13, 0, 7); g.fill();
-  g.fillStyle = light; g.beginPath(); g.ellipse(6, -31, 7, 5.5, 0, 0, 7); g.fill();
+  g.fillStyle = sp.earIn; g.beginPath(); g.arc(-9, -45, 3, 0, 7); g.arc(8, -45, 3, 0, 7); g.fill();
+  g.fillStyle = fur; g.beginPath(); g.arc(0, -35, 13, 0, 7); g.fill();
+  g.fillStyle = sp.muzzle; g.beginPath(); g.ellipse(6, -31, 7, 5.5, 0, 0, 7); g.fill();
   g.fillStyle = '#22160c'; g.beginPath(); g.ellipse(10, -33, 3, 2.3, 0, 0, 7); g.fill();
-  if (o.hurt) { g.strokeStyle = '#22160c'; g.lineWidth = 2; g.beginPath(); g.moveTo(1, -42); g.lineTo(6, -38); g.moveTo(6, -42); g.lineTo(1, -38); g.stroke(); }
+  if (sp.patch) { g.fillStyle = '#26221f'; g.beginPath(); g.ellipse(4, -40, 4.8, 3.8, -0.5, 0, 7); g.fill(); }
+  if (o.hurt) { g.strokeStyle = sp.patch ? '#ffffff' : sp.ring ? '#f3b45a' : '#22160c'; g.lineWidth = 2; g.beginPath(); g.moveTo(1, -42); g.lineTo(6, -38); g.moveTo(6, -42); g.lineTo(1, -38); g.stroke(); }
   else {
-    g.beginPath(); g.arc(4, -40, 2.4, 0, 7); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(4.8, -40.8, 0.9, 0, 7); g.fill();
-    if (o.girl) { g.strokeStyle = '#22160c'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(2, -42); g.lineTo(0.5, -44.5); g.moveTo(4, -42.6); g.lineTo(3.8, -45.5); g.moveTo(6, -42); g.lineTo(7.5, -44.5); g.stroke(); }
+    if (sp.patch) { g.fillStyle = '#ffffff'; g.beginPath(); g.arc(4.4, -40.4, 2.1, 0, 7); g.fill(); g.fillStyle = '#22160c'; g.beginPath(); g.arc(4.9, -40.2, 1.3, 0, 7); g.fill(); }
+    else {
+      if (sp.ring) { g.fillStyle = '#f3e3c8'; g.beginPath(); g.arc(4, -40, 3.4, 0, 7); g.fill(); }
+      g.fillStyle = '#22160c'; g.beginPath(); g.arc(4, -40, 2.4, 0, 7); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(4.8, -40.8, 0.9, 0, 7); g.fill();
+    }
+    if (o.girl) { g.strokeStyle = sp.ring ? '#f3e3c8' : '#22160c'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(2, -42); g.lineTo(0.5, -44.5); g.moveTo(4, -42.6); g.lineTo(3.8, -45.5); g.moveTo(6, -42); g.lineTo(7.5, -44.5); g.stroke(); }
   }
   g.fillStyle = o.girl ? '#ff8fb8' : '#f08a8a'; g.beginPath(); g.arc(-3, -32, o.girl ? 3 : 2.5, 0, 7); g.fill();
   g.fillStyle = scarf; R(-12, -27, 24, 6, 3); g.fill();
-  const flap = o.flap;
-  g.beginPath(); g.moveTo(-10, -26); g.lineTo(-22 - flap, -24 + o.wave); g.lineTo(-20 - flap, -18); g.lineTo(-8, -22); g.fill();
+  g.beginPath(); g.moveTo(-10, -26); g.lineTo(-22 - o.flap, -24 + o.wave); g.lineTo(-20 - o.flap, -18); g.lineTo(-8, -22); g.fill();
   g.fillStyle = '#ffffff90'; g.fillRect(-6, -26, 3, 4); g.fillRect(2, -26, 3, 4);
-  if (o.girl) { // bow between the ears
+  if (o.girl && !HATS.has(of)) { // bow between the ears
     g.save(); g.translate(1, -49); g.rotate(-0.2);
     g.fillStyle = '#4a2c17';
     g.beginPath(); g.moveTo(0, 0); g.lineTo(-10, -7); g.lineTo(-10, 7); g.closePath(); g.moveTo(0, 0); g.lineTo(10, -7); g.lineTo(10, 7); g.closePath(); g.fill();
@@ -893,6 +962,57 @@ function bearArt(g, o) {
     g.fillStyle = '#ffd1e3'; g.beginPath(); g.arc(0, 0, 2, 0, 7); g.fill();
     g.restore();
   }
+  outfitArt(g, of);
+}
+function outfitArt(g, of) {
+  const R = (x, y, w, h, r) => { g.beginPath(); g.roundRect(x, y, w, h, r); };
+  if (of === 'cap') {
+    g.fillStyle = '#1f56b0'; R(1, -45.5, 21, 4.5, 2.2); g.fill();
+    g.fillStyle = '#2f6fd6'; g.beginPath(); g.arc(0, -43, 12.5, Math.PI, 0); g.fill();
+    g.fillStyle = '#ffffff'; g.fillRect(-1, -55, 2, 12);
+    g.fillStyle = '#ffd23f'; g.beginPath(); g.arc(0, -55.5, 2.2, 0, 7); g.fill();
+  } else if (of === 'flower') {
+    g.strokeStyle = '#3f9b4a'; g.lineWidth = 2.5; g.beginPath(); g.arc(0, -35, 13.5, Math.PI * 1.08, Math.PI * 1.92); g.stroke();
+    [[-11, -44, '#ff5fa2'], [-4, -48.5, '#ffd23f'], [4, -48.5, '#7fd3ff'], [11, -44, '#ff8c42']].forEach(([x, y, c]) => {
+      g.fillStyle = c;
+      for (let k = 0; k < 5; k++) { const a = k * 1.2566; g.beginPath(); g.arc(x + Math.cos(a) * 2.8, y + Math.sin(a) * 2.8, 2.4, 0, 7); g.fill(); }
+      g.fillStyle = '#fff4dc'; g.beginPath(); g.arc(x, y, 1.8, 0, 7); g.fill();
+    });
+  } else if (of === 'glasses') {
+    g.fillStyle = '#22160c';
+    g.fillRect(-13, -41.2, 9, 1.6);
+    g.beginPath(); g.ellipse(-4, -40, 3.4, 3.1, 0, 0, 7); g.ellipse(5.5, -40, 4.4, 3.5, 0, 0, 7); g.fill();
+    g.fillRect(-1, -41.4, 3, 1.6);
+    g.fillStyle = '#ffffff90'; g.fillRect(3.5, -42, 2.2, 1.4); g.fillRect(-5.5, -42, 1.6, 1.2);
+  } else if (of === 'pirate') {
+    g.fillStyle = '#22160c'; g.beginPath(); g.moveTo(-18, -43); g.quadraticCurveTo(0, -66, 18, -43); g.quadraticCurveTo(0, -50, -18, -43); g.fill();
+    g.strokeStyle = '#ffd23f'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(-17, -43.5); g.quadraticCurveTo(0, -50.5, 17, -43.5); g.stroke();
+    g.fillStyle = '#ffffff'; g.beginPath(); g.arc(0, -53.5, 2.8, 0, 7); g.fill();
+    g.strokeStyle = '#ffffff'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(-3.5, -51); g.lineTo(3.5, -48); g.moveTo(3.5, -51); g.lineTo(-3.5, -48); g.stroke();
+  } else if (of === 'viking') {
+    g.fillStyle = '#f4ecd8';
+    g.beginPath(); g.moveTo(-10, -46); g.quadraticCurveTo(-23, -49, -21, -63); g.quadraticCurveTo(-16, -53, -5, -50); g.fill();
+    g.beginPath(); g.moveTo(10, -46); g.quadraticCurveTo(23, -49, 21, -63); g.quadraticCurveTo(16, -53, 5, -50); g.fill();
+    g.fillStyle = '#9aa5b1'; g.beginPath(); g.arc(0, -43, 13, Math.PI, 0); g.fill();
+    g.fillStyle = '#6b7682'; R(-14, -45, 28, 4.5, 2); g.fill(); g.fillRect(-1.5, -56, 3, 11);
+    g.fillStyle = '#d6dde5'; [-9, -3, 3, 9].forEach(x => { g.beginPath(); g.arc(x, -42.8, 0.9, 0, 7); g.fill(); });
+  } else if (of === 'wizard') {
+    g.fillStyle = '#3b4fd6'; g.beginPath(); g.moveTo(-14, -45); g.quadraticCurveTo(-6, -62, -12, -80); g.quadraticCurveTo(4, -64, 14, -45); g.closePath(); g.fill();
+    g.fillStyle = '#2b3aa8'; g.beginPath(); g.ellipse(0, -45, 18, 3.8, 0, 0, 7); g.fill();
+    g.fillStyle = '#ffd23f'; [[-3, -57, 1.8], [3, -50.5, 1.4], [-7, -67, 1.3], [-9, -77, 2]].forEach(([x, y, r]) => { g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); });
+  } else if (of === 'crown') {
+    g.save(); g.translate(0, -46); g.scale(0.8, 0.8);
+    g.fillStyle = '#4a2c17'; g.beginPath(); g.moveTo(-17, 2); g.lineTo(-17, -14); g.lineTo(-9, -6); g.lineTo(0, -18); g.lineTo(9, -6); g.lineTo(17, -14); g.lineTo(17, 2); g.fill();
+    g.fillStyle = '#ffd23f'; g.beginPath(); g.moveTo(-14, 0); g.lineTo(-14, -9); g.lineTo(-8, -3); g.lineTo(0, -13); g.lineTo(8, -3); g.lineTo(14, -9); g.lineTo(14, 0); g.fill();
+    g.fillStyle = '#e63946'; g.beginPath(); g.arc(0, -3, 2.5, 0, 7); g.fill();
+    g.restore();
+  }
+}
+const look = (over) => Object.assign({ girl: save.gender === 'girl', species: save.species, outfit: save.outfit, walk: 0, air: false, hurt: false, flap: 2, wave: 0 }, over || {});
+function paintBear(c, over, scale, ox, oy) {
+  const g = c.getContext('2d');
+  g.clearRect(0, 0, c.width, c.height); g.save(); g.translate(ox, oy); g.scale(scale, scale);
+  bearArt(g, look(over)); g.restore();
 }
 function drawBear() {
   if (P.inv > 0 && !P.dead && Math.floor(P.inv / 5) % 2) return;
@@ -902,7 +1022,7 @@ function drawBear() {
   if (P.spin > 0) { ctx.translate(0, -18); ctx.rotate((1 - P.spin / 22) * Math.PI * 2); ctx.translate(0, 18); }
   if (P.dead) { ctx.translate(0, -18); ctx.rotate(Math.PI); ctx.translate(0, 18); }
   bearArt(ctx, {
-    girl: save.gender === 'girl', walk: P.onGround ? Math.sin(P.anim) * 6 : 0, air: !P.onGround,
+    girl: save.gender === 'girl', species: save.species, outfit: save.outfit, walk: P.onGround ? Math.sin(P.anim) * 6 : 0, air: !P.onGround,
     hurt: !!P.dead || P.inv > 70, flap: Math.sin(frame * 0.3) * 3 + (Math.abs(P.vx) > 1 ? 4 : 0), wave: Math.sin(frame * 0.4) * 2,
   });
   ctx.restore();
@@ -944,7 +1064,7 @@ function drawHud() {
   let hx = 30 + save.maxHp * 34 + 4;
   drawHoneyJar(hx, 33, 1.15); txt('' + honey, hx + 16, 42, 26); hx += 70;
   drawCoin(hx, 32, 1.1); txt('' + save.coins, hx + 16, 42, 26); hx += 80;
-  ctx.fillStyle = '#8b5a2b'; ctx.beginPath(); ctx.arc(hx - 8, 22, 5, 0, 7); ctx.arc(hx + 8, 22, 5, 0, 7); ctx.arc(hx, 32, 11, 0, 7); ctx.fill();
+  ctx.fillStyle = (SPECIES[save.species] || SPECIES.brown).fur; ctx.beginPath(); ctx.arc(hx - 8, 22, 5, 0, 7); ctx.arc(hx + 8, 22, 5, 0, 7); ctx.arc(hx, 32, 11, 0, 7); ctx.fill();
   ctx.fillStyle = '#d9a066'; ctx.beginPath(); ctx.ellipse(hx, 36, 6, 4, 0, 0, 7); ctx.fill();
   txt('× ' + lives, hx + 16, 42, 26);
   txt(`${lvlIdx + 1}/5`, VW - 70, 42, 24, '#fff4dc', 'right');
@@ -995,11 +1115,11 @@ function draw() {
 
 /* ---------- flow ---------- */
 const $ = id => document.getElementById(id);
-const pTitle = $('pTitle'), pSelect = $('pSelect'), pMsg = $('pMsg');
+const pTitle = $('pTitle'), pSelect = $('pSelect'), pMsg = $('pMsg'), pWard = $('pWard');
 const msgTitle = $('msgTitle'), msgText = $('msgText'), msgBtn = $('msgBtn'), msgBtn2 = $('msgBtn2');
 const touchUi = $('touch'), pauseBtn = $('pauseBtn');
 let act1 = null, act2 = null;
-function hideAll() { pTitle.hidden = pSelect.hidden = pMsg.hidden = true; touchUi.hidden = true; pauseBtn.hidden = true; }
+function hideAll() { pTitle.hidden = pSelect.hidden = pMsg.hidden = pWard.hidden = true; touchUi.hidden = true; pauseBtn.hidden = true; }
 function showMsg(title, text, b1, a1, b2, a2) {
   hideAll();
   msgTitle.textContent = title; msgText.textContent = text;
@@ -1021,10 +1141,7 @@ function refreshWho() {
   $('titleName').textContent = genitive(cleanName()) + ' Bal Macerası';
   document.querySelectorAll('.pk').forEach(b => {
     const on = b.dataset.g === save.gender; b.setAttribute('aria-checked', on);
-    const c = b.querySelector('canvas'), g = c.getContext('2d');
-    g.clearRect(0, 0, c.width, c.height); g.save(); g.translate(72, 128); g.scale(2.1, 2.1);
-    bearArt(g, { girl: b.dataset.g === 'girl', walk: 0, air: false, hurt: false, flap: 2, wave: 0 });
-    g.restore();
+    paintBear(b.querySelector('canvas'), { girl: b.dataset.g === 'girl' }, 1.6, 72, 136);
   });
 }
 nameInput.value = save.name === 'Pofuduk' ? '' : save.name;
@@ -1033,6 +1150,59 @@ nameInput.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 
 document.querySelectorAll('.pk').forEach(b => b.onclick = () => { save.gender = b.dataset.g; refreshWho(); saveGame(); });
 refreshWho();
 $('backBtn').onclick = () => { hideAll(); pTitle.hidden = false; refreshWho(); setTimeout(() => nameInput.focus(), 50); };
+/* ---------- wardrobe ---------- */
+let wardFrom = 'title', trying = 'none';
+function openWard(from) {
+  if (from === 'title') { save.name = cleanName(); saveGame(); }
+  wardFrom = from; trying = save.outfit; hideAll(); renderWard(); pWard.hidden = false;
+  setTimeout(() => $('wDone').focus(), 50);
+}
+function optButton(id, label, price, pressed, over) {
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'opt'; b.id = id; b.setAttribute('aria-pressed', pressed);
+  const c = document.createElement('canvas'); c.width = 112; c.height = 112; c.setAttribute('aria-hidden', 'true');
+  paintBear(c, over, 1.3, 58, 107);
+  const n = document.createElement('span'); n.className = 'on'; n.textContent = label;
+  b.append(c, n);
+  if (price) { const pr = document.createElement('span'); pr.className = 'pr' + (price.cost ? ' cost' : ''); pr.textContent = price.text; b.append(pr); }
+  return b;
+}
+function renderWard() {
+  $('wCoins').textContent = save.coins;
+  const sp = $('spOpts'); sp.innerHTML = '';
+  Object.entries(SPECIES).forEach(([k, v]) => {
+    const b = optButton('sp-' + k, v.name, null, k === save.species, { species: k, outfit: trying });
+    b.onclick = () => { save.species = k; saveGame(); renderWard(); $('sp-' + k).focus(); };
+    sp.append(b);
+  });
+  const of = $('ofOpts'); of.innerHTML = '';
+  OUTFITS.forEach(o => {
+    const owned = save.owned.includes(o.id);
+    const price = owned ? { text: o.id === save.outfit ? 'Giyildi' : 'Senin' } : { text: o.price + ' para', cost: true };
+    const b = optButton('of-' + o.id, o.name, price, o.id === trying, { outfit: o.id });
+    b.onclick = () => { trying = o.id; if (owned) { save.outfit = o.id; saveGame(); } renderWard(); $('of-' + o.id).focus(); };
+    of.append(b);
+  });
+  const o = OUTFITS.find(x => x.id === trying), owned = save.owned.includes(trying), buy = $('wBuy'), note = $('wNote');
+  $('wName').textContent = `${save.name} · ${SPECIES[save.species].name}`;
+  buy.hidden = owned;
+  if (owned) note.textContent = `${save.name} şu an ${OUTFITS.find(x => x.id === save.outfit).name.toLocaleLowerCase('tr')} ile hazır. Karakterler ücretsiz, kıyafetleri parayla alırsın.`;
+  else {
+    buy.textContent = `Satın al · ${o.price} para`; buy.disabled = save.coins < o.price;
+    note.textContent = save.coins < o.price ? `${o.name} için ${o.price - save.coins} para daha lazım. Şimdilik sadece deniyorsun.` : `${o.name} üstünde nasıl duruyor? Beğendiysen satın al.`;
+  }
+}
+$('wBuy').onclick = () => {
+  const o = OUTFITS.find(x => x.id === trying);
+  if (!o || save.owned.includes(o.id) || save.coins < o.price) return;
+  audio(); save.coins -= o.price; save.owned.push(o.id); save.outfit = o.id; saveGame(); sfx.life(); renderWard();
+};
+$('wDone').onclick = () => {
+  if (wardFrom === 'select') showSelect();
+  else { hideAll(); pTitle.hidden = false; refreshWho(); }
+};
+$('wardBtn1').onclick = () => { audio(); openWard('title'); };
+$('wardBtn2').onclick = () => { audio(); openWard('select'); };
 $('startBtn').onclick = () => { audio(); save.name = cleanName(); saveGame(); showSelect(); };
 pauseBtn.onclick = () => togglePause();
 function togglePause() {
@@ -1103,6 +1273,7 @@ function loop(now) {
   while (accum >= 1000 / 60) {
     if (state === 'play') update();
     else if (state === 'title') { // attract mode: bear strolls
+      if (!pWard.hidden) paintBear($('wPrev'), { outfit: trying, walk: Math.sin(frame * 0.15) * 6, flap: Math.sin(frame * 0.3) * 3 + 3, wave: Math.sin(frame * 0.4) * 2 }, 2.9, 165, 305);
       frame++; P.vx = 2.2; P.face = 1; P.anim += 0.26; P.x += P.vx; P.y = L.start.y; P.onGround = true;
       if (P.x > 7 * T) P.x = L.start.x;
       cam = Math.max(0, P.x - VW * 0.42);
