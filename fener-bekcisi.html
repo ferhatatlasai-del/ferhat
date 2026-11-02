@@ -37,43 +37,70 @@ body { margin: 0; background: var(--night); color: var(--foam); font-family: var
 .life.off { background: transparent; box-shadow: none; outline: 1px solid var(--mist); opacity: .45; }
 
 .panel {
-  position: fixed; inset: 0; display: grid; place-items: center;
-  padding-block: 24px;
+  position: fixed; inset: 0; display: grid; place-items: center; overflow-y: auto;
+  padding-block: calc(16px + env(safe-area-inset-top, 0px)) calc(16px + env(safe-area-inset-bottom, 0px));
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   background: color-mix(in srgb, var(--night) 55%, transparent);
 }
 .card {
-  width: 100%; max-width: 440px; display: grid; gap: 18px;
-  padding: 28px 24px; border-radius: 6px;
-  background: color-mix(in srgb, var(--night) 88%, transparent);
+  width: 100%; max-width: 520px; display: grid; gap: 16px;
+  padding: 24px 20px; border-radius: 6px; box-sizing: border-box;
+  background: color-mix(in srgb, var(--night) 90%, transparent);
   border: 1px solid color-mix(in srgb, var(--lamp) 30%, transparent);
   box-shadow: 0 20px 60px rgba(0,0,0,.5);
 }
 .eyebrow { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--mist); }
-h1 { margin: 0; font-family: var(--display); font-weight: 800; font-size: clamp(42px, 11vw, 64px); line-height: .95; letter-spacing: -.02em; color: var(--lamp); text-wrap: balance; }
+h1 { margin: 0; font-family: var(--display); font-weight: 800; font-size: clamp(40px, 10vw, 60px); line-height: .95; letter-spacing: -.02em; color: var(--lamp); text-wrap: balance; }
+h2 { margin: 0; font-family: var(--display); font-weight: 600; font-size: 15px; letter-spacing: .02em; color: var(--foam); }
 p { margin: 0; font-size: 13px; line-height: 1.6; color: var(--foam); }
-.rules { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; font-size: 13px; }
-.rules li { display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; align-items: center; }
+
+.keepers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.keeper {
+  display: grid; gap: 6px; justify-items: center; text-align: center; min-width: 0;
+  padding: 10px 6px 12px; border-radius: 5px; cursor: pointer;
+  font: inherit; color: var(--foam);
+  background: color-mix(in srgb, var(--deep) 60%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mist) 25%, transparent);
+}
+.keeper:hover { border-color: color-mix(in srgb, var(--lamp) 55%, transparent); filter: none; }
+.keeper[aria-pressed="true"] { border-color: var(--lamp); background: color-mix(in srgb, var(--lamp) 12%, var(--night)); box-shadow: 0 0 0 1px var(--lamp) inset; }
+.keeper canvas { width: 64px; height: 64px; }
+.keeper .name { font-family: var(--display); font-weight: 800; font-size: 18px; line-height: 1; }
+.keeper .role { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--mist); }
+.keeper .blurb { font-size: 11px; line-height: 1.4; color: var(--foam); opacity: .85; min-height: 2.8em; }
+.bars { display: grid; gap: 4px; width: 100%; max-width: 120px; font-size: 10px; color: var(--mist); }
+.bar { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 6px; text-align: left; }
+.pips { display: flex; gap: 3px; }
+.pip { width: 8px; height: 5px; border-radius: 1px; background: color-mix(in srgb, var(--mist) 30%, transparent); }
+.pip.on { background: var(--lamp); }
+
+.rules { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; font-size: 12px; }
+.rules li { display: grid; grid-template-columns: 18px 1fr auto; gap: 10px; align-items: center; }
 .rules b { font-weight: 500; }
 .pts { font-variant-numeric: tabular-nums; color: var(--mist); }
-.dot { width: 12px; height: 12px; border-radius: 50%; justify-self: center; }
+.dot { width: 11px; height: 11px; border-radius: 50%; justify-self: center; }
 .dot.m { background: var(--lamp); box-shadow: 0 0 8px var(--lamp); }
 .dot.p { background: var(--ember); box-shadow: 0 0 8px var(--ember); }
 .dot.r { background: #3d4d52; border-radius: 3px; transform: rotate(20deg); }
 .hint { font-size: 12px; color: var(--mist); }
 .big { font-family: var(--display); font-weight: 800; font-size: 56px; line-height: 1; color: var(--foam); font-variant-numeric: tabular-nums; }
-button {
+.actions { display: grid; grid-template-columns: 1fr; gap: 8px; }
+.btn {
   font: 600 17px/1 var(--display); letter-spacing: .01em;
   padding: 15px 20px; border-radius: 4px; border: 0; cursor: pointer;
   background: var(--lamp); color: var(--night);
 }
-button:hover { filter: brightness(1.08); }
+.btn.ghost { background: transparent; color: var(--foam); border: 1px solid color-mix(in srgb, var(--mist) 50%, transparent); }
+.btn:hover { filter: brightness(1.08); }
 button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
 .toast {
   position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
   font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--mist);
   pointer-events: none; white-space: nowrap;
+}
+@media (max-width: 380px) {
+  .keeper .blurb { display: none; }
 }
 </style>
 
@@ -90,14 +117,16 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
   <div class="card">
     <span class="eyebrow">Bir gece nöbeti</span>
     <h1>Fener Bekçisi</h1>
-    <p>Kayalıklı bir koyda fenerin başındasın. Gemiler karanlıkta limanı arıyor. Işığı çevir, onları kayaların arasından geçir.</p>
+    <p>Kayalıklı bir koyda gece nöbetindesin. Gemiler karanlıkta limanı arıyor. Kayığına bin, fenerinle onlara yol göster.</p>
+    <h2>Kayıkçını seç</h2>
+    <div class="keepers" id="keepers" role="group" aria-label="Kayıkçı seçimi"></div>
     <ul class="rules">
-      <li><span class="dot m"></span><span><b>Tüccar gemisi.</b> Işıkla, limana gelsin.</span><span class="pts">+10</span></li>
-      <li><span class="dot p"></span><span><b>Korsan.</b> Karanlıkta bırak, kayaya çarpsın.</span><span class="pts">+5</span></li>
+      <li><span class="dot m"></span><span><b>Tüccar gemisi.</b> Yanına git, fenerin yolunu aydınlatsın.</span><span class="pts">+10</span></li>
+      <li><span class="dot p"></span><span><b>Korsan.</b> Uzak dur, karanlıkta kayaya çarpsın.</span><span class="pts">+5</span></li>
       <li><span class="dot r"></span><span><b>Kaya.</b> Işıksız gemi çarparsa batar.</span><span class="pts">−1 can</span></li>
     </ul>
-    <p class="hint">Fareyi gezdir ya da parmağını sürükle. ← → tuşları da çalışır. Işık bir gemiden ayrılınca rehberliği yavaşça söner.</p>
-    <button id="start" type="button">Nöbete başla</button>
+    <p class="hint">Kayık fareyi ya da parmağını izler. WASD ve ok tuşları da çalışır.</p>
+    <button class="btn" id="start" type="button">Nöbete başla</button>
   </div>
 </div>
 
@@ -106,18 +135,32 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
     <span class="eyebrow" id="overReason">Fener söndü</span>
     <div class="big" id="final">0</div>
     <p id="overText"></p>
-    <button id="again" type="button">Yeniden yak</button>
+    <div class="actions">
+      <button class="btn" id="again" type="button">Yeniden yak</button>
+      <button class="btn ghost" id="change" type="button">Kayıkçı değiştir</button>
+    </div>
   </div>
 </div>
 
 <script>
 (() => {
   const TAU = Math.PI * 2;
-  const BEAM_HALF = 0.21;      // radians
-  const BEAM_SPEED = 3.4;      // radians per second
   const ISLAND_R = 0.11;       // world units
   const DOCK_R = 0.155;
   const SHIP_R = 0.022;
+  const BOAT_R = 0.028;
+  const BEAM_HALF = 0.2;
+
+  // speed: world units/s · radius: lantern reach · hold: how long guidance lasts after leaving the light
+  const KEEPERS = [
+    { id: 'nuri',  name: 'Nuri',  role: 'Kürekçi', blurb: 'Hızlı kayık, küçük fener.',
+      speed: 0.66, radius: 0.15, hold: 1.0, coat: '#3f86b0', hull: '#7a4a2c', stats: [3, 1, 1] },
+    { id: 'leyla', name: 'Leyla', role: 'Fenerci', blurb: 'Kocaman ışık, ağır kayık.',
+      speed: 0.36, radius: 0.27, hold: 1.0, coat: '#c9653d', hull: '#5b3a28', stats: [1, 3, 1] },
+    { id: 'bora',  name: 'Bora',  role: 'Kılavuz', blurb: 'Gösterdiği yol uzun süre unutulmaz.',
+      speed: 0.48, radius: 0.19, hold: 2.2, coat: '#5f9a5c', hull: '#6d5034', stats: [2, 2, 3] },
+  ];
+  const STAT_NAMES = ['Hız', 'Işık', 'Kalıcılık'];
 
   const cv = document.getElementById('c');
   const ctx = cv.getContext('2d');
@@ -125,15 +168,22 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
   const fctx = fog.getContext('2d');
   const $ = id => document.getElementById(id);
 
-  let W = 0, H = 0, DPR = 1, U = 1, CX = 0, CY = 0, FAR = 1.6;
+  let W = 0, H = 0, DPR = 1, U = 1, CX = 0, CY = 0, FAR = 1.6, XB = 1, YB = 1;
   let seaGrad = null, waves = [];
 
   const S = {
     mode: 'menu', score: 0, lives: 3, t: 0, ships: [], rocks: [], fx: [], texts: [],
-    beam: -Math.PI / 2, target: -Math.PI / 2, spawnT: 0.6, best: 0, keys: 0, night: 1,
+    beam: -Math.PI / 2, spawnT: 0.6, best: 0, night: 1,
     wrecked: 0, docked: 0, pirates: 0,
+    keeper: KEEPERS[0],
+    p: { x: 0, y: 0.24, vx: 0, vy: 0, h: 0, moving: false },
+    aim: null, keys: new Set(),
   };
   try { S.best = parseInt(localStorage.getItem('fener-best') || '0', 10) || 0; } catch (e) {}
+  try {
+    const saved = localStorage.getItem('fener-keeper');
+    S.keeper = KEEPERS.find(k => k.id === saved) || KEEPERS[0];
+  } catch (e) {}
 
   const angDiff = (a, b) => ((a - b + Math.PI) % TAU + TAU) % TAU - Math.PI;
   const rand = (a, b) => a + Math.random() * (b - a);
@@ -144,6 +194,7 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
     for (const c of [cv, fog]) { c.width = Math.round(W * DPR); c.height = Math.round(H * DPR); }
     U = Math.min(W, H) / 2 * 0.94;
     CX = W / 2; CY = H / 2;
+    XB = W / 2 / U - 0.04; YB = H / 2 / U - 0.04;
     FAR = Math.hypot(W, H) / 2 / U + 0.1;
     seaGrad = ctx.createRadialGradient(CX, CY, 0, CX, CY, Math.hypot(W, H) / 2);
     seaGrad.addColorStop(0, '#123a4c');
@@ -176,7 +227,7 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
     const x = Math.cos(a) * FAR, y = Math.sin(a) * FAR;
     const toIsland = Math.atan2(-y, -x);
     const pirate = S.t > 15 && Math.random() < Math.min(0.34, 0.14 + S.t / 500);
-    const speed = rand(0.075, 0.105) * (1 + Math.min(0.7, S.t / 220));
+    const speed = rand(0.07, 0.095) * (1 + Math.min(0.6, S.t / 240));
     const off = pirate ? (Math.random() < 0.5 ? -1 : 1) * rand(0.18, 0.45) : rand(-0.15, 0.15);
     S.ships.push({ x, y, h: toIsland + off, base: toIsland + off, sp: speed, light: 0, lit: false, pirate, wob: Math.random() * TAU, age: 0 });
   }
@@ -197,15 +248,57 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
     if (S.lives <= 0) endGame(msg);
   }
 
+  // ---------- the keeper's boat ----------
+  function updateBoat(dt) {
+    const p = S.p, kp = S.keeper;
+    let dx = 0, dy = 0;
+    if (S.mode === 'play') {
+      const k = S.keys;
+      dx = (k.has('right') ? 1 : 0) - (k.has('left') ? 1 : 0);
+      dy = (k.has('down') ? 1 : 0) - (k.has('up') ? 1 : 0);
+      if (dx || dy) {
+        S.aim = null;
+        const l = Math.hypot(dx, dy); dx /= l; dy /= l;
+      } else if (S.aim) {
+        const ax = S.aim.x - p.x, ay = S.aim.y - p.y, d = Math.hypot(ax, ay);
+        if (d > 0.015) { const f = Math.min(1, d / 0.08); dx = ax / d * f; dy = ay / d * f; }
+      }
+    } else {
+      // menu / game-over: the boat makes a slow lap around the island
+      const a = S.t * 0.35;
+      const tx = Math.cos(a) * 0.3, ty = Math.sin(a) * 0.3;
+      const ax = tx - p.x, ay = ty - p.y, d = Math.hypot(ax, ay) || 1;
+      dx = ax / d * 0.5; dy = ay / d * 0.5;
+    }
+    const tvx = dx * kp.speed, tvy = dy * kp.speed;
+    const acc = Math.min(1, dt * 5);
+    p.vx += (tvx - p.vx) * acc;
+    p.vy += (tvy - p.vy) * acc;
+    p.x += p.vx * dt; p.y += p.vy * dt;
+    const sp = Math.hypot(p.vx, p.vy);
+    p.moving = sp > 0.04;
+    if (sp > 0.02) p.h += angDiff(Math.atan2(p.vy, p.vx), p.h) * Math.min(1, dt * 8);
+
+    // keep clear of rocks, the island and the screen edges
+    for (const r of S.rocks) {
+      const ox = p.x - r.x, oy = p.y - r.y, d = Math.hypot(ox, oy), min = r.r + BOAT_R;
+      if (d < min && d > 0) { p.x = r.x + ox / d * min; p.y = r.y + oy / d * min; }
+    }
+    const di = Math.hypot(p.x, p.y), minI = ISLAND_R + BOAT_R;
+    if (di < minI && di > 0) { p.x = p.x / di * minI; p.y = p.y / di * minI; }
+    p.x = Math.max(-XB, Math.min(XB, p.x));
+    p.y = Math.max(-YB + 0.1, Math.min(YB, p.y));
+  }
+
   function updateShips(dt) {
     const play = S.mode === 'play';
+    const kp = S.keeper, p = S.p;
+    const decay = 0.42 / kp.hold;
     for (let i = S.ships.length - 1; i >= 0; i--) {
       const s = S.ships[i];
       s.age += dt;
-      const d = Math.hypot(s.x, s.y);
-      const ang = Math.atan2(s.y, s.x);
-      s.lit = d > ISLAND_R && Math.abs(angDiff(ang, S.beam)) < BEAM_HALF;
-      s.light = s.lit ? Math.min(1, s.light + dt * 3.2) : Math.max(0, s.light - dt * 0.42);
+      s.lit = Math.hypot(s.x - p.x, s.y - p.y) < kp.radius;
+      s.light = s.lit ? Math.min(1, s.light + dt * 3.2) : Math.max(0, s.light - dt * decay);
       const guided = s.light > 0;
 
       let desired;
@@ -276,19 +369,13 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
 
   function update(dt) {
     S.t += dt;
-    if (S.mode === 'menu' || S.mode === 'over') {
-      S.target = S.beam + 0.8;
-    } else if (S.keys) {
-      S.target = S.beam + S.keys * 0.6;
-    }
-    const diff = angDiff(S.target, S.beam);
-    const step = (S.mode === 'play' ? BEAM_SPEED : 0.7) * dt;
-    S.beam += Math.max(-step, Math.min(step, diff));
+    S.beam += dt * 0.45;
+    updateBoat(dt);
 
     S.spawnT -= dt;
     if (S.spawnT <= 0) {
       spawn();
-      const base = S.mode === 'play' ? Math.max(0.95, 3.1 - S.t / 45) : 2.6;
+      const base = S.mode === 'play' ? Math.max(1.15, 3.4 - S.t / 45) : 2.8;
       S.spawnT = base * rand(0.8, 1.2);
     }
     updateShips(dt);
@@ -320,6 +407,39 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
   // ---------- drawing ----------
   const sx = x => CX + x * U;
   const sy = y => CY + y * U;
+
+  // Top-down rowboat with the keeper aboard; shared by the game and the selection cards.
+  function drawKeeper(c, x, y, k, h, kp, t, moving) {
+    c.save();
+    c.translate(x, y);
+    c.rotate(h);
+    const sw = moving ? Math.sin(t * 9) : 0.3;
+    c.strokeStyle = '#c9b48a';
+    c.lineWidth = Math.max(1.5, k * 0.11);
+    c.lineCap = 'round';
+    for (const side of [-1, 1]) {
+      c.beginPath();
+      c.moveTo(-k * 0.1, side * k * 0.3);
+      c.lineTo(-k * 0.1 + sw * k * 0.55, side * k * 1.2);
+      c.stroke();
+    }
+    c.beginPath();
+    c.moveTo(k * 1.15, 0);
+    c.quadraticCurveTo(k * 0.5, -k * 0.62, -k * 0.95, -k * 0.38);
+    c.quadraticCurveTo(-k * 1.15, 0, -k * 0.95, k * 0.38);
+    c.quadraticCurveTo(k * 0.5, k * 0.62, k * 1.15, 0);
+    c.fillStyle = kp.hull; c.fill();
+    c.lineWidth = Math.max(1, k * 0.08); c.strokeStyle = '#2b1b12'; c.stroke();
+    c.beginPath(); c.ellipse(0, 0, k * 0.78, k * 0.3, 0, 0, TAU);
+    c.fillStyle = '#9a7350'; c.fill();
+    c.beginPath(); c.arc(-k * 0.12, 0, k * 0.32, 0, TAU);
+    c.fillStyle = kp.coat; c.fill();
+    c.beginPath(); c.arc(-k * 0.06, 0, k * 0.17, 0, TAU);
+    c.fillStyle = '#e6c49c'; c.fill();
+    c.beginPath(); c.arc(k * 0.78, 0, k * 0.14, 0, TAU);
+    c.fillStyle = '#ffe2a6'; c.fill();
+    c.restore();
+  }
 
   function drawRock(r) {
     const x = sx(r.x), y = sy(r.y), rad = r.r * U;
@@ -353,10 +473,6 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
     ctx.fillStyle = '#2b3d40'; ctx.fill();
     ctx.beginPath(); ctx.arc(x, y, r * 0.78, 0, TAU);
     ctx.fillStyle = '#3a4f4f'; ctx.fill();
-    // pier
-    ctx.save(); ctx.translate(x, y); ctx.rotate(S.t * 0);
-    ctx.restore();
-    // tower
     const tr = r * 0.42;
     ctx.beginPath(); ctx.arc(x, y, tr, 0, TAU);
     ctx.fillStyle = '#e9e2d4'; ctx.fill();
@@ -370,14 +486,12 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(s.h);
-    // wake
     ctx.strokeStyle = 'rgba(214,230,228,0.18)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(-k * 1.1, -k * 0.3); ctx.lineTo(-k * 3, -k * 0.9);
     ctx.moveTo(-k * 1.1, k * 0.3); ctx.lineTo(-k * 3, k * 0.9);
     ctx.stroke();
-    // hull
     ctx.beginPath();
     ctx.moveTo(k * 1.3, 0);
     ctx.quadraticCurveTo(k * 0.4, -k * 0.55, -k * 1.1, -k * 0.42);
@@ -385,7 +499,6 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
     ctx.quadraticCurveTo(k * 0.4, k * 0.55, k * 1.3, 0);
     ctx.fillStyle = s.pirate ? '#1d1517' : '#5a3d2b';
     ctx.fill();
-    // sail
     ctx.beginPath();
     ctx.moveTo(-k * 0.05, -k * 0.95);
     ctx.quadraticCurveTo(k * 0.45, 0, -k * 0.05, k * 0.95);
@@ -401,29 +514,29 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
     fctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     fctx.globalCompositeOperation = 'source-over';
     fctx.clearRect(0, 0, W, H);
-    fctx.fillStyle = 'rgba(3,8,14,0.8)';
+    fctx.fillStyle = 'rgba(3,8,14,0.82)';
     fctx.fillRect(0, 0, W, H);
     fctx.globalCompositeOperation = 'destination-out';
     const len = Math.hypot(W, H);
     fctx.save();
     fctx.translate(CX, CY);
     fctx.rotate(S.beam);
-    for (const [half, alpha] of [[BEAM_HALF * 1.45, 0.35], [BEAM_HALF, 0.75]]) {
-      const g = fctx.createRadialGradient(0, 0, 0, 0, 0, len * 0.75);
-      g.addColorStop(0, `rgba(0,0,0,${alpha})`);
-      g.addColorStop(0.7, `rgba(0,0,0,${alpha * 0.85})`);
-      g.addColorStop(1, `rgba(0,0,0,${alpha * 0.55})`);
-      fctx.beginPath(); fctx.moveTo(0, 0); fctx.arc(0, 0, len, -half, half); fctx.closePath();
-      fctx.fillStyle = g; fctx.fill();
-    }
+    const g = fctx.createRadialGradient(0, 0, 0, 0, 0, len * 0.75);
+    g.addColorStop(0, 'rgba(0,0,0,0.6)');
+    g.addColorStop(1, 'rgba(0,0,0,0.25)');
+    fctx.beginPath(); fctx.moveTo(0, 0); fctx.arc(0, 0, len, -BEAM_HALF, BEAM_HALF); fctx.closePath();
+    fctx.fillStyle = g; fctx.fill();
     fctx.restore();
-    const glow = (x, y, r, a) => {
-      const g = fctx.createRadialGradient(x, y, 0, x, y, r);
-      g.addColorStop(0, `rgba(0,0,0,${a})`); g.addColorStop(1, 'rgba(0,0,0,0)');
-      fctx.fillStyle = g; fctx.beginPath(); fctx.arc(x, y, r, 0, TAU); fctx.fill();
+    const glow = (x, y, r, a, mid) => {
+      const gg = fctx.createRadialGradient(x, y, 0, x, y, r);
+      gg.addColorStop(0, `rgba(0,0,0,${a})`);
+      if (mid) gg.addColorStop(0.8, `rgba(0,0,0,${a * 0.85})`);
+      gg.addColorStop(1, 'rgba(0,0,0,0)');
+      fctx.fillStyle = gg; fctx.beginPath(); fctx.arc(x, y, r, 0, TAU); fctx.fill();
     };
     glow(CX, CY, ISLAND_R * U * 2.6, 0.9);
-    for (const s of S.ships) glow(sx(s.x), sy(s.y), U * (0.06 + s.light * 0.07), 0.35 + s.light * 0.45);
+    glow(sx(S.p.x), sy(S.p.y), S.keeper.radius * U * 1.12, 0.95, true);
+    for (const s of S.ships) glow(sx(s.x), sy(s.y), U * (0.05 + s.light * 0.06), 0.3 + s.light * 0.4);
   }
 
   function draw() {
@@ -446,24 +559,24 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
     for (const r of S.rocks) drawRock(r);
     drawIsland();
     for (const s of S.ships) drawShip(s);
+    const p = S.p;
+    drawKeeper(ctx, sx(p.x), sy(p.y), Math.max(12, U * 0.046), p.h, S.keeper, S.t, p.moving);
 
     drawFog();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.drawImage(fog, 0, 0);
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 
-    // warm beam tint
     ctx.globalCompositeOperation = 'lighter';
+    // lighthouse beam tint
     const len = Math.hypot(W, H);
     ctx.save(); ctx.translate(CX, CY); ctx.rotate(S.beam);
-    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, len * 0.6);
-    g.addColorStop(0, 'rgba(255,201,107,0.28)');
-    g.addColorStop(0.35, 'rgba(255,201,107,0.09)');
+    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, len * 0.55);
+    g.addColorStop(0, 'rgba(255,201,107,0.18)');
     g.addColorStop(1, 'rgba(255,201,107,0)');
     ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, len, -BEAM_HALF, BEAM_HALF); ctx.closePath();
     ctx.fillStyle = g; ctx.fill();
     ctx.restore();
-
     // lamp
     const lr = ISLAND_R * U;
     const lg = ctx.createRadialGradient(CX, CY, 0, CX, CY, lr * 1.4);
@@ -471,8 +584,14 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
     lg.addColorStop(0.25, 'rgba(255,201,107,0.6)');
     lg.addColorStop(1, 'rgba(255,201,107,0)');
     ctx.fillStyle = lg; ctx.beginPath(); ctx.arc(CX, CY, lr * 1.4, 0, TAU); ctx.fill();
-
-    // lanterns
+    // keeper's lantern pool
+    const px = sx(p.x), py = sy(p.y), pr = S.keeper.radius * U;
+    const kg = ctx.createRadialGradient(px, py, 0, px, py, pr);
+    kg.addColorStop(0, 'rgba(255,214,140,0.30)');
+    kg.addColorStop(0.6, 'rgba(255,201,107,0.10)');
+    kg.addColorStop(1, 'rgba(255,201,107,0)');
+    ctx.fillStyle = kg; ctx.beginPath(); ctx.arc(px, py, pr, 0, TAU); ctx.fill();
+    // ship lanterns
     for (const s of S.ships) {
       const x = sx(s.x), y = sy(s.y);
       const col = s.pirate ? '226,85,58' : '255,201,107';
@@ -484,6 +603,13 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
     }
     ctx.globalCompositeOperation = 'source-over';
 
+    // edge of the keeper's light
+    ctx.setLineDash([3, 6]);
+    ctx.strokeStyle = 'rgba(255,201,107,0.35)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(px, py, pr, 0, TAU); ctx.stroke();
+    ctx.setLineDash([]);
+
     // guidance rings
     for (const s of S.ships) {
       if (s.light <= 0) continue;
@@ -493,10 +619,18 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
       ctx.beginPath(); ctx.arc(x, y, r, -Math.PI / 2, -Math.PI / 2 + s.light * TAU); ctx.stroke();
     }
 
-    for (const p of S.fx) {
-      ctx.globalAlpha = Math.max(0, p.life / p.max);
-      ctx.fillStyle = p.col;
-      ctx.fillRect(sx(p.x) - 1.5, sy(p.y) - 1.5, 3, 3);
+    // touch / mouse target marker
+    if (S.mode === 'play' && S.aim) {
+      const ax = sx(S.aim.x), ay = sy(S.aim.y);
+      ctx.strokeStyle = 'rgba(214,230,228,0.35)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(ax, ay, 5, 0, TAU); ctx.stroke();
+    }
+
+    for (const f of S.fx) {
+      ctx.globalAlpha = Math.max(0, f.life / f.max);
+      ctx.fillStyle = f.col;
+      ctx.fillRect(sx(f.x) - 1.5, sy(f.y) - 1.5, 3, 3);
     }
     ctx.globalAlpha = 1;
 
@@ -510,23 +644,73 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
     ctx.globalAlpha = 1;
   }
 
+  // ---------- character selection ----------
+  const portraits = [];
+  function buildKeepers() {
+    const wrap = $('keepers');
+    wrap.innerHTML = KEEPERS.map(k => `
+      <button class="keeper" type="button" id="keeper-${k.id}" data-id="${k.id}" aria-pressed="false">
+        <canvas width="128" height="128" aria-hidden="true"></canvas>
+        <span class="name">${k.name}</span>
+        <span class="role">${k.role}</span>
+        <span class="blurb">${k.blurb}</span>
+        <span class="bars">${k.stats.map((v, i) => `
+          <span class="bar"><span>${STAT_NAMES[i]}</span><span class="pips">${[1, 2, 3].map(n => `<span class="pip${n <= v ? ' on' : ''}"></span>`).join('')}</span></span>`).join('')}
+        </span>
+      </button>`).join('');
+    wrap.querySelectorAll('.keeper').forEach(btn => {
+      const kp = KEEPERS.find(k => k.id === btn.dataset.id);
+      portraits.push({ c: btn.querySelector('canvas').getContext('2d'), kp });
+      btn.addEventListener('click', () => selectKeeper(kp));
+      btn.addEventListener('dblclick', () => { selectKeeper(kp); startGame(); });
+    });
+    selectKeeper(S.keeper);
+  }
+  function selectKeeper(kp) {
+    S.keeper = kp;
+    try { localStorage.setItem('fener-keeper', kp.id); } catch (e) {}
+    document.querySelectorAll('.keeper').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.id === kp.id)));
+    $('start').textContent = `${kp.name} ile nöbete başla`;
+  }
+  function drawPortraits() {
+    for (const { c, kp } of portraits) {
+      c.setTransform(1, 0, 0, 1, 0, 0);
+      c.clearRect(0, 0, 128, 128);
+      const sel = kp === S.keeper;
+      const g = c.createRadialGradient(64, 64, 0, 64, 64, 64);
+      g.addColorStop(0, sel ? 'rgba(255,201,107,0.35)' : 'rgba(255,201,107,0.12)');
+      g.addColorStop(1, 'rgba(255,201,107,0)');
+      c.fillStyle = g; c.beginPath(); c.arc(64, 64, 64, 0, TAU); c.fill();
+      const bob = Math.sin(S.t * 2 + kp.speed * 10) * 2;
+      drawKeeper(c, 64, 66 + bob, 30, -Math.PI / 2 + Math.sin(S.t * 0.8 + kp.radius * 20) * 0.15, kp, S.t, sel);
+    }
+  }
+
   // ---------- flow ----------
   function renderLives() {
     $('lives').innerHTML = [0, 1, 2].map(i => `<span class="life${i < S.lives ? '' : ' off'}"></span>`).join('');
   }
 
   function startGame() {
-    Object.assign(S, { mode: 'play', score: 0, lives: 3, t: 0, ships: [], fx: [], texts: [], spawnT: 1.2, night: 1, wrecked: 0, docked: 0, pirates: 0 });
+    Object.assign(S, { mode: 'play', score: 0, lives: 3, t: 0, ships: [], fx: [], texts: [], spawnT: 1.4, night: 1, wrecked: 0, docked: 0, pirates: 0, aim: null });
+    S.keys.clear();
     S.rocks = genRocks();
-    S.target = S.beam;
+    Object.assign(S.p, { x: 0, y: 0.2, vx: 0, vy: 0, h: -Math.PI / 2 });
     $('menu').hidden = true; $('over').hidden = true; $('hud').hidden = false;
     $('best').textContent = S.best;
     renderLives();
     cv.focus();
   }
 
+  function showMenu() {
+    S.mode = 'menu';
+    $('over').hidden = true; $('hud').hidden = true; $('menu').hidden = false;
+    document.getElementById('keeper-' + S.keeper.id).focus();
+  }
+
   function endGame(reason) {
     S.mode = 'over';
+    S.aim = null;
     const newBest = S.score > S.best;
     if (newBest) {
       S.best = S.score;
@@ -536,33 +720,43 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
     $('final').textContent = S.score;
     $('overReason').textContent = newBest ? 'Yeni rekor' : reason;
     const mins = Math.floor(S.t / 60), secs = Math.floor(S.t % 60);
-    $('overText').textContent = `${S.docked} gemiyi limana soktun, ${S.pirates} korsanı batırdın. Nöbet ${mins} dk ${secs} sn sürdü.`;
+    $('overText').textContent = `${S.keeper.name} ${S.docked} gemiyi limana soktu, ${S.pirates} korsan battı. Nöbet ${mins} dk ${secs} sn sürdü.`;
     setTimeout(() => { $('over').hidden = false; $('again').focus(); }, 700);
   }
 
   function aim(e) {
     if (S.mode !== 'play') return;
+    if (e.pointerType !== 'mouse' && e.type === 'pointermove' && e.buttons === 0) return;
     const rect = cv.getBoundingClientRect();
-    S.target = Math.atan2(e.clientY - rect.top - CY, e.clientX - rect.left - CX);
+    S.aim = { x: (e.clientX - rect.left - CX) / U, y: (e.clientY - rect.top - CY) / U };
   }
   cv.tabIndex = 0;
   cv.addEventListener('pointermove', aim);
   cv.addEventListener('pointerdown', aim);
+
+  const KEYMAP = { ArrowLeft: 'left', a: 'left', A: 'left', ArrowRight: 'right', d: 'right', D: 'right',
+                   ArrowUp: 'up', w: 'up', W: 'up', ArrowDown: 'down', s: 'down', S: 'down' };
   window.addEventListener('keydown', e => {
-    if (e.key === 'ArrowLeft' || e.key === 'a') { S.keys = -1; e.preventDefault(); }
-    if (e.key === 'ArrowRight' || e.key === 'd') { S.keys = 1; e.preventDefault(); }
-    if ((e.key === 'Enter' || e.key === ' ') && S.mode !== 'play' && document.activeElement?.tagName !== 'BUTTON') startGame();
+    const dir = KEYMAP[e.key];
+    if (dir && S.mode === 'play') { S.keys.add(dir); e.preventDefault(); }
+    if (S.mode === 'menu' && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+      const i = KEEPERS.indexOf(S.keeper) + (e.key === 'ArrowRight' ? 1 : -1);
+      selectKeeper(KEEPERS[(i + KEEPERS.length) % KEEPERS.length]);
+      document.getElementById('keeper-' + S.keeper.id).focus();
+      e.preventDefault();
+    }
   });
-  window.addEventListener('keyup', e => {
-    if (['ArrowLeft', 'ArrowRight', 'a', 'd'].includes(e.key)) { S.keys = 0; if (S.mode === 'play') S.target = S.beam; }
-  });
+  window.addEventListener('keyup', e => { const dir = KEYMAP[e.key]; if (dir) S.keys.delete(dir); });
+  window.addEventListener('blur', () => S.keys.clear());
   $('start').addEventListener('click', startGame);
   $('again').addEventListener('click', startGame);
+  $('change').addEventListener('click', showMenu);
   window.addEventListener('resize', resize);
 
   resize();
   S.rocks = genRocks();
-  for (let i = 0; i < 4; i++) { spawn(); const s = S.ships[i], f = rand(0.45, 0.85); s.x *= f; s.y *= f; s.light = i % 2 ? 0.7 : 0; }
+  buildKeepers();
+  for (let i = 0; i < 4; i++) { spawn(); const s = S.ships[i], f = rand(0.45, 0.85); s.x *= f; s.y *= f; }
 
   let last = performance.now();
   function frame(now) {
@@ -570,6 +764,7 @@ button:focus-visible { outline: 2px solid var(--foam); outline-offset: 3px; }
     last = now;
     update(dt);
     draw();
+    if (S.mode === 'menu') drawPortraits();
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
