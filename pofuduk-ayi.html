@@ -14,6 +14,7 @@
   --ink: #22160c;
   --night: #000000;
   --snow: #ffffff;
+  --logo-red: #ff5a5f;
   --logo: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
   --coin: #ffd23f;
   --heart: #e63946;
@@ -31,7 +32,7 @@
 #splash.run .tap { display: none; }
 @keyframes tapPulse { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
 #splash .logo { display: grid; justify-items: center; gap: clamp(.4rem, 2vw, 1.2rem); }
-#splash .sub { color: var(--snow); font-family: var(--logo); font-weight: 800; font-size: clamp(1rem, 4.2vw, 2.2rem); letter-spacing: .5em; padding-left: .5em; }
+#splash .sub { color: var(--logo-red); font-family: var(--logo); font-weight: 800; font-size: clamp(1rem, 4.2vw, 2.2rem); letter-spacing: .5em; padding-left: .5em; }
 #splash.run .sub { animation: subIn 1s ease-out 1s both; }
 @keyframes subIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 @keyframes hgIn { from { opacity: 0; transform: scale(.82); letter-spacing: .45em; } to { opacity: 1; transform: none; letter-spacing: .08em; } }
