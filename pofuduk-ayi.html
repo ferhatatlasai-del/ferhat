@@ -159,7 +159,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
   border: 3px solid color-mix(in srgb, var(--cream) 80%, transparent); background: color-mix(in srgb, var(--bark) 40%, transparent); }
 #knob { position: absolute; left: 50%; top: 50%; width: 56px; height: 56px; margin: -28px 0 0 -28px; border-radius: 50%;
   background: color-mix(in srgb, var(--cream) 75%, transparent); border: 3px solid var(--bark); pointer-events: none; }
-#c { cursor: grab; }
+#c { cursor: crosshair; }
 </style>
 
 <div id="splash" role="button" tabindex="0" aria-label="HG Yapımcılık. Başlamak için dokun"><div class="logo"><div class="hg">HG</div><div class="sub">YAPIMCILIK</div></div><div class="tap">BAŞLAMAK İÇİN DOKUN</div></div>
@@ -196,7 +196,8 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
       <b>Kenar</b><span>Düşerken kenara tutunursun: Boşluk ile tırman, Shift ile bırak</span>
       <b>Sarmaşık</b><span>Sarmaşığa tutun: W ile tırman, Boşluk ile atla</span>
       <b>F</b><span>Baltayı savur: 3 kez bas kombo, havada bas dönerek vur</span>
-      <b>Q / E</b><span>Kamerayı döndür (ekranı sürükleyerek de olur)</span>
+      <b>Fare</b><span>Fareyi oynat: yön ver. Oyuna tıkla: fare kilitlenir, sol tık balta savurur</span>
+      <b>Q / E</b><span>Kamerayı tuşla döndür (telefonda ekranı sürükle)</span>
       <b>P</b><span>Duraklat</span>
     </div>
     <div class="row">
@@ -495,9 +496,28 @@ document.querySelectorAll('.tb').forEach(b => {
   el.addEventListener('pointermove', e => { if (e.pointerId === stick.id) moveStick(e); });
   el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
 }
-{ // drag on the game view to turn the camera
+{ // camera: the mouse steers without clicking; touch drags
   let drag = null;
-  cv.addEventListener('pointerdown', e => { if (state !== 'play') return; drag = { id: e.pointerId, x: e.clientX }; cv.setPointerCapture(e.pointerId); });
+  const locked = () => document.pointerLockElement === cv;
+  cv.addEventListener('pointerdown', e => {
+    if (state !== 'play') return;
+    if (e.pointerType === 'mouse') {
+      if (locked()) { if (e.button === 0) press('attack'); return; }
+      try { const r = cv.requestPointerLock(); if (r && r.catch) r.catch(() => {}); } catch (err) {}
+      return;
+    }
+    drag = { id: e.pointerId, x: e.clientX }; cv.setPointerCapture(e.pointerId);
+  });
+  cv.addEventListener('pointerup', e => { if (e.pointerType === 'mouse' && e.button === 0) keys.attack = false; });
+  // mouse look: works while hovering, and without limits once the pointer is locked
+  addEventListener('mousemove', e => {
+    if (state !== 'play' || isTouch) return;
+    if (!locked() && e.target !== cv) return;
+    const mx = e.movementX || 0; if (!mx || Math.abs(mx) > 300) return;
+    G.camYaw -= mx * (locked() ? 0.0032 : 0.006) * (save.camSens || 1); G.manualT = 90;
+  });
+  // losing the lock with Esc pauses the game
+  document.addEventListener('pointerlockchange', () => { if (!locked() && state === 'play' && !isTouch) togglePause(); });
   cv.addEventListener('pointermove', e => { if (!drag || e.pointerId !== drag.id) return; G.camYaw -= (e.clientX - drag.x) * 0.009 * (save.camSens || 1); drag.x = e.clientX; G.manualT = 90; });
   const up = e => { if (drag && e.pointerId === drag.id) drag = null; };
   cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
@@ -2037,6 +2057,7 @@ function draw3(alpha, dtMs) {
   for (const p of pops) { const q = scr(p.x, p.y, p.z); if (!q) continue; ctx.globalAlpha = Math.min(1, p.life / 20); txt(p.txt, q.x, q.y, 22, p.color, 'center'); }
   ctx.globalAlpha = 1;
   if (state !== 'title') drawHud();
+  if (state === 'play' && !isTouch && document.pointerLockElement !== cv) { ctx.globalAlpha = 0.75 + Math.sin(frame * 0.08) * 0.2; txt('Fareyi kilitlemek için oyuna tıkla · sol tık: balta · Esc: duraklat', VW / 2, VH - 24, 17, '#ffffff', 'center'); ctx.globalAlpha = 1; }
 }
 
 /* ---------- flow ---------- */
@@ -2045,8 +2066,10 @@ const pTitle = $('pTitle'), pSelect = $('pSelect'), pMsg = $('pMsg'), pWard = $(
 const msgTitle = $('msgTitle'), msgText = $('msgText'), msgBtn = $('msgBtn'), msgBtn2 = $('msgBtn2');
 const touchUi = $('touch'), pauseBtn = $('pauseBtn');
 let act1 = null, act2 = null;
+function unlockMouse() { if (document.pointerLockElement) { try { document.exitPointerLock(); } catch (e) {} } }
 function hideAll() { pTitle.hidden = pSelect.hidden = pMsg.hidden = pWard.hidden = true; document.getElementById('pSmith').hidden = true; touchUi.hidden = true; pauseBtn.hidden = true; }
 function showMsg(title, text, b1, a1, b2, a2) {
+  unlockMouse();
   hideAll();
   msgTitle.textContent = title; msgText.textContent = text;
   msgBtn.textContent = b1; act1 = a1;
@@ -2148,6 +2171,7 @@ function renderSmith() {
   buy.hidden = !next; if (next) { buy.textContent = `Geliştir · ${next.price} para`; buy.disabled = save.coins < next.price; }
 }
 function openSmith() {
+  unlockMouse();
   smithGift = false;
   if (!save.axe) { save.axe = 1; smithGift = true; saveGame(); sfx.life(); }
   if (state === 'play') { state = 'pause'; smithPaused = true; for (const k in keys) keys[k] = false; stick.x = stick.y = 0; }
@@ -2168,7 +2192,7 @@ function syncSettings() {
   $('setCam').value = Math.round((save.camSens || 1) * 100); $('vCam').textContent = $('setCam').value + '%';
 }
 function openSettings() {
-  audio();
+  audio(); unlockMouse();
   if (state === 'play') { state = 'pause'; setPaused = true; for (const k in keys) keys[k] = false; stick.x = stick.y = 0; }
   syncSettings(); pSet.hidden = false; setTimeout(() => $('setClose').focus(), 50);
 }
@@ -2190,6 +2214,7 @@ function togglePause() {
 }
 
 function showSelect() {
+  unlockMouse();
   state = 'title'; hideAll(); saveGame();
   if (!L) loadLevel(0);
   P = newPlayer(L.start); L.shots = []; if (USE3D) G.ct = null;
