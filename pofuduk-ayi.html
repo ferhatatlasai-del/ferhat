@@ -25,8 +25,11 @@
 #splash { position: fixed; inset: 0; z-index: 30; background: var(--night); display: grid; place-items: center; cursor: pointer; transition: opacity .7s ease; }
 #splash.gone { opacity: 0; pointer-events: none; }
 #splash .hg { color: var(--snow); font-family: var(--logo); font-weight: 800; font-size: clamp(5rem, 24vw, 13rem); letter-spacing: .08em; line-height: 1; animation: hgIn 1.2s cubic-bezier(.2,.7,.2,1) both; }
+#splash .logo { display: grid; justify-items: center; gap: clamp(.4rem, 2vw, 1.2rem); }
+#splash .sub { color: var(--snow); font-family: var(--logo); font-weight: 800; font-size: clamp(1rem, 4.2vw, 2.2rem); letter-spacing: .5em; padding-left: .5em; animation: subIn 1s ease-out 1s both; }
+@keyframes subIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 @keyframes hgIn { from { opacity: 0; transform: scale(.82); letter-spacing: .45em; } to { opacity: 1; transform: none; letter-spacing: .08em; } }
-@media (prefers-reduced-motion: reduce) { #splash .hg { animation: none; } #splash { transition: none; } }
+@media (prefers-reduced-motion: reduce) { #splash .hg, #splash .sub { animation: none; } #splash { transition: none; } }
 html, body { height: 100%; }
 body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(--body); overflow: hidden; user-select: none; -webkit-user-select: none; }
 #wrap { position: fixed; inset: 0; display: grid; place-items: center; }
@@ -140,7 +143,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 #c { cursor: grab; }
 </style>
 
-<div id="splash" role="img" aria-label="HG"><div class="hg">HG</div></div>
+<div id="splash" role="img" aria-label="HG Yapımcılık"><div class="logo"><div class="hg">HG</div><div class="sub">YAPIMCILIK</div></div></div>
 <div id="wrap"><canvas id="gl" width="960" height="540" aria-hidden="true"></canvas><canvas id="c" width="960" height="540" aria-label="Oyun alanı"></canvas></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <button id="pauseBtn" type="button" aria-label="Duraklat" hidden>II</button>
