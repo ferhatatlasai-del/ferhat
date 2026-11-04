@@ -167,7 +167,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 <div class="panel" id="pTitle">
   <div class="card">
     <h1 id="titleName">Pofuduk'un Bal Macerası</h1>
-    <p>Ayımızın balları altı bölgeye dağılmış. Bal Köyü'ndeki portallardan bölgelere git, bal ve bozuk para topla, üç boss'u yen!</p>
+    <p>Ayımızın balları yedi bölgeye dağılmış. Bal Köyü'ndeki portallardan bölgelere git, bal ve bozuk para topla, dört boss'u yen!</p>
     <div class="who">
       <label for="nameInput">Ayının adı</label>
       <input id="nameInput" type="text" maxlength="14" autocomplete="off" spellcheck="false" placeholder="Pofuduk">
@@ -284,12 +284,14 @@ const SONGS = {
     bass: seq('38 . . 38 . . 45 . 36 . . 36 . . 43 .'), drum: seq('k . . h . . s . k . h . . . s h') },
   lv4: { bpm: 140, wave: 'sawtooth', vol: 0.025, lead: seq('69 . 70 . 69 . 67 . 69 . 72 . 70 . 69 . 64 . 65 . 67 . 69 . 70 69 67 65 64 . . . 69 . 70 . 72 . 74 . 76 . 74 . 72 . 70 . 69 . 67 . 65 . 64 . 69 . . .'),
     bass: seq('45 45 45 46 45 45 43 45 45 45 45 46 41 41 40 40'), drum: seq('k h s h k h s h k k s h k h s s') },
+  lv6: { bpm: 120, wave: 'triangle', vol: 0.06, lead: seq('62 . 62 65 . 69 . 67 65 . 64 . 62 . . . 60 . 60 64 . 67 . 65 64 . 62 . 60 . . . 62 . 62 65 . 69 . 72 70 . 69 . 67 . 65 . 64 . 65 67 . 69 . 64 . 61 . 62 . . .'),
+    bass: seq('38 . 45 . 38 . 45 . 36 . 43 . 36 . 43 . 34 . 41 . 34 . 41 . 33 . 40 . 37 . 45 .'), drum: seq('k . h s . h k . h s . h k h s h') },
   lv5: { bpm: 116, wave: 'sine', vol: 0.07, len: 2.2, lead: seq('77 . 81 . 84 . 81 . 82 . 79 . 76 . . . 74 . 77 . 81 . 79 . 77 . 76 . 77 . . . 72 . 76 . 79 . 84 . 82 . 81 . 79 . 77 . 76 . 79 . 77 . . . . . . .'),
     bass: seq('41 . 48 . 53 . 48 . 46 . 53 . 48 . 41 . 43 . 50 . 55 . 50 . 48 . 55 . 60 . 55 .'), drum: seq('k . h . h . s . h . h . k . s .') },
   boss: { bpm: 150, lead: seq('69 . 72 . 76 . 72 . 71 . 74 . 77 . 74 . 69 . 72 . 76 . 79 . 77 76 74 72 71 . . . 81 . 79 . 77 . 76 . 74 . 76 . 77 . 74 . 72 . 71 . 69 . 68 . 69 . . .'),
     bass: seq('45 45 57 45 43 43 55 43 41 41 53 41 40 40 52 40'), drum: seq('k h s h k k s h k h s h k k s s') },
 };
-const BOSS_KEY = [0, 0, 0, 0, -2, 3];
+const BOSS_KEY = [0, 0, 0, 0, -2, 3, 1];
 const music = { bus: null, song: null, name: '', tr: 0, step: 0, next: 0, noise: null };
 function musicInit() {
   music.bus = ac.createGain(); music.bus.gain.value = 0; music.bus.connect(ac.destination);
@@ -461,6 +463,7 @@ const LEVELS = [
   { name: 'Mantar Mağarası', sky: ['#1d1530', '#4a3463'], far: '#2f2347', mid: '#3e2d5c', grass: '#b07ad6', grassDark: '#8a55b3', dirt: '#3b2a3a', dirtDot: '#2a1d2b', tree: 'shroom', friction: 0.78, cave: true, weather: 'spore' },
   { name: 'Kızıl Kayalıklar', sky: ['#4a1626', '#f08a4b'], far: '#7a3242', mid: '#56202f', grass: '#ff8c42', grassDark: '#d9622b', dirt: '#3a1f1f', dirtDot: '#2a1414', tree: 'spire', friction: 0.78, sun: '#ffcf70', weather: 'ember', boss: 'queen' },
   { name: 'Bulut Krallığı', sky: ['#7fb6ff', '#ffe3f6'], far: '#b9a8f0', mid: '#d7c9ff', grass: '#ffffff', grassDark: '#e3dcff', dirt: '#efe9ff', dirtDot: '#cfc3f5', tree: 'candy', friction: 0.78, sun: '#fff6c8', boss: 'hog' },
+  { name: 'Korsan Koyu', sky: ['#3fb6e8', '#fff1c9'], far: '#7fb8a8', mid: '#2a8fb8', grass: '#f2d48a', grassDark: '#d9b56a', dirt: '#c99a5a', dirtDot: '#a87a40', tree: 'palm', friction: 0.78, sun: '#fff1a8', boss: 'crab' },
 ];
 
 function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
@@ -637,7 +640,7 @@ function drawHud() {
   if (bossBanner > 0) {
     ctx.globalAlpha = Math.min(1, bossBanner / 30);
     txt('BOSS!', VW / 2, 190, 64, '#ff4d6d', 'center');
-    txt(b.type === 'mush' ? 'Üstüne zıpla, yerdeki halkaların üstünden atla!' : b.type === 'queen' ? 'Kırmızı halkadan kaç; yere çakılınca üstüne zıpla!' : 'Yuvarlanırken kaç; duvara çarpınca üstüne zıpla!', VW / 2, 232, 24, '#fff4dc', 'center');
+    txt(b.type === 'mush' ? 'Üstüne zıpla, yerdeki halkaların üstünden atla!' : b.type === 'queen' ? 'Kırmızı halkadan kaç; yere çakılınca üstüne zıpla!' : b.type === 'hog' ? 'Yuvarlanırken kaç; duvara çarpınca üstüne zıpla!' : 'Baloncuklardan kaç; kıskaçları yere saplanınca üstüne zıpla!', VW / 2, 232, 24, '#fff4dc', 'center');
     ctx.globalAlpha = 1;
   }
 }
@@ -736,6 +739,30 @@ function beeModel() {
     w.castShadow = false; p.userData.s = s;
     return p;
   });
+  return g;
+}
+function crabModel() {
+  const g = new THREE.Group(), b = grp(g, 0, 0.85, 0);
+  mk('sph', '#e8573c', [1.5, 0.72, 1.15], [0, 0, 0], b);
+  mk('sph', '#f6a07a', [1.25, 0.4, 0.95], [0, -0.28, 0.05], b);
+  for (const [x, z] of [[-0.6, -0.3], [0.5, -0.5], [0.1, 0.2]]) mk('sph', '#c8402a', [0.2, 0.08, 0.2], [x, 0.66, z], b);
+  for (const s of [-1, 1]) {
+    mk('cyl', '#e8573c', [0.08, 0.6, 0.08], [s * 0.45, 0.85, 0.75], b);
+    mk('sph', '#ffffff', [0.2, 0.2, 0.2], [s * 0.45, 1.2, 0.78], b); mk('sph', '#22160c', [0.1, 0.1, 0.1], [s * 0.45, 1.22, 0.95], b);
+    for (let k = 0; k < 3; k++) { const lg = mk('cyl', '#c8402a', [0.08, 1.1, 0.08], [s * 1.55, -0.4, -0.5 + k * 0.45], b); lg.rotation.z = s * 0.9; }
+  }
+  // captain's hat
+  mk('prism', '#22160c', [0.95, 0.4, 0.75], [0, 0.88, -0.05], b);
+  mk('sph', '#ffffff', [0.13, 0.13, 0.06], [0, 0.92, 0.62], b);
+  const claws = [-1, 1].map(s => {
+    const c = grp(b, s * 1.45, 0.05, 0.75);
+    mk('sph', '#e8573c', [0.32, 0.32, 0.55], [0, 0, 0.35], c);
+    mk('sph', '#e8573c', [0.55, 0.45, 0.65], [0, 0.1, 0.95], c);
+    const t1 = mk('cone', '#c8402a', [0.2, 0.7, 0.2], [0, 0.32, 1.45], c); t1.rotation.x = Math.PI / 2 - 0.35;
+    const t2 = mk('cone', '#c8402a', [0.18, 0.6, 0.18], [0, -0.12, 1.4], c); t2.rotation.x = Math.PI / 2 + 0.35;
+    return c;
+  });
+  g.userData.body = b; g.userData.claws = claws;
   return g;
 }
 function hogModel() {
@@ -863,6 +890,11 @@ function treeModel(kind, parent, x, y, z, s, rnd) {
     mk('cyl', '#d8c9e8', [0.22, 2.2, 0.22], [0, 1.1, 0], t);
     mk('hemi', '#5ad1e6', [1.3, 0.8, 1.3], [0, 2.15, 0], t, { emissive: '#1c6b7a' });
     mk('sph', '#c9fbff', [0.16, 0.16, 0.16], [0.5, 2.7, 0.5], t, { emissive: '#4a8a92' });
+  } else if (kind === 'palm') {
+    let px = 0, py = 0;
+    for (let k = 0; k < 6; k++) { const seg = mk('cyl', k % 2 ? '#a87a40' : '#8f6533', [0.17 - k * 0.012, 0.5, 0.17 - k * 0.012], [px, py + 0.25, 0], t); seg.rotation.z = -0.12 - k * 0.03; px += 0.07 + k * 0.025; py += 0.48; }
+    for (let k = 0; k < 6; k++) { const leaf = mk('box', k % 2 ? '#3f9b37' : '#4fae45', [0.28, 0.05, 1.5], [px + Math.sin(k * 1.05) * 0.65, py + 0.05, Math.cos(k * 1.05) * 0.65], t); leaf.rotation.y = k * 1.05; leaf.rotation.x = 0.35; }
+    for (let k = 0; k < 3; k++) mk('sph', '#6b4226', [0.12, 0.12, 0.12], [px + Math.cos(k * 2.1) * 0.15, py - 0.15, Math.sin(k * 2.1) * 0.15], t);
   } else if (kind === 'candy') {
     mk('cyl', '#fff4dc', [0.16, 1.6, 0.16], [0, 0.8, 0], t);
     const c1 = rnd() < 0.5 ? '#ff9ad5' : '#b28dff';
@@ -984,7 +1016,7 @@ function buildHub() {
   const R = 34, boxes = [{ x0: -R, y0: -3, z0: -R, x1: R, y1: 0, z1: R, kind: 'ground', on: true }], trees = [], paths = [];
   const rnd = rng(9);
   // each portal sits on a patch of its own region, scattered around the village
-  const spots = [{ x: -13, y: 0, z: 5 }, { x: 15, y: 0, z: 1 }, { x: -22, y: 1.5, z: -15 }, { x: 22, y: 0, z: -19 }, { x: -5, y: 0, z: -27 }, { x: 15, y: 4.5, z: -30 }];
+  const spots = [{ x: -13, y: 0, z: 5 }, { x: 15, y: 0, z: 1 }, { x: -22, y: 1.5, z: -15 }, { x: 22, y: 0, z: -19 }, { x: -5, y: 0, z: -27 }, { x: 15, y: 4.5, z: -30 }, { x: -28, y: 0, z: -3 }];
   const portals = LEVELS.map((lv, i) => {
     const sp = spots[i], top = sp.y + 0.25;
     boxes.push({ x0: sp.x - 4.5, y0: -3, z0: sp.z - 4.5, x1: sp.x + 4.5, y1: top, z1: sp.z + 4.5, kind: 'ground', on: true, theme: lv });
@@ -1007,6 +1039,7 @@ function mkBoss(type, c) {
   const base = { type, c, x: c.x, z: c.zc - 3, y: c.y, vx: 0, vz: 0, vy: 0, t: 0, inv: 0, active: false, defeated: false, deadT: 0, yaw: 0, tx: 0, tz: 0, state: type === 'mush' ? 'walk' : type === 'queen' ? 'hover' : 'aim' };
   if (type === 'mush') return Object.assign(base, { name: 'Kocamantar', r: 1.25, h: 2.1, hp: 3, maxHp: 3 });
   if (type === 'hog') return Object.assign(base, { name: 'Dikenbaş', r: 1.3, h: 1.9, hp: 5, maxHp: 5, spinA: 0 });
+  if (type === 'crab') return Object.assign(base, { name: 'Kaptan Kıskaç', r: 1.5, h: 1.5, hp: 5, maxHp: 5, state: 'side', bub: 0 });
   return Object.assign(base, { name: 'Kraliçe Vızvız', r: 1.15, h: 1.4, hp: 4, maxHp: 4, y: c.y + 5 });
 }
 
@@ -1384,6 +1417,26 @@ function updateBoss() {
       b.y += 4 * DT; if (b.y >= top) { b.state = 'hover'; b.t = 0; }
     }
     b.x = lim(b.x, ax0, ax1); b.z = lim(b.z, az0, az1);
+  } else if (b.type === 'crab') {
+    if (b.state !== 'dash' && b.state !== 'stunned') b.yaw += angDiff(Math.atan2(dx, dz), b.yaw) * 0.1;
+    if (b.state === 'side') { // scuttle sideways and blow bubbles
+      const sd = Math.sin(b.t * 1.4) > 0 ? 1 : -1, sp = 3 + lost * 0.5;
+      b.x += Math.cos(b.yaw) * sd * sp * DT; b.z -= Math.sin(b.yaw) * sd * sp * DT;
+      b.bub += DT;
+      if (b.bub > 1.1 - lost * 0.12) { b.bub = 0; L.shots.push({ kind: 'bubble', x: b.x + Math.sin(b.yaw) * 1.4, y: A.y + 0.9, z: b.z + Math.cos(b.yaw) * 1.4, life: 260 }); sfx.box(); }
+      if (b.t > 3.2 - lost * 0.35) { b.state = 'raise'; b.t = 0; }
+    } else if (b.state === 'raise') {
+      if (b.t > 0.7) { b.state = 'dash'; b.t = 0; const v = Math.min(14, d / 0.45); b.vx = dx / d * v; b.vz = dz / d * v; sfx.djump(); }
+    } else if (b.state === 'dash') {
+      b.x += b.vx * DT; b.z += b.vz * DT;
+      if (b.t > 0.45) {
+        b.state = 'stunned'; b.t = 0; shake = 16; sfx.pound(); burst(b.x, A.y + 0.3, b.z, '#f2d48a', 20, 4);
+        L.shots.push({ kind: 'ring', x: b.x, y: A.y, z: b.z, r: b.r, sp: 7 + lost * 0.6, life: 130 });
+      }
+    } else if (b.state === 'stunned') {
+      if (b.t > 2.1 - lost * 0.2) { b.state = 'side'; b.t = 0; }
+    }
+    b.x = lim(b.x, ax0, ax1); b.z = lim(b.z, az0, az1);
   } else {
     if (b.state === 'aim') {
       b.yaw += angDiff(Math.atan2(dx, dz), b.yaw) * 0.12;
@@ -1414,7 +1467,8 @@ function hitBoss(b) {
   burst(b.x, b.y + b.h, b.z, '#ffffff', 16, 4);
   if (b.type === 'mush') { b.state = 'walk'; b.t = 0; const d = Math.hypot(P.x - b.x, P.z - b.z) || 1; b.x -= (P.x - b.x) / d * 1.5; b.z -= (P.z - b.z) / d * 1.5; }
   else if (b.type === 'queen') { b.state = 'rise'; b.t = 0; }
-  else { b.state = 'quills'; b.t = 0; }
+  else if (b.type === 'hog') { b.state = 'quills'; b.t = 0; }
+  else { b.state = 'side'; b.t = 0; b.bub = 0; }
   if (b.hp <= 0) {
     b.defeated = true; b.deadT = 0; b.vy = 8; L.shots = [];
     sfx.win(); shake = 20;
@@ -1432,6 +1486,11 @@ function updateShots() {
       s.r += s.sp * DT;
       if (s.r > A.w * 0.75) s.life = 0;
       if (s.life > 0 && P.y - A.y < 0.35 && Math.abs(Math.hypot(P.x - s.x, P.z - s.z) - s.r) < 0.45) hurt(P.x - s.x, P.z - s.z);
+    } else if (s.kind === 'bubble') {
+      const ex = P.x - s.x, ez = P.z - s.z, ed = Math.hypot(ex, ez) || 1;
+      s.x += ex / ed * 3.2 * DT; s.z += ez / ed * 3.2 * DT; s.y = A.y + 0.9 + Math.sin(s.life * 0.15) * 0.15;
+      if (s.life <= 0) burst(s.x, s.y, s.z, '#bfeaff', 6, 1.5);
+      if (s.life > 0 && ed < 0.65 && s.y > P.y - 0.2 && s.y < P.y + P.h + 0.2) { hurt(ex, ez); s.life = 0; burst(s.x, s.y, s.z, '#bfeaff', 8, 2); }
     } else if (s.kind === 'quill') {
       s.x += s.vx * DT; s.z += s.vz * DT;
       if (Math.abs(s.x - A.x) > A.w / 2 || Math.abs(s.z - A.zc) > A.d / 2) s.life = 0;
@@ -1456,7 +1515,7 @@ function buildScene() {
   G.scene.fog = new THREE.Fog(th.sky[1], 32, 130);
   G.hemi.color.set(th.cave ? '#b9a6ff' : '#ffffff'); G.hemi.groundColor.set(th.mid); G.hemi.intensity = th.cave ? 0.6 : 0.62;
   G.sun.color.set(th.weather === 'ember' ? '#ffcf9a' : '#fff6e0'); G.sun.intensity = th.cave ? 0.5 : 0.75;
-  const DECO = { round: ['#3f9b37', '#2f7f2a', '#ff5fa2', '#ffd23f'], cactus: ['#b8801f', '#8a5f17', '#6b8f3a'], pine: ['#ffffff', '#dbe8f7'], shroom: ['#9ef0ff', '#d9a7ff'], spire: ['#5a2433', '#ff8c42'], candy: ['#ff9ad5', '#b28dff', '#ffffff', '#7fd3ff'] }, DECO0 = DECO[th.tree];
+  const DECO = { round: ['#3f9b37', '#2f7f2a', '#ff5fa2', '#ffd23f'], cactus: ['#b8801f', '#8a5f17', '#6b8f3a'], pine: ['#ffffff', '#dbe8f7'], shroom: ['#9ef0ff', '#d9a7ff'], spire: ['#5a2433', '#ff8c42'], candy: ['#ff9ad5', '#b28dff', '#ffffff', '#7fd3ff'], palm: ['#fff4dc', '#ff8fb8', '#ffffff', '#e8b56a'] }, DECO0 = DECO[th.tree];
   for (const b of L.boxes) {
     const w = b.x1 - b.x0, h = b.y1 - b.y0, d = b.z1 - b.z0, cx = (b.x0 + b.x1) / 2, cy = (b.y0 + b.y1) / 2, cz = (b.z0 + b.z1) / 2;
     let m = null;
@@ -1646,7 +1705,8 @@ function render3D() {
     if (b) {
       if (b.type === 'mush') { G.bossMesh = mushModel(); G.bossMesh.scale.setScalar(2.75); crownModel(G.bossMesh.userData.body, 0.7, 0.9); }
       else if (b.type === 'queen') { G.bossMesh = beeModel(); G.bossMesh.scale.setScalar(2.6); crownModel(G.bossMesh, 0.26, 0.55); }
-      else G.bossMesh = hogModel();
+      else if (b.type === 'hog') G.bossMesh = hogModel();
+      else G.bossMesh = crabModel();
       G.world.add(G.bossMesh);
     }
   }
@@ -1666,6 +1726,13 @@ function render3D() {
       m.rotation.set(0, b.yaw - Math.PI / 2, (b.state === 'stunned' ? Math.sin(frame * 0.2) * 0.2 : 0) + (b.defeated ? Math.PI : 0));
       for (const w of m.userData.wings) w.rotation.x = w.userData.s * (0.3 + Math.sin(frame * (b.state === 'stunned' ? 0.15 : 0.9)) * 0.45);
       if (b.state === 'aim' || b.state === 'dive') { G.marker.visible = true; G.marker.position.set(b.tx, b.c.y + 0.05, b.tz); const ms = 1.3 + Math.sin(frame * 0.4) * 0.12; G.marker.scale.set(ms, ms, 2); }
+    } else if (b.type === 'crab') {
+      m.position.set(b.x, b.y + (b.defeated ? b.h : 0), b.z);
+      m.rotation.set(0, b.yaw, b.defeated ? Math.PI : 0);
+      const body = m.userData.body;
+      body.position.y = 0.85 + (b.state === 'side' ? Math.abs(Math.sin(frame * 0.35)) * 0.08 : 0);
+      body.rotation.z = b.state === 'stunned' ? Math.sin(frame * 0.2) * 0.12 : b.state === 'side' ? Math.sin(frame * 0.35) * 0.05 : 0;
+      m.userData.claws.forEach((c, i) => { c.rotation.x = b.state === 'raise' ? -1.1 + Math.sin(frame * 0.9) * 0.1 : b.state === 'stunned' ? 0.55 : b.state === 'dash' ? -0.3 : Math.sin(frame * 0.12 + i * 2) * 0.2; });
     } else {
       m.position.set(b.x + (b.state === 'aim' ? Math.sin(frame * 1.9) * 0.06 : 0), b.y + (b.defeated ? b.h : 0), b.z);
       m.rotation.set(0, b.yaw, b.defeated ? Math.PI : 0);
@@ -1678,6 +1745,7 @@ function render3D() {
   for (const s of L.shots) {
     if (!s.mesh) {
       if (s.kind === 'ring') { s.mesh = new THREE.Mesh(G.geo.ring, G.ringMat); s.mesh.rotation.x = Math.PI / 2; }
+      else if (s.kind === 'bubble') { s.mesh = mk('sph', '#bfeaff', [0.36, 0.36, 0.36], [0, 0, 0], null, { transparent: true, opacity: 0.6, emissive: '#2a5a7a' }); s.mesh.castShadow = false; }
       else if (s.kind === 'quill') { s.mesh = new THREE.Group(); const c = mk('cone', '#4a2c17', [0.1, 0.6, 0.1], [0, 0, 0], s.mesh); c.rotation.x = Math.PI / 2; s.mesh.rotation.y = s.yaw; }
       else { s.mesh = mk('cone', '#22160c', [0.12, 0.45, 0.12], [0, 0, 0]); s.mesh.rotation.x = Math.PI; }
       G.world.add(s.mesh); G.shotMeshes.push({ s, m: s.mesh });
@@ -1734,7 +1802,7 @@ function draw3() {
   if (b && b.active && !b.defeated && b.type !== 'mush') {
     const q = scr(b.x, b.y + b.h + 0.9, b.z);
     if (q && b.state === 'stunned') for (let i = 0; i < 3; i++) { const a = frame * 0.12 + i * 2.1; txt('★', q.x + Math.cos(a) * 40, q.y + Math.sin(a) * 9, 22, '#fff27a', 'center'); }
-    if (q && b.state === 'aim') txt('!', q.x, q.y - 10, 40, '#ff4d6d', 'center');
+    if (q && (b.state === 'aim' || b.state === 'raise')) txt('!', q.x, q.y - 10, 40, '#ff4d6d', 'center');
   }
   if (state === 'play' && banner > 0 && !P.dead) { const q = scr(P.x, P.y + 2.2, P.z); if (q) { ctx.globalAlpha = Math.min(1, banner / 30); txt(save.name, q.x, q.y, 18, '#ffffff', 'center'); ctx.globalAlpha = 1; } }
   if (L.portals) {
@@ -1901,7 +1969,7 @@ function levelDone() {
   saveGame();
   const honeyAll = L.items.filter(h => h.kind === 'honey').length, honeyGot = L.items.filter(h => h.kind === 'honey' && h.got).length;
   if (lvlIdx >= LEVELS.length - 1) {
-    showMsg('Bal kulübesi dolu!', `Dikenbaş yenildi ve ${save.name} altı bölgeyi de geçti. Bu bölümde ${honey} bal topladın, cebinde ${save.coins} para var.`, 'Haritaya dön', goHub);
+    showMsg('Bal kulübesi dolu!', `${L.boss ? L.boss.name : 'Son boss'} yenildi ve ${save.name} bütün bölgeleri geçti. Bu bölümde ${honey} bal topladın, cebinde ${save.coins} para var.`, 'Haritaya dön', goHub);
   } else {
     showMsg(`${L.def.name} tamam!`, `${honeyAll} kavanozun ${honeyGot} tanesini buldun. Cebinde ${save.coins} para var. Sıradaki: ${LEVELS[lvlIdx + 1].name}.`, 'Sonraki bölüm', () => startLevel(lvlIdx + 1), 'Haritaya dön', goHub);
   }
