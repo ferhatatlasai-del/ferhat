@@ -117,6 +117,10 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
   display: grid; place-items: center; touch-action: none; }
 .tb.big { width: 82px; height: 82px; background: color-mix(in srgb, var(--honey-deep) 55%, transparent); }
 .tb.on { background: color-mix(in srgb, var(--honey) 70%, transparent); }
+#musicBtn { position: fixed; z-index: 5; top: calc(10px + env(safe-area-inset-top, 0px)); right: calc(max(12px, env(safe-area-inset-right, 0px)) + 52px);
+  width: 42px; height: 42px; border-radius: 12px; border: 3px solid var(--bark); background: var(--cream); color: var(--bark); font-family: var(--display); font-size: 1.25rem; cursor: pointer; }
+#musicBtn.off { background: color-mix(in srgb, var(--cream) 55%, var(--bark)); text-decoration: line-through; }
+#musicBtn:focus-visible, #pauseBtn:focus-visible { outline: 3px solid var(--leaf); outline-offset: 2px; }
 #pauseBtn { position: fixed; top: calc(10px + env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px));
   width: 42px; height: 42px; border-radius: 12px; border: 3px solid var(--bark); background: var(--cream); color: var(--bark);
   font-family: var(--display); font-size: 1.1rem; cursor: pointer; }
@@ -131,6 +135,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 <div id="wrap"><canvas id="gl" width="960" height="540" aria-hidden="true"></canvas><canvas id="c" width="960" height="540" aria-label="Oyun alanı"></canvas></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <button id="pauseBtn" type="button" aria-label="Duraklat" hidden>II</button>
+<button id="musicBtn" type="button" aria-label="Müziği aç / kapat" aria-pressed="true">♪</button>
 
 <div id="touch" hidden>
   <div class="grp"><div id="stick" aria-label="Yürüme kolu"><div id="knob"></div></div></div>
@@ -235,13 +240,62 @@ addEventListener('resize', fit); fit();
 
 /* ---------- save ---------- */
 const PRICES = [20, 40, 65]; // 4th, 5th, 6th heart
-let save = { unlocked: 0, coins: 0, maxHp: 3, best: [0, 0, 0, 0, 0], name: 'Pofuduk', gender: 'boy', species: 'brown', outfit: 'none', owned: ['none'] };
+let save = { unlocked: 0, coins: 0, maxHp: 3, best: [0, 0, 0, 0, 0], name: 'Pofuduk', gender: 'boy', species: 'brown', outfit: 'none', owned: ['none'], music: true };
 try { const s = JSON.parse(localStorage.getItem('pofuduk-save') || 'null'); if (s) save = Object.assign(save, s); } catch (e) {}
 function saveGame() { try { localStorage.setItem('pofuduk-save', JSON.stringify(save)); } catch (e) {} }
 
 /* ---------- sound ---------- */
 let ac = null, muted = false;
-function audio() { if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } if (ac && ac.state === 'suspended') ac.resume(); }
+function audio() {
+  if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} if (ac) musicInit(); }
+  if (ac && ac.state === 'suspended') ac.resume();
+}
+/* ---------- music: original chiptune loops, one per mood ---------- */
+const seq = str => str.trim().split(/\s+/).map(t => t === '.' ? 0 : t);
+const SONGS = {
+  hub: { bpm: 104, lead: seq('72 . 76 . 79 . 76 . 77 . 74 . 72 . . . 74 . 77 . 81 . 79 . 77 76 74 . 72 . . . 76 . 79 . 84 . 81 . 79 . 77 . 76 . 74 . 72 . 74 76 77 79 77 76 74 . 72 . . .'),
+    bass: seq('48 . 55 . 53 . 55 . 50 . 57 . 55 . 43 . 48 . 55 . 53 . 60 . 50 . 57 . 43 . 55 .'), drum: seq('k . h . s . h . k . h . s . h h') },
+  level: { bpm: 128, lead: seq('76 . 79 76 . 72 74 . 76 . 79 . 84 . 81 . 79 . 76 . 77 79 81 . 79 77 76 74 72 . . . 74 . 77 74 . 71 72 . 74 . 77 . 83 . 81 . 79 . 77 76 74 . 72 74 76 79 . . 72 . . .'),
+    bass: seq('48 48 55 48 53 53 60 53 55 55 62 55 48 . 55 . 50 50 57 50 55 55 62 55 53 53 60 53 48 . 55 .'), drum: seq('k . h k s . h . k k h . s . h s') },
+  boss: { bpm: 150, lead: seq('69 . 72 . 76 . 72 . 71 . 74 . 77 . 74 . 69 . 72 . 76 . 79 . 77 76 74 72 71 . . . 81 . 79 . 77 . 76 . 74 . 76 . 77 . 74 . 72 . 71 . 69 . 68 . 69 . . .'),
+    bass: seq('45 45 57 45 43 43 55 43 41 41 53 41 40 40 52 40'), drum: seq('k h s h k k s h k h s h k k s s') },
+};
+const LEVEL_KEY = [0, 2, -3, -5, -1, 4];
+const music = { bus: null, song: null, name: '', tr: 0, step: 0, next: 0, noise: null };
+function musicInit() {
+  music.bus = ac.createGain(); music.bus.gain.value = 0; music.bus.connect(ac.destination);
+  const n = ac.createBuffer(1, ac.sampleRate, ac.sampleRate), d = n.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  music.noise = n; musicVol();
+  setInterval(musicTick, 40);
+}
+function musicVol() { if (music.bus) music.bus.gain.setTargetAtTime(save.music !== false && !muted ? 0.75 : 0, ac.currentTime, 0.08); }
+function playSong(name, tr = 0) { if (music.name === name && music.tr === tr) return; music.name = name; music.tr = tr; music.song = SONGS[name]; music.step = 0; }
+function mNote(m, t, dur, type, vol) {
+  const o = ac.createOscillator(), g = ac.createGain();
+  o.type = type; o.frequency.value = 440 * Math.pow(2, (m - 69) / 12);
+  g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g).connect(music.bus); o.start(t); o.stop(t + dur + 0.05);
+}
+function mDrum(k, t) {
+  if (k === 'k') { const o = ac.createOscillator(), g = ac.createGain(); o.frequency.setValueAtTime(140, t); o.frequency.exponentialRampToValueAtTime(45, t + 0.14); g.gain.setValueAtTime(0.22, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.16); o.connect(g).connect(music.bus); o.start(t); o.stop(t + 0.2); return; }
+  const src = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+  src.buffer = music.noise; f.type = k === 'h' ? 'highpass' : 'bandpass'; f.frequency.value = k === 'h' ? 7000 : 1800;
+  const len = k === 'h' ? 0.035 : 0.1; g.gain.setValueAtTime(k === 'h' ? 0.05 : 0.09, t); g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+  src.connect(f).connect(g).connect(music.bus); src.start(t, Math.random() * 0.5); src.stop(t + len + 0.02);
+}
+function musicTick() {
+  const s = music.song; if (!s || !ac || ac.state !== 'running') return;
+  const sp = 60 / s.bpm / 4;
+  if (music.next < ac.currentTime) music.next = ac.currentTime + 0.05;
+  while (music.next < ac.currentTime + 0.15) {
+    const st = music.step, l = +s.lead[st % s.lead.length], b = +s.bass[st % s.bass.length], d = s.drum[st % s.drum.length];
+    if (l) mNote(l + music.tr, music.next, sp * 1.7, 'square', 0.03);
+    if (b) mNote(b + music.tr, music.next, sp * 1.9, 'triangle', 0.08);
+    if (d) mDrum(d, music.next);
+    music.next += sp; music.step++;
+  }
+}
 function tone(f, d = 0.1, type = 'square', to = null, vol = 0.08, delay = 0) {
   if (!ac || muted) return;
   const t0 = ac.currentTime + delay, o = ac.createOscillator(), g = ac.createGain();
@@ -280,7 +334,7 @@ addEventListener('keydown', e => {
   if (k && (state === 'play' || state === 'pause')) e.preventDefault();
   if (k && state === 'play') press(k);
   if (e.code === 'KeyP' || e.code === 'Escape') togglePause();
-  if (e.code === 'KeyM') muted = !muted;
+  if (e.code === 'KeyM') { muted = !muted; musicVol(); }
   if (e.code === 'Enter') { const b = document.querySelector('.panel:not([hidden]) .btn.primary'); if (b) { e.preventDefault(); b.click(); } }
 });
 addEventListener('keyup', e => { const k = map[e.code]; if (k) keys[k] = false; });
@@ -842,24 +896,27 @@ function buildLevel(n) {
 }
 const HUB = { name: 'Bal Köyü', sky: ['#7fd3ff', '#d9f3ff'], far: '#8fc5a8', mid: '#5aa65e', grass: '#5cc04a', grassDark: '#3f9b37', dirt: '#9a6234', dirtDot: '#7b4a24', tree: 'round', friction: 0.78, sun: '#fff1a8' };
 function buildHub() {
-  const R = 16, boxes = [{ x0: -R, y0: -3, z0: -R, x1: R, y1: 0, z1: R, kind: 'ground', on: true }], trees = [];
+  const R = 34, boxes = [{ x0: -R, y0: -3, z0: -R, x1: R, y1: 0, z1: R, kind: 'ground', on: true }], trees = [], paths = [];
+  const rnd = rng(9);
+  // each portal sits on a patch of its own region, scattered around the village
+  const spots = [{ x: -13, y: 0, z: 5 }, { x: 15, y: 0, z: 1 }, { x: -22, y: 1.5, z: -15 }, { x: 22, y: 0, z: -19 }, { x: -5, y: 0, z: -27 }, { x: 15, y: 4.5, z: -30 }];
   const portals = LEVELS.map((lv, i) => {
-    const a = Math.PI - (i - (LEVELS.length - 1) / 2) * 0.55, x = Math.sin(a) * 10.5, z = Math.cos(a) * 10.5;
-    return { i, x, y: 0, z, yaw: Math.atan2(-x, -z), locked: i > save.unlocked, cd: 0 };
+    const sp = spots[i], top = sp.y + 0.25;
+    boxes.push({ x0: sp.x - 4.5, y0: -3, z0: sp.z - 4.5, x1: sp.x + 4.5, y1: top, z1: sp.z + 4.5, kind: 'ground', on: true, theme: lv });
+    for (const [dx, dz] of [[-3.4, -3.3], [3.4, -3.2], [-3.3, 3.3], [3.5, 3.2]]) if (rnd() < 0.8) trees.push({ x: sp.x + dx, y: top, z: sp.z + dz, s: 0.6 + rnd() * 0.3, kind: lv.tree });
+    paths.push({ x0: 0, z0: 15, x1: sp.x, z1: sp.z + (sp.y > 3 ? 5 : 0) });
+    return { i, x: sp.x, y: top, z: sp.z - 1, yaw: Math.atan2(0 - sp.x, 15 - sp.z), locked: i > save.unlocked, cd: 0 };
   });
-  const shop = { x: 11, y: 0, z: 4 }; shop.yaw = Math.atan2(-shop.x, -shop.z);
+  const cloud = spots[5]; // the cloud island is high up: climb its vine
+  boxes.push({ x0: cloud.x - 1.3, y0: 0, z0: cloud.z + 4.5, x1: cloud.x + 1.3, y1: cloud.y + 0.25, z1: cloud.z + 4.62, kind: 'vine', on: true, nx: 0, nz: 1, face: cloud.z + 4.5 });
+  const shop = { x: 13, y: 0, z: 15 }; shop.yaw = Math.atan2(-shop.x, 22 - shop.z);
   shop.tx = shop.x + Math.sin(shop.yaw) * 1.9; shop.tz = shop.z + Math.cos(shop.yaw) * 1.9;
   boxes.push({ x0: shop.x - 1.2, y0: 0, z0: shop.z - 1.2, x1: shop.x + 1.2, y1: 1, z1: shop.z + 1.2, kind: 'deco', on: true });
-  const goal = { x: -10, y: 0, z: 6 };
+  const goal = { x: -13, y: 0, z: 17 };
   boxes.push({ x0: goal.x - 1.65, y0: 0, z0: goal.z - 1.15, x1: goal.x + 1.65, y1: 2.6, z1: goal.z + 1.15, kind: 'cabin', on: true });
-  // practice pillar with a vine
-  boxes.push({ x0: -13.5, y0: -3, z0: -3, x1: -10.5, y1: 5, z1: 0, kind: 'ground', on: true });
-  boxes.push({ x0: -12.8, y0: 0, z0: 0, x1: -11.2, y1: 5, z1: 0.12, kind: 'vine', on: true, nx: 0, nz: 1, face: 0 });
-  const items = [{ kind: 'honey', x: -12, y: 5.8, z: -1.5 }];
-  items.forEach(h => { h.got = false; h.ph = 0; });
-  const rnd = rng(9);
-  for (let i = 0; i < 16; i++) { const a = i / 16 * 6.28 + 0.2, rr = 13.5 + rnd() * 1.5; trees.push({ x: Math.sin(a) * rr, y: 0, z: Math.cos(a) * rr, s: 0.7 + rnd() * 0.4 }); }
-  return { def: HUB, hub: true, boxes, items, enemies: [], trees, start: { x: 0, y: 0, z: 9 }, checkpoint: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop };
+  const clear = (x, z) => spots.every(sp => Math.hypot(x - sp.x, z - sp.z) > 7.5) && Math.hypot(x - shop.x, z - shop.z) > 4 && Math.hypot(x - goal.x, z - goal.z) > 4 && Math.abs(x) > 2.5;
+  for (let i = 0; i < 70; i++) { const x = (rnd() - 0.5) * 2 * (R - 2), z = (rnd() - 0.5) * 2 * (R - 2); if (clear(x, z)) trees.push({ x, y: 0, z, s: 0.7 + rnd() * 0.5 }); }
+  return { def: HUB, hub: true, boxes, items: [], enemies: [], trees, paths, start: { x: 0, y: 0, z: 24 }, checkpoint: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop };
 }
 function mkBoss(type, c) {
   const base = { type, c, x: c.x, z: c.zc - 3, y: c.y, vx: 0, vz: 0, vy: 0, t: 0, inv: 0, active: false, defeated: false, deadT: 0, yaw: 0, tx: 0, tz: 0, state: type === 'mush' ? 'walk' : type === 'queen' ? 'hover' : 'aim' };
@@ -876,7 +933,7 @@ const angDiff = (a, b) => Math.atan2(Math.sin(a - b), Math.cos(a - b));
 
 function newPlayer(s) {
   return { x: s.x, y: s.y, z: s.z, vx: 0, vy: 0, vz: 0, r: 0.38, h: 1.35, yaw: Math.PI, onGround: false, ground: null,
-    coyote: 0, buffer: 0, jumps: 0, hp: save.maxHp, inv: 0, pound: false, dead: 0, anim: 0, squash: 0, spin: 0, hang: null, hangCd: 0, hangT: 0, vine: null, vineCd: 0 };
+    coyote: 0, buffer: 0, jumps: 0, stepUp: true, hp: save.maxHp, inv: 0, pound: false, dead: 0, anim: 0, squash: 0, spin: 0, hang: null, hangCd: 0, hangT: 0, vine: null, vineCd: 0 };
 }
 function loadLevel(i) {
   lvlIdx = i; L = i < 0 ? buildHub() : buildLevel(i);
@@ -905,6 +962,11 @@ function moveAxis(o, axis, d) {
   o[axis] += d; let hit = null;
   for (const b of L.boxes) {
     if (!b.on || !solidKind(b.kind) || !hits(o, b)) continue;
+    if (axis !== 'y' && o.stepUp && b.y1 - o.y > 0 && b.y1 - o.y <= 0.36) {
+      const oy = o.y; o.y = b.y1 + 0.001;
+      if (!L.boxes.some(c => c !== b && c.on && solidKind(c.kind) && hits(o, c))) continue;
+      o.y = oy;
+    }
     hit = b;
     if (axis === 'x') o.x = d > 0 ? b.x0 - o.r : b.x1 + o.r;
     else if (axis === 'z') o.z = d > 0 ? b.z0 - o.r : b.z1 + o.r;
@@ -1309,11 +1371,12 @@ function buildScene() {
   G.scene.fog = new THREE.Fog(th.sky[1], 32, 130);
   G.hemi.color.set(th.cave ? '#b9a6ff' : '#ffffff'); G.hemi.groundColor.set(th.mid); G.hemi.intensity = th.cave ? 0.6 : 0.62;
   G.sun.color.set(th.weather === 'ember' ? '#ffcf9a' : '#fff6e0'); G.sun.intensity = th.cave ? 0.5 : 0.75;
-  const deco = { round: ['#3f9b37', '#2f7f2a', '#ff5fa2', '#ffd23f'], cactus: ['#b8801f', '#8a5f17', '#6b8f3a'], pine: ['#ffffff', '#dbe8f7'], shroom: ['#9ef0ff', '#d9a7ff'], spire: ['#5a2433', '#ff8c42'], candy: ['#ff9ad5', '#b28dff', '#ffffff', '#7fd3ff'] }[th.tree];
+  const DECO = { round: ['#3f9b37', '#2f7f2a', '#ff5fa2', '#ffd23f'], cactus: ['#b8801f', '#8a5f17', '#6b8f3a'], pine: ['#ffffff', '#dbe8f7'], shroom: ['#9ef0ff', '#d9a7ff'], spire: ['#5a2433', '#ff8c42'], candy: ['#ff9ad5', '#b28dff', '#ffffff', '#7fd3ff'] }, DECO0 = DECO[th.tree];
   for (const b of L.boxes) {
     const w = b.x1 - b.x0, h = b.y1 - b.y0, d = b.z1 - b.z0, cx = (b.x0 + b.x1) / 2, cy = (b.y0 + b.y1) / 2, cz = (b.z0 + b.z1) / 2;
     let m = null;
     if (b.kind === 'ground') {
+      const th = b.theme || L.def, deco = b.theme ? DECO[th.tree] : DECO0;
       m = grp(W, cx, 0, cz);
       const dirt = mk('box', th.dirt, [w, h, d], [0, cy, 0], m); dirt.receiveShadow = true;
       const top = mk('box', th.grass, [w + 0.14, 0.36, d + 0.14], [0, b.y1 - 0.14, 0], m); top.receiveShadow = true;
@@ -1356,7 +1419,11 @@ function buildScene() {
     }
     if (m) G.boxMeshes.set(b, m);
   }
-  for (const t of L.trees) treeModel(th.tree, W, t.x, t.y, t.z, t.s, rnd);
+  for (const t of L.trees) treeModel(t.kind || th.tree, W, t.x, t.y, t.z, t.s, rnd);
+  if (L.paths) for (const pa of L.paths) {
+    const dx = pa.x1 - pa.x0, dz = pa.z1 - pa.z0, len = Math.hypot(dx, dz);
+    const pm = mk('box', '#d9b27a', [1.7, 0.06, len], [(pa.x0 + pa.x1) / 2, 0.04, (pa.z0 + pa.z1) / 2], W); pm.rotation.y = Math.atan2(dx, dz); pm.castShadow = false; pm.receiveShadow = true;
+  }
 
   // surroundings: valley floor, mountains, clouds
   let x0 = 1e9, x1 = -1e9, z0 = 1e9, z1 = -1e9, ymax = -1e9;
@@ -1587,7 +1654,7 @@ function draw3() {
   if (state === 'play' && banner > 0 && !P.dead) { const q = scr(P.x, P.y + 2.2, P.z); if (q) { ctx.globalAlpha = Math.min(1, banner / 30); txt(save.name, q.x, q.y, 18, '#ffffff', 'center'); ctx.globalAlpha = 1; } }
   if (L.portals) {
     for (const pt of L.portals) {
-      if (Math.hypot(pt.x - P.x, pt.z - P.z) > 22) continue;
+      if (Math.hypot(pt.x - P.x, pt.z - P.z) > 30) continue;
       const q = scr(pt.x, pt.y + 3.7, pt.z); if (!q) continue;
       const lv = LEVELS[pt.i];
       txt(`${pt.i + 1}. ${lv.name}`, q.x, q.y, 17, pt.locked ? '#d6d6d6' : '#ffffff', 'center');
@@ -1691,6 +1758,10 @@ $('wDone').onclick = () => {
 };
 $('wardBtn1').onclick = () => { audio(); openWard('title'); };
 $('wardBtn2').onclick = () => { audio(); openWard('select'); };
+const musicBtn = $('musicBtn');
+function musicBtnSync() { const on = save.music !== false; musicBtn.classList.toggle('off', !on); musicBtn.setAttribute('aria-pressed', on); }
+musicBtn.onclick = () => { audio(); save.music = save.music === false; saveGame(); musicVol(); musicBtnSync(); musicBtn.blur(); };
+musicBtnSync();
 function goHub() { saveGame(); honey = 0; lives = 3; loadLevel(-1); setPlaying(); }
 $('hubBtn').onclick = () => { audio(); goHub(); };
 $('startBtn').onclick = () => { audio(); save.name = cleanName(); goHub(); };
@@ -1771,6 +1842,7 @@ if (!USE3D) {
       }
       accum -= 1000 / 60;
     }
+    if (ac) { const bb = L.boss; playSong(L.hub || state === 'title' ? 'hub' : bb && bb.active && !bb.defeated ? 'boss' : 'level', L.hub ? 0 : LEVEL_KEY[lvlIdx] || 0); }
     draw3();
     requestAnimationFrame(loop);
   };
