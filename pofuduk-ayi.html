@@ -143,7 +143,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 <div class="panel" id="pTitle">
   <div class="card">
     <h1 id="titleName">Pofuduk'un Bal Macerası</h1>
-    <p>Ayımızın balları altı bölgeye dağılmış. Bal ve bozuk para topla, üç boss'u yen, bal kulübesine ulaş!</p>
+    <p>Ayımızın balları altı bölgeye dağılmış. Bal Köyü'ndeki portallardan bölgelere git, bal ve bozuk para topla, üç boss'u yen!</p>
     <div class="who">
       <label for="nameInput">Ayının adı</label>
       <input id="nameInput" type="text" maxlength="14" autocomplete="off" spellcheck="false" placeholder="Pofuduk">
@@ -157,6 +157,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
       <b>Boşluk</b><span>Zıpla, havadayken bir daha bas: çift zıplama</span>
       <b>Shift</b><span>Havada bas: yere çakıl, sandıkları kır</span>
       <b>Kenar</b><span>Düşerken kenara tutunursun: Boşluk ile tırman, Shift ile bırak</span>
+      <b>Sarmaşık</b><span>Sarmaşığa tutun: W ile tırman, Boşluk ile atla</span>
       <b>Q / E</b><span>Kamerayı döndür (ekranı sürükleyerek de olur)</span>
       <b>P</b><span>Duraklat</span>
     </div>
@@ -181,6 +182,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
       <p class="small" id="shopNote"></p>
     </div>
     <div class="row">
+      <button class="btn primary" id="hubBtn" type="button">Haritaya dön</button>
       <button class="btn alt" id="backBtn" type="button">Adı değiştir</button>
       <button class="btn alt" id="wardBtn2" type="button">Dolap: karakter ve kıyafet</button>
     </div>
@@ -478,7 +480,7 @@ function drawHud() {
   ctx.fillStyle = (SPECIES[save.species] || SPECIES.brown).fur; ctx.beginPath(); ctx.arc(hx - 8, 22, 5, 0, 7); ctx.arc(hx + 8, 22, 5, 0, 7); ctx.arc(hx, 32, 11, 0, 7); ctx.fill();
   ctx.fillStyle = '#d9a066'; ctx.beginPath(); ctx.ellipse(hx, 36, 6, 4, 0, 0, 7); ctx.fill();
   txt('× ' + lives, hx + 16, 42, 26);
-  txt(`${lvlIdx + 1}/${LEVELS.length}`, VW - 70, 42, 24, '#fff4dc', 'right');
+  txt(L.hub ? 'Harita' : `${lvlIdx + 1}/${LEVELS.length}`, VW - 70, 42, 24, '#fff4dc', 'right');
   const b = L.boss;
   if (b && b.active && !b.defeated) {
     const bw = 300, bx = VW / 2 - bw / 2, by = 64;
@@ -490,7 +492,7 @@ function drawHud() {
   if (banner > 0) {
     ctx.globalAlpha = Math.min(1, banner / 30);
     txt(L.def.name, VW / 2, 200, 56, '#ffb627', 'center');
-    txt(`${save.name} · Bölge ${lvlIdx + 1}`, VW / 2, 240, 26, '#fff4dc', 'center');
+    txt(L.hub ? `${save.name} · Portaldan bir bölgeye gir` : `${save.name} · Bölge ${lvlIdx + 1}`, VW / 2, 240, 26, '#fff4dc', 'center');
     ctx.globalAlpha = 1;
   }
   if (bossBanner > 0) {
@@ -547,7 +549,7 @@ function init3D() {
     box: new THREE.BoxGeometry(1, 1, 1), sph: new THREE.SphereGeometry(1, 20, 14),
     hemi: new THREE.SphereGeometry(1, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2),
     cyl: new THREE.CylinderGeometry(1, 1, 1, 18), cone: new THREE.ConeGeometry(1, 1, 16), coneLow: new THREE.ConeGeometry(1, 1, 6),
-    ico: new THREE.IcosahedronGeometry(1, 1), torus: new THREE.TorusGeometry(1, 0.28, 10, 26), prism: new THREE.CylinderGeometry(1, 1, 1, 3), ring: new THREE.TorusGeometry(1, 0.07, 6, 48),
+    ico: new THREE.IcosahedronGeometry(1, 1), torus: new THREE.TorusGeometry(1, 0.28, 10, 26), prism: new THREE.CylinderGeometry(1, 1, 1, 3), ring: new THREE.TorusGeometry(1, 0.07, 6, 48), disc: new THREE.CircleGeometry(1, 40),
   };
   G.matQ = new THREE.MeshLambertMaterial({ map: canvasTex(64, 64, (g) => {
     g.fillStyle = '#ffd23f'; g.fillRect(0, 0, 64, 64); g.strokeStyle = '#4a2c17'; g.lineWidth = 7; g.strokeRect(3.5, 3.5, 57, 57);
@@ -746,8 +748,8 @@ function buildLevel(n) {
   const box = (x0, y0, z0, x1, y1, z1, kind, extra) => { const b = Object.assign({ x0, y0, z0, x1, y1, z1, kind, on: true }, extra || {}); boxes.push(b); return b; };
   const coin = (cx, cy, cz) => items.push({ kind: 'coin', x: cx, y: cy, z: cz });
   const jar = (cx, cy, cz) => items.push({ kind: 'honey', x: cx, y: cy, z: cz });
-  const island = (w, d, bare) => {
-    const b = box(x - w / 2, y - 3, z - d, x + w / 2, y, z, 'ground');
+  const island = (w, d, bare, depth = 3) => {
+    const b = box(x - w / 2, y - depth, z - d, x + w / 2, y, z, 'ground');
     const isl = { x, y, zf: z, zb: z - d, zc: z - d / 2, w, d, b };
     if (!bare) { const nt = Math.floor(r() * 3); for (let i = 0; i < nt; i++) { const side = r() < 0.5 ? -1 : 1; trees.push({ x: x + side * (w / 2 - 0.8 - r() * 0.5), y, z: z - 1.2 - r() * (d - 2.4), s: 0.6 + r() * 0.35 }); } }
     z -= d; return isl;
@@ -763,7 +765,16 @@ function buildLevel(n) {
   const start = { x: 0, y: 0, z: -3 };
   for (let i = 0; i < 3; i++) coin(0, 0.8, -6 - i * 1.3);
   const segs = 8 + Math.min(n, 4) * 2; let checkpoint = null;
+  const cliff = () => { // a wall too tall to jump, with a vine to climb
+    gap(2 + r() * 0.6, 0, pickDx()); island(8, 6);
+    const y0 = y; y += 5.5;
+    const c = island(8, 9, false, 8.5);
+    box(c.x - 1.3, y0, c.zf, c.x + 1.3, c.y, c.zf + 0.12, 'vine', { nx: 0, nz: 1, face: c.zf });
+    for (let k = 0; k < 3; k++) coin(c.x, y0 + 1.6 + k * 1.3, c.zf + 0.9);
+    jar(c.x, c.y + 0.8, c.zc);
+  };
   for (let s = 0; s < segs; s++) {
+    if (s === 1 || (s > 3 && s !== Math.floor(segs / 2) && r() < 0.12)) { cliff(); continue; }
     if (!checkpoint && s === Math.floor(segs / 2)) {
       gap(2.2, 0, pickDx()); const c = island(8, 8);
       checkpoint = { x: c.x - 2.2, y: c.y, z: c.zc, on: false }; jar(c.x + 1.5, c.y + 0.8, c.zc); continue;
@@ -829,6 +840,27 @@ function buildLevel(n) {
   const minY = Math.min(...boxes.map(b => b.y1));
   return { def, boxes, items, enemies, trees, start, checkpoint, goal, boss, bossCp, arena, shots: [], killY: minY - 12 };
 }
+const HUB = { name: 'Bal Köyü', sky: ['#7fd3ff', '#d9f3ff'], far: '#8fc5a8', mid: '#5aa65e', grass: '#5cc04a', grassDark: '#3f9b37', dirt: '#9a6234', dirtDot: '#7b4a24', tree: 'round', friction: 0.78, sun: '#fff1a8' };
+function buildHub() {
+  const R = 16, boxes = [{ x0: -R, y0: -3, z0: -R, x1: R, y1: 0, z1: R, kind: 'ground', on: true }], trees = [];
+  const portals = LEVELS.map((lv, i) => {
+    const a = Math.PI - (i - (LEVELS.length - 1) / 2) * 0.55, x = Math.sin(a) * 10.5, z = Math.cos(a) * 10.5;
+    return { i, x, y: 0, z, yaw: Math.atan2(-x, -z), locked: i > save.unlocked, cd: 0 };
+  });
+  const shop = { x: 11, y: 0, z: 4 }; shop.yaw = Math.atan2(-shop.x, -shop.z);
+  shop.tx = shop.x + Math.sin(shop.yaw) * 1.9; shop.tz = shop.z + Math.cos(shop.yaw) * 1.9;
+  boxes.push({ x0: shop.x - 1.2, y0: 0, z0: shop.z - 1.2, x1: shop.x + 1.2, y1: 1, z1: shop.z + 1.2, kind: 'deco', on: true });
+  const goal = { x: -10, y: 0, z: 6 };
+  boxes.push({ x0: goal.x - 1.65, y0: 0, z0: goal.z - 1.15, x1: goal.x + 1.65, y1: 2.6, z1: goal.z + 1.15, kind: 'cabin', on: true });
+  // practice pillar with a vine
+  boxes.push({ x0: -13.5, y0: -3, z0: -3, x1: -10.5, y1: 5, z1: 0, kind: 'ground', on: true });
+  boxes.push({ x0: -12.8, y0: 0, z0: 0, x1: -11.2, y1: 5, z1: 0.12, kind: 'vine', on: true, nx: 0, nz: 1, face: 0 });
+  const items = [{ kind: 'honey', x: -12, y: 5.8, z: -1.5 }];
+  items.forEach(h => { h.got = false; h.ph = 0; });
+  const rnd = rng(9);
+  for (let i = 0; i < 16; i++) { const a = i / 16 * 6.28 + 0.2, rr = 13.5 + rnd() * 1.5; trees.push({ x: Math.sin(a) * rr, y: 0, z: Math.cos(a) * rr, s: 0.7 + rnd() * 0.4 }); }
+  return { def: HUB, hub: true, boxes, items, enemies: [], trees, start: { x: 0, y: 0, z: 9 }, checkpoint: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop };
+}
 function mkBoss(type, c) {
   const base = { type, c, x: c.x, z: c.zc - 3, y: c.y, vx: 0, vz: 0, vy: 0, t: 0, inv: 0, active: false, defeated: false, deadT: 0, yaw: 0, tx: 0, tz: 0, state: type === 'mush' ? 'walk' : type === 'queen' ? 'hover' : 'aim' };
   if (type === 'mush') return Object.assign(base, { name: 'Kocamantar', r: 1.25, h: 2.1, hp: 3, maxHp: 3 });
@@ -844,10 +876,10 @@ const angDiff = (a, b) => Math.atan2(Math.sin(a - b), Math.cos(a - b));
 
 function newPlayer(s) {
   return { x: s.x, y: s.y, z: s.z, vx: 0, vy: 0, vz: 0, r: 0.38, h: 1.35, yaw: Math.PI, onGround: false, ground: null,
-    coyote: 0, buffer: 0, jumps: 0, hp: save.maxHp, inv: 0, pound: false, dead: 0, anim: 0, squash: 0, spin: 0, hang: null, hangCd: 0, hangT: 0 };
+    coyote: 0, buffer: 0, jumps: 0, hp: save.maxHp, inv: 0, pound: false, dead: 0, anim: 0, squash: 0, spin: 0, hang: null, hangCd: 0, hangT: 0, vine: null, vineCd: 0 };
 }
 function loadLevel(i) {
-  lvlIdx = i; L = buildLevel(i);
+  lvlIdx = i; L = i < 0 ? buildHub() : buildLevel(i);
   P = newPlayer(L.start);
   parts = []; ambs = []; pops = []; banner = 150; bossBanner = 0;
   if (USE3D) { G.camYaw = 0; G.ct = null; buildScene(); }
@@ -866,7 +898,7 @@ function respawn() {
 }
 
 /* ---------- physics ---------- */
-const solidKind = k => k !== 'spike';
+const solidKind = k => k !== 'spike' && k !== 'vine';
 function hits(o, b) { return o.x + o.r > b.x0 && o.x - o.r < b.x1 && o.z + o.r > b.z0 && o.z - o.r < b.z1 && o.y + o.h > b.y0 && o.y < b.y1; }
 function moveAxis(o, axis, d) {
   if (!d) return null;
@@ -883,7 +915,7 @@ function moveAxis(o, axis, d) {
 function groundBelow(x, z, y) {
   let best = null;
   for (const b of L.boxes) {
-    if (!b.on || b.kind === 'spike' || b.kind === 'cabin') continue;
+    if (!b.on || b.kind === 'spike' || b.kind === 'cabin' || b.kind === 'vine') continue;
     if (x > b.x0 && x < b.x1 && z > b.z0 && z < b.z1 && b.y1 <= y + 0.05 && (!best || b.y1 > best)) best = b.y1;
   }
   return best;
@@ -904,13 +936,13 @@ function addHoney(n, x, y, z) {
 function addCoins(n, x, y, z) { save.coins += n; if (x !== undefined) pop('+' + n + ' para', x, y, z, '#fff27a'); }
 function hurt(kx, kz) {
   if (P.inv > 0 || P.dead) return;
-  P.hp--; P.inv = 100; shake = 10; sfx.hurt(); P.hang = null; P.hangCd = 30;
+  P.hp--; P.inv = 100; shake = 10; sfx.hurt(); P.hang = null; P.hangCd = 30; P.vine = null; P.vineCd = 30;
   const m = Math.hypot(kx, kz) || 1;
   P.vy = 7; P.vx = kx / m * 6; P.vz = kz / m * 6; P.pound = false;
   burst(P.x, P.y + 0.7, P.z, '#ff5a4f', 12);
   if (P.hp <= 0) kill();
 }
-function kill() { if (P.dead) return; P.hang = null; P.dead = 1; P.vy = 9; P.vx = P.vz = 0; sfx.die(); shake = 14; }
+function kill() { if (P.dead) return; P.hang = null; P.vine = null; P.dead = 1; P.vy = 9; P.vx = P.vz = 0; sfx.die(); shake = 14; }
 function ambient() {
   const w = L.def.weather;
   if (w === 'snow' && frame % 3 === 0) ambs.push({ x: Math.random() * (VW + 100), y: -5, vx: -0.4 + Math.random() * 0.3, vy: 1 + Math.random(), color: '#ffffff', r: 1.5 + Math.random() * 1.5 });
@@ -954,6 +986,7 @@ function update() {
   const wx = fx * iy + rx * ix, wz = fz * iy + rz * ix, wm = Math.hypot(wx, wz);
   phys: {
   if (P.hang) { hangStep(wx, wz); break phys; }
+  if (P.vine) { vineStep(wx, wz); break phys; }
   const ice = L.def.friction > 0.9, max = 6.5;
   if (!P.pound) {
     const k = P.onGround ? (ice ? 3 : 12) : 4.5;
@@ -987,6 +1020,7 @@ function update() {
   }
   if (!P.onGround) P.ground = null;
   if (!P.onGround && P.vy < 0 && !P.pound && P.hangCd <= 0) tryGrab();
+  if (!P.hang && !P.pound && P.vineCd <= 0) tryVine(wx, wz);
   if (P.onGround && vyBefore < -6) P.squash = Math.min(8, -vyBefore * 0.4);
   if (P.onGround && P.pound) {
     P.pound = false; shake = 12; sfx.pound();
@@ -998,10 +1032,11 @@ function update() {
   P.anim += Math.hypot(P.vx, P.vz) * 0.035;
   }
   if (P.hangCd > 0) P.hangCd--;
+  if (P.vineCd > 0) P.vineCd--;
   if (P.inv > 0) P.inv--;
 
   for (const b of L.boxes) if (b.kind === 'spike' && b.on && hits(P, b)) hurt(P.x - (b.x0 + b.x1) / 2, P.z - (b.z0 + b.z1) / 2);
-  if (P.y < L.killY) { P.hp = 0; kill(); return; }
+  if (P.y < L.killY) { if (L.hub) { P = newPlayer(L.start); G.ct = null; return; } P.hp = 0; kill(); return; }
 
   for (const h of L.items) {
     if (h.got) continue;
@@ -1044,6 +1079,7 @@ function update() {
 
   const cp = L.checkpoint;
   if (cp && !cp.on && Math.hypot(P.x - cp.x, P.z - cp.z) < 2.2 && Math.abs(P.y - cp.y) < 1.5) { cp.on = true; sfx.flag(); pop('Kontrol noktası!', cp.x, cp.y + 3.2, cp.z, '#ffffff', 80); burst(cp.x, cp.y + 2.4, cp.z, '#ff4d6d', 16); }
+  if (L.hub) return hubStep();
   const gl = L.goal;
   if (Math.hypot(P.x - gl.x, P.z - (gl.z + 1.5)) < 1.3 && Math.abs(P.y - gl.y) < 1) levelDone();
 }
@@ -1089,6 +1125,57 @@ function hangStep(wx, wz) {
     P.hang = null; P.hangCd = 25; P.vy = 0;
   }
   jumpPressed = poundPressed = false;
+}
+/* ---------- vines ---------- */
+function tryVine(wx, wz) {
+  for (const b of L.boxes) {
+    if (b.kind !== 'vine') continue;
+    const d = b.nz ? (P.z - b.face) * b.nz : (P.x - b.face) * b.nx;
+    const a = b.nz ? P.x : P.z, a0 = b.nz ? b.x0 : b.z0, a1 = b.nz ? b.x1 : b.z1;
+    if (d < 0 || d > P.r + 0.35 || a < a0 + 0.1 || a > a1 - 0.1) continue;
+    if (P.y + P.h < b.y0 + 0.4 || P.y > b.y1 - 0.7) continue;
+    const into = -(wx * b.nx + wz * b.nz);
+    if (P.onGround ? into < 0.5 : into < -0.3) continue;
+    P.vine = b; P.vx = P.vy = P.vz = 0; P.spin = 0; P.jumps = 0; P.pound = false;
+    if (b.nz) P.z = b.face + b.nz * (P.r + 0.02); else P.x = b.face + b.nx * (P.r + 0.02);
+    if (P.onGround) P.y += 0.15;
+    P.onGround = false; P.yaw = Math.atan2(-b.nx, -b.nz); sfx.grab();
+    if (!L.vineTip) { L.vineTip = true; pop(isTouch ? 'Kolu it: tırman · ▲ atla' : 'W: tırman · Boşluk: atla', P.x, P.y + 2.4, P.z, '#ffffff', 150); }
+    return;
+  }
+}
+function vineStep(wx, wz) {
+  const b = P.vine, tx = b.nz, tz = -b.nx;
+  const into = -(wx * b.nx + wz * b.nz), along = wx * tx + wz * tz;
+  if (Math.abs(into) > 0.2) P.y += into * 2.8 * DT;
+  if (Math.abs(along) > 0.3) {
+    const d = along * 2.2 * DT;
+    if (b.nz) P.x = Math.max(b.x0 + 0.2, Math.min(b.x1 - 0.2, P.x + d * tx));
+    else P.z = Math.max(b.z0 + 0.2, Math.min(b.z1 - 0.2, P.z + d * tz));
+  }
+  P.anim += (Math.abs(into) + Math.abs(along)) * 0.12;
+  if (P.y + 1.0 >= b.y1) { // reached the top: step onto the cliff
+    P.vine = null; P.vineCd = 15;
+    P.x -= b.nx * (P.r + 0.45); P.z -= b.nz * (P.r + 0.45); P.y = b.y1 + 0.02; P.squash = 5; sfx.jump();
+  } else if (P.y <= b.y0 && into < -0.2) { P.y = b.y0; P.vine = null; P.vineCd = 20; }
+  else if (jumpPressed) {
+    P.vine = null; P.vineCd = 20; P.vy = 9.5; P.vx = b.nx * 4.5; P.vz = b.nz * 4.5; P.jumps = 1;
+    P.yaw = Math.atan2(b.nx, b.nz); sfx.jump();
+  } else if (poundPressed) { P.vine = null; P.vineCd = 25; }
+  jumpPressed = poundPressed = false;
+}
+
+/* ---------- hub ---------- */
+function hubStep() {
+  for (const p of L.portals) {
+    if (p.cd > 0) p.cd--;
+    if (Math.hypot(P.x - p.x, P.z - p.z) < 1.0 && Math.abs(P.y - p.y) < 1.2) {
+      if (p.locked) { if (!p.cd) { pop(`Önce ${p.i}. bölgeyi bitir`, P.x, P.y + 2.4, P.z, '#ffffff', 90); sfx.hurt(); p.cd = 90; } }
+      else { sfx.flag(); burst(p.x, p.y + 1.7, p.z, '#ffffff', 20, 4); startLevel(p.i); return; }
+    }
+  }
+  const sh = L.shop;
+  if (Math.hypot(P.x - sh.tx, P.z - sh.tz) < 1.1 && Math.abs(P.y - sh.y) < 1) { saveGame(); showSelect(); }
 }
 function squashEnemy(e) {
   e.alive = false; e.dead = 1; sfx.stomp(); shake = 5;
@@ -1255,6 +1342,13 @@ function buildScene() {
       const along = w > d, len = along ? w : d;
       for (let p = -len / 2 + 0.2; p <= len / 2; p += 1.6) mk('cyl', '#7a4a24', [0.16, h, 0.16], along ? [p, h / 2, 0] : [0, h / 2, p], m);
       for (const ry of [0.9, 2.1]) mk('box', '#a06d3a', along ? [w, 0.25, 0.18] : [0.18, 0.25, d], [0, ry, 0], m);
+    } else if (b.kind === 'vine') {
+      const along = b.nz ? w : d;
+      m = grp(W, b.nz ? cx : b.face + b.nx * 0.06, b.y0, b.nz ? b.face + b.nz * 0.06 : cz); m.rotation.y = Math.atan2(b.nx, b.nz);
+      for (let xx = -along / 2 + 0.2; xx < along / 2; xx += 0.42) { const st = mk('cyl', '#2f6f2a', [0.05, h, 0.05], [xx, h / 2, 0], m); st.rotation.z = Math.sin(xx * 7) * 0.04; }
+      const nl = Math.floor(along * h * 3.5);
+      for (let i = 0; i < nl; i++) mk('ico', rnd() < 0.5 ? '#3f9b37' : '#5cc04a', [0.17, 0.13, 0.06], [(rnd() - 0.5) * along, rnd() * h, 0.04], m).rotation.z = rnd() * 3;
+      for (let i = 0; i < 4; i++) mk('sph', '#ff8fb8', [0.07, 0.07, 0.07], [(rnd() - 0.5) * along, rnd() * h, 0.08], m);
     } else if (b.kind === 'gate') {
       m = grp(W, cx, b.y0, cz);
       for (let p = -w / 2 + 0.25; p < w / 2; p += 0.5) { mk('cyl', '#5a3418', [0.08, h, 0.08], [p, h / 2, 0], m); mk('cone', '#5a3418', [0.11, 0.3, 0.11], [p, h + 0.15, 0], m); }
@@ -1314,20 +1408,50 @@ function buildScene() {
     h.mesh = it;
   }
   for (const e of L.enemies) { e.mesh = e.type === 'mush' ? mushModel() : beeModel(); W.add(e.mesh); }
+  if (L.portals) {
+    for (const pt of L.portals) {
+      const lv = LEVELS[pt.i], g = grp(W, pt.x, pt.y, pt.z); g.rotation.y = pt.yaw;
+      mk('cyl', '#9c8f84', [1.8, 0.3, 1.2], [0, 0.15, 0], g).receiveShadow = true;
+      for (const sx of [-1, 1]) mk('cyl', '#b7aa9e', [0.22, 3.2, 0.22], [sx * 1.6, 1.75, 0], g);
+      mk('torus', pt.locked ? '#7d7f86' : '#ffd23f', [1.4, 1.4, 1.6], [0, 1.85, 0], g, pt.locked ? null : { emissive: '#5a4300' });
+      if (pt.locked) {
+        mk('cyl', '#5d6066', [1.35, 0.1, 1.35], [0, 1.85, 0], g).rotation.x = Math.PI / 2;
+        mk('box', '#c9a227', [0.6, 0.5, 0.2], [0, 1.75, 0.12], g);
+        mk('torus', '#c9a227', [0.2, 0.2, 0.3], [0, 2.05, 0.12], g);
+      } else {
+        const tex = canvasTex(128, 128, (c) => {
+          const gr = c.createRadialGradient(64, 64, 4, 64, 64, 64); gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.35, lv.sky[1]); gr.addColorStop(1, lv.sky[0]);
+          c.fillStyle = gr; c.fillRect(0, 0, 128, 128);
+          c.strokeStyle = 'rgba(255,255,255,0.55)'; c.lineWidth = 5;
+          for (let k = 0; k < 3; k++) { c.beginPath(); for (let t = 0; t < 60; t++) { const a = t * 0.18 + k * 2.09, rr = t; c.lineTo(64 + Math.cos(a) * rr, 64 + Math.sin(a) * rr); } c.stroke(); }
+        });
+        const disc = new THREE.Mesh(G.geo.disc, new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide, fog: false }));
+        disc.scale.setScalar(1.32); disc.position.y = 1.85; g.add(disc); pt.disc = disc;
+        if (lv.boss) mk('sph', '#e63946', [0.22, 0.22, 0.22], [0, 3.45, 0], g, { emissive: '#5a0a10' });
+      }
+    }
+    const sh = L.shop, t = grp(W, sh.x, sh.y, sh.z); t.rotation.y = sh.yaw;
+    mk('box', '#b07a43', [2.4, 1, 1.4], [0, 0.5, 0], t).receiveShadow = true;
+    for (const sx of [-1, 1]) for (const sz of [-1, 1]) mk('cyl', '#7a4a24', [0.08, 2.4, 0.08], [sx * 1.1, 1.2, sz * 0.6], t);
+    const roof = mk('cone', '#e63946', [1.9, 1.1, 1.9], [0, 2.9, 0], t); roof.rotation.y = Math.PI / 4;
+    mk('cyl', '#ffd23f', [0.35, 0.08, 0.35], [0, 1.25, 0.2], t, { emissive: '#4a3400' }).rotation.x = Math.PI / 2;
+    mk('cyl', '#e63946', [0.3, 0.3, 0.3], [-0.7, 1.15, 0], t); mk('cyl', '#ffb627', [0.25, 0.35, 0.25], [0.75, 1.17, 0], t);
+  }
   G.blob = mk('cyl', '#000000', [0.42, 0.02, 0.42], [0, 0, 0], W, { transparent: true, opacity: 0.32, depthWrite: false }); G.blob.castShadow = false;
   G.marker = new THREE.Mesh(G.geo.ring, mat('#ff4d6d', { emissive: '#7a1020' })); G.marker.rotation.x = Math.PI / 2; W.add(G.marker);
   G.ringMat = mat('#ffffff', { transparent: true, opacity: 0.85, emissive: '#555555' });
 }
+function portalSpin() { if (L.portals) for (const p of L.portals) if (p.disc) p.disc.rotation.z -= 0.03; }
 function lookKey() { return save.species + save.outfit + save.gender; }
 function render3D() {
   const bf = L.boss && L.boss.active && !L.boss.defeated ? L.boss : null;
   const tgt = new THREE.Vector3(P.x, P.y + 1.1, P.z);
   if (bf) { tgt.x += (bf.x - P.x) * 0.3; tgt.z += (bf.z - P.z) * 0.3; tgt.y = Math.max(tgt.y, bf.c.y + (bf.type === 'queen' ? 3.2 : 1.6)); }
-  G.dist = (G.dist || 7.4) + ((bf ? 11.5 : 7.4) - (G.dist || 7.4)) * 0.05;
+  G.dist = (G.dist || 7.4) + ((bf ? 11.5 : L.hub ? 9.5 : 7.4) - (G.dist || 7.4)) * 0.05;
   if (!G.ct) G.ct = tgt.clone(); else G.ct.lerp(tgt, P.dead ? 0.02 : 0.15);
   const cy = G.camYaw, sx = shake ? (Math.random() - 0.5) * shake * 0.02 : 0, sy = shake ? (Math.random() - 0.5) * shake * 0.02 : 0;
-  G.cam.position.set(G.ct.x + Math.sin(cy) * G.dist + sx, G.ct.y + G.dist * 0.48 + sy, G.ct.z + Math.cos(cy) * G.dist);
-  G.cam.lookAt(G.ct.x, G.ct.y + 0.3, G.ct.z);
+  G.cam.position.set(G.ct.x + Math.sin(cy) * G.dist + sx, G.ct.y + G.dist * (L.hub ? 0.3 : 0.48) + sy, G.ct.z + Math.cos(cy) * G.dist);
+  G.cam.lookAt(G.ct.x, G.ct.y + (L.hub ? 1.4 : 0.3), G.ct.z);
   G.sun.position.set(G.ct.x - 9, G.ct.y + 16, G.ct.z + 7); G.sun.target.position.copy(G.ct);
   if (G.sunMesh) G.sunMesh.position.set(G.ct.x - 50, G.ct.y + 40, G.ct.z - 110);
   for (const c of G.clouds) c.position.x += 0.006;
@@ -1337,6 +1461,8 @@ function render3D() {
     if (b.kind === 'crate' || b.kind === 'gate') m.visible = b.on;
   }
   if (G.flag) { G.flagMat.color.set(L.checkpoint.on ? '#e63946' : '#9aa5b1'); G.flag.rotation.y = Math.sin(frame * 0.12) * 0.25; }
+  portalSpin();
+  G.doorGlow.visible = !L.hub;
   G.doorGlow.scale.setScalar(0.85 + Math.sin(frame * 0.08) * 0.08);
   const near = (x, z) => Math.abs(x - P.x) < 45 && Math.abs(z - P.z) < 45;
   for (const h of L.items) {
@@ -1425,6 +1551,10 @@ function render3D() {
   const air = !P.onGround && state === 'play', sp = Math.hypot(P.vx, P.vz), wk = air ? 0 : Math.sin(P.anim) * Math.min(1, sp / 3);
   pp.legs.forEach((l, i) => { l.rotation.x = air ? (i ? 0.35 : -0.25) : (i ? wk : -wk) * 0.7; });
   pp.arms.forEach((a, i) => { a.rotation.x = air ? 0 : (i ? -wk : wk) * 0.6; a.rotation.z = air ? a.userData.s * 2.3 : a.userData.s * 0.12; });
+  if (P.vine) {
+    pp.arms.forEach((a, i) => { a.rotation.x = -2.5 + (i ? 1 : -1) * Math.sin(P.anim) * 0.5; a.rotation.z = a.userData.s * 0.15; });
+    pp.legs.forEach((l, i) => { l.rotation.x = (i ? 1 : -1) * Math.sin(P.anim) * 0.45; });
+  }
   if (P.hang) {
     pp.arms.forEach((a, i) => { a.rotation.x = -2.55 + (i ? 1 : -1) * Math.sin(P.anim) * 0.2; a.rotation.z = a.userData.s * 0.2; });
     pp.legs.forEach((l, i) => { l.rotation.x = Math.sin(frame * 0.1 + i * 3) * 0.25; });
@@ -1455,6 +1585,17 @@ function draw3() {
     if (q && b.state === 'aim') txt('!', q.x, q.y - 10, 40, '#ff4d6d', 'center');
   }
   if (state === 'play' && banner > 0 && !P.dead) { const q = scr(P.x, P.y + 2.2, P.z); if (q) { ctx.globalAlpha = Math.min(1, banner / 30); txt(save.name, q.x, q.y, 18, '#ffffff', 'center'); ctx.globalAlpha = 1; } }
+  if (L.portals) {
+    for (const pt of L.portals) {
+      if (Math.hypot(pt.x - P.x, pt.z - P.z) > 22) continue;
+      const q = scr(pt.x, pt.y + 3.7, pt.z); if (!q) continue;
+      const lv = LEVELS[pt.i];
+      txt(`${pt.i + 1}. ${lv.name}`, q.x, q.y, 17, pt.locked ? '#d6d6d6' : '#ffffff', 'center');
+      txt(pt.locked ? 'Kilitli' : lv.boss ? 'BOSS' : save.best[pt.i] ? `En iyi: ${save.best[pt.i]} bal` : 'Yeni', q.x, q.y + 19, 14, pt.locked ? '#bbbbbb' : lv.boss ? '#ff6b7a' : '#ffd23f', 'center');
+    }
+    const q = scr(L.shop.x, L.shop.y + 3.9, L.shop.z);
+    if (q) txt('Dükkân ve Dolap', q.x, q.y, 20, '#ffd23f', 'center');
+  }
   for (const p of pops) { const q = scr(p.x, p.y, p.z); if (!q) continue; ctx.globalAlpha = Math.min(1, p.life / 20); txt(p.txt, q.x, q.y, 22, p.color, 'center'); }
   ctx.globalAlpha = 1;
   if (state !== 'title') drawHud();
@@ -1550,10 +1691,12 @@ $('wDone').onclick = () => {
 };
 $('wardBtn1').onclick = () => { audio(); openWard('title'); };
 $('wardBtn2').onclick = () => { audio(); openWard('select'); };
-$('startBtn').onclick = () => { audio(); save.name = cleanName(); saveGame(); showSelect(); };
+function goHub() { saveGame(); honey = 0; lives = 3; loadLevel(-1); setPlaying(); }
+$('hubBtn').onclick = () => { audio(); goHub(); };
+$('startBtn').onclick = () => { audio(); save.name = cleanName(); goHub(); };
 pauseBtn.onclick = () => togglePause();
 function togglePause() {
-  if (state === 'play') { state = 'pause'; for (const k in keys) keys[k] = false; stick.x = stick.y = 0; showMsg('Duraklatıldı', `${save.name} · ${L.def.name} · ${honey} bal · ${save.coins} para`, 'Devam et', setPlaying, 'Bölüm seç', () => { saveGame(); showSelect(); }); }
+  if (state === 'play') { state = 'pause'; for (const k in keys) keys[k] = false; stick.x = stick.y = 0; showMsg('Duraklatıldı', `${save.name} · ${L.def.name} · ${honey} bal · ${save.coins} para`, 'Devam et', setPlaying, L.hub ? 'Dükkân ve bölümler' : 'Haritaya dön', () => { saveGame(); if (L.hub) showSelect(); else goHub(); }); }
   else if (state === 'pause') setPlaying();
 }
 
@@ -1602,21 +1745,21 @@ function levelDone() {
   saveGame();
   const honeyAll = L.items.filter(h => h.kind === 'honey').length, honeyGot = L.items.filter(h => h.kind === 'honey' && h.got).length;
   if (lvlIdx >= LEVELS.length - 1) {
-    showMsg('Bal kulübesi dolu!', `Dikenbaş yenildi ve ${save.name} altı bölgeyi de geçti. Bu bölümde ${honey} bal topladın, cebinde ${save.coins} para var.`, 'Bölüm seç', showSelect);
+    showMsg('Bal kulübesi dolu!', `Dikenbaş yenildi ve ${save.name} altı bölgeyi de geçti. Bu bölümde ${honey} bal topladın, cebinde ${save.coins} para var.`, 'Haritaya dön', goHub);
   } else {
-    showMsg(`${L.def.name} tamam!`, `${honeyAll} kavanozun ${honeyGot} tanesini buldun. Cebinde ${save.coins} para var. Sıradaki: ${LEVELS[lvlIdx + 1].name}.`, 'Sonraki bölüm', () => startLevel(lvlIdx + 1), 'Bölüm seç', showSelect);
+    showMsg(`${L.def.name} tamam!`, `${honeyAll} kavanozun ${honeyGot} tanesini buldun. Cebinde ${save.coins} para var. Sıradaki: ${LEVELS[lvlIdx + 1].name}.`, 'Sonraki bölüm', () => startLevel(lvlIdx + 1), 'Haritaya dön', goHub);
   }
 }
 function gameOver() {
   state = 'over'; saveGame();
-  showMsg(`${save.name} yoruldu`, `Canların bitti. Topladığın paralar cebinde kaldı; dükkândan kalp alıp yeniden deneyebilirsin.`, 'Tekrar dene', () => startLevel(lvlIdx), 'Bölüm seç', showSelect);
+  showMsg(`${save.name} yoruldu`, `Canların bitti. Topladığın paralar cebinde kaldı; dükkândan kalp alıp yeniden deneyebilirsin.`, 'Tekrar dene', () => startLevel(lvlIdx), 'Haritaya dön', goHub);
 }
 
 /* ---------- loop ---------- */
 if (!USE3D) {
   showMsg('3D açılamadı', 'Bu oyun 3D çizim (WebGL) ve internetten yüklenen bir kütüphane kullanıyor. İnternet bağlantını kontrol edip sayfayı yenile ya da başka bir tarayıcı dene.', 'Yeniden dene', () => location.reload());
 } else {
-  loadLevel(0);
+  loadLevel(-1);
   let last = performance.now(), accum = 0;
   const loop = now => {
     accum += Math.min(100, now - last); last = now;
