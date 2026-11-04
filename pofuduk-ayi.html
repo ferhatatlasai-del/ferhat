@@ -156,6 +156,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
       <b>W A S D</b><span>Her yöne yürü (ok tuşları da olur)</span>
       <b>Boşluk</b><span>Zıpla, havadayken bir daha bas: çift zıplama</span>
       <b>Shift</b><span>Havada bas: yere çakıl, sandıkları kır</span>
+      <b>Kenar</b><span>Düşerken kenara tutunursun: Boşluk ile tırman, Shift ile bırak</span>
       <b>Q / E</b><span>Kamerayı döndür (ekranı sürükleyerek de olur)</span>
       <b>P</b><span>Duraklat</span>
     </div>
@@ -261,6 +262,7 @@ const sfx = {
   life: () => [784, 988, 1175, 1568].forEach((f, i) => tone(f, 0.12, 'square', null, 0.06, i * 0.07)),
   die: () => [392, 330, 262, 196].forEach((f, i) => tone(f, 0.2, 'triangle', null, 0.09, i * 0.13)),
   boss: () => [196, 185, 175, 147].forEach((f, i) => tone(f, 0.3, 'sawtooth', null, 0.07, i * 0.22)),
+  grab: () => tone(520, 0.08, 'triangle', 760, 0.07),
   bossHit: () => { tone(300, 0.2, 'square', 120, 0.1); tone(150, 0.3, 'sawtooth', 60, 0.08, 0.05); },
 };
 
@@ -842,7 +844,7 @@ const angDiff = (a, b) => Math.atan2(Math.sin(a - b), Math.cos(a - b));
 
 function newPlayer(s) {
   return { x: s.x, y: s.y, z: s.z, vx: 0, vy: 0, vz: 0, r: 0.38, h: 1.35, yaw: Math.PI, onGround: false, ground: null,
-    coyote: 0, buffer: 0, jumps: 0, hp: save.maxHp, inv: 0, pound: false, dead: 0, anim: 0, squash: 0, spin: 0 };
+    coyote: 0, buffer: 0, jumps: 0, hp: save.maxHp, inv: 0, pound: false, dead: 0, anim: 0, squash: 0, spin: 0, hang: null, hangCd: 0, hangT: 0 };
 }
 function loadLevel(i) {
   lvlIdx = i; L = buildLevel(i);
@@ -902,13 +904,13 @@ function addHoney(n, x, y, z) {
 function addCoins(n, x, y, z) { save.coins += n; if (x !== undefined) pop('+' + n + ' para', x, y, z, '#fff27a'); }
 function hurt(kx, kz) {
   if (P.inv > 0 || P.dead) return;
-  P.hp--; P.inv = 100; shake = 10; sfx.hurt();
+  P.hp--; P.inv = 100; shake = 10; sfx.hurt(); P.hang = null; P.hangCd = 30;
   const m = Math.hypot(kx, kz) || 1;
   P.vy = 7; P.vx = kx / m * 6; P.vz = kz / m * 6; P.pound = false;
   burst(P.x, P.y + 0.7, P.z, '#ff5a4f', 12);
   if (P.hp <= 0) kill();
 }
-function kill() { if (P.dead) return; P.dead = 1; P.vy = 9; P.vx = P.vz = 0; sfx.die(); shake = 14; }
+function kill() { if (P.dead) return; P.hang = null; P.dead = 1; P.vy = 9; P.vx = P.vz = 0; sfx.die(); shake = 14; }
 function ambient() {
   const w = L.def.weather;
   if (w === 'snow' && frame % 3 === 0) ambs.push({ x: Math.random() * (VW + 100), y: -5, vx: -0.4 + Math.random() * 0.3, vy: 1 + Math.random(), color: '#ffffff', r: 1.5 + Math.random() * 1.5 });
@@ -950,6 +952,8 @@ function update() {
   const im = Math.hypot(ix, iy); if (im > 1) { ix /= im; iy /= im; }
   const cy = G.camYaw, fx = -Math.sin(cy), fz = -Math.cos(cy), rx = Math.cos(cy), rz = -Math.sin(cy);
   const wx = fx * iy + rx * ix, wz = fz * iy + rz * ix, wm = Math.hypot(wx, wz);
+  phys: {
+  if (P.hang) { hangStep(wx, wz); break phys; }
   const ice = L.def.friction > 0.9, max = 6.5;
   if (!P.pound) {
     const k = P.onGround ? (ice ? 3 : 12) : 4.5;
@@ -982,6 +986,7 @@ function update() {
     if (hy.kind === 'qbox' && !hy.used) { hy.used = true; sfx.box(); sfx.coin(); addCoins(5, (hy.x0 + hy.x1) / 2, hy.y1 + 0.5, (hy.z0 + hy.z1) / 2); burst((hy.x0 + hy.x1) / 2, hy.y1, (hy.z0 + hy.z1) / 2, '#ffd23f', 14); }
   }
   if (!P.onGround) P.ground = null;
+  if (!P.onGround && P.vy < 0 && !P.pound && P.hangCd <= 0) tryGrab();
   if (P.onGround && vyBefore < -6) P.squash = Math.min(8, -vyBefore * 0.4);
   if (P.onGround && P.pound) {
     P.pound = false; shake = 12; sfx.pound();
@@ -991,6 +996,8 @@ function update() {
   }
   if (P.squash > 0) P.squash -= 0.8; else if (P.squash < 0) P.squash += 0.6;
   P.anim += Math.hypot(P.vx, P.vz) * 0.035;
+  }
+  if (P.hangCd > 0) P.hangCd--;
   if (P.inv > 0) P.inv--;
 
   for (const b of L.boxes) if (b.kind === 'spike' && b.on && hits(P, b)) hurt(P.x - (b.x0 + b.x1) / 2, P.z - (b.z0 + b.z1) / 2);
@@ -1039,6 +1046,49 @@ function update() {
   if (cp && !cp.on && Math.hypot(P.x - cp.x, P.z - cp.z) < 2.2 && Math.abs(P.y - cp.y) < 1.5) { cp.on = true; sfx.flag(); pop('Kontrol noktası!', cp.x, cp.y + 3.2, cp.z, '#ffffff', 80); burst(cp.x, cp.y + 2.4, cp.z, '#ff4d6d', 16); }
   const gl = L.goal;
   if (Math.hypot(P.x - gl.x, P.z - (gl.z + 1.5)) < 1.3 && Math.abs(P.y - gl.y) < 1) levelDone();
+}
+/* ---------- ledge grab ---------- */
+const GRAB = new Set(['ground', 'plat', 'move', 'crate', 'qbox']);
+function tryGrab() {
+  const top = P.y + P.h, fx = Math.sin(P.yaw), fz = Math.cos(P.yaw), m = P.r + 0.3;
+  for (const b of L.boxes) {
+    if (!b.on || !GRAB.has(b.kind) || b.y1 < top - 0.45 || b.y1 > top + 0.2) continue;
+    let nx = 0, nz = 0;
+    if (P.x > b.x0 + 0.15 && P.x < b.x1 - 0.15) { if (P.z >= b.z1 - 0.05 && P.z <= b.z1 + m) nz = 1; else if (P.z <= b.z0 + 0.05 && P.z >= b.z0 - m) nz = -1; }
+    if (!nz && P.z > b.z0 + 0.15 && P.z < b.z1 - 0.15) { if (P.x >= b.x1 - 0.05 && P.x <= b.x1 + m) nx = 1; else if (P.x <= b.x0 + 0.05 && P.x >= b.x0 - m) nx = -1; }
+    if (!nx && !nz) continue;
+    if (-(fx * nx + fz * nz) < 0.35) continue; // the bear has to face the ledge
+    const ex = nx ? (nx > 0 ? b.x1 - 0.5 : b.x0 + 0.5) : P.x, ez = nz ? (nz > 0 ? b.z1 - 0.5 : b.z0 + 0.5) : P.z;
+    if (L.boxes.some(o => o !== b && o.on && solidKind(o.kind) && ex > o.x0 && ex < o.x1 && ez > o.z0 && ez < o.z1 && o.y0 < b.y1 + 1.3 && o.y1 > b.y1 + 0.05)) continue;
+    P.hang = { b, nx, nz }; P.hangT = 0; P.vx = P.vy = P.vz = 0; P.spin = 0; P.jumps = 0;
+    if (nx) P.x = nx > 0 ? b.x1 + P.r + 0.02 : b.x0 - P.r - 0.02; else P.z = nz > 0 ? b.z1 + P.r + 0.02 : b.z0 - P.r - 0.02;
+    P.y = b.y1 - 1.08; P.yaw = Math.atan2(-nx, -nz); sfx.grab();
+    if (!L.hangTip) { L.hangTip = true; pop(isTouch ? '▲ tırman · ▼ bırak' : 'Boşluk: tırman · Shift: bırak', P.x, b.y1 + 1.3, P.z, '#ffffff', 150); }
+    return;
+  }
+}
+function hangStep(wx, wz) {
+  const h = P.hang, b = h.b;
+  if (!b.on) { P.hang = null; P.hangCd = 20; return; }
+  if (b.dz) P.z += b.dz;
+  const tx = h.nz, tz = -h.nx, along = wx * tx + wz * tz, into = -(wx * h.nx + wz * h.nz);
+  if (Math.abs(along) > 0.3 && Math.abs(along) > Math.abs(into)) {
+    const d = along * 2.4 * DT;
+    if (h.nz) P.x = Math.max(b.x0 + 0.2, Math.min(b.x1 - 0.2, P.x + d * tx));
+    else P.z = Math.max(b.z0 + 0.2, Math.min(b.z1 - 0.2, P.z + d * tz));
+    P.anim += 0.12;
+  }
+  P.hangT++;
+  if (jumpPressed || (into > 0.6 && P.hangT > 12)) {
+    const hop = jumpPressed;
+    P.hang = null; P.hangCd = 10;
+    P.x -= h.nx * (P.r + 0.45); P.z -= h.nz * (P.r + 0.45); P.y = b.y1 + 0.02;
+    P.vy = hop ? 7.5 : 0; P.squash = 5; sfx.jump();
+    burst(P.x, P.y, P.z, '#ffffffaa', 6, 1.2);
+  } else if (poundPressed || into < -0.6) {
+    P.hang = null; P.hangCd = 25; P.vy = 0;
+  }
+  jumpPressed = poundPressed = false;
 }
 function squashEnemy(e) {
   e.alive = false; e.dead = 1; sfx.stomp(); shake = 5;
@@ -1375,6 +1425,10 @@ function render3D() {
   const air = !P.onGround && state === 'play', sp = Math.hypot(P.vx, P.vz), wk = air ? 0 : Math.sin(P.anim) * Math.min(1, sp / 3);
   pp.legs.forEach((l, i) => { l.rotation.x = air ? (i ? 0.35 : -0.25) : (i ? wk : -wk) * 0.7; });
   pp.arms.forEach((a, i) => { a.rotation.x = air ? 0 : (i ? -wk : wk) * 0.6; a.rotation.z = air ? a.userData.s * 2.3 : a.userData.s * 0.12; });
+  if (P.hang) {
+    pp.arms.forEach((a, i) => { a.rotation.x = -2.55 + (i ? 1 : -1) * Math.sin(P.anim) * 0.2; a.rotation.z = a.userData.s * 0.2; });
+    pp.legs.forEach((l, i) => { l.rotation.x = Math.sin(frame * 0.1 + i * 3) * 0.25; });
+  }
   const fl = Math.min(0.6, sp * 0.1);
   pp.tail.rotation.x = 0.35 + fl + Math.sin(frame * 0.3) * 0.12;
   if (pp.cape) pp.cape.rotation.x = 0.12 + fl * 0.9 + Math.sin(frame * 0.25) * 0.06 + (air && P.vy < 0 ? 0.4 : 0);
