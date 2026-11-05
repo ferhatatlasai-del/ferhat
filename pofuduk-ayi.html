@@ -138,6 +138,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 #setBtn { position: fixed; z-index: 5; top: calc(10px + env(safe-area-inset-top, 0px)); right: calc(max(12px, env(safe-area-inset-right, 0px)) + 52px);
   width: 42px; height: 42px; border-radius: 12px; border: 3px solid var(--bark); background: var(--cream); color: var(--bark); font-family: var(--display); font-size: 1.25rem; cursor: pointer; }
 #pSettings, #pQuests { z-index: 7; }
+#pShop .shop { border-top: 0; padding-top: 0; }
 #questBtn { position: fixed; z-index: 5; top: calc(10px + env(safe-area-inset-top, 0px)); right: calc(max(12px, env(safe-area-inset-right, 0px)) + 104px);
   width: 42px; height: 42px; border-radius: 12px; border: 3px solid var(--bark); background: var(--cream); color: var(--bark); font-family: var(--display); font-size: 1.15rem; cursor: pointer; }
 #questBtn:focus-visible { outline: 3px solid var(--leaf); outline-offset: 2px; }
@@ -222,19 +223,26 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
   </div>
 </div>
 
-<div class="panel" id="pSelect" hidden>
-  <div class="card wide">
-    <h2>Bölüm seç</h2>
-    <div class="levels" id="levels"></div>
+<div class="panel" id="pShop" hidden>
+  <div class="card">
+    <h2>Kalp Dükkânı</h2>
     <div class="shop">
       <div class="wallet"><span class="coin" aria-hidden="true"></span><span id="coinCount">0</span></div>
       <div>
-        <h3>Kalp dükkânı</h3>
+        <h3>Kalplerin</h3>
         <div class="hearts" id="heartRow" aria-label="Kalpler"></div>
       </div>
       <button class="btn" id="buyHeart" type="button">Kalp al</button>
       <p class="small" id="shopNote"></p>
     </div>
+    <button class="btn primary" id="shopClose" type="button">Kapat</button>
+  </div>
+</div>
+
+<div class="panel" id="pSelect" hidden>
+  <div class="card wide">
+    <h2>Bölüm seç</h2>
+    <div class="levels" id="levels"></div>
     <div class="row">
       <button class="btn primary" id="hubBtn" type="button">Haritaya dön</button>
       <button class="btn alt" id="backBtn" type="button">Adı değiştir</button>
@@ -525,6 +533,8 @@ addEventListener('keydown', e => {
   if (!pQuest.hidden) { if (e.code === 'Escape' || e.code === 'KeyG') closeQuests(); return; }
   if (e.code === 'KeyG' && splashDone) { openQuests(); return; }
   if (!pSmith.hidden) { if (e.code === 'Escape') closeSmith(); return; }
+  if (!pShop.hidden) { if (e.code === 'Escape') closeShop(); return; }
+  if (!pWard.hidden && wardFrom === 'hub') { if (e.code === 'Escape') setPlaying(); return; }
   if (e.code === 'KeyP' || e.code === 'Escape') togglePause();
   if (e.code === 'KeyM') { muted = !muted; musicVol(); }
   if (!splashDone) { e.preventDefault(); runSplash(); return; }
@@ -1299,6 +1309,9 @@ function buildHub() {
   const shop = { x: 19, y: 0, z: 22 }; shop.yaw = Math.atan2(-shop.x, 30 - shop.z);
   shop.tx = shop.x + Math.sin(shop.yaw) * 1.9; shop.tz = shop.z + Math.cos(shop.yaw) * 1.9;
   boxes.push({ x0: shop.x - 1.2, y0: 0, z0: shop.z - 1.2, x1: shop.x + 1.2, y1: 1, z1: shop.z + 1.2, kind: 'deco', on: true });
+  const ward = { x: 11, y: 0, z: 27 }; ward.yaw = Math.atan2(-ward.x, 36 - ward.z);
+  ward.tx = ward.x + Math.sin(ward.yaw) * 2.1; ward.tz = ward.z + Math.cos(ward.yaw) * 2.1; ward.armed = true; shop.armed = true;
+  boxes.push({ x0: ward.x - 0.95, y0: 0, z0: ward.z - 0.95, x1: ward.x + 0.95, y1: 2.6, z1: ward.z + 0.95, kind: 'deco', on: true });
   const goal = { x: -19, y: 0, z: 25 };
   boxes.push({ x0: goal.x - 1.65, y0: 0, z0: goal.z - 1.15, x1: goal.x + 1.65, y1: 2.6, z1: goal.z + 1.15, kind: 'cabin', on: true });
   // cloud parkour: a spiral of clouds with a treasure chest on top
@@ -1311,7 +1324,7 @@ function buildHub() {
   const last = park.clouds[12]; park.chest = { x: last.x, y: last.top, z: last.z }; park.first = park.clouds[0];
   // village houses, brown and light brown, scattered between everything else
   const houses = [];
-  const nearAny = (x, z) => spots.some(sp => Math.hypot(x - sp.x, z - sp.z) < 9.5) || Math.hypot(x - shop.x, z - shop.z) < 7 || Math.hypot(x - goal.x, z - goal.z) < 7
+  const nearAny = (x, z) => spots.some(sp => Math.hypot(x - sp.x, z - sp.z) < 9.5) || Math.hypot(x - shop.x, z - shop.z) < 7 || Math.hypot(x - ward.x, z - ward.z) < 6 || Math.hypot(x - goal.x, z - goal.z) < 7
     || Math.hypot(x - smith.x, z - smith.z) < 7 || Math.hypot(x - park.cx, z - park.cz) < 12 || Math.hypot(x, z - 36) < 7 || Math.abs(x) < 4;
   for (let k = 0; houses.length < 16 && k < 900; k++) {
     const x = (rnd() - 0.5) * 2 * (R - 6), z = (rnd() - 0.5) * 2 * (R - 6);
@@ -1326,7 +1339,7 @@ function buildHub() {
     const x = (rnd() - 0.5) * 2 * (R - 8), z = (rnd() - 0.5) * 2 * (R - 8);
     if (clear(x, z)) turtles.push({ id: turtles.length, x, z, yaw: rnd() * 6.28, t: rnd() * 5, next: 2 + rnd() * 3, s: 0.8 + rnd() * 0.45, hue: ['#3f9b4a', '#5aa65e', '#7a9b3a', '#4f8f6a'][turtles.length % 4], petT: 0, hop: 0 });
   }
-  return { def: HUB, hub: true, R, boxes, items: [], enemies: [], trees, paths, start: { x: 0, y: 0, z: 36 }, checkpoint: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, smith, houses, turtles, park };
+  return { def: HUB, hub: true, R, boxes, items: [], enemies: [], trees, paths, start: { x: 0, y: 0, z: 36 }, checkpoint: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, ward, smith, houses, turtles, park };
 }
 function mkBoss(type, c) {
   const base = { type, c, x: c.x, z: c.zc - 3, y: c.y, vx: 0, vz: 0, vy: 0, t: 0, inv: 0, active: false, defeated: false, deadT: 0, yaw: 0, tx: 0, tz: 0, state: type === 'mush' ? 'walk' : type === 'queen' ? 'hover' : 'aim' };
@@ -1703,7 +1716,10 @@ function hubStep() {
   if (ds > 2.2) sm.armed = true;
   else if (ds < 1.1 && sm.armed) { sm.armed = false; openSmith(); return; }
   const sh = L.shop;
-  if (Math.hypot(P.x - sh.tx, P.z - sh.tz) < 1.1 && Math.abs(P.y - sh.y) < 1) { saveGame(); showSelect(); }
+  const dsh = Math.hypot(P.x - sh.tx, P.z - sh.tz);
+  if (dsh > 2.2) sh.armed = true; else if (dsh < 1.1 && sh.armed && Math.abs(P.y - sh.y) < 1) { sh.armed = false; saveGame(); openShop(); return; }
+  const wd = L.ward, dw = Math.hypot(P.x - wd.tx, P.z - wd.tz);
+  if (dw > 2.2) wd.armed = true; else if (dw < 1.1 && wd.armed && Math.abs(P.y - wd.y) < 1) { wd.armed = false; saveGame(); openWard('hub'); }
 }
 /* ---------- axe ---------- */
 function startAttack() {
@@ -2115,6 +2131,14 @@ function buildScene() {
       mk('box', '#ffd23f', [0.2, 0.24, 0.06], [0, 0.66, 0.43], c, { emissive: '#5a4300' });
       L.park.glow = mk('torus', '#fff27a', [1.3, 1.3, 1.3], [0, 0.05, 0], c, { emissive: '#8a7a20' }); L.park.glow.rotation.x = Math.PI / 2; L.park.glow.castShadow = false; }
     for (const t of L.turtles) { t.mesh = turtleModel(t.hue); t.mesh.scale.setScalar(t.s); W.add(t.mesh); }
+    { const wd = L.ward, w2 = grp(W, wd.x, wd.y, wd.z); w2.rotation.y = wd.yaw;
+      mk('box', '#8a5a2b', [1.8, 2.4, 1], [0, 1.2, 0], w2).receiveShadow = true;
+      mk('box', '#5c3a1c', [1.95, 0.18, 1.1], [0, 2.45, 0], w2);
+      for (const sx of [-1, 1]) { mk('box', '#b07a43', [0.8, 2.05, 0.08], [sx * 0.43, 1.18, 0.52], w2); mk('sph', '#ffd23f', [0.07, 0.07, 0.07], [sx * 0.12, 1.2, 0.58], w2, { emissive: '#5a4300' }); }
+      mk('hemi', '#e63946', [0.42, 0.32, 0.42], [-0.35, 2.54, 0], w2); mk('box', '#c22f3c', [0.7, 0.06, 0.5], [-0.15, 2.56, 0.12], w2);
+      mk('cyl', '#3b4fd6', [0.28, 0.08, 0.28], [0.45, 2.58, 0], w2); mk('cone', '#3b4fd6', [0.2, 0.55, 0.2], [0.45, 2.88, 0], w2);
+      mk('box', '#5c3a1c', [0.75, 1.5, 0.08], [1.35, 0.95, 0.15], w2); mk('box', '#cfe8ff', [0.6, 1.3, 0.05], [1.35, 0.95, 0.2], w2, { emissive: '#3a5a7a' });
+      for (const sx of [-1, 1]) mk('box', '#5c3a1c', [0.15, 0.25, 0.15], [sx * 0.75, 0.05, 0.35], w2); }
     const sh = L.shop, t = grp(W, sh.x, sh.y, sh.z); t.rotation.y = sh.yaw;
     mk('box', '#b07a43', [2.4, 1, 1.4], [0, 0.5, 0], t).receiveShadow = true;
     for (const sx of [-1, 1]) for (const sz of [-1, 1]) mk('cyl', '#7a4a24', [0.08, 2.4, 0.08], [sx * 1.1, 1.2, sz * 0.6], t);
@@ -2337,7 +2361,8 @@ function draw3(alpha, dtMs) {
     const ch = L.park.chest, qc = !L.park.used && Math.hypot(ch.x - P.x, ch.z - P.z) < 40 ? scr(ch.x, ch.y + 2.2, ch.z) : null; if (qc) txt(save.cloudChest ? 'Sandık' : 'Hazine Sandığı', qc.x, qc.y, 18, '#ffd23f', 'center');
     const qs = scr(L.smith.x, 4.4, L.smith.z); if (qs) txt('Demirci', qs.x, qs.y, 20, '#ffd23f', 'center');
     const q = scr(L.shop.x, L.shop.y + 3.9, L.shop.z);
-    if (q) txt('Dükkân ve Dolap', q.x, q.y, 20, '#ffd23f', 'center');
+    if (q) txt('Kalp Dükkânı', q.x, q.y, 20, '#ffd23f', 'center');
+    const qw = scr(L.ward.x, 3.7, L.ward.z); if (qw) txt('Dolap', qw.x, qw.y, 20, '#ffd23f', 'center');
   }
   for (const p of pops) { const q = scr(p.x, p.y, p.z); if (!q) continue; ctx.globalAlpha = Math.min(1, p.life / 20); txt(p.txt, q.x, q.y, 22, p.color, 'center'); }
   ctx.globalAlpha = 1;
@@ -2352,7 +2377,7 @@ const msgTitle = $('msgTitle'), msgText = $('msgText'), msgBtn = $('msgBtn'), ms
 const touchUi = $('touch'), pauseBtn = $('pauseBtn');
 let act1 = null, act2 = null;
 function unlockMouse() { if (document.pointerLockElement) { try { document.exitPointerLock(); } catch (e) {} } }
-function hideAll() { pTitle.hidden = pSelect.hidden = pMsg.hidden = pWard.hidden = true; document.getElementById('pSmith').hidden = true; touchUi.hidden = true; pauseBtn.hidden = true; }
+function hideAll() { pTitle.hidden = pSelect.hidden = pMsg.hidden = pWard.hidden = true; document.getElementById('pSmith').hidden = true; document.getElementById('pShop').hidden = true; touchUi.hidden = true; pauseBtn.hidden = true; }
 function showMsg(title, text, b1, a1, b2, a2) {
   unlockMouse();
   hideAll();
@@ -2388,6 +2413,7 @@ $('backBtn').onclick = () => { hideAll(); pTitle.hidden = false; refreshWho(); s
 let wardFrom = 'title', trying = 'none';
 function openWard(from) {
   if (from === 'title') { save.name = cleanName(); saveGame(); }
+  if (from === 'hub') { unlockMouse(); state = 'pause'; for (const k in keys) keys[k] = false; stick.x = stick.y = 0; }
   wardFrom = from; trying = save.outfit; hideAll(); renderWard(); pWard.hidden = false;
   setTimeout(() => $('wDone').focus(), 50);
 }
@@ -2432,11 +2458,20 @@ $('wBuy').onclick = () => {
   audio(); save.coins -= o.price; save.owned.push(o.id); save.outfit = o.id; saveGame(); sfx.life(); renderWard();
 };
 $('wDone').onclick = () => {
-  if (wardFrom === 'select') showSelect();
+  if (wardFrom === 'hub') setPlaying();
+  else if (wardFrom === 'select') showSelect();
   else { hideAll(); pTitle.hidden = false; refreshWho(); }
 };
 $('wardBtn1').onclick = () => { audio(); openWard('title'); };
 $('wardBtn2').onclick = () => { audio(); openWard('select'); };
+/* ---------- heart shop ---------- */
+const pShop = $('pShop');
+function openShop() {
+  audio(); unlockMouse(); state = 'pause'; for (const k in keys) keys[k] = false; stick.x = stick.y = 0;
+  renderShop(); pShop.hidden = false; touchUi.hidden = true; setTimeout(() => $('shopClose').focus(), 50);
+}
+function closeShop() { pShop.hidden = true; setPlaying(); }
+$('shopClose').onclick = closeShop;
 /* ---------- smithy ---------- */
 const pSmith = $('pSmith'); let smithPaused = false, smithGift = false;
 function renderSmith() {
@@ -2520,7 +2555,7 @@ $('hubBtn').onclick = () => { audio(); goHub(); };
 $('startBtn').onclick = () => { audio(); save.name = cleanName(); goHub(); };
 pauseBtn.onclick = () => togglePause();
 function togglePause() {
-  if (state === 'play') { state = 'pause'; for (const k in keys) keys[k] = false; stick.x = stick.y = 0; showMsg('Duraklatıldı', `${save.name} · ${L.def.name} · ${honey} bal · ${save.coins} para`, 'Devam et', setPlaying, L.hub ? 'Dükkân ve bölümler' : 'Haritaya dön', () => { saveGame(); if (L.hub) showSelect(); else goHub(); }); }
+  if (state === 'play') { state = 'pause'; for (const k in keys) keys[k] = false; stick.x = stick.y = 0; showMsg('Duraklatıldı', `${save.name} · ${L.def.name} · ${honey} bal · ${save.coins} para`, 'Devam et', setPlaying, L.hub ? 'Bölüm seç' : 'Haritaya dön', () => { saveGame(); if (L.hub) showSelect(); else goHub(); }); }
   else if (state === 'pause') setPlaying();
 }
 
@@ -2548,6 +2583,8 @@ function renderSelect() {
     b.onclick = () => { audio(); startLevel(i); };
     box.append(b);
   });
+}
+function renderShop() {
   $('coinCount').textContent = save.coins;
   $('heartRow').innerHTML = Array.from({ length: 6 }, (_, i) => `<span class="${i < save.maxHp ? 'on' : 'off'}">♥</span>`).join('');
   const price = PRICES[save.maxHp - 3], buy = $('buyHeart'), note = $('shopNote');
@@ -2560,7 +2597,7 @@ function renderSelect() {
 $('buyHeart').onclick = () => {
   const price = PRICES[save.maxHp - 3];
   if (price === undefined || save.coins < price) return;
-  audio(); save.coins -= price; save.maxHp++; saveGame(); sfx.life(); renderSelect();
+  audio(); save.coins -= price; save.maxHp++; saveGame(); sfx.life(); renderShop();
 };
 function startLevel(i) { honey = 0; lives = 3; loadLevel(i); setPlaying(); }
 function levelDone() {
@@ -2593,10 +2630,11 @@ if (!USE3D) {
       if (state === 'play') update();
       else if (state === 'title') {
         frame++; G.camYaw += 0.004;
-        if (!pWard.hidden) paintBear($('wPrev'), { outfit: trying, walk: Math.sin(frame * 0.15) * 6, flap: Math.sin(frame * 0.3) * 3 + 3, wave: Math.sin(frame * 0.4) * 2 }, 2.9, 165, 305);
       }
       accum -= 1000 / 60;
     }
+    if (!pWard.hidden) paintBear($('wPrev'), { outfit: trying, walk: Math.sin(frame * 0.15) * 6, flap: Math.sin(frame * 0.3) * 3 + 3, wave: Math.sin(frame * 0.4) * 2 }, 2.9, 165, 305);
+    if (state !== 'title' && state !== 'play') frame++;
     if (ac && splashDone) { const bb = L.boss; const fight = !L.hub && bb && bb.active && !bb.defeated; playSong(L.hub || state === 'title' ? 'hub' : fight ? 'boss' : 'lv' + lvlIdx, fight ? BOSS_KEY[lvlIdx] || 0 : 0); }
     draw3(state === 'play' ? accum / (1000 / 60) : 1, dtMs);
     requestAnimationFrame(loop);
