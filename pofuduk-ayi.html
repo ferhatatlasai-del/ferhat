@@ -2480,9 +2480,12 @@ function render3D(alpha = 1, dtMs = 16.667) {
   pp.flip.rotation.set(flip, yawI, 0, 'YXZ');
   br.rotation.z = P.dead ? Math.PI : 0;
   if (P.dead) br.position.y += 1.5;
-  const sq = ip(P.osq, P.squash), s0 = 1.1 / 36;
+  // squash/stretch eases in over a few frames instead of snapping
+  const tsq = ip(P.osq, P.squash); G.sqv = (G.sqv || 0) + (tsq - (G.sqv || 0)) * fk(0.35);
+  const sq = G.sqv, s0 = 1.1 / 36;
   pp.model.scale.set(s0 * (1 + sq * 0.03), s0 * (1 - sq * 0.03), s0 * (1 + sq * 0.03));
   const air = !P.onGround && state === 'play', sp = Math.hypot(P.vx, P.vz), wk = air ? 0 : Math.sin(animI) * Math.min(1, sp / 3);
+  const limbs = [...pp.legs, ...pp.arms], prevPose = limbs.map(o => [o.rotation.x, o.rotation.z]);
   pp.legs.forEach((l, i) => { l.rotation.x = air ? (i ? 0.35 : -0.25) : (i ? wk : -wk) * 0.7; });
   pp.arms.forEach((a, i) => { a.rotation.x = air ? 0 : (i ? -wk : wk) * 0.6; a.rotation.z = air ? a.userData.s * 2.3 : a.userData.s * 0.12; });
   if (P.vine) {
@@ -2506,6 +2509,13 @@ function render3D(alpha = 1, dtMs = 16.667) {
       else G.trail.rotation.set(0, P.yaw - Math.PI / 2, -0.2);
     }
   }
+  // blend every limb toward its new pose so take-off and landing don't snap (the axe swing stays crisp)
+  const kp = fk(0.35);
+  limbs.forEach((o, i) => {
+    if (P.atkT > 0 && o === pp.arms[0]) return;
+    o.rotation.x = prevPose[i][0] + (o.rotation.x - prevPose[i][0]) * kp;
+    o.rotation.z = prevPose[i][1] + (o.rotation.z - prevPose[i][1]) * kp;
+  });
   const fl = Math.min(0.6, sp * 0.1);
   pp.tail.rotation.x = 0.35 + fl + Math.sin(fI * 0.3) * 0.12;
   if (pp.cape) pp.cape.rotation.x = 0.12 + fl * 0.9 + Math.sin(fI * 0.25) * 0.06 + (air && P.vy < 0 ? 0.4 : 0);
