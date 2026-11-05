@@ -1409,19 +1409,36 @@ function buildHub() {
     const a = T(x0, z0), b = T(x1, z1);
     return Object.assign({ x0: Math.min(a[0], b[0]), z0: Math.min(a[1], b[1]), x1: Math.max(a[0], b[0]), z1: Math.max(a[1], b[1]), y0, y1, kind, on: true }, extra || {});
   };
-  // climbable mountains: rocky tiers with a stone staircase facing the village and a chest on top
-  const MT = { name: 'Dağ', dirt: '#8a8f99', dirtDot: '#6b7078', grass: '#9aa79a', grassDark: '#7a867a', tree: 'pine' };
-  const mts = [];
-  [[-25, 62, 2, 32], [66, 18, 3, 38], [-66, -30, 1, 44], [-32, -66, 0, 50]].forEach(([cx, cz, dir, coins], id) => {
-    const T = turn(cx, cz, dir), tiers = 5, H = 2.1, base = 10, inset = 2, step = 0.35, d = inset * step / H;
-    for (let k = 0; k < tiers; k++) { const hs = base - k * inset; boxes.push(rectBox(T, -hs, -hs, hs, hs, -3, (k + 1) * H, 'ground', { theme: MT })); }
-    const n = Math.round(tiers * H / step), zf = base + inset - d;
-    for (let j = 0; j < n; j++) { const zc = zf - j * d; boxes.push(rectBox(T, -0.95, zc - d / 2, 0.95, zc + d / 2 + 0.02, 0, (j + 1) * step, 'stair')); }
-    const top = T(0, -0.6), foot = T(0, base + inset + 1.5);
-    mts.push({ id, cx, cz, dir, coins, chest: { x: top[0], y: tiers * H, z: top[1] }, foot: { x: foot[0], z: foot[1] }, yaw: [0, Math.PI / 2, Math.PI, -Math.PI / 2][dir] });
+  // cone mountains around the edge of the village: a spiral stone staircase winds up to a chest on the flat top
+  const mts = [], MCOL = ['#8fb59a', '#9aa7b8', '#a7b88f', '#b5a48f'], PEAK_COINS = [30, 33, 36, 39, 42, 45, 48, 50];
+  const clearOf = (x, z, need) => spots.every(sp => Math.hypot(x - sp.x, z - sp.z) > need + 6) && parks.every(pk => Math.hypot(x - pk.cx, z - pk.cz) > need + pk.rad + 3)
+    && [shop, ward, goal, smith].every(o => Math.hypot(x - o.x, z - o.z) > need + 5) && Math.hypot(x, z - 50) > need + 6 && mts.every(m => Math.hypot(x - m.cx, z - m.cz) > need + m.r + 6);
+  for (let k = 0; mts.length < 8 && k < 600; k++) {
+    const a = rnd() * Math.PI * 2, rad = 56 + rnd() * 10, cx = Math.sin(a) * rad, cz = Math.cos(a) * rad, r = 8 + rnd() * 3, h = 18 + rnd() * 8;
+    if (Math.abs(cx) + r + 2.5 > R || Math.abs(cz) + r + 2.5 > R || !clearOf(cx, cz, r + 2)) continue;
+    mts.push({ cx, cz, r, h });
+  }
+  mts.forEach((m, id) => {
+    m.id = id; m.coins = PEAK_COINS[id]; m.col = MCOL[id % 4];
+    m.yEnd = m.h * 0.8; m.rTop = m.r * (1 - (m.yEnd + 0.3) / m.h);
+    // hidden core so the bear bumps into the mountain instead of walking through it
+    for (let k = 0; k < 4; k++) { const y0 = k * m.yEnd / 4, y1 = (k + 1) * m.yEnd / 4, rc = m.r * (1 - y1 / m.h) * 0.66; boxes.push({ x0: m.cx - rc, x1: m.cx + rc, z0: m.cz - rc, z1: m.cz + rc, y0, y1, kind: 'core', on: true }); }
+    boxes.push({ x0: m.cx - m.rTop - 0.2, x1: m.cx + m.rTop + 0.2, z0: m.cz - m.rTop - 0.2, z1: m.cz + m.rTop + 0.2, y0: m.yEnd - 1, y1: m.yEnd + 0.3, kind: 'core', on: true });
+    // the spiral: each step 0.3 higher, hugging the cone's surface
+    let y = 0, ang = Math.atan2(0 - m.cx, 20 - m.cz);
+    m.steps = [];
+    while (y < m.yEnd - 0.001) {
+      y = Math.min(m.yEnd, y + 0.3);
+      const rc = m.r * (1 - y / m.h) + 0.85, px = m.cx + Math.sin(ang) * rc, pz = m.cz + Math.cos(ang) * rc;
+      boxes.push({ x0: px - 0.7, x1: px + 0.7, z0: pz - 0.7, z1: pz + 0.7, y0: y - 0.45, y1: y, kind: 'spiral', on: true });
+      m.steps.push({ x: px, y, z: pz, rot: ang });
+      ang += 0.52 / rc;
+    }
+    m.foot = { x: m.steps[0].x, z: m.steps[0].z };
+    m.chest = { x: m.cx, y: m.yEnd + 0.3, z: m.cz }; m.yaw = Math.atan2(0 - m.cx, 20 - m.cz);
   });
   const houses = [];
-  const nearAny = (x, z) => mts.some(m => Math.hypot(x - m.cx, z - m.cz) < 17) || spots.some(sp => Math.hypot(x - sp.x, z - sp.z) < 9.5) || Math.hypot(x - shop.x, z - shop.z) < 7 || Math.hypot(x - ward.x, z - ward.z) < 6 || Math.hypot(x - goal.x, z - goal.z) < 7
+  const nearAny = (x, z) => mts.some(m => Math.hypot(x - m.cx, z - m.cz) < m.r + 6) || spots.some(sp => Math.hypot(x - sp.x, z - sp.z) < 9.5) || Math.hypot(x - shop.x, z - shop.z) < 7 || Math.hypot(x - ward.x, z - ward.z) < 6 || Math.hypot(x - goal.x, z - goal.z) < 7
     || Math.hypot(x - smith.x, z - smith.z) < 7 || parks.some(pk => Math.hypot(x - pk.cx, z - pk.cz) < pk.rad + 4.5) || Math.hypot(x, z - 50) < 8 || Math.abs(x) < 4;
   for (let k = 0; houses.length < 36 && k < 3000; k++) {
     const x = (rnd() - 0.5) * 2 * (R - 6), z = (rnd() - 0.5) * 2 * (R - 6);
@@ -1812,12 +1829,12 @@ function turtleStep() {
 }
 function hubStep() {
   turtleStep();
-  save.mtChests = save.mtChests || {};
+  save.peaks = save.peaks || {};
   for (const m of L.mts) {
     const ch = m.chest;
     if (m.used || Math.hypot(P.x - ch.x, P.z - ch.z) >= 1.5 || Math.abs(P.y - ch.y) >= 1.2) continue;
     m.used = true; sfx.win(); burst(ch.x, ch.y + 1, ch.z, '#ffd23f', 30, 5);
-    if (!save.mtChests[m.id]) { save.mtChests[m.id] = true; addCoins(m.coins, ch.x, ch.y + 2, ch.z); pop('Dağın zirvesi!', ch.x, ch.y + 2.8, ch.z, '#ffffff', 120); }
+    if (!save.peaks[m.id]) { save.peaks[m.id] = true; addCoins(m.coins, ch.x, ch.y + 2, ch.z); pop('Dağın zirvesi!', ch.x, ch.y + 2.8, ch.z, '#ffffff', 120); }
     else addCoins(3, ch.x, ch.y + 2, ch.z);
     saveGame();
   }
@@ -2253,12 +2270,12 @@ function buildScene() {
   for (const b of L.boxes) { x0 = Math.min(x0, b.x0); x1 = Math.max(x1, b.x1); z0 = Math.min(z0, b.z0); z1 = Math.max(z1, b.z1); ymax = Math.max(ymax, b.y1); }
   const mx = (x0 + x1) / 2, mz = (z0 + z1) / 2, floorY = L.killY - 8;
   mk('box', th.mid, [x1 - x0 + 500, 1, z1 - z0 + 500], [mx, floorY, mz], W).castShadow = false;
-  for (let zz = z1 + 40; zz > z0 - 80; zz -= 11 + rnd() * 8) for (const side of [-1, 1]) {
+  if (!L.hub) for (let zz = z1 + 40; zz > z0 - 80; zz -= 11 + rnd() * 8) for (const side of [-1, 1]) {
     const rr = 10 + rnd() * 10, hh = 22 + rnd() * 22, xx = mx + side * (48 + rnd() * 30);
     mk('cone', th.far, [rr, hh, rr], [xx, floorY + hh / 2, zz], W).castShadow = false;
     if (th.caps) mk('cone', '#ffffff', [rr * 0.33, hh * 0.33, rr * 0.33], [xx, floorY + hh - hh * 0.165 + 0.05, zz], W).castShadow = false;
   }
-  for (let xx = mx - 60; xx < mx + 60; xx += 12 + rnd() * 8) { const rr = 12 + rnd() * 10, hh = 25 + rnd() * 25; mk('cone', th.far, [rr, hh, rr], [xx, floorY + hh / 2, z0 - 70 - rnd() * 20], W).castShadow = false; }
+  if (!L.hub) for (let xx = mx - 60; xx < mx + 60; xx += 12 + rnd() * 8) { const rr = 12 + rnd() * 10, hh = 25 + rnd() * 25; mk('cone', th.far, [rr, hh, rr], [xx, floorY + hh / 2, z0 - 70 - rnd() * 20], W).castShadow = false; }
   G.clouds = [];
   if (th.cave) {
     for (let i = 0; i < 70; i++) { const hh = 3 + rnd() * 7, c = mk('cone', '#140e22', [1 + rnd() * 1.5, hh, 1 + rnd() * 1.5], [mx + (rnd() - 0.5) * 90, ymax + 12 - hh / 2, z0 + rnd() * (z1 - z0 + 20)], W); c.rotation.x = Math.PI; c.castShadow = false; }
@@ -2331,6 +2348,21 @@ function buildScene() {
     }
     smithModel(W, L.smith.x, L.smith.y, L.smith.z, L.smith.yaw);
     for (const h of L.houses) houseModel(W, h);
+    const nSteps = L.mts.reduce((a, m) => a + m.steps.length, 0);
+    const stepTop = new THREE.InstancedMesh(G.geo.box, new THREE.MeshLambertMaterial({ color: '#c9bcae' }), nSteps), stepBody = new THREE.InstancedMesh(G.geo.box, new THREE.MeshLambertMaterial({ color: '#8d8378' }), nSteps);
+    stepTop.frustumCulled = stepBody.frustumCulled = false; stepTop.castShadow = stepTop.receiveShadow = stepBody.castShadow = true; W.add(stepTop); W.add(stepBody);
+    const dm = new THREE.Object3D(); let si2 = 0;
+    for (const mt of L.mts) {
+      const topH = mt.yEnd + 0.3, body = new THREE.Mesh(new THREE.CylinderGeometry(mt.rTop, mt.r, topH, 24), mat(mt.col));
+      body.position.set(mt.cx, topH / 2, mt.cz); body.castShadow = body.receiveShadow = true; W.add(body);
+      mk('cyl', '#b5d6a0', [mt.rTop + 0.05, 0.12, mt.rTop + 0.05], [mt.cx, topH + 0.03, mt.cz], W).receiveShadow = true;
+      for (let k = 0; k < 6; k++) { const a = k * 1.05 + mt.id, yy = 1 + (k % 3) * mt.yEnd * 0.25, rr = mt.r * (1 - yy / mt.h); mk('ico', '#7d8590', [0.5, 0.35, 0.5], [mt.cx + Math.sin(a) * rr, yy, mt.cz + Math.cos(a) * rr], W); }
+      for (const st of mt.steps) {
+        dm.position.set(st.x, st.y - 0.09, st.z); dm.rotation.set(0, st.rot, 0); dm.scale.set(0.8, 0.18, 1.55); dm.updateMatrix(); stepTop.setMatrixAt(si2, dm.matrix);
+        dm.position.set(st.x, st.y - 0.38, st.z); dm.scale.set(0.74, 0.42, 1.4); dm.updateMatrix(); stepBody.setMatrixAt(si2, dm.matrix); si2++;
+      }
+    }
+    stepTop.instanceMatrix.needsUpdate = stepBody.instanceMatrix.needsUpdate = true;
     for (const mt of L.mts) {
       const ch = mt.chest, c = grp(W, ch.x, ch.y, ch.z); c.rotation.y = mt.yaw;
       mk('box', '#8a5a2b', [1.2, 0.7, 0.8], [0, 0.35, 0], c); mk('box', '#a06d3a', [1.24, 0.35, 0.84], [0, 0.85, 0], c);
@@ -2608,7 +2640,7 @@ function draw3(alpha, dtMs) {
       const gc = (save.gold[pt.i] || []).filter(Boolean).length;
       txt(pt.locked ? 'Kilitli' : '★'.repeat(gc) + '☆'.repeat(3 - gc) + (lv.boss ? '  BOSS' : ''), q.x, q.y + 19, 14, pt.locked ? '#bbbbbb' : lv.boss ? '#ff6b7a' : '#ffd23f', 'center');
     }
-    const mdone = save.mtChests || {};
+    const mdone = save.peaks || {};
     for (const mt of L.mts) {
       if (Math.hypot(mt.foot.x - P.x, mt.foot.z - P.z) < 30 && !mt.used) { const qf = scr(mt.foot.x, 2.6, mt.foot.z); if (qf) { txt('Dağ', qf.x, qf.y, 20, '#ffffff', 'center'); txt(mdone[mt.id] ? 'Zirvedeki sandık açıldı ✓' : `Zirvede ${mt.coins} paralık sandık`, qf.x, qf.y + 19, 14, '#ffd23f', 'center'); } }
       const ch = mt.chest, qc = !mt.used && Math.hypot(ch.x - P.x, ch.z - P.z) < 30 ? scr(ch.x, ch.y + 2.2, ch.z) : null;
