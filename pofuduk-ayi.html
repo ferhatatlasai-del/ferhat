@@ -442,7 +442,8 @@ const QUESTS = [
   { id: 'gold', name: 'Altın Avcısı', desc: '5 altın kavanoz bul', stat: 'gold', goal: 5, reward: 40 },
   { id: 'turtle', name: 'Kaplumbağa Dostu', desc: "Bal Köyü'ndeki kaplumbağalardan 5 tanesini sev", stat: 'turtle', goal: 5, reward: 20 },
   { id: 'boss', name: 'Kahraman', desc: '2 boss yen', stat: 'boss', goal: 2, reward: 50 },
-  { id: 'cloud', name: 'Bulut Tırmanıcısı', desc: "Bal Köyü'ndeki bulut parkurunun tepesindeki sandığa ulaş", stat: 'cloud', goal: 1, reward: 30 },
+  { id: 'cloud', name: 'Bulut Tırmanıcısı', desc: "Bal Köyü'ndeki bir bulut parkurunun tepesindeki sandığa ulaş", stat: 'cloud', goal: 1, reward: 30 },
+  { id: 'cloud3', name: 'Gökyüzü Ustası', desc: "Bal Köyü'ndeki üç bulut parkurunun hepsini tamamla", stat: 'cloud', goal: 3, reward: 80 },
 ];
 const statOf = q => { const v = (save.stats || {})[q.stat]; return Array.isArray(v) ? v.length : v || 0; };
 const questReady = q => statOf(q) >= q.goal && !save.qdone.includes(q.id);
@@ -962,7 +963,15 @@ function smithModel(parent, x, y, z, yaw) {
   mk('box', '#4a2c17', [1, 1.6, 0.1], [-0.8, 0.8, 0.72], t);
   mk('box', '#ff7b3d', [0.7, 0.5, 0.1], [0.8, 1.2, 0.72], t, { emissive: '#a03a00' });
   mk('box', '#5d6670', [0.9, 0.5, 0.5], [0.9, 0.55, 1.4], t); mk('box', '#5d6670', [0.4, 0.4, 0.35], [0.9, 0.2, 1.4], t); mk('box', '#5d6670', [1.2, 0.18, 0.55], [0.9, 0.85, 1.4], t);
-  const sign = axeModel(3); sign.scale.setScalar(0.045); sign.position.set(-0.2, 2.2, 0.75); sign.rotation.z = -0.7; t.add(sign);
+  // hammer resting on the anvil
+  const hm = grp(t, 0.85, 1.02, 1.4); hm.rotation.set(0, 0.35, 0.15);
+  mk('cyl', '#9a6234', [0.07, 1.0, 0.07], [0.35, 0.06, 0], hm).rotation.z = Math.PI / 2;
+  mk('box', '#3d4148', [0.26, 0.26, 0.5], [-0.15, 0.1, 0], hm); mk('box', '#6b7280', [0.08, 0.28, 0.52], [-0.3, 0.1, 0], hm);
+  // big hammer sign above the door
+  const sg = grp(t, -0.8, 2.05, 0.78);
+  mk('box', '#5c3a1c', [1.2, 0.8, 0.08], [0, 0, 0], sg); mk('box', '#e8c79a', [1.06, 0.66, 0.06], [0, 0, 0.03], sg);
+  const hd = grp(sg, 0, 0, 0.08); hd.rotation.z = -0.65;
+  mk('box', '#7a4a24', [0.09, 0.56, 0.04], [0, -0.08, 0], hd); mk('box', '#3d4148', [0.42, 0.18, 0.05], [0, 0.22, 0], hd);
   return t;
 }
 function frogModel() {
@@ -1371,17 +1380,24 @@ function buildHub() {
   const goal = { x: -26, y: 0, z: 34 };
   boxes.push({ x0: goal.x - 1.65, y0: 0, z0: goal.z - 1.15, x1: goal.x + 1.65, y1: 2.6, z1: goal.z + 1.15, kind: 'cabin', on: true });
   // cloud parkour: a spiral of clouds with a treasure chest on top
-  const park = { cx: 50, cz: 46, clouds: [] };
-  for (let k = 0; k <= 12; k++) {
-    const a = k * 0.72, x = park.cx + Math.cos(a) * 7.5, z = park.cz + Math.sin(a) * 7.5, top = 1.3 + k * 1.2, hs = k === 12 ? 2 : 1.3 - k * 0.025;
-    boxes.push({ x0: x - hs, y0: top - 0.6, z0: z - hs, x1: x + hs, y1: top, z1: z + hs, kind: 'cloud', on: true });
-    park.clouds.push({ x, z, top });
-  }
-  const last = park.clouds[12]; park.chest = { x: last.x, y: last.top, z: last.z }; park.first = park.clouds[0];
+  const parks = [];
+  const makePark = (id, cx, cz, n, rad, step, reward) => {
+    const pk = { id, cx, cz, rad, n, reward, clouds: [] };
+    for (let k = 0; k < n; k++) {
+      const last = k === n - 1, a = k * step, x = cx + Math.cos(a) * rad, z = cz + Math.sin(a) * rad, top = 1.3 + k * 1.2, hs = last ? 2 : Math.max(0.95, 1.3 - k * 0.02);
+      boxes.push({ x0: x - hs, y0: top - 0.6, z0: z - hs, x1: x + hs, y1: top, z1: z + hs, kind: 'cloud', on: true });
+      pk.clouds.push({ x, z, top });
+    }
+    const lc = pk.clouds[n - 1]; pk.chest = { x: lc.x, y: lc.top, z: lc.z }; pk.first = pk.clouds[0];
+    parks.push(pk);
+  };
+  makePark(1, 50, 46, 13, 7.5, 0.72, 30);   // short
+  makePark(2, -55, 55, 19, 8, 0.66, 60);    // longer
+  makePark(3, -30, -20, 27, 9, 0.6, 100);   // longest and highest
   // village houses, brown and light brown, scattered between everything else
   const houses = [];
   const nearAny = (x, z) => spots.some(sp => Math.hypot(x - sp.x, z - sp.z) < 9.5) || Math.hypot(x - shop.x, z - shop.z) < 7 || Math.hypot(x - ward.x, z - ward.z) < 6 || Math.hypot(x - goal.x, z - goal.z) < 7
-    || Math.hypot(x - smith.x, z - smith.z) < 7 || Math.hypot(x - park.cx, z - park.cz) < 12 || Math.hypot(x, z - 50) < 8 || Math.abs(x) < 4;
+    || Math.hypot(x - smith.x, z - smith.z) < 7 || parks.some(pk => Math.hypot(x - pk.cx, z - pk.cz) < pk.rad + 4.5) || Math.hypot(x, z - 50) < 8 || Math.abs(x) < 4;
   for (let k = 0; houses.length < 36 && k < 3000; k++) {
     const x = (rnd() - 0.5) * 2 * (R - 6), z = (rnd() - 0.5) * 2 * (R - 6);
     if (nearAny(x, z) || houses.some(h => Math.hypot(x - h.x, z - h.z) < 8.5)) continue;
@@ -1395,7 +1411,7 @@ function buildHub() {
     const x = (rnd() - 0.5) * 2 * (R - 8), z = (rnd() - 0.5) * 2 * (R - 8);
     if (clear(x, z)) turtles.push({ id: turtles.length, x, z, yaw: rnd() * 6.28, t: rnd() * 5, next: 2 + rnd() * 3, s: 0.8 + rnd() * 0.45, hue: ['#3f9b4a', '#5aa65e', '#7a9b3a', '#4f8f6a'][turtles.length % 4], petT: 0, hop: 0 });
   }
-  return { def: HUB, hub: true, R, boxes, items: [], enemies: [], trees, paths, start: { x: 0, y: 0, z: 50 }, checkpoints: [], cpActive: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, ward, smith, houses, turtles, park };
+  return { def: HUB, hub: true, R, boxes, items: [], enemies: [], trees, paths, start: { x: 0, y: 0, z: 50 }, checkpoints: [], cpActive: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, ward, smith, houses, turtles, parks };
 }
 function mkBoss(type, c) {
   const base = { type, c, x: c.x, z: c.zc - 3, y: c.y, vx: 0, vz: 0, vy: 0, t: 0, inv: 0, active: false, defeated: false, deadT: 0, yaw: 0, tx: 0, tz: 0, state: type === 'mush' ? 'walk' : type === 'queen' ? 'hover' : 'aim' };
@@ -1762,11 +1778,13 @@ function turtleStep() {
 }
 function hubStep() {
   turtleStep();
-  const ch = L.park.chest;
-  if (!L.park.used && Math.hypot(P.x - ch.x, P.z - ch.z) < 1.4 && Math.abs(P.y - ch.y) < 1.2) {
-    L.park.used = true; sfx.win(); burst(ch.x, ch.y + 1, ch.z, '#ffd23f', 30, 5);
-    if (!save.cloudChest) { save.cloudChest = true; addCoins(30, ch.x, ch.y + 2, ch.z); pop('Bulut parkuru tamam!', ch.x, ch.y + 2.8, ch.z, '#ffffff', 120); bump('cloud'); }
-    else addCoins(3, ch.x, ch.y + 2, ch.z);
+  save.cloudChests = save.cloudChests || (save.cloudChest ? { 1: true } : {});
+  for (const pk of L.parks) {
+    const ch = pk.chest;
+    if (pk.used || Math.hypot(P.x - ch.x, P.z - ch.z) >= 1.4 || Math.abs(P.y - ch.y) >= 1.2) continue;
+    pk.used = true; sfx.win(); burst(ch.x, ch.y + 1, ch.z, '#ffd23f', 30, 5);
+    if (!save.cloudChests[pk.id]) { save.cloudChests[pk.id] = true; addCoins(pk.reward, ch.x, ch.y + 2, ch.z); pop(`Bulut Parkuru ${pk.id} tamam!`, ch.x, ch.y + 2.8, ch.z, '#ffffff', 120); bump('cloud'); }
+    else addCoins(2 + pk.id * 2, ch.x, ch.y + 2, ch.z);
     saveGame();
   }
   for (const p of L.portals) {
@@ -2266,11 +2284,11 @@ function buildScene() {
     }
     smithModel(W, L.smith.x, L.smith.y, L.smith.z, L.smith.yaw);
     for (const h of L.houses) houseModel(W, h);
-    { const ch = L.park.chest, c = grp(W, ch.x, ch.y, ch.z); c.rotation.y = Math.atan2(L.park.cx - ch.x, L.park.cz - ch.z) + Math.PI;
+    for (const pk of L.parks) { const ch = pk.chest, c = grp(W, ch.x, ch.y, ch.z); c.rotation.y = Math.atan2(pk.cx - ch.x, pk.cz - ch.z) + Math.PI;
       mk('box', '#8a5a2b', [1.2, 0.7, 0.8], [0, 0.35, 0], c); mk('box', '#a06d3a', [1.24, 0.35, 0.84], [0, 0.85, 0], c);
       for (const sx of [-0.45, 0.45]) mk('box', '#ffd23f', [0.12, 1.06, 0.86], [sx, 0.52, 0], c, { emissive: '#5a4300' });
       mk('box', '#ffd23f', [0.2, 0.24, 0.06], [0, 0.66, 0.43], c, { emissive: '#5a4300' });
-      L.park.glow = mk('torus', '#fff27a', [1.3, 1.3, 1.3], [0, 0.05, 0], c, { emissive: '#8a7a20' }); L.park.glow.rotation.x = Math.PI / 2; L.park.glow.castShadow = false; }
+      pk.glow = mk('torus', '#fff27a', [1.3, 1.3, 1.3], [0, 0.05, 0], c, { emissive: '#8a7a20' }); pk.glow.rotation.x = Math.PI / 2; pk.glow.castShadow = false; }
     for (const t of L.turtles) { t.mesh = turtleModel(t.hue); t.mesh.scale.setScalar(t.s); W.add(t.mesh); }
     { const wd = L.ward, w2 = grp(W, wd.x, wd.y, wd.z); w2.rotation.y = wd.yaw;
       mk('box', '#8a5a2b', [1.8, 2.4, 1], [0, 1.2, 0], w2).receiveShadow = true;
@@ -2292,7 +2310,7 @@ function buildScene() {
   G.ringMat = mat('#ffffff', { transparent: true, opacity: 0.85, emissive: '#555555' });
 }
 function portalSpin() {
-  if (L.park && L.park.glow) { L.park.glow.visible = !L.park.used; L.park.glow.scale.setScalar(1.2 + Math.sin(frame * 0.1) * 0.12); }
+  if (L.parks) for (const pk of L.parks) if (pk.glow) { pk.glow.visible = !pk.used; pk.glow.scale.setScalar(1.2 + Math.sin(frame * 0.1) * 0.12); }
   if (L.portals) for (const p of L.portals) if (p.disc) p.disc.rotation.z -= 0.03;
   if (L.turtles) for (const t of L.turtles) {
     const m = t.mesh, u = m.userData, moving = !t.rest && t.petT <= 180;
@@ -2522,8 +2540,13 @@ function draw3(alpha, dtMs) {
       const gc = (save.gold[pt.i] || []).filter(Boolean).length;
       txt(pt.locked ? 'Kilitli' : '★'.repeat(gc) + '☆'.repeat(3 - gc) + (lv.boss ? '  BOSS' : ''), q.x, q.y + 19, 14, pt.locked ? '#bbbbbb' : lv.boss ? '#ff6b7a' : '#ffd23f', 'center');
     }
-    const pf = L.park.first, qp = Math.hypot(pf.x - P.x, pf.z - P.z) < 34 ? scr(pf.x, pf.top + 1.8, pf.z) : null; if (qp) txt('Bulut Parkuru', qp.x, qp.y, 20, '#ffffff', 'center');
-    const ch = L.park.chest, qc = !L.park.used && Math.hypot(ch.x - P.x, ch.z - P.z) < 40 ? scr(ch.x, ch.y + 2.2, ch.z) : null; if (qc) txt(save.cloudChest ? 'Sandık' : 'Hazine Sandığı', qc.x, qc.y, 18, '#ffd23f', 'center');
+    const done = save.cloudChests || {};
+    for (const pk of L.parks) {
+      const pf = pk.first, qp = Math.hypot(pf.x - P.x, pf.z - P.z) < 34 ? scr(pf.x, pf.top + 2, pf.z) : null;
+      if (qp) { txt(`Bulut Parkuru ${pk.id}`, qp.x, qp.y, 20, '#ffffff', 'center'); txt(done[pk.id] ? 'Tamamlandı ✓' : `${pk.n} bulut · Hazine: ${pk.reward} para`, qp.x, qp.y + 19, 14, '#ffd23f', 'center'); }
+      const ch = pk.chest, qc = !pk.used && Math.hypot(ch.x - P.x, ch.z - P.z) < 40 ? scr(ch.x, ch.y + 2.2, ch.z) : null;
+      if (qc) txt(done[pk.id] ? 'Sandık' : `Hazine Sandığı · ${pk.reward} para`, qc.x, qc.y, 18, '#ffd23f', 'center');
+    }
     const qs = scr(L.smith.x, 4.4, L.smith.z); if (qs) txt('Demirci', qs.x, qs.y, 20, '#ffd23f', 'center');
     const q = scr(L.shop.x, L.shop.y + 3.9, L.shop.z);
     if (q) txt('Kalp Dükkânı', q.x, q.y, 20, '#ffd23f', 'center');
