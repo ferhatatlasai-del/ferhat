@@ -1520,7 +1520,7 @@ function ambient() {
 
 /* ---------- update ---------- */
 function update() {
-  P.ox = P.x; P.oy = P.y; P.oz = P.z; P.oyaw = P.yaw; G.oCamYaw = G.camYaw;
+  P.ox = P.x; P.oy = P.y; P.oz = P.z; P.oyaw = P.yaw; P.oanim = P.anim; P.osq = P.squash; G.oCamYaw = G.camYaw;
   frame++;
   if (banner > 0) banner--;
   if (bossBanner > 0) bossBanner--;
@@ -2322,6 +2322,7 @@ function portalSpin() {
 function lookKey() { return save.species + save.outfit + save.gender + save.axe; }
 function render3D(alpha = 1, dtMs = 16.667) {
   const ip = (o, n) => o === undefined ? n : o + (n - o) * alpha;
+  const fI = frame + (state === 'play' ? alpha : 0), animI = ip(P.oanim, P.anim);
   const PX = ip(P.ox, P.x), PY = ip(P.oy, P.y), PZ = ip(P.oz, P.z), fk = b => 1 - Math.pow(1 - b, dtMs / 16.667);
   const bf = L.boss && L.boss.active && !L.boss.defeated ? L.boss : null;
   const tgt = new THREE.Vector3(PX, PY + 1.1, PZ);
@@ -2337,19 +2338,19 @@ function render3D(alpha = 1, dtMs = 16.667) {
   for (const c of G.clouds) c.position.x += 0.006;
   for (const [b, m] of G.boxMeshes) {
     if (b.mv) m.position.z = (b.z0 + b.z1) / 2;
-    if (b.kind === 'qbox') { m.material = b.used ? mat('#a58b6e') : G.matQ; m.position.y = (b.y0 + b.y1) / 2 + (b.used ? 0 : Math.sin(frame * 0.1) * 0.04); m.rotation.y = b.used ? 0 : frame * 0.01; }
+    if (b.kind === 'qbox') { m.material = b.used ? mat('#a58b6e') : G.matQ; m.position.y = (b.y0 + b.y1) / 2 + (b.used ? 0 : Math.sin(fI * 0.1) * 0.04); m.rotation.y = b.used ? 0 : fI * 0.01; }
     if (b.kind === 'crate' || b.kind === 'gate' || b.kind === 'bush') m.visible = b.on;
   }
-  for (const cp of L.checkpoints) { cp.mat.color.set(cp.on ? '#e63946' : '#9aa5b1'); cp.flag.rotation.y = Math.sin(frame * 0.12) * 0.25; }
+  for (const cp of L.checkpoints) { cp.mat.color.set(cp.on ? '#e63946' : '#9aa5b1'); cp.flag.rotation.y = Math.sin(fI * 0.12) * 0.25; }
   portalSpin();
   G.doorGlow.visible = !L.hub;
-  G.doorGlow.scale.setScalar(0.85 + Math.sin(frame * 0.08) * 0.08);
+  G.doorGlow.scale.setScalar(0.85 + Math.sin(fI * 0.08) * 0.08);
   const near = (x, z) => Math.abs(x - P.x) < 45 && Math.abs(z - P.z) < 45;
   for (const h of L.items) {
     const m = h.mesh; m.visible = !h.got && near(h.x, h.z);
     if (!m.visible) continue;
-    if (h.kind === 'coin' || h.kind === 'axe' || h.kind === 'gold' || h.kind === 'heart') m.rotation.y = frame * (h.kind === 'coin' ? 0.07 : 0.03) + h.ph;
-    else { m.position.y = h.y + Math.sin(frame * 0.08 + h.ph) * 0.08; m.rotation.y = Math.sin(frame * 0.03 + h.ph) * 0.6; }
+    if (h.kind === 'coin' || h.kind === 'axe' || h.kind === 'gold' || h.kind === 'heart') m.rotation.y = fI * (h.kind === 'coin' ? 0.07 : 0.03) + h.ph;
+    else { m.position.y = h.y + Math.sin(fI * 0.08 + h.ph) * 0.08; m.rotation.y = Math.sin(fI * 0.03 + h.ph) * 0.6; }
   }
   for (const e of L.enemies) {
     const m = e.mesh;
@@ -2364,7 +2365,7 @@ function render3D(alpha = 1, dtMs = 16.667) {
       m.position.set(e.x, e.y + 0.3, e.z);
       m.rotation.set(0, e.yaw - Math.PI / 2, e.alive ? 0 : Math.PI);
       m.scale.setScalar(e.alive ? 1 : Math.max(0.1, 1 - e.dead / 30));
-      for (const w of m.userData.wings) w.rotation.x = w.userData.s * (0.3 + Math.sin(frame * 0.9) * 0.45);
+      for (const w of m.userData.wings) w.rotation.x = w.userData.s * (0.3 + Math.sin(fI * 0.9) * 0.45);
     }
   }
   const b = L.boss;
@@ -2395,44 +2396,44 @@ function render3D(alpha = 1, dtMs = 16.667) {
       if (b.defeated) m.position.y += b.h;
     } else if (b.type === 'queen') {
       m.position.set(b.x, b.y + b.h / 2, b.z);
-      if (b.state === 'aim') m.position.x += Math.sin(frame * 1.7) * 0.08;
-      m.rotation.set(0, b.yaw - Math.PI / 2, (b.state === 'stunned' ? Math.sin(frame * 0.2) * 0.2 : 0) + (b.defeated ? Math.PI : 0));
-      for (const w of m.userData.wings) w.rotation.x = w.userData.s * (0.3 + Math.sin(frame * (b.state === 'stunned' ? 0.15 : 0.9)) * 0.45);
-      if (b.state === 'aim' || b.state === 'dive') { G.marker.visible = true; G.marker.position.set(b.tx, b.c.y + 0.05, b.tz); const ms = 1.3 + Math.sin(frame * 0.4) * 0.12; G.marker.scale.set(ms, ms, 2); }
+      if (b.state === 'aim') m.position.x += Math.sin(fI * 1.7) * 0.08;
+      m.rotation.set(0, b.yaw - Math.PI / 2, (b.state === 'stunned' ? Math.sin(fI * 0.2) * 0.2 : 0) + (b.defeated ? Math.PI : 0));
+      for (const w of m.userData.wings) w.rotation.x = w.userData.s * (0.3 + Math.sin(fI * (b.state === 'stunned' ? 0.15 : 0.9)) * 0.45);
+      if (b.state === 'aim' || b.state === 'dive') { G.marker.visible = true; G.marker.position.set(b.tx, b.c.y + 0.05, b.tz); const ms = 1.3 + Math.sin(fI * 0.4) * 0.12; G.marker.scale.set(ms, ms, 2); }
     } else if (b.type === 'owl') {
       m.position.set(b.x, b.y + (b.defeated ? b.h : 0), b.z);
-      m.rotation.set(b.state === 'swoop' ? 0.6 : 0, b.yaw, (b.state === 'stunned' ? Math.sin(frame * 0.2) * 0.2 : 0) + (b.defeated ? Math.PI : 0));
-      for (const w of m.userData.wings) w.rotation.z = w.userData.s * (b.state === 'stunned' ? 0.2 : b.state === 'swoop' ? 1.2 : 0.4 + Math.sin(frame * 0.5) * 0.6);
-      if (b.state === 'aim' || b.state === 'swoop') { G.marker.visible = true; G.marker.position.set(b.tx, b.c.y + 0.05, b.tz); const ms = 1.3 + Math.sin(frame * 0.4) * 0.12; G.marker.scale.set(ms, ms, 2); }
+      m.rotation.set(b.state === 'swoop' ? 0.6 : 0, b.yaw, (b.state === 'stunned' ? Math.sin(fI * 0.2) * 0.2 : 0) + (b.defeated ? Math.PI : 0));
+      for (const w of m.userData.wings) w.rotation.z = w.userData.s * (b.state === 'stunned' ? 0.2 : b.state === 'swoop' ? 1.2 : 0.4 + Math.sin(fI * 0.5) * 0.6);
+      if (b.state === 'aim' || b.state === 'swoop') { G.marker.visible = true; G.marker.position.set(b.tx, b.c.y + 0.05, b.tz); const ms = 1.3 + Math.sin(fI * 0.4) * 0.12; G.marker.scale.set(ms, ms, 2); }
     } else if (b.type === 'golem') {
       m.position.set(b.x, b.y + (b.defeated ? b.h : 0), b.z);
       m.rotation.set(0, b.yaw, b.defeated ? Math.PI : 0);
       const body = m.userData.body;
-      body.rotation.z = b.state === 'stunned' ? Math.sin(frame * 0.2) * 0.08 : b.state === 'walk' ? Math.sin(frame * 0.18) * 0.05 : 0;
+      body.rotation.z = b.state === 'stunned' ? Math.sin(fI * 0.2) * 0.08 : b.state === 'walk' ? Math.sin(fI * 0.18) * 0.05 : 0;
       body.scale.y = b.state === 'leap' && !b.air ? 1 - Math.min(0.15, b.t * 0.3) : 1;
-      m.userData.arms.forEach((a, i) => { a.rotation.x = b.state === 'throw' ? -2.7 * Math.min(1, b.t / 0.6) : b.state === 'stunned' ? -0.9 : b.state === 'leap' ? 0.6 : Math.sin(frame * 0.18 + i * Math.PI) * 0.35; });
+      m.userData.arms.forEach((a, i) => { a.rotation.x = b.state === 'throw' ? -2.7 * Math.min(1, b.t / 0.6) : b.state === 'stunned' ? -0.9 : b.state === 'leap' ? 0.6 : Math.sin(fI * 0.18 + i * Math.PI) * 0.35; });
     } else if (b.type === 'frog') {
       m.position.set(b.x, b.y + (b.defeated ? b.h : 0), b.z);
-      m.rotation.set(0, b.yaw, (b.state === 'stunned' ? Math.sin(frame * 0.2) * 0.12 : 0) + (b.defeated ? Math.PI : 0));
+      m.rotation.set(0, b.yaw, (b.state === 'stunned' ? Math.sin(fI * 0.2) * 0.12 : 0) + (b.defeated ? Math.PI : 0));
       const body = m.userData.body, sq = b.state === 'crouch' ? Math.min(1, b.t / 0.4) : 0;
       body.scale.set(1 + sq * 0.15, b.state === 'air' ? 1.15 : 1 - sq * 0.25, 1 + sq * 0.15);
     } else if (b.type === 'storm') {
       m.position.set(b.x, b.y + (b.defeated ? b.h : 0), b.z);
-      m.rotation.set(0, b.yaw, (b.state === 'stunned' ? Math.sin(frame * 0.15) * 0.15 : 0) + (b.defeated ? Math.PI : 0));
-      m.userData.body.scale.set(1, b.state === 'stunned' ? 0.8 : 1 + Math.sin(frame * 0.1) * 0.04, 1);
+      m.rotation.set(0, b.yaw, (b.state === 'stunned' ? Math.sin(fI * 0.15) * 0.15 : 0) + (b.defeated ? Math.PI : 0));
+      m.userData.body.scale.set(1, b.state === 'stunned' ? 0.8 : 1 + Math.sin(fI * 0.1) * 0.04, 1);
     } else if (b.type === 'crab') {
       m.position.set(b.x, b.y + (b.defeated ? b.h : 0), b.z);
       m.rotation.set(0, b.yaw, b.defeated ? Math.PI : 0);
       const body = m.userData.body;
-      body.position.y = 0.85 + (b.state === 'side' ? Math.abs(Math.sin(frame * 0.35)) * 0.08 : 0);
-      body.rotation.z = b.state === 'stunned' ? Math.sin(frame * 0.2) * 0.12 : b.state === 'side' ? Math.sin(frame * 0.35) * 0.05 : 0;
-      m.userData.claws.forEach((c, i) => { c.rotation.x = b.state === 'raise' ? -1.1 + Math.sin(frame * 0.9) * 0.1 : b.state === 'stunned' ? 0.55 : b.state === 'dash' ? -0.3 : Math.sin(frame * 0.12 + i * 2) * 0.2; });
+      body.position.y = 0.85 + (b.state === 'side' ? Math.abs(Math.sin(fI * 0.35)) * 0.08 : 0);
+      body.rotation.z = b.state === 'stunned' ? Math.sin(fI * 0.2) * 0.12 : b.state === 'side' ? Math.sin(fI * 0.35) * 0.05 : 0;
+      m.userData.claws.forEach((c, i) => { c.rotation.x = b.state === 'raise' ? -1.1 + Math.sin(fI * 0.9) * 0.1 : b.state === 'stunned' ? 0.55 : b.state === 'dash' ? -0.3 : Math.sin(fI * 0.12 + i * 2) * 0.2; });
     } else {
-      m.position.set(b.x + (b.state === 'aim' ? Math.sin(frame * 1.9) * 0.06 : 0), b.y + (b.defeated ? b.h : 0), b.z);
+      m.position.set(b.x + (b.state === 'aim' ? Math.sin(fI * 1.9) * 0.06 : 0), b.y + (b.defeated ? b.h : 0), b.z);
       m.rotation.set(0, b.yaw, b.defeated ? Math.PI : 0);
       const body = m.userData.body;
       body.rotation.x = b.state === 'roll' ? b.spinA : b.state === 'aim' ? -0.3 * Math.min(1, b.t * 2) : 0;
-      body.rotation.z = b.state === 'stunned' ? Math.sin(frame * 0.2) * 0.15 : 0;
+      body.rotation.z = b.state === 'stunned' ? Math.sin(fI * 0.2) * 0.15 : 0;
     }
   }
   G.shotMeshes = G.shotMeshes.filter(({ s, m }) => { if (L.shots.includes(s)) return true; G.world.remove(m); return false; });
@@ -2463,7 +2464,7 @@ function render3D(alpha = 1, dtMs = 16.667) {
     s.mesh.position.set(s.x, s.kind === 'ring' ? s.y + 0.15 : s.y, s.z);
     if (s.kind === 'ring') s.mesh.scale.set(s.r, s.r, 3);
     if (s.kind === 'tongue') { const out = s.phase !== 'warn'; s.warnM.visible = !out; s.tip.visible = s.ball.visible = out; s.tip.scale.z = Math.max(0.01, s.len); s.tip.position.z = s.len / 2; s.ball.position.z = s.len; }
-    if (s.kind === 'bolt') { const k = 1.25 * (0.85 + Math.min(1, s.t / s.delay) * 0.15) + Math.sin(frame * 0.6) * 0.05; s.rg.scale.set(k, k, 2); s.beam.visible = s.t >= s.delay; }
+    if (s.kind === 'bolt') { const k = 1.25 * (0.85 + Math.min(1, s.t / s.delay) * 0.15) + Math.sin(fI * 0.6) * 0.05; s.rg.scale.set(k, k, 2); s.beam.visible = s.t >= s.delay; }
   }
   const k = lookKey();
   if (G.bearKey !== k) {
@@ -2479,18 +2480,18 @@ function render3D(alpha = 1, dtMs = 16.667) {
   pp.flip.rotation.set(flip, yawI, 0, 'YXZ');
   br.rotation.z = P.dead ? Math.PI : 0;
   if (P.dead) br.position.y += 1.5;
-  const sq = P.squash, s0 = 1.1 / 36;
+  const sq = ip(P.osq, P.squash), s0 = 1.1 / 36;
   pp.model.scale.set(s0 * (1 + sq * 0.03), s0 * (1 - sq * 0.03), s0 * (1 + sq * 0.03));
-  const air = !P.onGround && state === 'play', sp = Math.hypot(P.vx, P.vz), wk = air ? 0 : Math.sin(P.anim) * Math.min(1, sp / 3);
+  const air = !P.onGround && state === 'play', sp = Math.hypot(P.vx, P.vz), wk = air ? 0 : Math.sin(animI) * Math.min(1, sp / 3);
   pp.legs.forEach((l, i) => { l.rotation.x = air ? (i ? 0.35 : -0.25) : (i ? wk : -wk) * 0.7; });
   pp.arms.forEach((a, i) => { a.rotation.x = air ? 0 : (i ? -wk : wk) * 0.6; a.rotation.z = air ? a.userData.s * 2.3 : a.userData.s * 0.12; });
   if (P.vine) {
-    pp.arms.forEach((a, i) => { a.rotation.x = -2.5 + (i ? 1 : -1) * Math.sin(P.anim) * 0.5; a.rotation.z = a.userData.s * 0.15; });
-    pp.legs.forEach((l, i) => { l.rotation.x = (i ? 1 : -1) * Math.sin(P.anim) * 0.45; });
+    pp.arms.forEach((a, i) => { a.rotation.x = -2.5 + (i ? 1 : -1) * Math.sin(animI) * 0.5; a.rotation.z = a.userData.s * 0.15; });
+    pp.legs.forEach((l, i) => { l.rotation.x = (i ? 1 : -1) * Math.sin(animI) * 0.45; });
   }
   if (P.hang) {
-    pp.arms.forEach((a, i) => { a.rotation.x = -2.55 + (i ? 1 : -1) * Math.sin(P.anim) * 0.2; a.rotation.z = a.userData.s * 0.2; });
-    pp.legs.forEach((l, i) => { l.rotation.x = Math.sin(frame * 0.1 + i * 3) * 0.25; });
+    pp.arms.forEach((a, i) => { a.rotation.x = -2.55 + (i ? 1 : -1) * Math.sin(animI) * 0.2; a.rotation.z = a.userData.s * 0.2; });
+    pp.legs.forEach((l, i) => { l.rotation.x = Math.sin(fI * 0.1 + i * 3) * 0.25; });
   }
   G.trailMat.opacity = 0;
   if (P.atkT > 0 && pp.axe) {
@@ -2501,13 +2502,13 @@ function render3D(alpha = 1, dtMs = 16.667) {
     if (pr >= 0.3) {
       G.trailMat.opacity = 0.55 * (1 - k); G.trailMat.color.set(save.axe >= 4 ? '#ffe680' : '#ffffff');
       G.trail.position.set(PX, PY + 0.75, PZ); const tr = AXES[save.axe].range / 1.6; G.trail.scale.set(tr, tr, tr);
-      if (P.combo === 2 || P.combo === 4) G.trail.rotation.set(Math.PI / 2, 0, -P.yaw + (P.combo === 4 ? frame * 0.3 : 0.4));
+      if (P.combo === 2 || P.combo === 4) G.trail.rotation.set(Math.PI / 2, 0, -P.yaw + (P.combo === 4 ? fI * 0.3 : 0.4));
       else G.trail.rotation.set(0, P.yaw - Math.PI / 2, -0.2);
     }
   }
   const fl = Math.min(0.6, sp * 0.1);
-  pp.tail.rotation.x = 0.35 + fl + Math.sin(frame * 0.3) * 0.12;
-  if (pp.cape) pp.cape.rotation.x = 0.12 + fl * 0.9 + Math.sin(frame * 0.25) * 0.06 + (air && P.vy < 0 ? 0.4 : 0);
+  pp.tail.rotation.x = 0.35 + fl + Math.sin(fI * 0.3) * 0.12;
+  if (pp.cape) pp.cape.rotation.x = 0.12 + fl * 0.9 + Math.sin(fI * 0.25) * 0.06 + (air && P.vy < 0 ? 0.4 : 0);
   const gy = P.dead ? null : groundBelow(PX, PZ, PY);
   G.blob.visible = gy !== null;
   if (gy !== null) { G.blob.position.set(PX, gy + 0.03, PZ); G.blob.scale.setScalar(Math.max(0.15, 0.45 - (PY - gy) * 0.04)); G.blob.scale.y = 0.02; }
