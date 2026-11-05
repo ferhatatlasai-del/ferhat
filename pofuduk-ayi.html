@@ -1449,7 +1449,7 @@ function ambient() {
 
 /* ---------- update ---------- */
 function update() {
-  P.ox = P.x; P.oy = P.y; P.oz = P.z;
+  P.ox = P.x; P.oy = P.y; P.oz = P.z; P.oyaw = P.yaw;
   frame++;
   if (banner > 0) banner--;
   if (bossBanner > 0) bossBanner--;
@@ -1716,10 +1716,17 @@ function hubStep() {
   }
   for (const p of L.portals) {
     if (p.cd > 0) p.cd--;
-    if (Math.hypot(P.x - p.x, P.z - p.z) < 1.0 && Math.abs(P.y - p.y) < 1.2) {
-      if (p.locked) { if (!p.cd) { pop(`Önce ${p.i}. bölgeyi bitir`, P.x, P.y + 2.4, P.z, '#ffffff', 90); sfx.hurt(); p.cd = 90; } }
-      else { sfx.flag(); burst(p.x, p.y + 1.7, p.z, '#ffffff', 20, 4); startLevel(p.i); return; }
+    // portal frame in its own axes: lx across the ring, lz through it
+    const rx = Math.cos(p.yaw), rz = -Math.sin(p.yaw), nx = Math.sin(p.yaw), nz = Math.cos(p.yaw);
+    const dx = P.x - p.x, dz = P.z - p.z, lx = dx * rx + dz * rz, lz = dx * nx + dz * nz, half = 0.3 + P.r;
+    if (Math.abs(lz) >= half || Math.abs(lx) > 1.85 + P.r || P.y > p.y + 3.2) continue;
+    if (!p.locked && Math.abs(lx) < 0.75) { // inside the opening
+      if (Math.abs(lz) < 0.3) { sfx.flag(); burst(p.x, p.y + 1.5, p.z, '#ffffff', 20, 4); startLevel(p.i); return; }
+      continue;
     }
+    const push = (lz >= 0 ? half : -half) - lz; // bump into the ring or pillars
+    P.x += nx * push; P.z += nz * push;
+    if (p.locked && !p.cd) { pop(`Önce ${p.i}. bölgeyi bitir`, P.x, P.y + 2.4, P.z, '#ffffff', 90); sfx.hurt(); p.cd = 90; }
   }
   const sm = L.smith, ds = Math.hypot(P.x - sm.tx, P.z - sm.tz);
   if (ds > 2.2) sm.armed = true;
@@ -2119,12 +2126,12 @@ function buildScene() {
     for (const pt of L.portals) {
       const lv = LEVELS[pt.i], g = grp(W, pt.x, pt.y, pt.z); g.rotation.y = pt.yaw;
       mk('cyl', '#9c8f84', [1.8, 0.3, 1.2], [0, 0.15, 0], g).receiveShadow = true;
-      for (const sx of [-1, 1]) mk('cyl', '#b7aa9e', [0.22, 3.2, 0.22], [sx * 1.6, 1.75, 0], g);
-      mk('torus', pt.locked ? '#7d7f86' : '#ffd23f', [1.4, 1.4, 1.6], [0, 1.85, 0], g, pt.locked ? null : { emissive: '#5a4300' });
+      for (const sx of [-1, 1]) mk('cyl', '#b7aa9e', [0.22, 3.0, 0.22], [sx * 1.6, 1.5, 0], g);
+      mk('torus', pt.locked ? '#7d7f86' : '#ffd23f', [1.4, 1.4, 1.6], [0, 1.5, 0], g, pt.locked ? null : { emissive: '#5a4300' });
       if (pt.locked) {
-        mk('cyl', '#5d6066', [1.35, 0.1, 1.35], [0, 1.85, 0], g).rotation.x = Math.PI / 2;
-        mk('box', '#c9a227', [0.6, 0.5, 0.2], [0, 1.75, 0.12], g);
-        mk('torus', '#c9a227', [0.2, 0.2, 0.3], [0, 2.05, 0.12], g);
+        mk('cyl', '#5d6066', [1.35, 0.1, 1.35], [0, 1.5, 0], g).rotation.x = Math.PI / 2;
+        mk('box', '#c9a227', [0.6, 0.5, 0.2], [0, 1.4, 0.12], g);
+        mk('torus', '#c9a227', [0.2, 0.2, 0.3], [0, 1.7, 0.12], g);
       } else {
         const tex = canvasTex(128, 128, (c) => {
           const gr = c.createRadialGradient(64, 64, 4, 64, 64, 64); gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.35, lv.sky[1]); gr.addColorStop(1, lv.sky[0]);
@@ -2133,8 +2140,8 @@ function buildScene() {
           for (let k = 0; k < 3; k++) { c.beginPath(); for (let t = 0; t < 60; t++) { const a = t * 0.18 + k * 2.09, rr = t; c.lineTo(64 + Math.cos(a) * rr, 64 + Math.sin(a) * rr); } c.stroke(); }
         });
         const disc = new THREE.Mesh(G.geo.disc, new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide, fog: false }));
-        disc.scale.setScalar(1.32); disc.position.y = 1.85; g.add(disc); pt.disc = disc;
-        if (lv.boss) mk('sph', '#e63946', [0.22, 0.22, 0.22], [0, 3.45, 0], g, { emissive: '#5a0a10' });
+        disc.scale.setScalar(1.32); disc.position.y = 1.5; g.add(disc); pt.disc = disc;
+        if (lv.boss) mk('sph', '#e63946', [0.22, 0.22, 0.22], [0, 3.1, 0], g, { emissive: '#5a0a10' });
       }
     }
     smithModel(W, L.smith.x, L.smith.y, L.smith.z, L.smith.yaw);
@@ -2306,8 +2313,9 @@ function render3D(alpha = 1, dtMs = 16.667) {
   const br = G.bear, pp = br.userData.parts;
   br.visible = !(P.inv > 0 && !P.dead && Math.floor(P.inv / 5) % 2);
   br.position.set(PX, PY, PZ);
-  const flip = P.spin > 0 ? (1 - P.spin / 30) * Math.PI * 2 : 0;
-  pp.flip.rotation.set(flip, P.yaw, 0, 'YXZ');
+  const spf = Math.max(0, P.spin - alpha), flip = P.spin > 0 ? (1 - spf / 30) * Math.PI * 2 : 0;
+  const yawI = P.oyaw === undefined ? P.yaw : P.oyaw + angDiff(P.yaw, P.oyaw) * alpha;
+  pp.flip.rotation.set(flip, yawI, 0, 'YXZ');
   br.rotation.z = P.dead ? Math.PI : 0;
   if (P.dead) br.position.y += 1.5;
   const sq = P.squash, s0 = 1.1 / 36;
@@ -2325,7 +2333,7 @@ function render3D(alpha = 1, dtMs = 16.667) {
   }
   G.trailMat.opacity = 0;
   if (P.atkT > 0 && pp.axe) {
-    const pr = 1 - P.atkT / P.atkDur, arm = pp.arms[0], k = pr < 0.3 ? pr / 0.3 : (pr - 0.3) / 0.7;
+    const pr = 1 - Math.max(0, P.atkT - alpha) / P.atkDur, arm = pp.arms[0], k = pr < 0.3 ? pr / 0.3 : (pr - 0.3) / 0.7;
     if (P.combo === 2) { arm.rotation.x = -1.5; arm.rotation.z = pr < 0.3 ? -1.3 * k : -1.3 + 2.6 * k; }
     else if (P.combo === 4) { arm.rotation.x = -1.4; arm.rotation.z = -1.4; pp.flip.rotation.y += pr * Math.PI * 2; }
     else { arm.rotation.z = -0.15; arm.rotation.x = pr < 0.3 ? -2.9 * k : -2.9 + (P.combo === 3 ? 3.3 : 2.5) * k; }
