@@ -1643,6 +1643,11 @@ function update() {
 
   moveAxis(P, 'x', P.vx * DT);
   moveAxis(P, 'z', P.vz * DT);
+  if (L.mts) for (const m of L.mts) { // the cone is solid all the way through: push the bear back out to its surface
+    if (P.y >= m.yEnd + 0.25) continue;
+    const dx = P.x - m.cx, dz = P.z - m.cz, d = Math.hypot(dx, dz), rs = m.r * (1 - Math.max(0, P.y) / m.h) + P.r * 0.6;
+    if (d < rs && d > 1e-4) { P.x = m.cx + dx / d * rs; P.z = m.cz + dz / d * rs; const vn = (P.vx * dx + P.vz * dz) / d; if (vn < 0) { P.vx -= vn * dx / d; P.vz -= vn * dz / d; } }
+  }
   const vyBefore = P.vy, hy = moveAxis(P, 'y', P.vy * DT);
   P.onGround = false;
   if (hy && vyBefore <= 0) { P.onGround = true; P.ground = hy; P.vy = 0; }
@@ -2366,7 +2371,7 @@ function buildScene() {
     stepTop.frustumCulled = stepBody.frustumCulled = false; stepTop.castShadow = stepTop.receiveShadow = stepBody.castShadow = true; W.add(stepTop); W.add(stepBody);
     const dm = new THREE.Object3D(); let si2 = 0;
     for (const mt of L.mts) {
-      const topH = mt.yEnd + 0.3, body = new THREE.Mesh(new THREE.CylinderGeometry(mt.rTop, mt.r, topH, 24), mat(mt.col));
+      const topH = mt.yEnd + 0.3, body = new THREE.Mesh(new THREE.CylinderGeometry(mt.rTop, mt.r, topH, 32), mat(mt.col, { side: 'double' }));
       body.position.set(mt.cx, topH / 2, mt.cz); body.castShadow = body.receiveShadow = true; W.add(body);
       mk('cyl', '#b5d6a0', [mt.rTop + 0.05, 0.12, mt.rTop + 0.05], [mt.cx, topH + 0.03, mt.cz], W).receiveShadow = true;
       for (let k = 0; k < 6; k++) { const a = k * 1.05 + mt.id, yy = 1 + (k % 3) * mt.yEnd * 0.25, rr = mt.r * (1 - yy / mt.h); mk('ico', '#7d8590', [0.5, 0.35, 0.5], [mt.cx + Math.sin(a) * rr, yy, mt.cz + Math.cos(a) * rr], W); }
@@ -2440,6 +2445,11 @@ function render3D(alpha = 1, dtMs = 16.667) {
     const c = Math.cos(hin.yaw), sn = Math.sin(hin.yaw);
     const nx = hin.x + lx * c + lz * sn, nz = hin.z - lx * sn + lz * c, near = Math.hypot(nx - PX, nz - PZ);
     G.cam.position.set(nx, near < 1.6 ? HOUSE.h - 0.3 : Math.min(HOUSE.h - 0.35, G.cam.position.y), nz); // too close: look down from the ceiling
+  }
+  if (L.mts) for (const m of L.mts) { // never let the camera sink into a mountain
+    const cp = G.cam.position; if (cp.y > m.yEnd + 0.6) continue;
+    const dx = cp.x - m.cx, dz = cp.z - m.cz, d = Math.hypot(dx, dz), rs = m.r * (1 - Math.max(0, cp.y) / m.h) + 0.6;
+    if (d < rs && d > 1e-4) cp.set(m.cx + dx / d * rs, cp.y, m.cz + dz / d * rs);
   }
   G.homeLight.intensity += ((hin ? 1.6 : 0) - G.homeLight.intensity) * fk(0.15);
   if (hin) G.homeLight.position.set(hin.x, HOUSE.h - 0.7, hin.z);
