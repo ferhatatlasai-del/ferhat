@@ -1597,7 +1597,7 @@ function update() {
     if (P.ground.kind === 'crate') { const c = P.ground; c.on = false; addCoins(2, P.x, P.y + 0.6, P.z); addHoney(1); burst(P.x, P.y + 0.3, P.z, '#a8743d', 16, 4); P.vy = 6; P.onGround = false; P.ground = null; }
     for (const e of L.enemies) if (e.alive && Math.hypot(e.x - P.x, e.z - P.z) < 2.4 && Math.abs(e.y - P.y) < 1) { if (e.helmet) sfx.clank(); else damageEnemy(e, 1, e.x - P.x, e.z - P.z); }
   }
-  if (P.squash > 0) P.squash -= 0.8; else if (P.squash < 0) P.squash += 0.6;
+  P.squash = P.squash > 0 ? Math.max(0, P.squash - 0.8) : Math.min(0, P.squash + 0.6); // settle exactly at 0, never overshoot
   P.anim += Math.hypot(P.vx, P.vz) * 0.035;
   }
   if (P.hangCd > 0) P.hangCd--;
