@@ -860,6 +860,7 @@ function init3D() {
   Object.assign(G.sun.shadow.camera, { left: -20, right: 20, top: 13, bottom: -13, near: 1, far: 70 });
   G.sun.shadow.bias = -0.0015;
   G.scene.add(G.sun); G.scene.add(G.sun.target);
+  G.homeLight = new THREE.PointLight(0xffd9a0, 0, 7.5, 1.4); G.scene.add(G.homeLight); // lit only inside a house
   G.v = new THREE.Vector3();
   G.geo = {
     box: new THREE.BoxGeometry(1, 1, 1), sph: new THREE.SphereGeometry(1, 20, 14),
@@ -928,27 +929,37 @@ function axeModel(tier) { // built in bear art units, handle along +y
   head.castShadow = true;
   return g;
 }
+const HOUSE = { hw: 2.7, hd: 2.55, h: 3.2, wt: 0.25, dw: 0.7, rise: 1.7 };
+const houseWalls = () => { const { hw, hd, wt, dw } = HOUSE; return [[-hw, -hd, hw, -hd + wt], [-hw, -hd, -hw + wt, hd], [hw - wt, -hd, hw, hd], [-hw, hd - wt, -dw, hd], [dw, hd - wt, hw, hd]]; };
 function houseModel(parent, h) {
+  const { hw, hd, h: hh, wt, dw, rise } = HOUSE;
   const t = grp(parent, h.x, 0, h.z); t.rotation.y = h.yaw;
-  const wall = h.light ? '#c8935a' : '#8a5a2b', trim = h.light ? '#8a5a2b' : '#5c3a1c', roof = h.rnd < 0.5 ? '#b5452f' : '#7a4a24';
-  const sh = grp(t); h.shell = sh; // walls and roof hide while the bear is inside
-  for (const [x0, z0, x1, z1] of [[-1.8, -1.7, 1.8, -1.5], [-1.8, -1.7, -1.6, 1.7], [1.6, -1.7, 1.8, 1.7], [-1.8, 1.5, -0.55, 1.7], [0.55, 1.5, 1.8, 1.7]])
-    mk('box', wall, [x1 - x0, 2.4, z1 - z0], [(x0 + x1) / 2, 1.2, (z0 + z1) / 2], sh).receiveShadow = true;
-  mk('box', wall, [1.1, 0.7, 0.2], [0, 2.05, 1.6], sh);
-  for (const sx of [-1, 1]) for (const sz of [-1, 1]) mk('box', trim, [0.22, 2.4, 0.22], [sx * 1.75, 1.2, sz * 1.65], sh);
-  for (const sx of [-1, 1]) mk('box', trim, [0.12, 1.75, 0.26], [sx * 0.6, 0.87, 1.6], sh);
-  mk('box', trim, [1.32, 0.12, 0.26], [0, 1.72, 1.6], sh);
-  for (const sd of [-1, 1]) { const rf = mk('box', roof, [2.45, 0.18, 4], [sd * 0.98, 3.1, 0], sh); rf.rotation.z = -sd * 0.68; }
-  mk('prism', wall, [2.08, 3.4, 0.97], [0, 2.88, 0], sh).rotation.set(-Math.PI / 2, 0, 0);
-  mk('box', '#7d7f86', [0.45, 1.1, 0.45], [1, 3.6, -0.8], sh);
-  for (const sx of [-1, 1]) { mk('box', '#ffe08a', [0.6, 0.55, 0.08], [sx * 1.2, 1.5, 1.72], sh, { emissive: '#5a4a10' }); mk('box', '#ffe08a', [0.08, 0.55, 0.6], [sx * 1.82, 1.5, 0], sh, { emissive: '#5a4a10' }); }
-  // inside: floor, rug, table, bed and a little lamp
-  mk('box', '#b07a43', [3.2, 0.04, 3.0], [0, 0.02, 0], t).receiveShadow = true;
-  mk('box', h.rnd < 0.5 ? '#c94a2a' : '#3b6fb0', [1.6, 0.02, 1.1], [0, 0.05, 0.3], t).receiveShadow = true;
-  mk('box', '#8a5a2b', [0.9, 0.08, 0.6], [1.0, 0.7, 0.6], t); mk('cyl', '#5c3a1c', [0.07, 0.66, 0.07], [1.0, 0.35, 0.6], t);
-  mk('box', '#7a4a24', [1.0, 0.35, 1.6], [-1.05, 0.2, -0.6], t); mk('box', h.light ? '#e63946' : '#7fb8e0', [0.95, 0.12, 1.2], [-1.05, 0.42, -0.4], t); mk('box', '#ffffff', [0.8, 0.12, 0.35], [-1.05, 0.45, -1.2], t);
-  mk('sph', '#ffe08a', [0.12, 0.12, 0.12], [1.0, 0.86, 0.6], t, { emissive: '#ffd23f' });
-  if (h.rnd > 0.4) for (let k = 0; k < 3; k++) mk('sph', ['#ff5fa2', '#ffd23f', '#7fd3ff'][k], [0.16, 0.16, 0.16], [-1.3 + k * 0.35, 0.15, 2.05], t);
+  const wall = h.light ? '#c8935a' : '#8a5a2b', trim = h.light ? '#8a5a2b' : '#5c3a1c', roof = h.rnd < 0.5 ? '#b5452f' : '#7a4a24', roofDark = h.rnd < 0.5 ? '#8f3324' : '#5c361e';
+  for (const [x0, z0, x1, z1] of houseWalls()) mk('box', wall, [x1 - x0, hh, z1 - z0], [(x0 + x1) / 2, hh / 2, (z0 + z1) / 2], t).receiveShadow = true;
+  mk('box', wall, [2 * dw, hh - 2.2, wt], [0, 2.2 + (hh - 2.2) / 2, hd - wt / 2], t);
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) mk('box', trim, [0.3, hh, 0.3], [sx * (hw - 0.12), hh / 2, sz * (hd - 0.12)], t);
+  for (const sx of [-1, 1]) mk('box', trim, [0.14, 2.25, 0.32], [sx * (dw + 0.06), 1.12, hd - 0.1], t);
+  mk('box', trim, [2 * dw + 0.3, 0.14, 0.32], [0, 2.25, hd - 0.1], t);
+  // closed roof: two slopes, a ridge cap and solid gables
+  const L2 = Math.hypot(hw, rise) + 0.45, ang = Math.atan2(rise, hw);
+  for (const sd of [-1, 1]) { const rf = mk('box', roof, [L2, 0.22, 2 * hd + 0.7], [sd * hw / 2, hh + rise / 2 + 0.08, 0], t); rf.rotation.z = -sd * ang; }
+  mk('box', roofDark, [0.5, 0.24, 2 * hd + 0.75], [0, hh + rise + 0.12, 0], t);
+  mk('prism', wall, [hw / 0.866, 2 * hd, rise / 1.5], [0, hh + rise / 3, 0], t).rotation.set(-Math.PI / 2, 0, 0);
+  mk('box', '#7d7f86', [0.55, 1.5, 0.55], [hw * 0.45, hh + rise * 0.75, -hd * 0.4], t);
+  for (const sx of [-1, 1]) {
+    mk('box', '#ffe08a', [0.85, 0.75, 0.08], [sx * (hw - 1.0), 1.75, hd + 0.01], t, { emissive: '#5a4a10' }); mk('box', trim, [1.0, 0.12, 0.14], [sx * (hw - 1.0), 1.32, hd + 0.03], t);
+    mk('box', '#ffe08a', [0.08, 0.75, 1.0], [sx * (hw + 0.01), 1.75, 0], t, { emissive: '#5a4a10' });
+  }
+  // inside: floor, rug, bed, table with a lamp, a shelf of jars and a hanging lamp
+  mk('box', '#b07a43', [2 * hw - 0.4, 0.04, 2 * hd - 0.4], [0, 0.02, 0], t).receiveShadow = true;
+  mk('box', h.rnd < 0.5 ? '#c94a2a' : '#3b6fb0', [2.2, 0.02, 1.6], [0.2, 0.05, 0.5], t).receiveShadow = true;
+  mk('box', '#7a4a24', [1.3, 0.42, 2.1], [-1.55, 0.23, -1.15], t); mk('box', h.light ? '#e63946' : '#7fb8e0', [1.25, 0.14, 1.6], [-1.55, 0.5, -0.9], t); mk('box', '#ffffff', [1.05, 0.14, 0.45], [-1.55, 0.52, -1.95], t);
+  mk('box', '#8a5a2b', [1.1, 0.1, 0.8], [1.5, 0.8, 1.0], t); mk('cyl', '#5c3a1c', [0.09, 0.76, 0.09], [1.5, 0.4, 1.0], t);
+  mk('sph', '#ffe08a', [0.13, 0.13, 0.13], [1.5, 0.98, 1.0], t, { emissive: '#ffd23f' });
+  mk('box', '#7a4a24', [1.5, 0.1, 0.35], [1.3, 1.6, -hd + 0.42], t);
+  for (let k = 0; k < 3; k++) { mk('cyl', '#ffb627', [0.12, 0.22, 0.12], [0.85 + k * 0.45, 1.77, -hd + 0.42], t, { emissive: '#4a2800' }); mk('cyl', '#e63946', [0.13, 0.05, 0.13], [0.85 + k * 0.45, 1.9, -hd + 0.42], t); }
+  mk('cyl', '#3d2a1a', [0.02, 0.5, 0.02], [0, hh - 0.25, 0], t); mk('sph', '#fff3c0', [0.18, 0.14, 0.18], [0, hh - 0.55, 0], t, { emissive: '#ffd23f' });
+  if (h.rnd > 0.4) for (let k = 0; k < 3; k++) mk('sph', ['#ff5fa2', '#ffd23f', '#7fd3ff'][k], [0.18, 0.18, 0.18], [-1.8 + k * 0.4, 0.17, hd + 0.4], t);
   return t;
 }
 function turtleModel(hue) {
@@ -1442,7 +1453,7 @@ function buildHub() {
     || Math.hypot(x - smith.x, z - smith.z) < 7 || parks.some(pk => Math.hypot(x - pk.cx, z - pk.cz) < pk.rad + 4.5) || Math.hypot(x, z - 50) < 8 || Math.abs(x) < 4;
   for (let k = 0; houses.length < 36 && k < 3000; k++) {
     const x = (rnd() - 0.5) * 2 * (R - 6), z = (rnd() - 0.5) * 2 * (R - 6);
-    if (nearAny(x, z) || houses.some(h => Math.hypot(x - h.x, z - h.z) < 8.5)) continue;
+    if (nearAny(x, z) || houses.some(h => Math.hypot(x - h.x, z - h.z) < 10.5)) continue;
     const raw = Math.atan2(-x, 20 - z), dir = ((Math.round(raw / (Math.PI / 2)) % 4) + 4) % 4;
     houses.push({ x, z, dir, yaw: dir * Math.PI / 2, light: houses.length % 2 === 1, rnd: rnd(), coins: 2 + Math.floor(rnd() * 3) });
   }
@@ -1450,11 +1461,11 @@ function buildHub() {
   const hitems = [], got = save.houseCoins || [];
   houses.forEach((h, hi) => {
     const T = (lx, lz) => { const c = Math.cos(h.yaw), sn = Math.sin(h.yaw); return [h.x + lx * c + lz * sn, h.z - lx * sn + lz * c]; };
-    for (const [x0, z0, x1, z1] of [[-1.8, -1.7, 1.8, -1.5], [-1.8, -1.7, -1.6, 1.7], [1.6, -1.7, 1.8, 1.7], [-1.8, 1.5, -0.55, 1.7], [0.55, 1.5, 1.8, 1.7]]) boxes.push(rectBox(T, x0, z0, x1, z1, 0, 2.4, 'deco'));
-    for (let k = 0; k < h.coins; k++) { const key = hi + '-' + k, [cx, cz] = T(-0.9 + k * 0.6, -0.9); if (!got.includes(key)) hitems.push({ kind: 'coin', key, x: cx, y: 0.8, z: cz }); }
+    for (const [x0, z0, x1, z1] of houseWalls()) boxes.push(rectBox(T, x0, z0, x1, z1, 0, HOUSE.h, 'deco'));
+    for (let k = 0; k < h.coins; k++) { const key = hi + '-' + k, [cx, cz] = T(-0.6 + k * 0.75, -0.6); if (!got.includes(key)) hitems.push({ kind: 'coin', key, x: cx, y: 0.8, z: cz }); }
   });
   hitems.forEach(h => { h.got = false; h.ph = rnd() * 6; });
-  const clear = (x, z) => !nearAny(x, z) && houses.every(h => Math.hypot(x - h.x, z - h.z) > 4.5);
+  const clear = (x, z) => !nearAny(x, z) && houses.every(h => Math.hypot(x - h.x, z - h.z) > 5.8);
   for (let i = 0; i < 360; i++) { const x = (rnd() - 0.5) * 2 * (R - 2), z = (rnd() - 0.5) * 2 * (R - 2); if (clear(x, z)) trees.push({ x, y: 0, z, s: 0.7 + rnd() * 0.5 }); }
   const turtles = [];
   for (let i = 0; turtles.length < 14 && i < 600; i++) {
@@ -2398,7 +2409,6 @@ function buildScene() {
 }
 function portalSpin() {
   if (L.mts) for (const mt of L.mts) if (mt.glow) { mt.glow.visible = !mt.used; mt.glow.scale.setScalar(1.2 + Math.sin(frame * 0.1) * 0.12); }
-  if (L.houses) for (const h of L.houses) if (h.shell) { const c = Math.cos(h.yaw), sn = Math.sin(h.yaw), dx = P.x - h.x, dz = P.z - h.z, lx = dx * c - dz * sn, lz = dx * sn + dz * c; h.shell.visible = !(Math.abs(lx) < 1.85 && Math.abs(lz) < 1.75 && P.y < 2.4); }
   if (L.parks) for (const pk of L.parks) if (pk.glow) { pk.glow.visible = !pk.used; pk.glow.scale.setScalar(1.2 + Math.sin(frame * 0.1) * 0.12); }
   if (L.portals) for (const p of L.portals) if (p.disc) p.disc.rotation.z -= 0.03;
   if (L.turtles) for (const t of L.turtles) {
@@ -2416,11 +2426,22 @@ function render3D(alpha = 1, dtMs = 16.667) {
   const bf = L.boss && L.boss.active && !L.boss.defeated ? L.boss : null;
   const tgt = new THREE.Vector3(PX, PY + 1.1, PZ);
   if (bf) { tgt.x += (bf.x - PX) * 0.3; tgt.z += (bf.z - PZ) * 0.3; tgt.y = Math.max(tgt.y, bf.c.y + (bf.type === 'queen' ? 3.2 : 1.6)); }
-  G.dist = (G.dist || 7.4) + ((bf ? 11.5 : L.hub ? 9.5 : 7.4) - (G.dist || 7.4)) * fk(0.05);
+  const toHouse = (h, x, z) => { const c = Math.cos(h.yaw), sn = Math.sin(h.yaw), dx = x - h.x, dz = z - h.z; return [dx * c - dz * sn, dx * sn + dz * c]; };
+  const hin = L.houses ? L.houses.find(h => { const [lx, lz] = toHouse(h, PX, PZ); return Math.abs(lx) < HOUSE.hw && lz > -HOUSE.hd && lz < HOUSE.hd - 0.9 && PY < HOUSE.h; }) : null;
+  G.dist = (G.dist || 7.4) + ((bf ? 11.5 : hin ? 2.4 : L.hub ? 9.5 : 7.4) - (G.dist || 7.4)) * fk(hin ? 0.2 : 0.05);
   if (!G.ct) G.ct = tgt.clone(); else G.ct.lerp(tgt, fk(P.dead ? 0.02 : 0.15));
   const cy = state === 'play' && G.oCamYaw !== undefined ? G.oCamYaw + angDiff(G.camYaw, G.oCamYaw) * alpha : G.camYaw, sx = shake ? (Math.random() - 0.5) * shake * 0.02 : 0, sy = shake ? (Math.random() - 0.5) * shake * 0.02 : 0;
   G.cam.position.set(G.ct.x + Math.sin(cy) * G.dist + sx, G.ct.y + G.dist * (L.hub ? 0.3 : 0.48) + sy, G.ct.z + Math.cos(cy) * G.dist);
-  G.cam.lookAt(G.ct.x, G.ct.y + (L.hub ? 1.4 : 0.3), G.ct.z);
+  if (hin) { // keep the camera inside the room so the roof and walls can stay closed
+    let [lx, lz] = toHouse(hin, G.cam.position.x, G.cam.position.z);
+    lx = Math.max(-HOUSE.hw + 0.4, Math.min(HOUSE.hw - 0.4, lx)); lz = Math.max(-HOUSE.hd + 0.4, Math.min(HOUSE.hd - 0.4, lz));
+    const c = Math.cos(hin.yaw), sn = Math.sin(hin.yaw);
+    const nx = hin.x + lx * c + lz * sn, nz = hin.z - lx * sn + lz * c, near = Math.hypot(nx - PX, nz - PZ);
+    G.cam.position.set(nx, near < 1.6 ? HOUSE.h - 0.3 : Math.min(HOUSE.h - 0.35, G.cam.position.y), nz); // too close: look down from the ceiling
+  }
+  G.homeLight.intensity += ((hin ? 1.6 : 0) - G.homeLight.intensity) * fk(0.15);
+  if (hin) G.homeLight.position.set(hin.x, HOUSE.h - 0.7, hin.z);
+  G.cam.lookAt(G.ct.x, G.ct.y + (hin ? 0 : L.hub ? 1.4 : 0.3), G.ct.z);
   const snap = v => Math.round(v * 25) / 25, lx = snap(G.ct.x), ly = snap(G.ct.y), lz = snap(G.ct.z); // keeps shadows from shimmering
   G.sun.position.set(lx - 9, ly + 16, lz + 7); G.sun.target.position.set(lx, ly, lz);
   if (G.sunMesh) G.sunMesh.position.set(G.ct.x - 50, G.ct.y + 40, G.ct.z - 110);
