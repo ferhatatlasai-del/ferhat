@@ -951,8 +951,8 @@ function houseModel(parent, h) {
     mk('box', '#ffe08a', [0.08, 0.75, 1.0], [sx * (hw + 0.01), 1.75, 0], t, { emissive: '#5a4a10' });
   }
   // inside: floor, rug, bed, table with a lamp, a shelf of jars and a hanging lamp
-  mk('box', '#b07a43', [2 * hw - 0.4, 0.04, 2 * hd - 0.4], [0, 0.02, 0], t).receiveShadow = true;
-  mk('box', h.rnd < 0.5 ? '#c94a2a' : '#3b6fb0', [2.2, 0.02, 1.6], [0.2, 0.05, 0.5], t).receiveShadow = true;
+  mk('box', '#b07a43', [2 * hw - 0.4, 0.06, 2 * hd - 0.4], [0, 0.11, 0], t).receiveShadow = true;
+  mk('box', h.rnd < 0.5 ? '#c94a2a' : '#3b6fb0', [2.2, 0.03, 1.6], [0.2, 0.155, 0.5], t).receiveShadow = true;
   mk('box', '#7a4a24', [1.3, 0.42, 2.1], [-1.55, 0.23, -1.15], t); mk('box', h.light ? '#e63946' : '#7fb8e0', [1.25, 0.14, 1.6], [-1.55, 0.5, -0.9], t); mk('box', '#ffffff', [1.05, 0.14, 0.45], [-1.55, 0.52, -1.95], t);
   mk('box', '#8a5a2b', [1.1, 0.1, 0.8], [1.5, 0.8, 1.0], t); mk('cyl', '#5c3a1c', [0.09, 0.76, 0.09], [1.5, 0.4, 1.0], t);
   mk('sph', '#ffe08a', [0.13, 0.13, 0.13], [1.5, 0.98, 1.0], t, { emissive: '#ffd23f' });
@@ -1462,6 +1462,8 @@ function buildHub() {
   houses.forEach((h, hi) => {
     const T = (lx, lz) => { const c = Math.cos(h.yaw), sn = Math.sin(h.yaw); return [h.x + lx * c + lz * sn, h.z - lx * sn + lz * c]; };
     for (const [x0, z0, x1, z1] of houseWalls()) boxes.push(rectBox(T, x0, z0, x1, z1, 0, HOUSE.h, 'deco'));
+    boxes.push(rectBox(T, -HOUSE.hw - 0.3, -HOUSE.hd - 0.35, HOUSE.hw + 0.3, HOUSE.hd + 0.35, HOUSE.h - 0.15, HOUSE.h + 0.2, 'deco'));
+    for (let k = 1; k < 4; k++) { const ex = (HOUSE.hw + 0.3) * (1 - k / 4); boxes.push(rectBox(T, -ex, -HOUSE.hd - 0.35, ex, HOUSE.hd + 0.35, HOUSE.h, HOUSE.h + 0.2 + HOUSE.rise * k / 4, 'deco')); }
     for (let k = 0; k < h.coins; k++) { const key = hi + '-' + k, [cx, cz] = T(-0.6 + k * 0.75, -0.6); if (!got.includes(key)) hitems.push({ kind: 'coin', key, x: cx, y: 0.8, z: cz }); }
   });
   hitems.forEach(h => { h.got = false; h.ph = rnd() * 6; });
@@ -2214,7 +2216,7 @@ function buildScene() {
     if (b.kind === 'ground') {
       const th = b.theme || L.def, deco = b.theme ? DECO[th.tree] : DECO0;
       m = grp(W, cx, 0, cz);
-      const dirt = mk('box', th.dirt, [w, h, d], [0, cy, 0], m); dirt.receiveShadow = true;
+      const dirt = mk('box', th.dirt, [w, Math.max(0.05, h - 0.2), d], [0, cy - Math.min(0.1, h / 2 - 0.025), 0], m); dirt.receiveShadow = true;
       const top = mk('box', th.grass, [w + 0.14, 0.36, d + 0.14], [0, b.y1 - 0.14, 0], m); top.receiveShadow = true;
       const lip = mk('box', th.grassDark, [w + 0.16, 0.12, d + 0.16], [0, b.y1 - 0.34, 0], m); lip.castShadow = false;
       const un = mk('coneLow', th.dirtDot, [Math.min(w, d) * 0.55, 4.5, Math.min(w, d) * 0.55], [0, b.y0 - 2.25, 0], m); un.rotation.x = Math.PI; un.castShadow = false;
@@ -2273,7 +2275,7 @@ function buildScene() {
   for (const t of L.trees) treeModel(t.kind || th.tree, W, t.x, t.y, t.z, t.s, rnd);
   if (L.paths) for (const pa of L.paths) {
     const dx = pa.x1 - pa.x0, dz = pa.z1 - pa.z0, len = Math.hypot(dx, dz);
-    const pm = mk('box', '#d9b27a', [1.7, 0.06, len], [(pa.x0 + pa.x1) / 2, 0.04, (pa.z0 + pa.z1) / 2], W); pm.rotation.y = Math.atan2(dx, dz); pm.castShadow = false; pm.receiveShadow = true;
+    const pm = mk('box', '#d9b27a', [1.7, 0.06, len], [(pa.x0 + pa.x1) / 2, 0.09, (pa.z0 + pa.z1) / 2], W); pm.rotation.y = Math.atan2(dx, dz); pm.castShadow = false; pm.receiveShadow = true;
   }
 
   // surroundings: valley floor, mountains, clouds
