@@ -137,7 +137,21 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 .tb.on { background: color-mix(in srgb, var(--honey) 70%, transparent); }
 #setBtn { position: fixed; z-index: 5; top: calc(10px + env(safe-area-inset-top, 0px)); right: calc(max(12px, env(safe-area-inset-right, 0px)) + 52px);
   width: 42px; height: 42px; border-radius: 12px; border: 3px solid var(--bark); background: var(--cream); color: var(--bark); font-family: var(--display); font-size: 1.25rem; cursor: pointer; }
-#pSettings { z-index: 7; }
+#pSettings, #pQuests { z-index: 7; }
+#questBtn { position: fixed; z-index: 5; top: calc(10px + env(safe-area-inset-top, 0px)); right: calc(max(12px, env(safe-area-inset-right, 0px)) + 104px);
+  width: 42px; height: 42px; border-radius: 12px; border: 3px solid var(--bark); background: var(--cream); color: var(--bark); font-family: var(--display); font-size: 1.15rem; cursor: pointer; }
+#questBtn:focus-visible { outline: 3px solid var(--leaf); outline-offset: 2px; }
+#questBtn .dot { position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; border-radius: 50%; background: var(--heart); border: 2px solid var(--cream); }
+.quests { display: grid; gap: 8px; text-align: left; max-height: min(58vh, 30rem); overflow-y: auto; padding-right: 4px; }
+.quest { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; padding: 8px 10px; border: 3px solid color-mix(in srgb, var(--bark) 25%, transparent); border-radius: 12px; }
+.quest.ready { border-color: var(--bark); background: color-mix(in srgb, var(--honey) 40%, var(--cream)); }
+.quest.done { opacity: .6; }
+.quest b { font-family: var(--display); font-weight: 400; font-size: 1.05rem; }
+.quest small { display: block; opacity: .85; }
+.quest .bar { grid-column: 1 / -1; height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--bark) 18%, transparent); overflow: hidden; }
+.quest .bar i { display: block; height: 100%; background: var(--leaf); }
+.quest .btn { font-size: .95rem; padding: 5px 12px; box-shadow: 0 3px 0 var(--bark); }
+.quest .tag { font-family: var(--display); font-size: .9rem; font-variant-numeric: tabular-nums; }
 .axes { display: grid; gap: 8px; text-align: left; }
 .axe { display: grid; grid-template-columns: 52px 1fr auto; gap: 10px; align-items: center; padding: 8px 10px; border: 3px solid color-mix(in srgb, var(--bark) 25%, transparent); border-radius: 12px; }
 .axe.cur { border-color: var(--bark); background: color-mix(in srgb, var(--honey) 45%, var(--cream)); }
@@ -167,6 +181,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <button id="pauseBtn" type="button" aria-label="Duraklat" hidden>II</button>
 <button id="setBtn" type="button" aria-label="Ayarlar">&#9881;&#xFE0E;</button>
+<button id="questBtn" type="button" aria-label="Görevler">&#128220;<span class="dot" id="questDot" hidden></span></button>
 
 <div id="touch" hidden>
   <div class="grp"><div id="stick" aria-label="Yürüme kolu"><div id="knob"></div></div></div>
@@ -260,6 +275,15 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
   </div>
 </div>
 
+<div class="panel" id="pQuests" hidden>
+  <div class="card wide">
+    <h2>Görevler</h2>
+    <div class="quests" id="questList"></div>
+    <p class="small">Görevleri bölgelerde ve Bal Köyü'nde ilerletirsin. Biten görevin ödülünü buradan al.</p>
+    <button class="btn primary" id="questClose" type="button">Kapat</button>
+  </div>
+</div>
+
 <div class="panel" id="pSettings" hidden>
   <div class="card">
     <h2>Ayarlar</h2>
@@ -300,7 +324,7 @@ addEventListener('resize', fit); fit();
 
 /* ---------- save ---------- */
 const PRICES = [20, 40, 65]; // 4th, 5th, 6th heart
-let save = { unlocked: 0, coins: 0, maxHp: 3, best: [0, 0, 0, 0, 0], name: 'Pofuduk', gender: 'boy', species: 'brown', outfit: 'none', owned: ['none'], music: true, musicVol: 1, sfxVol: 1, camSens: 1, axe: 0, gold: {} };
+let save = { unlocked: 0, coins: 0, maxHp: 3, best: [0, 0, 0, 0, 0], name: 'Pofuduk', gender: 'boy', species: 'brown', outfit: 'none', owned: ['none'], music: true, musicVol: 1, sfxVol: 1, camSens: 1, axe: 0, gold: {}, stats: {}, qdone: [] };
 try { const s = JSON.parse(localStorage.getItem('pofuduk-save') || 'null'); if (s) save = Object.assign(save, s); } catch (e) {}
 function saveGame() { try { localStorage.setItem('pofuduk-save', JSON.stringify(save)); } catch (e) {} }
 
@@ -399,6 +423,32 @@ const sfx = {
   bossHit: () => { tone(300, 0.2, 'square', 120, 0.1); tone(150, 0.3, 'sawtooth', 60, 0.08, 0.05); },
 };
 
+/* ---------- quests ---------- */
+const QUESTS = [
+  { id: 'mush', name: 'Mantar Avcısı', desc: '10 mantar yen', stat: 'mush', goal: 10, reward: 20 },
+  { id: 'bee', name: 'Vızvız Kovucu', desc: '6 arı yen', stat: 'bee', goal: 6, reward: 20 },
+  { id: 'helmet', name: 'Miğfer Kırıcı', desc: '3 miğferli mantarı baltayla yen', stat: 'helmet', goal: 3, reward: 25 },
+  { id: 'bush', name: 'Bahçıvan', desc: '5 dikenli çalı kes', stat: 'bush', goal: 5, reward: 15 },
+  { id: 'vine', name: 'Sarmaşık Ustası', desc: '3 kez bir sarmaşığın tepesine tırman', stat: 'vine', goal: 3, reward: 15 },
+  { id: 'gold', name: 'Altın Avcısı', desc: '5 altın kavanoz bul', stat: 'gold', goal: 5, reward: 40 },
+  { id: 'turtle', name: 'Kaplumbağa Dostu', desc: "Bal Köyü'ndeki kaplumbağalardan 5 tanesini sev", stat: 'turtle', goal: 5, reward: 20 },
+  { id: 'boss', name: 'Kahraman', desc: '2 boss yen', stat: 'boss', goal: 2, reward: 50 },
+];
+const statOf = q => { const v = (save.stats || {})[q.stat]; return Array.isArray(v) ? v.length : v || 0; };
+const questReady = q => statOf(q) >= q.goal && !save.qdone.includes(q.id);
+function questDotSync() { const d = document.getElementById('questDot'); if (d) d.hidden = !QUESTS.some(questReady); }
+function bump(stat, n = 1, id) {
+  save.stats = save.stats || {};
+  const before = QUESTS.filter(q => q.stat === stat).map(q => statOf(q) >= q.goal);
+  if (id !== undefined) { const a = save.stats[stat] = Array.isArray(save.stats[stat]) ? save.stats[stat] : []; if (a.includes(id)) return; a.push(id); }
+  else save.stats[stat] = (save.stats[stat] || 0) + n;
+  QUESTS.filter(q => q.stat === stat).forEach((q, i) => {
+    if (!before[i] && statOf(q) >= q.goal) { questBanner = 160; questName = q.name; sfx.flag(); }
+  });
+  saveGame(); questDotSync();
+}
+let questBanner = 0, questName = '';
+
 /* ---------- HG splash ---------- */
 let splashDone = false;
 const splashEl = document.getElementById('splash');
@@ -467,6 +517,8 @@ addEventListener('keydown', e => {
   if (k && (state === 'play' || state === 'pause')) e.preventDefault();
   if (k && state === 'play') press(k);
   if (!pSet.hidden) { if (e.code === 'Escape') closeSettings(); return; }
+  if (!pQuest.hidden) { if (e.code === 'Escape' || e.code === 'KeyG') closeQuests(); return; }
+  if (e.code === 'KeyG' && splashDone) { openQuests(); return; }
   if (!pSmith.hidden) { if (e.code === 'Escape') closeSmith(); return; }
   if (e.code === 'KeyP' || e.code === 'Escape') togglePause();
   if (e.code === 'KeyM') { muted = !muted; musicVol(); }
@@ -722,6 +774,7 @@ function drawHud() {
     ctx.globalAlpha = 1;
   }
   if (!L.hub) { const gc = (save.gold[lvlIdx] || []).filter(Boolean).length; drawHoneyJar(VW - 128, 72, 0.9); txt(`${gc}/3`, VW - 70, 80, 20, '#ffd23f', 'right'); }
+  if (questBanner > 0) { questBanner--; ctx.globalAlpha = Math.min(1, questBanner / 25); txt('Görev tamamlandı: ' + questName, VW / 2, VH - 70, 26, '#ffd23f', 'center'); txt('Ödülünü almak için Görevler düğmesine bas (G)', VW / 2, VH - 44, 16, '#fff4dc', 'center'); ctx.globalAlpha = 1; }
   if (itemBanner > 0) {
     ctx.globalAlpha = Math.min(1, itemBanner / 30);
     txt('YENİ EŞYA: TAHTA BALTA!', VW / 2, 180, 50, '#ffd23f', 'center');
@@ -844,6 +897,33 @@ function axeModel(tier) { // built in bear art units, handle along +y
   mk('sph', '#5c3a1c', [1.6, 1.6, 2.5], [0, 20, 0], g);
   if (a.glow) mk('sph', '#ffffff', [1, 1, 1], [3, 23, 1.6], g, { emissive: '#ffffff' });
   head.castShadow = true;
+  return g;
+}
+function houseModel(parent, h) {
+  const t = grp(parent, h.x, 0, h.z); t.rotation.y = h.yaw;
+  const wall = h.light ? '#c8935a' : '#8a5a2b', trim = h.light ? '#8a5a2b' : '#5c3a1c', roof = h.rnd < 0.5 ? '#b5452f' : '#7a4a24';
+  mk('box', wall, [3.6, 2.4, 3.4], [0, 1.2, 0], t).receiveShadow = true;
+  for (let k = 0; k < 4; k++) mk('box', trim, [3.66, 0.08, 3.46], [0, 0.35 + k * 0.6, 0], t).castShadow = false;
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) mk('box', trim, [0.22, 2.4, 0.22], [sx * 1.75, 1.2, sz * 1.65], t);
+  for (const sd of [-1, 1]) { const rf = mk('box', roof, [2.45, 0.18, 4], [sd * 0.98, 3.1, 0], t); rf.rotation.z = -sd * 0.68; }
+  mk('prism', wall, [2.08, 3.4, 0.97], [0, 2.88, 0], t).rotation.set(-Math.PI / 2, 0, 0);
+  mk('box', '#7d7f86', [0.45, 1.1, 0.45], [1, 3.6, -0.8], t);
+  mk('box', '#4a2c17', [0.9, 1.5, 0.1], [0, 0.75, 1.72], t);
+  mk('sph', '#ffd23f', [0.07, 0.07, 0.07], [0.3, 0.75, 1.79], t, { emissive: '#5a4300' });
+  for (const sx of [-1, 1]) { mk('box', '#ffe08a', [0.7, 0.6, 0.08], [sx * 1.2, 1.5, 1.72], t, { emissive: '#5a4a10' }); mk('box', trim, [0.82, 0.1, 0.12], [sx * 1.2, 1.15, 1.74], t); }
+  if (h.rnd > 0.4) for (let k = 0; k < 3; k++) mk('sph', ['#ff5fa2', '#ffd23f', '#7fd3ff'][k], [0.16, 0.16, 0.16], [-1.3 + k * 0.35, 0.15, 2.05], t);
+  return t;
+}
+function turtleModel(hue) {
+  const g = new THREE.Group(), b = grp(g);
+  mk('hemi', hue, [0.62, 0.42, 0.75], [0, 0.18, 0], b);
+  mk('cyl', '#d9c27a', [0.64, 0.08, 0.77], [0, 0.18, 0], b);
+  for (const [x, z] of [[0, 0], [0.28, 0.25], [-0.28, 0.25], [0.28, -0.28], [-0.28, -0.28]]) mk('sph', '#2f6f2a', [0.13, 0.05, 0.13], [x, 0.18 + 0.4 - Math.hypot(x, z) * 0.35, z], b);
+  const head = mk('sph', '#9bc46a', [0.2, 0.17, 0.24], [0, 0.25, 0.82], b);
+  for (const sx of [-1, 1]) { mk('sph', '#22160c', [0.04, 0.04, 0.04], [sx * 0.11, 0.32, 0.98], b); }
+  const legs = [[-1, 1], [1, 1], [-1, -1], [1, -1]].map(([sx, sz]) => mk('sph', '#9bc46a', [0.15, 0.1, 0.18], [sx * 0.48, 0.08, sz * 0.48], b));
+  mk('cone', '#9bc46a', [0.06, 0.18, 0.06], [0, 0.12, -0.8], b).rotation.x = -Math.PI / 2;
+  g.userData = { body: b, head, legs };
   return g;
 }
 function smithModel(parent, x, y, z, yaw) {
@@ -1178,9 +1258,17 @@ function buildHub() {
   boxes.push({ x0: shop.x - 1.2, y0: 0, z0: shop.z - 1.2, x1: shop.x + 1.2, y1: 1, z1: shop.z + 1.2, kind: 'deco', on: true });
   const goal = { x: -13, y: 0, z: 17 };
   boxes.push({ x0: goal.x - 1.65, y0: 0, z0: goal.z - 1.15, x1: goal.x + 1.65, y1: 2.6, z1: goal.z + 1.15, kind: 'cabin', on: true });
-  const clear = (x, z) => spots.every(sp => Math.hypot(x - sp.x, z - sp.z) > 7.5) && Math.hypot(x - shop.x, z - shop.z) > 4 && Math.hypot(x - goal.x, z - goal.z) > 4 && Math.abs(x) > 2.5 && Math.hypot(x - smith.x, z - smith.z) > 5;
+  // village houses, brown and light brown
+  const houses = [[-24, 22], [-29, 12], [24, 25], [29, 9], [8, -15], [-12, -7], [-5, 7], [29, -7]].map(([hx, hz], i) => ({ x: hx, z: hz, yaw: Math.atan2(-hx, 12 - hz), light: i % 2 === 1, rnd: rnd() }));
+  for (const h of houses) boxes.push({ x0: h.x - 1.9, y0: 0, z0: h.z - 1.9, x1: h.x + 1.9, y1: 3.2, z1: h.z + 1.9, kind: 'deco', on: true });
+  const clear = (x, z) => houses.every(h => Math.hypot(x - h.x, z - h.z) > 4.5) && spots.every(sp => Math.hypot(x - sp.x, z - sp.z) > 7.5) && Math.hypot(x - shop.x, z - shop.z) > 4 && Math.hypot(x - goal.x, z - goal.z) > 4 && Math.abs(x) > 2.5 && Math.hypot(x - smith.x, z - smith.z) > 5;
   for (let i = 0; i < 70; i++) { const x = (rnd() - 0.5) * 2 * (R - 2), z = (rnd() - 0.5) * 2 * (R - 2); if (clear(x, z)) trees.push({ x, y: 0, z, s: 0.7 + rnd() * 0.5 }); }
-  return { def: HUB, hub: true, boxes, items: [], enemies: [], trees, paths, start: { x: 0, y: 0, z: 24 }, checkpoint: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, smith };
+  const turtles = [];
+  for (let i = 0; turtles.length < 9 && i < 200; i++) {
+    const x = (rnd() - 0.5) * 2 * (R - 5), z = (rnd() - 0.5) * 2 * (R - 5);
+    if (clear(x, z) && Math.hypot(x, z - 24) > 4) turtles.push({ id: turtles.length, x, z, yaw: rnd() * 6.28, t: rnd() * 5, next: 2 + rnd() * 3, s: 0.8 + rnd() * 0.45, hue: ['#3f9b4a', '#5aa65e', '#7a9b3a', '#4f8f6a'][turtles.length % 4], petT: 0, hop: 0 });
+  }
+  return { def: HUB, hub: true, boxes, items: [], enemies: [], trees, paths, start: { x: 0, y: 0, z: 24 }, checkpoint: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, smith, houses, turtles };
 }
 function mkBoss(type, c) {
   const base = { type, c, x: c.x, z: c.zc - 3, y: c.y, vx: 0, vz: 0, vy: 0, t: 0, inv: 0, active: false, defeated: false, deadT: 0, yaw: 0, tx: 0, tz: 0, state: type === 'mush' ? 'walk' : type === 'queen' ? 'hover' : 'aim' };
@@ -1382,7 +1470,7 @@ function update() {
         document.getElementById('tbAxe').hidden = false; continue;
       }
       if (h.kind === 'gold') {
-        (save.gold[lvlIdx] = save.gold[lvlIdx] || [])[h.gi] = true; saveGame();
+        (save.gold[lvlIdx] = save.gold[lvlIdx] || [])[h.gi] = true; saveGame(); bump('gold');
         sfx.life(); addHoney(5); addCoins(3); burst(h.x, h.y, h.z, '#ffd23f', 24, 4);
         pop('Altın kavanoz! ' + save.gold[lvlIdx].filter(Boolean).length + '/3', h.x, h.y + 1.4, h.z, '#ffd23f', 90); continue;
       }
@@ -1503,7 +1591,7 @@ function vineStep(wx, wz) {
   }
   P.anim += (Math.abs(into) + Math.abs(along)) * 0.12;
   if (P.y + 1.0 >= b.y1) { // reached the top: step onto the cliff
-    P.vine = null; P.vineCd = 15;
+    P.vine = null; P.vineCd = 15; bump('vine');
     P.x -= b.nx * (P.r + 0.45); P.z -= b.nz * (P.r + 0.45); P.y = b.y1 + 0.02; P.squash = 5; sfx.jump();
   } else if (P.y <= b.y0 && into < -0.2) { P.y = b.y0; P.vine = null; P.vineCd = 20; }
   else if (jumpPressed) {
@@ -1514,7 +1602,27 @@ function vineStep(wx, wz) {
 }
 
 /* ---------- hub ---------- */
+function turtleStep() {
+  const R = 31;
+  for (const t of L.turtles) {
+    t.t += DT; if (t.petT > 0) t.petT--; if (t.hop > 0) t.hop -= DT;
+    const d = Math.hypot(P.x - t.x, P.z - t.z);
+    if (d < 1.7 && t.petT <= 0) {
+      t.petT = 240; t.hop = 0.5; t.yaw = Math.atan2(P.x - t.x, P.z - t.z); sfx.honey();
+      pop('♥', t.x, 1.3, t.z, '#ff6b8a', 60); burst(t.x, 0.9, t.z, '#ff8fb8', 8, 1.5);
+      bump('turtle', 1, t.id);
+    }
+    if (t.petT > 180) continue; // stays still for a moment after a pat
+    if (t.t > t.next) { t.t = 0; t.next = 2 + Math.random() * 4; t.yaw += (Math.random() - 0.5) * 2.4; t.rest = Math.random() < 0.3; }
+    if (t.rest) continue;
+    const sp = 0.55 * DT, nx = t.x + Math.sin(t.yaw) * sp, nz = t.z + Math.cos(t.yaw) * sp;
+    const blocked = Math.abs(nx) > R || Math.abs(nz) > R || L.boxes.some(b => b.kind !== 'ground' && b.kind !== 'vine' && nx > b.x0 - 0.7 && nx < b.x1 + 0.7 && nz > b.z0 - 0.7 && nz < b.z1 + 0.7)
+      || L.portals.some(p => Math.hypot(nx - p.x, nz - p.z) < 5.2);
+    if (blocked) t.yaw += Math.PI * (0.6 + Math.random() * 0.4); else { t.x = nx; t.z = nz; }
+  }
+}
 function hubStep() {
+  turtleStep();
   for (const p of L.portals) {
     if (p.cd > 0) p.cd--;
     if (Math.hypot(P.x - p.x, P.z - p.z) < 1.0 && Math.abs(P.y - p.y) < 1.2) {
@@ -1560,13 +1668,14 @@ function axeHit() {
     if (o.y1 < P.y - 0.2 || o.y0 > P.y + 1.4 || !inArc(cx, cz, P.y, 0)) continue;
     o.on = false; hit = true;
     if (o.kind === 'crate') { addCoins(2, (o.x0 + o.x1) / 2, o.y1 + 0.4, (o.z0 + o.z1) / 2); burst((o.x0 + o.x1) / 2, o.y0 + 0.5, (o.z0 + o.z1) / 2, '#a8743d', 16, 4); }
-    else { sfx.cut(); burst((o.x0 + o.x1) / 2, o.y0 + 1.2, (o.z0 + o.z1) / 2, '#3f8a35', 22, 4); }
+    else { sfx.cut(); bump('bush'); burst((o.x0 + o.x1) / 2, o.y0 + 1.2, (o.z0 + o.z1) / 2, '#3f8a35', 22, 4); }
   }
   if (a.glow) burst(P.x + fx * 2, P.y + 0.6, P.z + fz * 2, '#fff27a', 10, 2.5);
   if (P.combo === 3) { shake = Math.max(shake, 8); burst(P.x + fx * 1.2, P.y + 0.1, P.z + fz * 1.2, '#c9a27a', 14, 3); }
   if (hit) { shake = Math.max(shake, 4); sfx.hit(); }
 }
 function squashEnemy(e) {
+  bump(e.type === 'bee' ? 'bee' : 'mush'); if (e.helmet) bump('helmet');
   e.alive = false; e.dead = 1; sfx.stomp(); shake = 5;
   burst(e.x, e.y + 0.4, e.z, e.type === 'bee' ? '#ffd34d' : '#e94b3c', 12, 3);
   addCoins(e.variant === 'thick' ? 2 : e.helmet ? 2 : 1, e.x, e.y + 1.2, e.z);
@@ -1679,7 +1788,7 @@ function hitBoss(b) {
   else if (b.type === 'hog') { b.state = 'quills'; b.t = 0; }
   else { b.state = 'side'; b.t = 0; b.bub = 0; }
   if (b.hp <= 0) {
-    b.defeated = true; b.deadT = 0; b.vy = 8; L.shots = [];
+    b.defeated = true; b.deadT = 0; b.vy = 8; L.shots = []; bump('boss');
     sfx.win(); shake = 20;
     for (let i = 0; i < 4; i++) burst(b.x, b.y + b.h / 2, b.z, ['#ffd23f', '#ff4d6d', '#ffffff'][i % 3], 14, 6);
     addCoins(20, b.x, b.y + b.h + 0.8, b.z); addHoney(10);
@@ -1861,6 +1970,8 @@ function buildScene() {
       }
     }
     smithModel(W, L.smith.x, L.smith.y, L.smith.z, L.smith.yaw);
+    for (const h of L.houses) houseModel(W, h);
+    for (const t of L.turtles) { t.mesh = turtleModel(t.hue); t.mesh.scale.setScalar(t.s); W.add(t.mesh); }
     const sh = L.shop, t = grp(W, sh.x, sh.y, sh.z); t.rotation.y = sh.yaw;
     mk('box', '#b07a43', [2.4, 1, 1.4], [0, 0.5, 0], t).receiveShadow = true;
     for (const sx of [-1, 1]) for (const sz of [-1, 1]) mk('cyl', '#7a4a24', [0.08, 2.4, 0.08], [sx * 1.1, 1.2, sz * 0.6], t);
@@ -1872,7 +1983,15 @@ function buildScene() {
   G.marker = new THREE.Mesh(G.geo.ring, mat('#ff4d6d', { emissive: '#7a1020' })); G.marker.rotation.x = Math.PI / 2; W.add(G.marker);
   G.ringMat = mat('#ffffff', { transparent: true, opacity: 0.85, emissive: '#555555' });
 }
-function portalSpin() { if (L.portals) for (const p of L.portals) if (p.disc) p.disc.rotation.z -= 0.03; }
+function portalSpin() {
+  if (L.portals) for (const p of L.portals) if (p.disc) p.disc.rotation.z -= 0.03;
+  if (L.turtles) for (const t of L.turtles) {
+    const m = t.mesh, u = m.userData, moving = !t.rest && t.petT <= 180;
+    m.position.set(t.x, t.hop > 0 ? Math.sin(t.hop / 0.5 * Math.PI) * 0.35 : 0, t.z); m.rotation.y = t.yaw;
+    u.legs.forEach((l, i) => { l.position.y = 0.08 + (moving ? Math.max(0, Math.sin(frame * 0.15 + i * 1.6)) * 0.05 : 0); });
+    u.head.position.z = t.petT > 0 ? 0.88 : 0.82 + Math.sin(frame * 0.05 + t.id) * 0.03;
+  }
+}
 function lookKey() { return save.species + save.outfit + save.gender + save.axe; }
 function render3D(alpha = 1, dtMs = 16.667) {
   const ip = (o, n) => o === undefined ? n : o + (n - o) * alpha;
@@ -2183,6 +2302,32 @@ $('smithBuy').onclick = () => {
   const next = AXES[save.axe + 1]; if (!next || save.coins < next.price) return;
   save.coins -= next.price; save.axe++; smithGift = false; saveGame(); sfx.win(); renderSmith();
 };
+/* ---------- quest panel ---------- */
+const pQuest = $('pQuests'); let questPaused = false;
+function renderQuests() {
+  const list = $('questList'); list.innerHTML = '';
+  const order = q => questReady(q) ? 0 : save.qdone.includes(q.id) ? 2 : 1;
+  for (const q of [...QUESTS].sort((a, b) => order(a) - order(b))) {
+    const v = Math.min(q.goal, statOf(q)), done = save.qdone.includes(q.id), ready = questReady(q);
+    const row = document.createElement('div'); row.className = 'quest' + (ready ? ' ready' : done ? ' done' : '');
+    const info = document.createElement('div'); info.innerHTML = '<b></b><small></small>';
+    info.querySelector('b').textContent = q.name; info.querySelector('small').textContent = `${q.desc} · Ödül: ${q.reward} para`;
+    let right;
+    if (ready) { right = document.createElement('button'); right.type = 'button'; right.className = 'btn'; right.textContent = `Al · ${q.reward}`; right.onclick = () => { save.qdone.push(q.id); save.coins += q.reward; saveGame(); sfx.win(); renderQuests(); questDotSync(); }; }
+    else { right = document.createElement('span'); right.className = 'tag'; right.textContent = done ? 'Alındı ✓' : `${v}/${q.goal}`; }
+    const bar = document.createElement('div'); bar.className = 'bar'; bar.innerHTML = `<i style="width:${Math.round(v / q.goal * 100)}%"></i>`;
+    row.append(info, right, bar); list.append(row);
+  }
+}
+function openQuests() {
+  audio(); unlockMouse();
+  if (state === 'play') { state = 'pause'; questPaused = true; for (const k in keys) keys[k] = false; stick.x = stick.y = 0; }
+  renderQuests(); pQuest.hidden = false; setTimeout(() => $('questClose').focus(), 50);
+}
+function closeQuests() { pQuest.hidden = true; if (questPaused) { questPaused = false; state = 'play'; } }
+$('questBtn').onclick = () => { if (pQuest.hidden) openQuests(); else closeQuests(); };
+$('questClose').onclick = closeQuests;
+questDotSync();
 /* ---------- settings ---------- */
 const pSet = $('pSettings'); let setPaused = false;
 function syncSettings() {
