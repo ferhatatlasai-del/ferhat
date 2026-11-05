@@ -541,11 +541,12 @@ let jumpPressed = false, poundPressed = false;
 const stick = { x: 0, y: 0, id: null };
 const map = { ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right', ArrowUp: 'fwd', KeyW: 'fwd', ArrowDown: 'back', KeyS: 'back',
   Space: 'jump', ShiftLeft: 'pound', ShiftRight: 'pound', KeyC: 'pound', KeyK: 'pound', KeyQ: 'camL', KeyE: 'camR', KeyF: 'attack' };
-let attackPressed = false;
+let attackPressed = false, lastFwd = -1e9, sprint = false; // double-tap W (or Up) to run
 function press(k) { if (!keys[k]) { if (k === 'jump') jumpPressed = true; if (k === 'pound') poundPressed = true; if (k === 'attack') attackPressed = true; } keys[k] = true; }
 addEventListener('keydown', e => {
   const k = map[e.code];
   if (k && (state === 'play' || state === 'pause')) e.preventDefault();
+  if (k === 'fwd' && !e.repeat && state === 'play') { const t = performance.now(); if (t - lastFwd < 350) sprint = true; lastFwd = t; }
   if (k && state === 'play') press(k);
   if (!pSet.hidden) { if (e.code === 'Escape') closeSettings(); return; }
   if (!pQuest.hidden) { if (e.code === 'Escape' || e.code === 'KeyG') closeQuests(); return; }
@@ -560,8 +561,8 @@ addEventListener('keydown', e => {
   if (!splashDone) { e.preventDefault(); runSplash(); return; }
   if (e.code === 'Enter') { const b = document.querySelector('.panel:not([hidden]) .btn.primary'); if (b) { e.preventDefault(); b.click(); } }
 });
-addEventListener('keyup', e => { const k = map[e.code]; if (k) keys[k] = false; });
-addEventListener('blur', () => { for (const k in keys) keys[k] = false; });
+addEventListener('keyup', e => { const k = map[e.code]; if (k) keys[k] = false; if (k === 'fwd') sprint = false; });
+addEventListener('blur', () => { for (const k in keys) keys[k] = false; sprint = false; });
 const isTouch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
 document.querySelectorAll('.tb').forEach(b => {
   const k = b.dataset.k;
@@ -1354,7 +1355,7 @@ function buildLevel(n) {
   };
   const sign = (sx, sz, title, text) => signs.push({ x: sx, y, z: sz, title, text });
   if (tut) { // one station per move, each with a sign that explains it
-    sign(-2.6, -5, 'Yürü ve etrafa bak', 'W A S D ya da ok tuşlarıyla yürü. Fareyi oynatarak etrafa bak; Q ve E de kamerayı çevirir.');
+    sign(-2.6, -5, 'Yürü ve etrafa bak', 'W A S D ya da ok tuşlarıyla yürü. W’ye iki kez hızlıca basıp basılı tutarsan koşarsın! Fareyle etrafa bak; Q ve E de kamerayı çevirir.');
     sign(2.6, st.zb + 2, 'Zıpla', 'Boşluk tuşuyla zıpla. Öndeki boşluğun üstünden atla!');
     gap(2.6); let c = island(9, 9, true);
     for (let i = 0; i < 3; i++) coin(c.x, c.y + 0.8, c.zf - 2 - i * 1.3);
@@ -1730,7 +1731,9 @@ function update() {
   phys: {
   if (P.hang) { hangStep(wx, wz); break phys; }
   if (P.vine) { vineStep(wx, wz); break phys; }
-  const ice = L.def.friction > 0.9, max = 6.5;
+  P.sprint = sprint && keys.fwd && wm > 0.3;
+  const ice = L.def.friction > 0.9, max = P.sprint ? 10.5 : 6.5;
+  if (P.sprint && P.onGround && frame % 5 === 0) burst(P.x - Math.sin(P.yaw) * 0.4, P.y + 0.1, P.z - Math.cos(P.yaw) * 0.4, '#e8dcc0', 2, 1.2);
   if (!P.pound) {
     const k = P.onGround ? (ice ? 3 : 12) : 4.5;
     P.vx += (wx * max - P.vx) * Math.min(1, k * DT);
@@ -2593,6 +2596,7 @@ function render3D(alpha = 1, dtMs = 16.667) {
   }
   G.homeLight.intensity += ((hin ? 1.6 : 0) - G.homeLight.intensity) * fk(0.15);
   if (hin) G.homeLight.position.set(hin.x, HOUSE.h - 0.7, hin.z);
+  const fov = P.sprint ? 46 : 40; if (Math.abs(G.cam.fov - fov) > 0.01) { G.cam.fov += (fov - G.cam.fov) * fk(0.12); G.cam.updateProjectionMatrix(); } // a wider view while running
   G.cam.lookAt(G.ct.x, G.ct.y + (hin ? 0 : L.hub ? 1.4 : 0.3), G.ct.z);
   const snap = v => Math.round(v * 25) / 25, lx = snap(G.ct.x), ly = snap(G.ct.y), lz = snap(G.ct.z); // keeps shadows from shimmering
   G.sun.position.set(lx - 9, ly + 16, lz + 7); G.sun.target.position.set(lx, ly, lz);
