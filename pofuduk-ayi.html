@@ -306,6 +306,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
       <label for="setMusic"><span>Müzik</span><input type="checkbox" id="setMusic"></label>
       <label for="setMusicVol"><span>Müzik sesi <span class="val" id="vMusic"></span></span><input type="range" id="setMusicVol" min="0" max="100" step="5"></label>
       <label for="setSfxVol"><span>Efekt sesleri <span class="val" id="vSfx"></span></span><input type="range" id="setSfxVol" min="0" max="100" step="5"></label>
+      <label for="setView"><span>Görüş uzaklığı <span class="val" id="vView"></span></span><input type="range" id="setView" min="50" max="250" step="10"></label>
       <label for="setCam"><span>Kamera dönüş hızı <span class="val" id="vCam"></span></span><input type="range" id="setCam" min="30" max="200" step="10"></label>
     </div>
     <p class="small">Klavyede M tuşu bütün sesleri bir anda susturur.</p>
@@ -884,6 +885,14 @@ function mk(geo, c, s, p, parent, o) {
   return m;
 }
 const grp = (parent, x = 0, y = 0, z = 0) => { const g = new THREE.Group(); g.position.set(x, y, z); if (parent) parent.add(g); return g; };
+// view distance setting: stretches the fog and the camera's far plane
+function applyView() {
+  if (!G.scene || !G.scene.fog || !G.fogBase) return;
+  const v = save.viewDist || 1;
+  G.scene.fog.near = G.fogBase[0] * v; G.scene.fog.far = G.fogBase[1] * v;
+  G.cam.far = Math.max(300, G.fogBase[1] * v + 80); G.cam.updateProjectionMatrix();
+}
+const viewWord = v => v < 0.8 ? 'Yakın' : v < 1.3 ? 'Normal' : v < 1.9 ? 'Uzak' : 'Çok uzak';
 function canvasTex(w, h, fn) { const c = document.createElement('canvas'); c.width = w; c.height = h; fn(c.getContext('2d'), w, h); return new THREE.CanvasTexture(c); }
 
 function init3D() {
@@ -2309,7 +2318,7 @@ function buildScene() {
   const th = L.def, rnd = rng(77 + lvlIdx * 31);
   if (G.scene.background) G.scene.background.dispose();
   G.scene.background = canvasTex(4, 256, (c, w, h) => { const gr = c.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, th.sky[0]); gr.addColorStop(1, th.sky[1]); c.fillStyle = gr; c.fillRect(0, 0, w, h); });
-  G.scene.fog = new THREE.Fog(th.sky[1], th.mist ? 14 : 32, th.mist ? 85 : 130);
+  G.scene.fog = new THREE.Fog(th.sky[1], th.mist ? 14 : 32, th.mist ? 85 : 130); G.fogBase = [G.scene.fog.near, G.scene.fog.far]; applyView();
   G.hemi.color.set(th.cave ? '#b9a6ff' : th.night ? '#9fb4ff' : '#ffffff'); G.hemi.groundColor.set(th.mid); G.hemi.intensity = th.cave ? 0.6 : th.night ? 0.45 : 0.62;
   G.sun.color.set(th.weather === 'ember' ? '#ffcf9a' : th.night ? '#bcd0ff' : '#fff6e0'); G.sun.intensity = th.cave ? 0.5 : th.night ? 0.5 : 0.75;
   const DECO = { round: ['#3f9b37', '#2f7f2a', '#ff5fa2', '#ffd23f'], cactus: ['#b8801f', '#8a5f17', '#6b8f3a'], pine: ['#ffffff', '#dbe8f7'], shroom: ['#9ef0ff', '#d9a7ff'], spire: ['#5a2433', '#ff8c42'], candy: ['#ff9ad5', '#b28dff', '#ffffff', '#7fd3ff'], palm: ['#fff4dc', '#ff8fb8', '#ffffff', '#e8b56a'], night: ['#2c5c44', '#9ef0a0', '#e8ff6a'], crystal: ['#bff0ff', '#ffffff', '#9fd8ff'], autumn: ['#e8742a', '#c94a2a', '#f2b33a'], willow: ['#4f7036', '#8fb06a', '#c9e09a'], tower: ['#bfb8e0', '#ffd23f', '#8a86a8'] }, DECO0 = DECO[th.tree];
@@ -3056,6 +3065,7 @@ function syncSettings() {
   $('setMusic').checked = save.music !== false;
   $('setMusicVol').value = Math.round((save.musicVol ?? 1) * 100); $('vMusic').textContent = $('setMusicVol').value + '%';
   $('setSfxVol').value = Math.round((save.sfxVol ?? 1) * 100); $('vSfx').textContent = $('setSfxVol').value + '%';
+  $('setView').value = Math.round((save.viewDist || 1) * 100); $('vView').textContent = viewWord(save.viewDist || 1) + ' · ' + $('setView').value + '%';
   $('setCam').value = Math.round((save.camSens || 1) * 100); $('vCam').textContent = $('setCam').value + '%';
 }
 function openSettings() {
@@ -3075,6 +3085,7 @@ $('setMusic').onchange = e => { save.music = e.target.checked; musicVol(); };
 $('setMusicVol').oninput = e => { save.musicVol = e.target.value / 100; $('vMusic').textContent = e.target.value + '%'; musicVol(); };
 $('setSfxVol').oninput = e => { save.sfxVol = e.target.value / 100; $('vSfx').textContent = e.target.value + '%'; };
 $('setSfxVol').onchange = () => sfx.coin();
+$('setView').oninput = e => { save.viewDist = e.target.value / 100; $('vView').textContent = viewWord(save.viewDist) + ' · ' + e.target.value + '%'; applyView(); };
 $('setCam').oninput = e => { save.camSens = e.target.value / 100; $('vCam').textContent = e.target.value + '%'; };
 function goHub() { saveGame(); honey = 0; lives = 3; loadLevel(-1); setPlaying(); }
 $('startBtn').onclick = () => { audio(); save.name = cleanName(); if (!save.tutDone && !save.unlocked && !Object.values(save.best || {}).some(Boolean)) { saveGame(); startLevel(TUT); } else goHub(); };
