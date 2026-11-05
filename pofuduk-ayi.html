@@ -831,6 +831,14 @@ function drawHud() {
     txt(L.hub ? `${save.name} · Portaldan bir bölgeye gir` : L.tut ? `${save.name} · Tabelalara yaklaş ve oku` : `${save.name} · Bölge ${lvlIdx + 1}`, VW / 2, 240, 26, '#fff4dc', 'center');
     ctx.globalAlpha = 1;
   }
+  if (L.hub && save.chestT) {
+    const run = [];
+    for (const m of L.mts) { const l = chestLeft('m' + m.id); if (l) run.push([l, `Dağ ${m.id + 1}`]); }
+    for (const pk of L.parks) { const l = chestLeft('c' + pk.id); if (l) run.push([l, `Bulut ${pk.id}`]); }
+    run.sort((a, b) => a[0] - b[0]);
+    run.slice(0, 4).forEach(([l, n], i) => txt(`⏱ ${n} sandığı ${mmss(l)}`, VW - 14, 112 + i * 24, 18, '#bfe6ff', 'right'));
+    if (run.length > 4) txt(`+${run.length - 4} sandık daha`, VW - 14, 112 + 4 * 24, 15, '#bfe6ff', 'right');
+  }
   if (L.signs) { // tutorial: show the nearest sign's text
     let sg = null, bd = 4.2; for (const g of L.signs) { const d = Math.hypot(g.x - P.x, g.z - P.z); if (d < bd && Math.abs(g.y - P.y) < 2.5) { bd = d; sg = g; } }
     if (sg) {
@@ -1948,24 +1956,28 @@ function turtleStep() {
     if (blocked) t.yaw += Math.PI * (0.6 + Math.random() * 0.4); else { t.x = nx; t.z = nz; }
   }
 }
+// treasure chests refill 10 minutes (real time) after they are opened
+const CHEST_MS = 10 * 60 * 1000;
+const chestLeft = key => Math.max(0, ((save.chestT || {})[key] || 0) - Date.now());
+const mmss = ms => { const t = Math.ceil(ms / 1000); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); };
+function openChest(key) { (save.chestT = save.chestT || {})[key] = Date.now() + CHEST_MS; }
 function hubStep() {
   turtleStep();
   save.peaks = save.peaks || {};
   for (const m of L.mts) {
     const ch = m.chest;
-    if (m.used || Math.hypot(P.x - ch.x, P.z - ch.z) >= 1.5 || Math.abs(P.y - ch.y) >= 1.2) continue;
-    m.used = true; sfx.win(); burst(ch.x, ch.y + 1, ch.z, '#ffd23f', 30, 5);
-    if (!save.peaks[m.id]) { save.peaks[m.id] = true; addCoins(m.coins, ch.x, ch.y + 2, ch.z); pop('Dağın zirvesi!', ch.x, ch.y + 2.8, ch.z, '#ffffff', 120); }
-    else addCoins(3, ch.x, ch.y + 2, ch.z);
+    if (chestLeft('m' + m.id) > 0 || Math.hypot(P.x - ch.x, P.z - ch.z) >= 1.5 || Math.abs(P.y - ch.y) >= 1.2) continue;
+    openChest('m' + m.id); sfx.win(); burst(ch.x, ch.y + 1, ch.z, '#ffd23f', 30, 5); addCoins(m.coins, ch.x, ch.y + 2, ch.z);
+    pop(save.peaks[m.id] ? 'Sandık yenilenmişti!' : 'Dağın zirvesi!', ch.x, ch.y + 2.8, ch.z, '#ffffff', 120); save.peaks[m.id] = true;
     saveGame();
   }
   save.cloudChests = save.cloudChests || (save.cloudChest ? { 1: true } : {});
   for (const pk of L.parks) {
     const ch = pk.chest;
-    if (pk.used || Math.hypot(P.x - ch.x, P.z - ch.z) >= 1.4 || Math.abs(P.y - ch.y) >= 1.2) continue;
-    pk.used = true; sfx.win(); burst(ch.x, ch.y + 1, ch.z, '#ffd23f', 30, 5);
-    if (!save.cloudChests[pk.id]) { save.cloudChests[pk.id] = true; addCoins(pk.reward, ch.x, ch.y + 2, ch.z); pop(`Bulut Parkuru ${pk.id} tamam!`, ch.x, ch.y + 2.8, ch.z, '#ffffff', 120); bump('cloud'); }
-    else addCoins(2 + pk.id * 2, ch.x, ch.y + 2, ch.z);
+    if (chestLeft('c' + pk.id) > 0 || Math.hypot(P.x - ch.x, P.z - ch.z) >= 1.4 || Math.abs(P.y - ch.y) >= 1.2) continue;
+    openChest('c' + pk.id); sfx.win(); burst(ch.x, ch.y + 1, ch.z, '#ffd23f', 30, 5); addCoins(pk.reward, ch.x, ch.y + 2, ch.z);
+    if (!save.cloudChests[pk.id]) { save.cloudChests[pk.id] = true; pop(`Bulut Parkuru ${pk.id} tamam!`, ch.x, ch.y + 2.8, ch.z, '#ffffff', 120); bump('cloud'); }
+    else pop('Sandık yenilenmişti!', ch.x, ch.y + 2.8, ch.z, '#ffffff', 120);
     saveGame();
   }
   for (const p of L.portals) {
@@ -2543,8 +2555,8 @@ function buildScene() {
   G.ringMat = mat('#ffffff', { transparent: true, opacity: 0.85, emissive: '#555555' });
 }
 function portalSpin() {
-  if (L.mts) for (const mt of L.mts) if (mt.glow) { mt.glow.visible = !mt.used; mt.glow.scale.setScalar(1.2 + Math.sin(frame * 0.1) * 0.12); }
-  if (L.parks) for (const pk of L.parks) if (pk.glow) { pk.glow.visible = !pk.used; pk.glow.scale.setScalar(1.2 + Math.sin(frame * 0.1) * 0.12); }
+  if (L.mts) for (const mt of L.mts) if (mt.glow) { mt.glow.visible = !chestLeft('m' + mt.id); mt.glow.scale.setScalar(1.2 + Math.sin(frame * 0.1) * 0.12); }
+  if (L.parks) for (const pk of L.parks) if (pk.glow) { pk.glow.visible = !chestLeft('c' + pk.id); pk.glow.scale.setScalar(1.2 + Math.sin(frame * 0.1) * 0.12); }
   if (L.portals) for (const p of L.portals) if (p.disc) p.disc.rotation.z -= 0.03;
   if (L.turtles) for (const t of L.turtles) {
     const m = t.mesh, u = m.userData, moving = !t.rest && t.petT <= 180;
@@ -2803,16 +2815,18 @@ function draw3(alpha, dtMs) {
     }
     const mdone = save.peaks || {};
     for (const mt of L.mts) {
-      if (Math.hypot(mt.foot.x - P.x, mt.foot.z - P.z) < 30 && !mt.used) { const qf = scr(mt.foot.x, 2.6, mt.foot.z); if (qf) { txt('Dağ', qf.x, qf.y, 20, '#ffffff', 'center'); txt(mdone[mt.id] ? 'Zirvedeki sandık açıldı ✓' : `Zirvede ${mt.coins} paralık sandık`, qf.x, qf.y + 19, 14, '#ffd23f', 'center'); } }
-      const ch = mt.chest, qc = !mt.used && Math.hypot(ch.x - P.x, ch.z - P.z) < 30 ? scr(ch.x, ch.y + 2.2, ch.z) : null;
-      if (qc) txt(mdone[mt.id] ? 'Sandık' : `Dağ Sandığı · ${mt.coins} para`, qc.x, qc.y, 18, '#ffd23f', 'center');
+      const left = chestLeft('m' + mt.id);
+      if (Math.hypot(mt.foot.x - P.x, mt.foot.z - P.z) < 30) { const qf = scr(mt.foot.x, 2.6, mt.foot.z); if (qf) { txt('Dağ', qf.x, qf.y, 20, '#ffffff', 'center'); txt(left ? `Sandık ${mmss(left)} sonra dolar` : `Zirvede ${mt.coins} paralık sandık`, qf.x, qf.y + 19, 14, left ? '#bfe6ff' : '#ffd23f', 'center'); } }
+      const ch = mt.chest, qc = Math.hypot(ch.x - P.x, ch.z - P.z) < 30 ? scr(ch.x, ch.y + 2.2, ch.z) : null;
+      if (qc) txt(left ? `⏱ ${mmss(left)}` : `Dağ Sandığı · ${mt.coins} para`, qc.x, qc.y, 18, left ? '#bfe6ff' : '#ffd23f', 'center');
     }
     const done = save.cloudChests || {};
     for (const pk of L.parks) {
       const pf = pk.first, qp = Math.hypot(pf.x - P.x, pf.z - P.z) < 34 ? scr(pf.x, pf.top + 2, pf.z) : null;
-      if (qp) { txt(`Bulut Parkuru ${pk.id}`, qp.x, qp.y, 20, '#ffffff', 'center'); txt(done[pk.id] ? 'Tamamlandı ✓' : `${pk.n} bulut · Hazine: ${pk.reward} para`, qp.x, qp.y + 19, 14, '#ffd23f', 'center'); }
-      const ch = pk.chest, qc = !pk.used && Math.hypot(ch.x - P.x, ch.z - P.z) < 40 ? scr(ch.x, ch.y + 2.2, ch.z) : null;
-      if (qc) txt(done[pk.id] ? 'Sandık' : `Hazine Sandığı · ${pk.reward} para`, qc.x, qc.y, 18, '#ffd23f', 'center');
+      const left = chestLeft('c' + pk.id);
+      if (qp) { txt(`Bulut Parkuru ${pk.id}${done[pk.id] ? ' ✓' : ''}`, qp.x, qp.y, 20, '#ffffff', 'center'); txt(left ? `Hazine ${mmss(left)} sonra dolar` : `${pk.n} bulut · Hazine: ${pk.reward} para`, qp.x, qp.y + 19, 14, left ? '#bfe6ff' : '#ffd23f', 'center'); }
+      const ch = pk.chest, qc = Math.hypot(ch.x - P.x, ch.z - P.z) < 40 ? scr(ch.x, ch.y + 2.2, ch.z) : null;
+      if (qc) txt(left ? `⏱ ${mmss(left)}` : `Hazine Sandığı · ${pk.reward} para`, qc.x, qc.y, 18, left ? '#bfe6ff' : '#ffd23f', 'center');
     }
     const qs = scr(L.smith.x, 4.4, L.smith.z); if (qs) txt('Demirci', qs.x, qs.y, 20, '#ffd23f', 'center');
     const qt = Math.hypot(L.tutGate.x - P.x, L.tutGate.z - P.z) < 18 ? scr(L.tutGate.x, 4.3, L.tutGate.z) : null; if (qt) txt(save.tutDone ? 'Öğretici ✓' : 'Öğretici', qt.x, qt.y, 20, '#ffd23f', 'center');
@@ -2991,7 +3005,7 @@ function mapView(c, bb, [vx, vy, vw, vh], side, me, opt, fs) {
     else if (b.kind === 'wall' || b.kind === 'gate') rect(b, '#7a4a24');
   }
   if (L.hub) {
-    for (const m of L.mts) { dot(m.cx, m.cz, m.r * sc, m.col); dot(m.cx, m.cz, Math.max(2, m.rTop * sc), '#b5d6a0'); label('▲', m.cx, m.cz, fs * 0.8, (save.peaks || {})[m.id] ? '#ffffff' : '#ffd23f'); }
+    for (const m of L.mts) { dot(m.cx, m.cz, m.r * sc, m.col); dot(m.cx, m.cz, Math.max(2, m.rTop * sc), '#b5d6a0'); label('▲', m.cx, m.cz, fs * 0.8, chestLeft('m' + m.id) ? '#ffffff' : '#ffd23f'); }
     for (const pk of L.parks) { const [px, py] = T(pk.cx, pk.cz); c.setLineDash([4, 4]); c.beginPath(); c.arc(px, py, pk.rad * sc, 0, Math.PI * 2); c.strokeStyle = '#ffffff'; c.lineWidth = 2.5; c.stroke(); c.setLineDash([]); label('☁', pk.cx, pk.cz, fs); }
     for (const hs of L.houses) {
       const [px, py] = T(hs.x, hs.z); c.save(); c.translate(px, py); c.rotate(-hs.yaw);
