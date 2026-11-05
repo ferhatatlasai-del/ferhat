@@ -137,7 +137,13 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 .tb.on { background: color-mix(in srgb, var(--honey) 70%, transparent); }
 #setBtn { position: fixed; z-index: 5; top: calc(10px + env(safe-area-inset-top, 0px)); right: calc(max(12px, env(safe-area-inset-right, 0px)) + 52px);
   width: 42px; height: 42px; border-radius: 12px; border: 3px solid var(--bark); background: var(--cream); color: var(--bark); font-family: var(--display); font-size: 1.25rem; cursor: pointer; }
-#pSettings, #pQuests { z-index: 7; }
+#pSettings, #pQuests, #pMap { z-index: 7; }
+#mapBtn { position: fixed; z-index: 5; top: calc(10px + env(safe-area-inset-top, 0px)); right: calc(max(12px, env(safe-area-inset-right, 0px)) + 156px);
+  width: 42px; height: 42px; border-radius: 12px; border: 3px solid var(--bark); background: var(--cream); color: var(--bark); font-family: var(--display); font-size: 1.15rem; cursor: pointer; }
+#mapBtn:focus-visible { outline: 3px solid var(--leaf); outline-offset: 2px; }
+#mapCv { display: block; width: min(78vw, 62vh, 30rem); height: auto; aspect-ratio: 1; margin: 4px auto 8px; border-radius: 14px; border: 3px solid var(--bark); background: #3d7a3a; }
+.mapKey { display: flex; flex-wrap: wrap; gap: 4px 12px; justify-content: center; font-size: 0.85rem; margin-bottom: 8px; }
+.mapKey i { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; border: 1px solid #0004; }
 #pShop .shop { border-top: 0; padding-top: 0; }
 #questBtn { position: fixed; z-index: 5; top: calc(10px + env(safe-area-inset-top, 0px)); right: calc(max(12px, env(safe-area-inset-right, 0px)) + 104px);
   width: 42px; height: 42px; border-radius: 12px; border: 3px solid var(--bark); background: var(--cream); color: var(--bark); font-family: var(--display); font-size: 1.15rem; cursor: pointer; }
@@ -184,6 +190,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <button id="pauseBtn" type="button" aria-label="Duraklat" hidden>II</button>
 <button id="setBtn" type="button" aria-label="Ayarlar">&#9881;&#xFE0E;</button>
+<button id="mapBtn" type="button" aria-label="Harita (H)">&#128506;&#xFE0E;</button>
 <button id="questBtn" type="button" aria-label="Görevler">&#128220;<span class="dot" id="questDot" hidden></span></button>
 
 <div id="touch" hidden>
@@ -270,6 +277,15 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
       <button class="btn" id="smithBuy" type="button"></button>
       <button class="btn primary" id="smithClose" type="button">Kapat</button>
     </div>
+  </div>
+</div>
+
+<div class="panel" id="pMap" hidden>
+  <div class="card wide">
+    <h2 id="mapTitle">Harita</h2>
+    <canvas id="mapCv" width="600" height="600" role="img" aria-label="Haritada ayının yeri"></canvas>
+    <div class="mapKey" id="mapKey"></div>
+    <button class="btn primary" id="mapClose" type="button">Kapat</button>
   </div>
 </div>
 
@@ -530,6 +546,8 @@ addEventListener('keydown', e => {
   if (!pSet.hidden) { if (e.code === 'Escape') closeSettings(); return; }
   if (!pQuest.hidden) { if (e.code === 'Escape' || e.code === 'KeyG') closeQuests(); return; }
   if (e.code === 'KeyG' && splashDone) { openQuests(); return; }
+  if (!pMap.hidden) { if (e.code === 'Escape' || e.code === 'KeyH') closeMap(); return; }
+  if (e.code === 'KeyH' && splashDone && (state === 'play' || state === 'pause')) { openMap(); return; }
   if (!pSmith.hidden) { if (e.code === 'Escape') closeSmith(); return; }
   if (!pShop.hidden) { if (e.code === 'Escape') closeShop(); return; }
   if (!pWard.hidden && wardFrom === 'hub') { if (e.code === 'Escape') setPlaying(); return; }
@@ -787,7 +805,7 @@ function drawHud() {
   ctx.fillStyle = (SPECIES[save.species] || SPECIES.brown).fur; ctx.beginPath(); ctx.arc(hx - 8, 22, 5, 0, 7); ctx.arc(hx + 8, 22, 5, 0, 7); ctx.arc(hx, 32, 11, 0, 7); ctx.fill();
   ctx.fillStyle = '#d9a066'; ctx.beginPath(); ctx.ellipse(hx, 36, 6, 4, 0, 0, 7); ctx.fill();
   txt('× ' + lives, hx + 16, 42, 26);
-  txt(L.hub ? 'Harita' : `${lvlIdx + 1}/${LEVELS.length}`, VW - 70, 42, 24, '#fff4dc', 'right');
+  txt(L.hub ? 'Bal Köyü' : `${lvlIdx + 1}/${LEVELS.length}`, VW - 14, 78, 22, '#fff4dc', 'right');
   const b = L.boss;
   if (b && b.active && !b.defeated) {
     const bw = 300, bx = VW / 2 - bw / 2, by = 64;
@@ -1389,6 +1407,8 @@ function buildHub() {
   const cloud = spots[5]; // the cloud island is high up: climb its vine
   boxes.push({ x0: cloud.x - 1.3, y0: 0, z0: cloud.z + 4.5, x1: cloud.x + 1.3, y1: cloud.y + 0.25, z1: cloud.z + 4.62, kind: 'vine', on: true, nx: 0, nz: 1, face: cloud.z + 4.5 });
   const smith = { x: 0, y: 0, z: -16, yaw: 0 }; smith.tx = 0; smith.tz = -16 + 2.4; smith.armed = true;
+  const board = { x: 4.2, z: 45, tx: 4.2, tz: 46.3, armed: true }; // map board beside the spawn point, facing it
+  boxes.push({ x0: board.x - 1.5, x1: board.x + 1.5, z0: board.z - 0.25, z1: board.z + 0.25, y0: 0, y1: 3.1, kind: 'deco', on: true });
   boxes.push({ x0: -1.7, y0: 0, z0: -18.2, x1: 1.7, y1: 2.4, z1: -15.3, kind: 'deco', on: true });
   const shop = { x: 24, y: 0, z: 32 }; shop.yaw = Math.atan2(-shop.x, 42 - shop.z);
   shop.tx = shop.x + Math.sin(shop.yaw) * 1.9; shop.tz = shop.z + Math.cos(shop.yaw) * 1.9;
@@ -1474,7 +1494,7 @@ function buildHub() {
     const x = (rnd() - 0.5) * 2 * (R - 8), z = (rnd() - 0.5) * 2 * (R - 8);
     if (clear(x, z)) turtles.push({ id: turtles.length, x, z, yaw: rnd() * 6.28, t: rnd() * 5, next: 2 + rnd() * 3, s: 0.8 + rnd() * 0.45, hue: ['#3f9b4a', '#5aa65e', '#7a9b3a', '#4f8f6a'][turtles.length % 4], petT: 0, hop: 0 });
   }
-  return { def: HUB, hub: true, R, boxes, items: hitems, enemies: [], trees, paths, start: { x: 0, y: 0, z: 50 }, checkpoints: [], cpActive: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, ward, smith, houses, turtles, parks, mts };
+  return { def: HUB, hub: true, R, boxes, items: hitems, enemies: [], trees, paths, start: { x: 0, y: 0, z: 50 }, checkpoints: [], cpActive: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, ward, smith, board, houses, turtles, parks, mts };
 }
 function mkBoss(type, c) {
   const base = { type, c, x: c.x, z: c.zc - 3, y: c.y, vx: 0, vz: 0, vy: 0, t: 0, inv: 0, active: false, defeated: false, deadT: 0, yaw: 0, tx: 0, tz: 0, state: type === 'mush' ? 'walk' : type === 'queen' ? 'hover' : 'aim' };
@@ -1885,6 +1905,8 @@ function hubStep() {
   const sh = L.shop;
   const dsh = Math.hypot(P.x - sh.tx, P.z - sh.tz);
   if (dsh > 2.2) sh.armed = true; else if (dsh < 1.1 && sh.armed && Math.abs(P.y - sh.y) < 1) { sh.armed = false; saveGame(); openShop(); return; }
+  const bd = L.board, dbd = Math.hypot(P.x - bd.tx, P.z - bd.tz);
+  if (dbd > 2.2) bd.armed = true; else if (dbd < 1.0 && bd.armed && P.y < 1) { bd.armed = false; openMap(); return; }
   const wd = L.ward, dw = Math.hypot(P.x - wd.tx, P.z - wd.tz);
   if (dw > 2.2) wd.armed = true; else if (dw < 1.1 && wd.armed && Math.abs(P.y - wd.y) < 1) { wd.armed = false; saveGame(); openWard('hub'); }
 }
@@ -2365,6 +2387,13 @@ function buildScene() {
       }
     }
     smithModel(W, L.smith.x, L.smith.y, L.smith.z, L.smith.yaw);
+    { const bd = L.board, g2 = grp(W, bd.x, 0, bd.z);
+      for (const sx of [-1.35, 1.35]) mk('box', '#6b4220', [0.18, 3.0, 0.18], [sx, 1.5, 0], g2);
+      mk('box', '#8a5a2b', [2.9, 2.0, 0.16], [0, 1.85, 0], g2);
+      const tex = canvasTex(512, 352, (c, w, h) => drawMap(c, w, h, { board: true }));
+      const face = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 1.79), new THREE.MeshLambertMaterial({ map: tex, emissive: '#222', emissiveIntensity: 0.4 }));
+      face.position.set(0, 1.85, 0.09); g2.add(face);
+      mk('box', '#5c3a1c', [3.1, 0.16, 0.36], [0, 2.92, 0], g2); }
     for (const h of L.houses) houseModel(W, h);
     const nSteps = L.mts.reduce((a, m) => a + m.steps.length, 0);
     const stepTop = new THREE.InstancedMesh(G.geo.box, new THREE.MeshLambertMaterial({ color: '#c9bcae' }), nSteps), stepBody = new THREE.InstancedMesh(G.geo.box, new THREE.MeshLambertMaterial({ color: '#8d8378' }), nSteps);
@@ -2827,6 +2856,82 @@ $('smithBuy').onclick = () => {
   const next = AXES[save.axe + 1]; if (!next || save.coins < next.price) return;
   save.coins -= next.price; save.axe++; smithGift = false; saveGame(); sfx.win(); renderSmith();
 };
+/* ---------- map ---------- */
+// top-down map of the current place. The village is shown whole (world -z up); a region gets a
+// sideways overview strip (start left, finish right) plus a close-up around the bear.
+function drawMap(c, w, h, opt = {}) {
+  let x0 = 1e9, x1 = -1e9, z0 = 1e9, z1 = -1e9;
+  for (const b of L.boxes) if (b.kind === 'ground' || b.kind === 'plat' || b.kind === 'move' || b.kind === 'cloud') { x0 = Math.min(x0, b.x0); x1 = Math.max(x1, b.x1); z0 = Math.min(z0, b.z0); z1 = Math.max(z1, b.z1); }
+  c.fillStyle = L.def.sky[0]; c.fillRect(0, 0, w, h);
+  const me = opt.board ? { x: L.start.x, z: L.start.z, yaw: Math.PI } : { x: P.x, z: P.z, yaw: P.yaw };
+  if (L.hub) { mapView(c, { x0, x1, z0, z1 }, [0, 0, w, h], false, me, opt, w / 25); return; }
+  const sh = Math.round(h * 0.2);
+  mapView(c, { x0, x1, z0, z1 }, [0, 0, w, sh], true, me, { strip: true }, w / 34);
+  c.fillStyle = '#3d2a1a'; c.fillRect(0, sh, w, 4);
+  const half = 30; mapView(c, { x0: me.x - half, x1: me.x + half, z0: me.z - half * (h - sh) / w, z1: me.z + half * (h - sh) / w }, [0, sh + 4, w, h - sh - 4], false, me, opt, w / 28);
+}
+function mapView(c, bb, [vx, vy, vw, vh], side, me, opt, fs) {
+  const pad = opt.strip ? 8 : 14, ww = side ? bb.z1 - bb.z0 : bb.x1 - bb.x0, hh = side ? bb.x1 - bb.x0 : bb.z1 - bb.z0;
+  const sc = Math.min((vw - 2 * pad) / ww, (vh - 2 * pad) / hh), ox = vx + (vw - ww * sc) / 2, oy = vy + (vh - hh * sc) / 2;
+  const T = side ? (x, z) => [ox + (bb.z1 - z) * sc, oy + (x - bb.x0) * sc] : (x, z) => [ox + (x - bb.x0) * sc, oy + (z - bb.z0) * sc];
+  c.save(); c.beginPath(); c.rect(vx, vy, vw, vh); c.clip();
+  c.fillStyle = L.def.sky[0]; c.fillRect(vx, vy, vw, vh);
+  const rect = (b, col) => { const [ax, ay] = T(b.x0, b.z0), [bx, by] = T(b.x1, b.z1); c.fillStyle = col; c.fillRect(Math.min(ax, bx), Math.min(ay, by), Math.max(1.5, Math.abs(bx - ax)), Math.max(1.5, Math.abs(by - ay))); };
+  const dot = (x, z, r, col, edge = '#3d2a1a') => { const [px, py] = T(x, z); c.beginPath(); c.arc(px, py, r, 0, Math.PI * 2); c.fillStyle = col; c.fill(); c.lineWidth = 1.5; c.strokeStyle = edge; c.stroke(); };
+  const label = (t, x, z, size, col = '#ffffff', dy = 0) => { const [px, py] = T(x, z); c.font = `800 ${Math.round(size)}px "Baloo 2", system-ui, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.lineWidth = Math.max(3, size / 5); c.strokeStyle = '#3d2a1a'; c.strokeText(t, px, py + dy); c.fillStyle = col; c.fillText(t, px, py + dy); };
+  const ground = L.boxes.filter(b => b.kind === 'ground').sort((a, b) => (b.x1 - b.x0) * (b.z1 - b.z0) - (a.x1 - a.x0) * (a.z1 - a.z0));
+  for (const b of ground) rect(b, (b.theme || L.def).grass);
+  if (L.paths) { c.strokeStyle = '#d9b27a'; c.lineCap = 'round'; c.lineWidth = Math.max(2, 1.7 * sc); for (const pa of L.paths) { const [ax, ay] = T(pa.x0, pa.z0), [bx, by] = T(pa.x1, pa.z1); c.beginPath(); c.moveTo(ax, ay); c.lineTo(bx, by); c.stroke(); } }
+  for (const b of L.boxes) {
+    if (b.kind === 'plat' || b.kind === 'move') rect(b, '#b07a43');
+    else if (b.kind === 'cloud') rect(b, '#ffffff');
+    else if (b.kind === 'spike') rect(b, '#5d6670');
+    else if (b.kind === 'bush') rect(b, '#2f6f2a');
+    else if (b.kind === 'qbox' || b.kind === 'crate') rect(b, '#ffb627');
+    else if (b.kind === 'wall' || b.kind === 'gate') rect(b, '#7a4a24');
+  }
+  if (L.hub) {
+    for (const m of L.mts) { dot(m.cx, m.cz, m.r * sc, m.col); dot(m.cx, m.cz, Math.max(2, m.rTop * sc), '#b5d6a0'); label('▲', m.cx, m.cz, fs * 0.8, (save.peaks || {})[m.id] ? '#ffffff' : '#ffd23f'); }
+    for (const pk of L.parks) { const [px, py] = T(pk.cx, pk.cz); c.setLineDash([4, 4]); c.beginPath(); c.arc(px, py, pk.rad * sc, 0, Math.PI * 2); c.strokeStyle = '#ffffff'; c.lineWidth = 2.5; c.stroke(); c.setLineDash([]); label('☁', pk.cx, pk.cz, fs); }
+    for (const hs of L.houses) {
+      const [px, py] = T(hs.x, hs.z); c.save(); c.translate(px, py); c.rotate(-hs.yaw);
+      c.fillStyle = hs.rnd < 0.5 ? '#b5452f' : '#7a4a24'; c.fillRect(-HOUSE.hw * sc, -HOUSE.hd * sc, 2 * HOUSE.hw * sc, 2 * HOUSE.hd * sc);
+      c.strokeStyle = '#3d2a1a'; c.lineWidth = 1; c.strokeRect(-HOUSE.hw * sc, -HOUSE.hd * sc, 2 * HOUSE.hw * sc, 2 * HOUSE.hd * sc); c.restore();
+    }
+    if (!opt.board) for (const t of L.turtles || []) dot(t.x, t.z, 3, '#5aa65e', '#2c5c44');
+    for (const pt of L.portals) { dot(pt.x, pt.z, fs * 0.62, pt.locked ? '#9a9a9a' : LEVELS[pt.i].grass, pt.locked ? '#555' : '#3d2a1a'); label(String(pt.i + 1), pt.x, pt.z, fs * 0.8, pt.locked ? '#dddddd' : '#ffffff'); }
+    const place = (o, ch, name, col) => { dot(o.x, o.z, fs * 0.6, col); label(ch, o.x, o.z, fs * 0.7); label(name, o.x, o.z, fs * 0.7, '#ffd23f', -fs * 1.05); };
+    place(L.shop, '♥', 'Dükkân', '#e63946'); place(L.ward, '★', 'Dolap', '#8a5aa8'); place(L.smith, '⚒', 'Demirci', '#5d6670'); if (!opt.board) place(L.board, '▦', 'Harita', '#8a5a2b');
+  } else {
+    if (L.start) dot(L.start.x, L.start.z, fs * 0.35, '#7fd3ff');
+    for (const cp of L.checkpoints || []) dot(cp.x, cp.z, fs * 0.35, cp === L.cpActive ? '#ffd23f' : '#ffffff');
+    if (L.goal) { dot(L.goal.x, L.goal.z, fs * 0.5, '#ff5fa2'); label('★', L.goal.x, L.goal.z, fs * 0.7); }
+  }
+  // the bear: a red arrow pointing where it faces
+  const [bx, bz] = T(me.x, me.z); let fx = Math.sin(me.yaw), fz = Math.cos(me.yaw); if (side) [fx, fz] = [-fz, fx];
+  const R2 = opt.strip ? fs * 0.45 : fs * 0.6;
+  c.beginPath(); c.arc(bx, bz, R2 * 1.7, 0, Math.PI * 2); c.fillStyle = '#ff3b3b55'; c.fill();
+  c.beginPath(); c.moveTo(bx + fx * R2 * 1.5, bz + fz * R2 * 1.5); c.lineTo(bx - fz * R2 * 0.9 - fx * R2 * 0.7, bz + fx * R2 * 0.9 - fz * R2 * 0.7); c.lineTo(bx - fx * R2 * 0.25, bz - fz * R2 * 0.25); c.lineTo(bx + fz * R2 * 0.9 - fx * R2 * 0.7, bz - fx * R2 * 0.9 - fz * R2 * 0.7); c.closePath();
+  c.fillStyle = '#ff3b3b'; c.fill(); c.lineWidth = 2.5; c.strokeStyle = '#ffffff'; c.stroke();
+  if (!opt.strip) label(opt.board ? 'Buradasın' : 'Sen', me.x, me.z, fs * (opt.board ? 1.1 : 0.9), '#ffffff', -R2 * 2.6);
+  c.restore();
+}
+const pMap = $('pMap'); let mapPaused = false;
+function openMap() {
+  if (!L) return;
+  audio(); unlockMouse();
+  if (state === 'play') { state = 'pause'; mapPaused = true; for (const k in keys) keys[k] = false; stick.x = stick.y = 0; }
+  $('mapTitle').textContent = L.hub ? 'Bal Köyü Haritası' : `${lvlIdx + 1}. ${L.def.name} Haritası`;
+  const cv2 = $('mapCv'); drawMap(cv2.getContext('2d'), cv2.width, cv2.height);
+  const keyItems = L.hub ? [['#ff3b3b', 'Sen'], ['#9a9a9a', 'Portal (numaralı)'], ['#b5452f', 'Ev'], ['#9aa7b8', 'Dağ'], ['#ffffff', 'Bulut parkuru'], ['#e63946', 'Dükkân'], ['#8a5aa8', 'Dolap'], ['#5d6670', 'Demirci'], ['#5aa65e', 'Kaplumbağa']]
+    : [['#ff3b3b', 'Sen'], ['#7fd3ff', 'Başlangıç'], ['#ffffff', 'Kontrol noktası'], ['#ffd23f', 'Son kontrol noktası'], ['#ff5fa2', 'Bitiş'], ['#b07a43', 'Platform'], ['#5d6670', 'Diken']];
+  const mk2 = $('mapKey'); mk2.innerHTML = '';
+  for (const [col, t] of keyItems) { const sp = document.createElement('span'); const i = document.createElement('i'); i.style.background = col; sp.append(i, t); mk2.append(sp); }
+  pMap.hidden = false; setTimeout(() => $('mapClose').focus(), 50);
+}
+function closeMap() { pMap.hidden = true; if (mapPaused) { mapPaused = false; state = 'play'; } }
+$('mapBtn').onclick = () => { if (pMap.hidden) openMap(); else closeMap(); };
+$('mapClose').onclick = closeMap;
 /* ---------- quest panel ---------- */
 const pQuest = $('pQuests'); let questPaused = false;
 function renderQuests() {
