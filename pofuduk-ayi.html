@@ -164,6 +164,8 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 .set label { display: grid; grid-template-columns: 1fr minmax(0, 14rem); align-items: center; gap: 12px; font-weight: 800; }
 .set input[type="range"] { width: 100%; accent-color: var(--honey-deep); }
 .set input[type="checkbox"] { width: 28px; height: 28px; accent-color: var(--honey-deep); justify-self: end; }
+.set input[type="text"] { font-family: var(--display); font-size: 1.1rem; color: var(--bark); background: #fff; border: 3px solid var(--bark); border-radius: 10px; padding: 4px 8px; width: 100%; box-sizing: border-box; }
+.set input[type="text"]:focus-visible { outline: 3px solid var(--leaf); outline-offset: 2px; }
 .set .val { font-variant-numeric: tabular-nums; opacity: .7; font-weight: 600; }
 #setBtn:focus-visible, #pauseBtn:focus-visible { outline: 3px solid var(--leaf); outline-offset: 2px; }
 #pauseBtn { position: fixed; top: calc(10px + env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px));
@@ -239,18 +241,6 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
   </div>
 </div>
 
-<div class="panel" id="pSelect" hidden>
-  <div class="card wide">
-    <h2>Bölüm seç</h2>
-    <div class="levels" id="levels"></div>
-    <div class="row">
-      <button class="btn primary" id="hubBtn" type="button">Haritaya dön</button>
-      <button class="btn alt" id="backBtn" type="button">Adı değiştir</button>
-      <button class="btn alt" id="wardBtn2" type="button">Dolap: karakter ve kıyafet</button>
-    </div>
-  </div>
-</div>
-
 <div class="panel" id="pWard" hidden>
   <div class="card wide">
     <div class="wardHead"><h2>Dolap</h2><div class="wallet"><span class="coin" aria-hidden="true"></span><span id="wCoins">0</span></div></div>
@@ -296,6 +286,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
   <div class="card">
     <h2>Ayarlar</h2>
     <div class="set">
+      <label for="setName"><span>Ayının adı</span><input type="text" id="setName" maxlength="14" autocomplete="off" spellcheck="false" placeholder="Pofuduk"></label>
       <label for="setMusic"><span>Müzik</span><input type="checkbox" id="setMusic"></label>
       <label for="setMusicVol"><span>Müzik sesi <span class="val" id="vMusic"></span></span><input type="range" id="setMusicVol" min="0" max="100" step="5"></label>
       <label for="setSfxVol"><span>Efekt sesleri <span class="val" id="vSfx"></span></span><input type="range" id="setSfxVol" min="0" max="100" step="5"></label>
@@ -2372,12 +2363,12 @@ function draw3(alpha, dtMs) {
 
 /* ---------- flow ---------- */
 const $ = id => document.getElementById(id);
-const pTitle = $('pTitle'), pSelect = $('pSelect'), pMsg = $('pMsg'), pWard = $('pWard');
+const pTitle = $('pTitle'), pMsg = $('pMsg'), pWard = $('pWard');
 const msgTitle = $('msgTitle'), msgText = $('msgText'), msgBtn = $('msgBtn'), msgBtn2 = $('msgBtn2');
 const touchUi = $('touch'), pauseBtn = $('pauseBtn');
 let act1 = null, act2 = null;
 function unlockMouse() { if (document.pointerLockElement) { try { document.exitPointerLock(); } catch (e) {} } }
-function hideAll() { pTitle.hidden = pSelect.hidden = pMsg.hidden = pWard.hidden = true; document.getElementById('pSmith').hidden = true; document.getElementById('pShop').hidden = true; touchUi.hidden = true; pauseBtn.hidden = true; }
+function hideAll() { pTitle.hidden = pMsg.hidden = pWard.hidden = true; document.getElementById('pSmith').hidden = true; document.getElementById('pShop').hidden = true; touchUi.hidden = true; pauseBtn.hidden = true; }
 function showMsg(title, text, b1, a1, b2, a2) {
   unlockMouse();
   hideAll();
@@ -2408,7 +2399,6 @@ nameInput.addEventListener('input', refreshWho);
 nameInput.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') $('startBtn').click(); });
 document.querySelectorAll('.pk').forEach(b => b.onclick = () => { save.gender = b.dataset.g; refreshWho(); saveGame(); });
 refreshWho();
-$('backBtn').onclick = () => { hideAll(); pTitle.hidden = false; refreshWho(); setTimeout(() => nameInput.focus(), 50); };
 /* ---------- wardrobe ---------- */
 let wardFrom = 'title', trying = 'none';
 function openWard(from) {
@@ -2459,11 +2449,9 @@ $('wBuy').onclick = () => {
 };
 $('wDone').onclick = () => {
   if (wardFrom === 'hub') setPlaying();
-  else if (wardFrom === 'select') showSelect();
   else { hideAll(); pTitle.hidden = false; refreshWho(); }
 };
 $('wardBtn1').onclick = () => { audio(); openWard('title'); };
-$('wardBtn2').onclick = () => { audio(); openWard('select'); };
 /* ---------- heart shop ---------- */
 const pShop = $('pShop');
 function openShop() {
@@ -2532,6 +2520,7 @@ questDotSync();
 /* ---------- settings ---------- */
 const pSet = $('pSettings'); let setPaused = false;
 function syncSettings() {
+  $('setName').value = save.name === 'Pofuduk' ? '' : save.name;
   $('setMusic').checked = save.music !== false;
   $('setMusicVol').value = Math.round((save.musicVol ?? 1) * 100); $('vMusic').textContent = $('setMusicVol').value + '%';
   $('setSfxVol').value = Math.round((save.sfxVol ?? 1) * 100); $('vSfx').textContent = $('setSfxVol').value + '%';
@@ -2545,45 +2534,24 @@ function openSettings() {
 function closeSettings() { pSet.hidden = true; saveGame(); if (setPaused) { setPaused = false; state = 'play'; } }
 $('setBtn').onclick = () => { if (pSet.hidden) openSettings(); else closeSettings(); };
 $('setClose').onclick = closeSettings;
+$('setName').oninput = e => {
+  save.name = e.target.value.trim().replace(/\s+/g, ' ').slice(0, 14) || 'Pofuduk';
+  nameInput.value = save.name === 'Pofuduk' ? '' : save.name; refreshWho();
+};
+$('setName').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter' || e.key === 'Escape') closeSettings(); });
 $('setMusic').onchange = e => { save.music = e.target.checked; musicVol(); };
 $('setMusicVol').oninput = e => { save.musicVol = e.target.value / 100; $('vMusic').textContent = e.target.value + '%'; musicVol(); };
 $('setSfxVol').oninput = e => { save.sfxVol = e.target.value / 100; $('vSfx').textContent = e.target.value + '%'; };
 $('setSfxVol').onchange = () => sfx.coin();
 $('setCam').oninput = e => { save.camSens = e.target.value / 100; $('vCam').textContent = e.target.value + '%'; };
 function goHub() { saveGame(); honey = 0; lives = 3; loadLevel(-1); setPlaying(); }
-$('hubBtn').onclick = () => { audio(); goHub(); };
 $('startBtn').onclick = () => { audio(); save.name = cleanName(); goHub(); };
 pauseBtn.onclick = () => togglePause();
 function togglePause() {
-  if (state === 'play') { state = 'pause'; for (const k in keys) keys[k] = false; stick.x = stick.y = 0; showMsg('Duraklatıldı', `${save.name} · ${L.def.name} · ${honey} bal · ${save.coins} para`, 'Devam et', setPlaying, L.hub ? 'Bölüm seç' : 'Haritaya dön', () => { saveGame(); if (L.hub) showSelect(); else goHub(); }); }
+  if (state === 'play') { state = 'pause'; for (const k in keys) keys[k] = false; stick.x = stick.y = 0; showMsg('Duraklatıldı', `${save.name} · ${L.def.name} · ${honey} bal · ${save.coins} para`, 'Devam et', setPlaying, L.hub ? 'Ayarlar' : 'Haritaya dön', () => { saveGame(); if (L.hub) { setPlaying(); openSettings(); } else goHub(); }); }
   else if (state === 'pause') setPlaying();
 }
 
-function showSelect() {
-  unlockMouse();
-  state = 'title'; hideAll(); saveGame();
-  if (!L) loadLevel(0);
-  P = newPlayer(L.start); L.shots = []; if (USE3D) G.ct = null;
-  renderSelect(); pSelect.hidden = false;
-  setTimeout(() => { const b = $('lvl' + Math.min(save.unlocked, LEVELS.length - 1)); if (b) b.focus(); }, 50);
-}
-function renderSelect() {
-  const box = $('levels'); box.innerHTML = '';
-  LEVELS.forEach((lv, i) => {
-    const locked = i > save.unlocked;
-    const b = document.createElement('button');
-    b.type = 'button'; b.className = 'lvl'; b.id = 'lvl' + i; b.disabled = locked;
-    const sw = document.createElement('span'); sw.className = 'sw';
-    sw.style.background = `linear-gradient(${lv.sky[0]}, ${lv.sky[1]} 60%, ${lv.grass} 60%)`;
-    sw.innerHTML = `<span class="num">${i + 1}</span>` + (locked ? '<span class="tag lock">KİLİTLİ</span>' : lv.boss ? '<span class="tag">BOSS</span>' : '');
-    const nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = lv.name;
-    const meta = document.createElement('span'); meta.className = 'meta';
-    meta.textContent = locked ? `Önce ${i}. bölümü bitir` : save.best[i] ? `En iyi: ${save.best[i]} bal` : 'Henüz oynanmadı';
-    b.append(sw, nm, meta);
-    b.onclick = () => { audio(); startLevel(i); };
-    box.append(b);
-  });
-}
 function renderShop() {
   $('coinCount').textContent = save.coins;
   $('heartRow').innerHTML = Array.from({ length: 6 }, (_, i) => `<span class="${i < save.maxHp ? 'on' : 'off'}">♥</span>`).join('');
