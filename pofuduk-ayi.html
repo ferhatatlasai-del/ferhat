@@ -1192,7 +1192,7 @@ function buildLevel(n) {
   const st = island(10, 12);
   const start = { x: 0, y: 0, z: -3 };
   for (let i = 0; i < 3; i++) coin(0, 0.8, -6 - i * 1.3);
-  const segs = 8 + Math.min(n, 4) * 2; let checkpoint = null;
+  const segs = 14 + Math.min(n, 4) * 2; const checkpoints = [], cpAt = [Math.floor(segs / 3), Math.floor(segs * 2 / 3)];
   const cliff = () => { // a wall too tall to jump, with a vine to climb
     gap(2 + r() * 0.6, 0, pickDx()); island(8, 6);
     const y0 = y; y += 5.5;
@@ -1203,10 +1203,11 @@ function buildLevel(n) {
   };
   for (let s = 0; s < segs; s++) {
     segIdx = s;
-    if (s === 1 || (s > 3 && s !== Math.floor(segs / 2) && r() < 0.12)) { cliff(); continue; }
-    if (!checkpoint && s === Math.floor(segs / 2)) {
+    if (s === 1 || (s > 3 && !cpAt.includes(s) && r() < 0.12)) { cliff(); continue; }
+    if (cpAt.includes(s)) {
       gap(2.2, 0, pickDx()); const c = island(8, 8);
-      checkpoint = { x: c.x - 2.2, y: c.y, z: c.zc, on: false }; jar(c.x + 1.5, c.y + 0.8, c.zc); continue;
+      checkpoints.push({ x: c.x - 2.2, y: c.y, z: c.zc, on: false }); jar(c.x + 1.5, c.y + 0.8, c.zc);
+      items.push({ kind: 'heart', x: c.x + 1.5, y: c.y + 1, z: c.zc - 2 }); continue;
     }
     const t = r();
     if (t < 0.2) { // stepping stones
@@ -1250,6 +1251,7 @@ function buildLevel(n) {
   let boss = null, bossCp = null, arena = null;
   if (def.boss) {
     bossCp = { x, y, z: z + 2 };
+    items.push({ kind: 'heart', x: x + 1.6, y: y + 1, z: z + 2 });
     gap(2.6); const A = 22, c = island(A, A, true); arena = c;
     const th = 0.5, hg = 3, xL = c.x - A / 2, xR = c.x + A / 2;
     box(xL, c.y, c.zb, xL + th, c.y + hg, c.zf, 'wall'); box(xR - th, c.y, c.zb, xR, c.y + hg, c.zf, 'wall');
@@ -1287,8 +1289,10 @@ function buildLevel(n) {
   }
   if (n === 0) items.push({ kind: 'axe', x: 0, y: 1.1, z: -10 });
   items.forEach(h => { h.got = h.kind === 'gold' ? !!(save.gold[n] || [])[h.gi] : h.kind === 'axe' ? save.axe > 0 : false; h.ph = r() * 6; });
+  // a heart on every fifth regular island
+  isles.forEach((c, i) => { if (i > 0 && !c.bare && i % 5 === 3 && !c.gold) items.push({ kind: 'heart', x: c.x - c.w / 2 + 1.2, y: c.y + 1, z: c.zf - 1.4 }); });
   const minY = Math.min(...boxes.map(b => b.y1));
-  return { def, boxes, items, enemies, trees, start, checkpoint, goal, boss, bossCp, arena, shots: [], killY: minY - 12 };
+  return { def, boxes, items, enemies, trees, start, checkpoints, cpActive: null, goal, boss, bossCp, arena, shots: [], killY: minY - 12 };
 }
 const HUB = { name: 'Bal Köyü', sky: ['#7fd3ff', '#d9f3ff'], far: '#8fc5a8', mid: '#5aa65e', grass: '#5cc04a', grassDark: '#3f9b37', dirt: '#9a6234', dirtDot: '#7b4a24', tree: 'round', friction: 0.78, sun: '#fff1a8' };
 function buildHub() {
@@ -1340,7 +1344,7 @@ function buildHub() {
     const x = (rnd() - 0.5) * 2 * (R - 8), z = (rnd() - 0.5) * 2 * (R - 8);
     if (clear(x, z)) turtles.push({ id: turtles.length, x, z, yaw: rnd() * 6.28, t: rnd() * 5, next: 2 + rnd() * 3, s: 0.8 + rnd() * 0.45, hue: ['#3f9b4a', '#5aa65e', '#7a9b3a', '#4f8f6a'][turtles.length % 4], petT: 0, hop: 0 });
   }
-  return { def: HUB, hub: true, R, boxes, items: [], enemies: [], trees, paths, start: { x: 0, y: 0, z: 36 }, checkpoint: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, ward, smith, houses, turtles, park };
+  return { def: HUB, hub: true, R, boxes, items: [], enemies: [], trees, paths, start: { x: 0, y: 0, z: 36 }, checkpoints: [], cpActive: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, ward, smith, houses, turtles, park };
 }
 function mkBoss(type, c) {
   const base = { type, c, x: c.x, z: c.zc - 3, y: c.y, vx: 0, vz: 0, vy: 0, t: 0, inv: 0, active: false, defeated: false, deadT: 0, yaw: 0, tx: 0, tz: 0, state: type === 'mush' ? 'walk' : type === 'queen' ? 'hover' : 'aim' };
@@ -1376,7 +1380,7 @@ function respawn() {
     setEntryGate(false); L.boss = mkBoss(b.type, b.c); L.shots = [];
     P = newPlayer(L.bossCp);
   } else {
-    const cp = L.checkpoint && L.checkpoint.on ? L.checkpoint : null;
+    const cp = L.cpActive;
     P = newPlayer(cp ? { x: cp.x + 1.2, y: cp.y, z: cp.z } : L.start);
   }
   P.inv = 90; if (USE3D) G.ct = null;
@@ -1539,8 +1543,13 @@ function update() {
 
   for (const h of L.items) {
     if (h.got) continue;
+    if (h.cd > 0) h.cd--;
     if (Math.abs(h.x - P.x) < 0.8 && Math.abs(h.z - P.z) < 0.8 && h.y > P.y - 0.4 && h.y < P.y + P.h + 0.4) {
       h.got = true;
+      if (h.kind === 'heart') {
+        if (P.hp >= save.maxHp) { h.got = false; if (!h.cd) { h.cd = 90; pop('Canın zaten tam', h.x, h.y + 1.2, h.z, '#ffffff', 50); } continue; }
+        P.hp++; sfx.life(); burst(h.x, h.y, h.z, '#ff5a6e', 18, 3); pop('+1 kalp', h.x, h.y + 1.2, h.z, '#ff8fa0', 60); continue;
+      }
       if (h.kind === 'axe') {
         save.axe = Math.max(1, save.axe); saveGame(); sfx.life(); itemBanner = 220; burst(h.x, h.y, h.z, '#fff27a', 24, 4);
         document.getElementById('tbAxe').hidden = false; continue;
@@ -1589,8 +1598,7 @@ function update() {
   updateShots();
   if (P.dead) return;
 
-  const cp = L.checkpoint;
-  if (cp && !cp.on && Math.hypot(P.x - cp.x, P.z - cp.z) < 2.2 && Math.abs(P.y - cp.y) < 1.5) { cp.on = true; sfx.flag(); pop('Kontrol noktası!', cp.x, cp.y + 3.2, cp.z, '#ffffff', 80); burst(cp.x, cp.y + 2.4, cp.z, '#ff4d6d', 16); }
+  for (const cp of L.checkpoints) if (!cp.on && Math.hypot(P.x - cp.x, P.z - cp.z) < 2.2 && Math.abs(P.y - cp.y) < 1.5) { cp.on = true; L.cpActive = cp; sfx.flag(); pop('Kontrol noktası!', cp.x, cp.y + 3.2, cp.z, '#ffffff', 80); burst(cp.x, cp.y + 2.4, cp.z, '#ff4d6d', 16); }
   if (L.hub) return hubStep();
   const gl = L.goal;
   if (Math.hypot(P.x - gl.x, P.z - (gl.z + 1.5)) < 1.3 && Math.abs(P.y - gl.y) < 1) levelDone();
@@ -2074,13 +2082,12 @@ function buildScene() {
   }
 
   // checkpoint, cabin, pickups, enemies
-  G.flag = null;
-  if (L.checkpoint) {
-    const cp = L.checkpoint, f = grp(W, cp.x, cp.y, cp.z);
+  for (const cp of L.checkpoints) {
+    const f = grp(W, cp.x, cp.y, cp.z);
     mk('cyl', '#6b4220', [0.08, 2.7, 0.08], [0, 1.35, 0], f);
     mk('sph', '#ffb627', [0.16, 0.16, 0.16], [0, 2.75, 0], f);
-    G.flagMat = new THREE.MeshLambertMaterial({ color: '#9aa5b1' });
-    G.flag = new THREE.Mesh(G.geo.box, G.flagMat); G.flag.scale.set(1.05, 0.62, 0.05); G.flag.position.set(0.55, 2.3, 0); G.flag.castShadow = true; f.add(G.flag);
+    cp.mat = new THREE.MeshLambertMaterial({ color: '#9aa5b1' });
+    cp.flag = new THREE.Mesh(G.geo.box, cp.mat); cp.flag.scale.set(1.05, 0.62, 0.05); cp.flag.position.set(0.55, 2.3, 0); cp.flag.castShadow = true; f.add(cp.flag);
   }
   const gl = L.goal, cab = grp(W, gl.x, gl.y, gl.z);
   mk('box', '#8a5a2b', [3.3, 2.6, 2.3], [0, 1.3, 0], cab);
@@ -2095,6 +2102,12 @@ function buildScene() {
     const it = grp(W, h.x, h.y, h.z);
     if (h.kind === 'coin') { const c = mk('cyl', '#ffd23f', [0.3, 0.08, 0.3], [0, 0, 0], it, { emissive: '#4a3400' }); c.rotation.x = Math.PI / 2; }
     else if (h.kind === 'gold') { mk('cyl', '#ffd23f', [0.36, 0.6, 0.36], [0, -0.05, 0], it, { emissive: '#8a6400' }); mk('cyl', '#e63946', [0.39, 0.13, 0.39], [0, 0.31, 0], it); mk('sph', '#ffffff', [0.08, 0.16, 0.05], [-0.15, 0.05, 0.33], it, { emissive: '#ffffff' }); const rg = mk('torus', '#fff27a', [0.7, 0.7, 0.7], [0, -0.6, 0], it, { emissive: '#8a7a20' }); rg.rotation.x = Math.PI / 2; rg.castShadow = false; }
+    else if (h.kind === 'heart') {
+      for (const sx of [-1, 1]) mk('sph', '#e63946', [0.24, 0.24, 0.2], [sx * 0.17, 0.08, 0], it, { emissive: '#5a0a14' });
+      const tip = mk('cone', '#e63946', [0.36, 0.42, 0.2], [0, -0.2, 0], it, { emissive: '#5a0a14' }); tip.rotation.z = Math.PI;
+      mk('sph', '#ffffff', [0.06, 0.05, 0.03], [-0.2, 0.18, 0.18], it, { emissive: '#ffffff' });
+      const rg = mk('torus', '#ff8fa0', [0.6, 0.6, 0.6], [0, -0.75, 0], it, { emissive: '#7a2030' }); rg.rotation.x = Math.PI / 2; rg.castShadow = false;
+    }
     else if (h.kind === 'axe') { mk('cyl', '#9c8f84', [0.6, 0.5, 0.6], [0, -0.85, 0], it).receiveShadow = true; const ax = axeModel(1); ax.scale.setScalar(0.04); ax.position.y = -0.55; it.add(ax); const rg = mk('torus', '#fff27a', [0.75, 0.75, 0.75], [0, -0.55, 0], it, { emissive: '#8a7a20' }); rg.rotation.x = Math.PI / 2; rg.castShadow = false; }
     else { mk('cyl', '#ffb627', [0.26, 0.42, 0.26], [0, -0.04, 0], it, { emissive: '#4a2800' }); mk('cyl', '#e63946', [0.28, 0.1, 0.28], [0, 0.22, 0], it); mk('cyl', '#ffe08a', [0.27, 0.12, 0.27], [0, -0.06, 0], it, { emissive: '#3a2a00' }); }
     h.mesh = it;
@@ -2182,7 +2195,7 @@ function render3D(alpha = 1, dtMs = 16.667) {
     if (b.kind === 'qbox') { m.material = b.used ? mat('#a58b6e') : G.matQ; m.position.y = (b.y0 + b.y1) / 2 + (b.used ? 0 : Math.sin(frame * 0.1) * 0.04); m.rotation.y = b.used ? 0 : frame * 0.01; }
     if (b.kind === 'crate' || b.kind === 'gate' || b.kind === 'bush') m.visible = b.on;
   }
-  if (G.flag) { G.flagMat.color.set(L.checkpoint.on ? '#e63946' : '#9aa5b1'); G.flag.rotation.y = Math.sin(frame * 0.12) * 0.25; }
+  for (const cp of L.checkpoints) { cp.mat.color.set(cp.on ? '#e63946' : '#9aa5b1'); cp.flag.rotation.y = Math.sin(frame * 0.12) * 0.25; }
   portalSpin();
   G.doorGlow.visible = !L.hub;
   G.doorGlow.scale.setScalar(0.85 + Math.sin(frame * 0.08) * 0.08);
@@ -2190,7 +2203,7 @@ function render3D(alpha = 1, dtMs = 16.667) {
   for (const h of L.items) {
     const m = h.mesh; m.visible = !h.got && near(h.x, h.z);
     if (!m.visible) continue;
-    if (h.kind === 'coin' || h.kind === 'axe' || h.kind === 'gold') m.rotation.y = frame * (h.kind === 'coin' ? 0.07 : 0.03) + h.ph;
+    if (h.kind === 'coin' || h.kind === 'axe' || h.kind === 'gold' || h.kind === 'heart') m.rotation.y = frame * (h.kind === 'coin' ? 0.07 : 0.03) + h.ph;
     else { m.position.y = h.y + Math.sin(frame * 0.08 + h.ph) * 0.08; m.rotation.y = Math.sin(frame * 0.03 + h.ph) * 0.6; }
   }
   for (const e of L.enemies) {
