@@ -755,9 +755,19 @@ function txt(s, x, y, size, color = '#fff4dc', align = 'left') {
   ctx.lineWidth = size / 5; ctx.strokeStyle = '#4a2c17'; ctx.lineJoin = 'round'; ctx.strokeText(s, x, y);
   ctx.fillStyle = color; ctx.fillText(s, x, y);
 }
+function heartPath(x, y, r) { // one closed shape: two round lobes meeting in a point
+  const c = Math.SQRT1_2;
+  ctx.beginPath();
+  ctx.moveTo(x, y + r * 2.05);
+  ctx.lineTo(x - r - r * c, y + r * c);
+  ctx.arc(x - r, y, r, Math.PI * 0.75, Math.PI * 2);
+  ctx.arc(x + r, y, r, Math.PI, Math.PI * 2.25);
+  ctx.closePath();
+}
 function drawHeart(x, y, full) {
-  ctx.fillStyle = '#4a2c17'; ctx.beginPath(); ctx.arc(x - 6, y, 9, 0, 7); ctx.arc(x + 6, y, 9, 0, 7); ctx.moveTo(x - 15, y + 2); ctx.lineTo(x, y + 18); ctx.lineTo(x + 15, y + 2); ctx.fill();
-  ctx.fillStyle = full ? '#e63946' : '#a58b6e'; ctx.beginPath(); ctx.arc(x - 6, y, 6.5, 0, 7); ctx.arc(x + 6, y, 6.5, 0, 7); ctx.moveTo(x - 12.5, y + 2); ctx.lineTo(x, y + 14.5); ctx.lineTo(x + 12.5, y + 2); ctx.fill();
+  ctx.fillStyle = '#4a2c17'; heartPath(x, y - 1, 8.4); ctx.fill();
+  ctx.fillStyle = full ? '#e63946' : '#a58b6e'; heartPath(x, y - 0.5, 6); ctx.fill();
+  if (full) { ctx.fillStyle = 'rgba(255,255,255,0.75)'; ctx.beginPath(); ctx.ellipse(x - 5.5, y - 2.5, 2.4, 1.6, -0.6, 0, 7); ctx.fill(); }
 }
 function drawHud() {
   for (let i = 0; i < save.maxHp; i++) drawHeart(30 + i * 34, 28, i < P.hp);
