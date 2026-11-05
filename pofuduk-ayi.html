@@ -198,7 +198,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 <div class="panel" id="pTitle">
   <div class="card">
     <h1 id="titleName">Pofuduk'un Bal Macerası</h1>
-    <p>Ayımızın balları dokuz bölgeye dağılmış. Bal Köyü'ndeki portallardan bölgelere git, bal ve bozuk para topla, altı boss'u yen!</p>
+    <p>Ayımızın balları on iki bölgeye dağılmış. Bal Köyü'ndeki portallardan bölgelere git, bal ve bozuk para topla, sekiz boss'u yen!</p>
     <div class="who">
       <label for="nameInput">Ayının adı</label>
       <input id="nameInput" type="text" maxlength="14" autocomplete="off" spellcheck="false" placeholder="Pofuduk">
@@ -350,6 +350,12 @@ const SONGS = {
     bass: seq('45 45 45 46 45 45 43 45 45 45 45 46 41 41 40 40'), drum: seq('k h s h k h s h k k s h k h s s') },
   lv7: { bpm: 92, wave: 'triangle', vol: 0.06, len: 2.4, lead: seq('69 . . 72 . . 76 . 74 . 72 . 69 . . . 67 . . 71 . . 74 . 72 . 71 . 67 . . . 65 . . 69 . . 72 . 71 . 69 . 65 . . . 64 . 67 . 71 . 69 . 68 . 64 . . . . .'),
     bass: seq('45 . . . 52 . . . 43 . . . 50 . . . 41 . . . 48 . . . 40 . . . 47 . . .'), drum: seq('. . h . . . s . . . h . . h s .') },
+  lv9: { bpm: 104, wave: 'triangle', vol: 0.06, lead: seq('67 . 69 71 . 74 . 72 71 . 69 . 67 . . . 64 . 67 69 . 71 . 69 67 . 64 . 62 . . . 67 . 69 71 . 76 . 74 72 . 71 . 69 . 67 . 69 . 71 . 67 . 64 . 67 . . . . .'),
+    bass: seq('43 . 50 . 47 . 50 . 40 . 47 . 43 . 47 . 36 . 43 . 40 . 43 . 38 . 45 . 42 . 45 .'), drum: seq('k . h . s . h h k . h . s . h .') },
+  lv10: { bpm: 88, wave: 'triangle', vol: 0.06, len: 2.6, lead: seq('64 . . 67 . 66 . 64 . . 59 . . . . . 62 . . 66 . 64 . 62 . . 57 . . . . . 64 . . 67 . 71 . 69 . 67 . 66 . 64 . 62 . 64 . 66 . 59 . . . . . . .'),
+    bass: seq('40 . . 40 . . 47 . 38 . . 38 . . 45 . 36 . . 36 . . 43 . 35 . . 35 . . 42 .'), drum: seq('k . . h . s . . k . h . . s h .') },
+  lv11: { bpm: 132, wave: 'sawtooth', vol: 0.025, lead: seq('70 . 73 . 77 . 75 73 . 72 . 70 . . . 68 . 72 . 75 . 73 72 . 70 . 68 . . . 70 . 73 . 77 . 80 78 . 77 . 75 . 73 . 72 . 73 75 . 77 . 72 . 70 . . .'),
+    bass: seq('46 46 53 46 44 44 51 44 42 42 49 42 41 41 48 41'), drum: seq('k h s h k h s h k k s h k h s s') },
   lv8: { bpm: 108, wave: 'sine', vol: 0.07, len: 2, lead: seq('84 . 88 . 91 . 88 . 86 . 83 . 79 . . . 81 . 84 . 88 . 86 . 84 . 81 . 79 . . . 77 . 81 . 84 . 88 . 86 . 84 . 83 . 81 . 79 . 83 . 84 . . . . . . .'),
     bass: seq('48 . 55 . 52 . 55 . 45 . 52 . 48 . 52 . 41 . 48 . 45 . 48 . 43 . 50 . 47 . 50 .'), drum: seq('k . h . s . h h k . h . s . h .') },
   lv6: { bpm: 120, wave: 'triangle', vol: 0.06, lead: seq('62 . 62 65 . 69 . 67 65 . 64 . 62 . . . 60 . 60 64 . 67 . 65 64 . 62 . 60 . . . 62 . 62 65 . 69 . 72 70 . 69 . 67 . 65 . 64 . 65 67 . 69 . 64 . 61 . 62 . . .'),
@@ -359,7 +365,7 @@ const SONGS = {
   boss: { bpm: 150, lead: seq('69 . 72 . 76 . 72 . 71 . 74 . 77 . 74 . 69 . 72 . 76 . 79 . 77 76 74 72 71 . . . 81 . 79 . 77 . 76 . 74 . 76 . 77 . 74 . 72 . 71 . 69 . 68 . 69 . . .'),
     bass: seq('45 45 57 45 43 43 55 43 41 41 53 41 40 40 52 40'), drum: seq('k h s h k k s h k h s h k k s s') },
 };
-const BOSS_KEY = [0, 0, 0, 0, -2, 3, 1, -3, 2];
+const BOSS_KEY = [0, 0, 0, 0, -2, 3, 1, -3, 2, 0, -4, 1];
 const music = { bus: null, song: null, name: '', tr: 0, step: 0, next: 0, noise: null };
 function musicInit() {
   music.bus = ac.createGain(); music.bus.gain.value = 0; music.bus.connect(ac.destination);
@@ -592,6 +598,9 @@ const LEVELS = [
   { name: 'Korsan Koyu', sky: ['#3fb6e8', '#fff1c9'], far: '#7fb8a8', mid: '#2a8fb8', grass: '#f2d48a', grassDark: '#d9b56a', dirt: '#c99a5a', dirtDot: '#a87a40', tree: 'palm', friction: 0.78, sun: '#fff1a8', boss: 'crab' },
   { name: 'Gece Ormanı', sky: ['#0b1433', '#2b3a6b'], far: '#1c2a4f', mid: '#1f3358', grass: '#3f7a5a', grassDark: '#2c5c44', dirt: '#3a2f3f', dirtDot: '#2a2230', tree: 'night', friction: 0.78, sun: '#f4f6ff', night: true, weather: 'firefly', boss: 'owl' },
   { name: 'Kristal Buzul', sky: ['#7fc4f0', '#e8f7ff'], far: '#b8d8f0', mid: '#8fbce0', grass: '#e6f7ff', grassDark: '#b4dcf5', dirt: '#7fa8c8', dirtDot: '#6a90b0', tree: 'crystal', friction: 0.93, sun: '#ffffff', weather: 'snow', caps: true, boss: 'golem' },
+  { name: 'Sonbahar Ormanı', sky: ['#f6b26b', '#fde7c4'], far: '#c97a4a', mid: '#a8603a', grass: '#d98a3a', grassDark: '#b86a28', dirt: '#7a4a2a', dirtDot: '#5c361e', tree: 'autumn', friction: 0.78, sun: '#fff1c8', weather: 'leaves' },
+  { name: 'Sisli Bataklık', sky: ['#6f8a6a', '#c9d8b8'], far: '#5a7058', mid: '#4a6a4a', grass: '#6a8f4a', grassDark: '#4f7036', dirt: '#4a3a2a', dirtDot: '#3a2c20', tree: 'willow', friction: 0.78, sun: '#f4f0d0', mist: true, boss: 'frog' },
+  { name: 'Fırtına Kalesi', sky: ['#2a2346', '#6a5a8a'], far: '#3a3258', mid: '#4a4068', grass: '#8a86a8', grassDark: '#6a6688', dirt: '#4a4658', dirtDot: '#36323f', tree: 'tower', friction: 0.78, sun: '#e8e4ff', night: true, weather: 'rain', boss: 'storm' },
 ];
 
 function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
@@ -645,7 +654,7 @@ function axeIcon(c, tier) {
   if (a.glow) { g.fillStyle = '#ffffff'; g.beginPath(); g.arc(4, -15, 2, 0, 7); g.fill(); }
   g.restore();
 }
-const BOSS_HINT = { mush: 'Üstüne zıpla, yerdeki halkaların üstünden atla!', queen: 'Kırmızı halkadan kaç; yere çakılınca üstüne zıpla!', hog: 'Yuvarlanırken kaç; duvara çarpınca üstüne zıpla!', crab: 'Baloncuklardan kaç; kıskaçları yere saplanınca üstüne zıpla!', owl: 'Tüylerden ve kırmızı halkadan kaç; yere çakılınca üstüne zıpla!', golem: 'Kayaların düşeceği yerden kaç; yere vurunca üstüne zıpla!' };
+const BOSS_HINT = { mush: 'Üstüne zıpla, yerdeki halkaların üstünden atla!', queen: 'Kırmızı halkadan kaç; yere çakılınca üstüne zıpla!', hog: 'Yuvarlanırken kaç; duvara çarpınca üstüne zıpla!', crab: 'Baloncuklardan kaç; kıskaçları yere saplanınca üstüne zıpla!', owl: 'Tüylerden ve kırmızı halkadan kaç; yere çakılınca üstüne zıpla!', golem: 'Kayaların düşeceği yerden kaç; yere vurunca üstüne zıpla!', frog: 'Kırmızı şeritten çekil; çamura saplanınca üstüne zıpla!', storm: 'Sarı halkalardan kaç; yere inince üstüne zıpla!' };
 const HATS = new Set(['cap', 'flower', 'pirate', 'viking', 'wizard', 'crown']);
 // bear art, origin at the feet centre, facing right
 function bearArt(g, o) {
@@ -956,6 +965,35 @@ function smithModel(parent, x, y, z, yaw) {
   const sign = axeModel(3); sign.scale.setScalar(0.045); sign.position.set(-0.2, 2.2, 0.75); sign.rotation.z = -0.7; t.add(sign);
   return t;
 }
+function frogModel() {
+  const g = new THREE.Group(), b = grp(g);
+  mk('sph', '#5aa04a', [1.45, 0.95, 1.35], [0, 0.95, 0], b);
+  mk('sph', '#c9e09a', [1.0, 0.6, 0.7], [0, 0.75, 0.75], b);
+  for (const s of [-1, 1]) {
+    mk('sph', '#5aa04a', [0.42, 0.42, 0.42], [s * 0.6, 1.75, 0.55], b);
+    mk('sph', '#ffffff', [0.3, 0.3, 0.2], [s * 0.6, 1.8, 0.82], b);
+    mk('sph', '#22160c', [0.14, 0.18, 0.08], [s * 0.6, 1.8, 0.98], b);
+    mk('sph', '#4a8a3a', [0.55, 0.4, 0.8], [s * 1.15, 0.45, -0.3], b);
+    mk('sph', '#4a8a3a', [0.3, 0.2, 0.45], [s * 0.9, 0.12, 0.85], b);
+    mk('sph', '#3f7a32', [0.22, 0.1, 0.22], [s * 0.5, 1.75, -0.45], b);
+  }
+  mk('box', '#7a2a3a', [1.3, 0.08, 0.1], [0, 1.15, 1.32], b);
+  crownModel(b, 1.85, 0.6);
+  g.userData = { body: b };
+  return g;
+}
+function stormModel() {
+  const g = new THREE.Group(), b = grp(g, 0, 0.9, 0);
+  for (const [x, y, z, r] of [[0, 0, 0, 1.0], [-0.9, -0.1, 0.1, 0.75], [0.9, -0.1, 0.1, 0.75], [0, 0.5, -0.2, 0.75], [-0.5, 0.35, 0.4, 0.55], [0.5, 0.35, 0.4, 0.55]]) mk('sph', '#4a4a66', [r, r * 0.85, r], [x, y, z], b, { emissive: '#14142a' });
+  for (const s of [-1, 1]) {
+    mk('sph', '#ffffff', [0.2, 0.2, 0.1], [s * 0.33, 0.15, 0.95], b, { emissive: '#555555' }); mk('sph', '#22160c', [0.1, 0.1, 0.06], [s * 0.33, 0.15, 1.04], b);
+    const br = mk('box', '#22160c', [0.32, 0.07, 0.05], [s * 0.33, 0.37, 1.0], b); br.rotation.z = -s * 0.4;
+  }
+  for (const x of [-0.5, 0.4]) { mk('box', '#ffe066', [0.12, 0.5, 0.12], [x, -0.95, 0.2], b, { emissive: '#ffcc00' }).rotation.z = 0.4; mk('box', '#ffe066', [0.12, 0.5, 0.12], [x + 0.15, -1.35, 0.2], b, { emissive: '#ffcc00' }).rotation.z = -0.4; }
+  crownModel(b, 0.95, 0.75);
+  g.userData = { body: b };
+  return g;
+}
 function owlModel() {
   const g = new THREE.Group(), b = grp(g, 0, 1.0, 0);
   mk('sph', '#3b3566', [0.95, 1.05, 0.85], [0, 0, 0], b);
@@ -1135,6 +1173,19 @@ function treeModel(kind, parent, x, y, z, s, rnd) {
     mk('cyl', '#d8c9e8', [0.22, 2.2, 0.22], [0, 1.1, 0], t);
     mk('hemi', '#5ad1e6', [1.3, 0.8, 1.3], [0, 2.15, 0], t, { emissive: '#1c6b7a' });
     mk('sph', '#c9fbff', [0.16, 0.16, 0.16], [0.5, 2.7, 0.5], t, { emissive: '#4a8a92' });
+  } else if (kind === 'autumn') {
+    mk('cyl', '#5c361e', [0.18, 1.5, 0.18], [0, 0.75, 0], t);
+    const c1 = ['#e8742a', '#c94a2a', '#f2b33a'][Math.floor(rnd() * 3)];
+    mk('ico', c1, [1.1, 1, 1.1], [0, 2.1, 0], t); mk('ico', '#d9642a', [0.6, 0.55, 0.6], [0.6, 1.7, 0.25], t); mk('ico', '#f2b33a', [0.5, 0.45, 0.5], [-0.55, 1.8, -0.2], t);
+  } else if (kind === 'willow') {
+    mk('cyl', '#4a3a2a', [0.22, 1.8, 0.22], [0, 0.9, 0], t);
+    mk('hemi', '#5f8a45', [1.3, 0.8, 1.3], [0, 1.9, 0], t);
+    for (let k = 0; k < 8; k++) { const a = k / 8 * Math.PI * 2; mk('cyl', k % 2 ? '#6f9a52' : '#8fb06a', [0.08, 1.3, 0.08], [Math.cos(a) * 1.1, 1.3, Math.sin(a) * 1.1], t).castShadow = false; }
+  } else if (kind === 'tower') {
+    mk('cyl', '#6a6688', [0.45, 2.6, 0.45], [0, 1.3, 0], t);
+    for (let k = 0; k < 4; k++) { const a = k / 4 * Math.PI * 2; mk('box', '#6a6688', [0.25, 0.3, 0.25], [Math.cos(a) * 0.38, 2.75, Math.sin(a) * 0.38], t); }
+    mk('box', '#ffd23f', [0.18, 0.28, 0.05], [0, 1.9, 0.46], t, { emissive: '#8a6a00' });
+    mk('box', '#b5452f', [0.04, 0.6, 0.5], [0.06, 3.2, 0.25], t);
   } else if (kind === 'night') {
     mk('cyl', '#3a2a22', [0.18, 1.5, 0.18], [0, 0.75, 0], t);
     mk('ico', '#1f4a3a', [1.1, 1, 1.1], [0, 2.1, 0], t); mk('ico', '#24563f', [0.65, 0.6, 0.65], [0.6, 1.7, 0.2], t);
@@ -1296,31 +1347,31 @@ function buildLevel(n) {
 }
 const HUB = { name: 'Bal Köyü', sky: ['#7fd3ff', '#d9f3ff'], far: '#8fc5a8', mid: '#5aa65e', grass: '#5cc04a', grassDark: '#3f9b37', dirt: '#9a6234', dirtDot: '#7b4a24', tree: 'round', friction: 0.78, sun: '#fff1a8' };
 function buildHub() {
-  const R = 52, boxes = [{ x0: -R, y0: -3, z0: -R, x1: R, y1: 0, z1: R, kind: 'ground', on: true }], trees = [], paths = [];
+  const R = 78, boxes = [{ x0: -R, y0: -3, z0: -R, x1: R, y1: 0, z1: R, kind: 'ground', on: true }], trees = [], paths = [];
   const rnd = rng(9);
   // each portal sits on a patch of its own region, scattered around the village
-  const spots = [{ x: -19, y: 0, z: 7 }, { x: 22, y: 0, z: 1 }, { x: -32, y: 1.5, z: -22 }, { x: 32, y: 0, z: -28 }, { x: -7, y: 0, z: -39 }, { x: 22, y: 4.5, z: -43 }, { x: -41, y: 0, z: -4 }, { x: 41, y: 0, z: -6 }, { x: -36, y: 0, z: -41 }];
+  const spots = [{ x: -28, y: 0, z: 10 }, { x: 32, y: 0, z: 1 }, { x: -46, y: 1.5, z: -32 }, { x: 46, y: 0, z: -41 }, { x: -10, y: 0, z: -57 }, { x: 32, y: 4.5, z: -62 }, { x: -59, y: 0, z: -6 }, { x: 59, y: 0, z: -9 }, { x: -52, y: 0, z: -59 }, { x: 12, y: 0, z: -68 }, { x: 62, y: 0, z: -58 }, { x: -64, y: 0, z: 28 }];
   const portals = LEVELS.map((lv, i) => {
     const sp = spots[i], top = sp.y + 0.25;
     boxes.push({ x0: sp.x - 4.5, y0: -3, z0: sp.z - 4.5, x1: sp.x + 4.5, y1: top, z1: sp.z + 4.5, kind: 'ground', on: true, theme: lv });
     for (const [dx, dz] of [[-3.4, -3.3], [3.4, -3.2], [-3.3, 3.3], [3.5, 3.2]]) if (rnd() < 0.8) trees.push({ x: sp.x + dx, y: top, z: sp.z + dz, s: 0.6 + rnd() * 0.3, kind: lv.tree });
-    paths.push({ x0: 0, z0: 22, x1: sp.x, z1: sp.z + (sp.y > 3 ? 5 : 0) });
-    return { i, x: sp.x, y: top, z: sp.z - 1, yaw: Math.atan2(0 - sp.x, 22 - sp.z), locked: i > save.unlocked, cd: 0 };
+    paths.push({ x0: 0, z0: 32, x1: sp.x, z1: sp.z + (sp.y > 3 ? 5 : 0) });
+    return { i, x: sp.x, y: top, z: sp.z - 1, yaw: Math.atan2(0 - sp.x, 32 - sp.z), locked: i > save.unlocked, cd: 0 };
   });
   const cloud = spots[5]; // the cloud island is high up: climb its vine
   boxes.push({ x0: cloud.x - 1.3, y0: 0, z0: cloud.z + 4.5, x1: cloud.x + 1.3, y1: cloud.y + 0.25, z1: cloud.z + 4.62, kind: 'vine', on: true, nx: 0, nz: 1, face: cloud.z + 4.5 });
-  const smith = { x: 0, y: 0, z: -12, yaw: 0 }; smith.tx = 0; smith.tz = -12 + 2.4; smith.armed = true;
-  boxes.push({ x0: -1.7, y0: 0, z0: -14.2, x1: 1.7, y1: 2.4, z1: -11.3, kind: 'deco', on: true });
-  const shop = { x: 19, y: 0, z: 22 }; shop.yaw = Math.atan2(-shop.x, 30 - shop.z);
+  const smith = { x: 0, y: 0, z: -16, yaw: 0 }; smith.tx = 0; smith.tz = -16 + 2.4; smith.armed = true;
+  boxes.push({ x0: -1.7, y0: 0, z0: -18.2, x1: 1.7, y1: 2.4, z1: -15.3, kind: 'deco', on: true });
+  const shop = { x: 24, y: 0, z: 32 }; shop.yaw = Math.atan2(-shop.x, 42 - shop.z);
   shop.tx = shop.x + Math.sin(shop.yaw) * 1.9; shop.tz = shop.z + Math.cos(shop.yaw) * 1.9;
   boxes.push({ x0: shop.x - 1.2, y0: 0, z0: shop.z - 1.2, x1: shop.x + 1.2, y1: 1, z1: shop.z + 1.2, kind: 'deco', on: true });
-  const ward = { x: 11, y: 0, z: 27 }; ward.yaw = Math.atan2(-ward.x, 36 - ward.z);
+  const ward = { x: 14, y: 0, z: 39 }; ward.yaw = Math.atan2(-ward.x, 50 - ward.z);
   ward.tx = ward.x + Math.sin(ward.yaw) * 2.1; ward.tz = ward.z + Math.cos(ward.yaw) * 2.1; ward.armed = true; shop.armed = true;
   boxes.push({ x0: ward.x - 0.95, y0: 0, z0: ward.z - 0.95, x1: ward.x + 0.95, y1: 2.6, z1: ward.z + 0.95, kind: 'deco', on: true });
-  const goal = { x: -19, y: 0, z: 25 };
+  const goal = { x: -26, y: 0, z: 34 };
   boxes.push({ x0: goal.x - 1.65, y0: 0, z0: goal.z - 1.15, x1: goal.x + 1.65, y1: 2.6, z1: goal.z + 1.15, kind: 'cabin', on: true });
   // cloud parkour: a spiral of clouds with a treasure chest on top
-  const park = { cx: 36, cz: 33, clouds: [] };
+  const park = { cx: 50, cz: 46, clouds: [] };
   for (let k = 0; k <= 12; k++) {
     const a = k * 0.72, x = park.cx + Math.cos(a) * 7.5, z = park.cz + Math.sin(a) * 7.5, top = 1.3 + k * 1.2, hs = k === 12 ? 2 : 1.3 - k * 0.025;
     boxes.push({ x0: x - hs, y0: top - 0.6, z0: z - hs, x1: x + hs, y1: top, z1: z + hs, kind: 'cloud', on: true });
@@ -1330,27 +1381,29 @@ function buildHub() {
   // village houses, brown and light brown, scattered between everything else
   const houses = [];
   const nearAny = (x, z) => spots.some(sp => Math.hypot(x - sp.x, z - sp.z) < 9.5) || Math.hypot(x - shop.x, z - shop.z) < 7 || Math.hypot(x - ward.x, z - ward.z) < 6 || Math.hypot(x - goal.x, z - goal.z) < 7
-    || Math.hypot(x - smith.x, z - smith.z) < 7 || Math.hypot(x - park.cx, z - park.cz) < 12 || Math.hypot(x, z - 36) < 7 || Math.abs(x) < 4;
-  for (let k = 0; houses.length < 16 && k < 900; k++) {
+    || Math.hypot(x - smith.x, z - smith.z) < 7 || Math.hypot(x - park.cx, z - park.cz) < 12 || Math.hypot(x, z - 50) < 8 || Math.abs(x) < 4;
+  for (let k = 0; houses.length < 36 && k < 3000; k++) {
     const x = (rnd() - 0.5) * 2 * (R - 6), z = (rnd() - 0.5) * 2 * (R - 6);
     if (nearAny(x, z) || houses.some(h => Math.hypot(x - h.x, z - h.z) < 8.5)) continue;
-    houses.push({ x, z, yaw: Math.atan2(-x, 15 - z), light: houses.length % 2 === 1, rnd: rnd() });
+    houses.push({ x, z, yaw: Math.atan2(-x, 20 - z), light: houses.length % 2 === 1, rnd: rnd() });
   }
   for (const h of houses) boxes.push({ x0: h.x - 1.9, y0: 0, z0: h.z - 1.9, x1: h.x + 1.9, y1: 3.2, z1: h.z + 1.9, kind: 'deco', on: true });
   const clear = (x, z) => !nearAny(x, z) && houses.every(h => Math.hypot(x - h.x, z - h.z) > 4.5);
-  for (let i = 0; i < 160; i++) { const x = (rnd() - 0.5) * 2 * (R - 2), z = (rnd() - 0.5) * 2 * (R - 2); if (clear(x, z)) trees.push({ x, y: 0, z, s: 0.7 + rnd() * 0.5 }); }
+  for (let i = 0; i < 360; i++) { const x = (rnd() - 0.5) * 2 * (R - 2), z = (rnd() - 0.5) * 2 * (R - 2); if (clear(x, z)) trees.push({ x, y: 0, z, s: 0.7 + rnd() * 0.5 }); }
   const turtles = [];
-  for (let i = 0; turtles.length < 9 && i < 300; i++) {
+  for (let i = 0; turtles.length < 14 && i < 600; i++) {
     const x = (rnd() - 0.5) * 2 * (R - 8), z = (rnd() - 0.5) * 2 * (R - 8);
     if (clear(x, z)) turtles.push({ id: turtles.length, x, z, yaw: rnd() * 6.28, t: rnd() * 5, next: 2 + rnd() * 3, s: 0.8 + rnd() * 0.45, hue: ['#3f9b4a', '#5aa65e', '#7a9b3a', '#4f8f6a'][turtles.length % 4], petT: 0, hop: 0 });
   }
-  return { def: HUB, hub: true, R, boxes, items: [], enemies: [], trees, paths, start: { x: 0, y: 0, z: 36 }, checkpoints: [], cpActive: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, ward, smith, houses, turtles, park };
+  return { def: HUB, hub: true, R, boxes, items: [], enemies: [], trees, paths, start: { x: 0, y: 0, z: 50 }, checkpoints: [], cpActive: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, ward, smith, houses, turtles, park };
 }
 function mkBoss(type, c) {
   const base = { type, c, x: c.x, z: c.zc - 3, y: c.y, vx: 0, vz: 0, vy: 0, t: 0, inv: 0, active: false, defeated: false, deadT: 0, yaw: 0, tx: 0, tz: 0, state: type === 'mush' ? 'walk' : type === 'queen' ? 'hover' : 'aim' };
   if (type === 'mush') return Object.assign(base, { name: 'Kocamantar', r: 1.25, h: 2.1, hp: 3, maxHp: 3 });
   if (type === 'hog') return Object.assign(base, { name: 'Dikenbaş', r: 1.3, h: 1.9, hp: 5, maxHp: 5, spinA: 0 });
   if (type === 'owl') return Object.assign(base, { name: 'Gölge Baykuş', r: 1.15, h: 1.9, hp: 5, maxHp: 5, state: 'circle', y: c.y + 3.6, ang: 0, fe: 0 });
+  if (type === 'frog') return Object.assign(base, { name: 'Bataklık Kurbağası', r: 1.4, h: 1.6, hp: 6, maxHp: 6, state: 'sit', cnt: 0, tg: null });
+  if (type === 'storm') return Object.assign(base, { name: 'Kara Bulut', r: 1.5, h: 1.6, hp: 7, maxHp: 7, state: 'float', y: c.y + 4.5, vol: 0, volleys: 0 });
   if (type === 'golem') return Object.assign(base, { name: 'Buz Golemi', r: 1.4, h: 2.9, hp: 6, maxHp: 6, state: 'walk', throws: 0, air: false });
   if (type === 'crab') return Object.assign(base, { name: 'Kaptan Kıskaç', r: 1.5, h: 1.5, hp: 5, maxHp: 5, state: 'side', bub: 0 });
   return Object.assign(base, { name: 'Kraliçe Vızvız', r: 1.15, h: 1.4, hp: 4, maxHp: 4, y: c.y + 5 });
@@ -1443,6 +1496,8 @@ function ambient() {
   if (w === 'ember' && frame % 4 === 0) ambs.push({ x: Math.random() * VW, y: VH + 5, vx: (Math.random() - 0.5) * 0.6, vy: -1 - Math.random() * 1.5, color: Math.random() < 0.5 ? '#ffb36b' : '#ff6b3d', r: 1.2 + Math.random() * 2 });
   if (w === 'spore' && frame % 6 === 0) ambs.push({ x: Math.random() * VW, y: VH + 5, vx: (Math.random() - 0.5) * 0.4, vy: -0.4 - Math.random() * 0.6, color: Math.random() < 0.5 ? '#9ef0ff' : '#d9a7ff', r: 1.5 + Math.random() * 2 });
   ambs.forEach(p => { p.x += p.vx; p.y += p.vy; });
+  if (w === 'leaves' && frame % 6 === 0) ambs.push({ x: Math.random() * VW - 60, y: -6, vx: 0.4 + Math.random() * 0.6, vy: 0.8 + Math.random() * 0.6, color: ['#e8742a', '#c94a2a', '#f2b33a'][Math.floor(Math.random() * 3)], r: 2.5 + Math.random() * 2 });
+  if (w === 'rain') for (let k = 0; k < 2; k++) ambs.push({ x: Math.random() * (VW + 80), y: -8, vx: -1.5, vy: 9 + Math.random() * 3, color: '#b8c8ff', r: 1.2, streak: true });
   if (w === 'firefly' && frame % 5 === 0) ambs.push({ x: Math.random() * VW, y: VH * (0.25 + Math.random() * 0.7), vx: (Math.random() - 0.5) * 0.5, vy: (Math.random() - 0.5) * 0.3, color: Math.random() < 0.6 ? '#e8ff6a' : '#fff3a0', r: 1.6 + Math.random() * 1.6, life: 180 + Math.random() * 120 });
   ambs = ambs.filter(p => p.y < VH + 10 && p.y > -10 && (p.life === undefined || --p.life > 0));
 }
@@ -1888,6 +1943,53 @@ function updateBoss() {
       if (b.t > 2.3 - lost * 0.2) { b.state = 'walk'; b.t = 0; }
     }
     b.x = lim(b.x, ax0, ax1); b.z = lim(b.z, az0, az1);
+  } else if (b.type === 'frog') {
+    if (b.state === 'sit') {
+      b.yaw += angDiff(Math.atan2(dx, dz), b.yaw) * 0.1;
+      if (b.t > 1.2 - lost * 0.15) {
+        b.t = 0; b.cnt++;
+        if (b.cnt % 2) { b.state = 'tongue'; b.tg = { kind: 'tongue', x: b.x + Math.sin(b.yaw) * 1.3, y: A.y + 0.9, z: b.z + Math.cos(b.yaw) * 1.3, yaw: b.yaw, len: 0, phase: 'warn', t: 0, life: 600 }; L.shots.push(b.tg); }
+        else b.state = 'crouch';
+      }
+    } else if (b.state === 'tongue') {
+      if (!L.shots.includes(b.tg)) { b.state = 'sit'; b.t = 0; }
+    } else if (b.state === 'crouch') {
+      if (b.t > 0.4) { b.state = 'air'; b.t = 0; b.vy = 13; const v = Math.min(10, d / 0.87); b.vx = dx / d * v; b.vz = dz / d * v; sfx.djump(); }
+    } else if (b.state === 'air') {
+      b.vy -= 30 * DT; b.x += b.vx * DT; b.z += b.vz * DT; b.y += b.vy * DT; b.yaw = Math.atan2(b.vx, b.vz);
+      if (b.y <= A.y) {
+        b.y = A.y; b.state = 'stunned'; b.t = 0; shake = 16; sfx.pound(); burst(b.x, A.y + 0.3, b.z, '#6a8f4a', 22, 5);
+        L.shots.push({ kind: 'ring', x: b.x, y: A.y, z: b.z, r: b.r, sp: 7 + lost * 0.5, life: 130 });
+      }
+    } else if (b.state === 'stunned') {
+      if (b.t > 2.2 - lost * 0.2) { b.state = 'sit'; b.t = 0; }
+    }
+    b.x = lim(b.x, ax0, ax1); b.z = lim(b.z, az0, az1);
+  } else if (b.type === 'storm') {
+    const top = A.y + 4.5;
+    if (b.state === 'float') { // drift above the bear and call down marked lightning
+      b.yaw = Math.atan2(dx, dz);
+      const k = (0.8 + lost * 0.15) * DT; b.x += dx * k; b.z += dz * k; b.y += (top + Math.sin(b.t * 2) * 0.3 - b.y) * 0.08;
+      b.vol += DT;
+      if (b.vol > 1.7 - lost * 0.18) {
+        b.vol = 0; b.volleys++;
+        const n = 2 + Math.min(3, lost);
+        for (let i = 0; i < n; i++) {
+          const tx = i === 0 ? lim(P.x, ax0, ax1) : A.x + (Math.random() - 0.5) * (A.w - 3), tz = i === 0 ? lim(P.z, az0, az1) : A.zc + (Math.random() - 0.5) * (A.d - 3);
+          L.shots.push({ kind: 'bolt', x: tx, y: A.y, z: tz, t: 0, delay: 0.95, life: 600 });
+        }
+        sfx.djump();
+      }
+      if (b.volleys >= 3) { b.state = 'descend'; b.t = 0; b.volleys = 0; }
+    } else if (b.state === 'descend') {
+      b.y += (A.y - b.y) * 0.08;
+      if (b.y < A.y + 0.15) { b.y = A.y; b.state = 'stunned'; b.t = 0; shake = 10; sfx.pound(); burst(b.x, A.y + 0.5, b.z, '#9a9ab8', 18, 3); }
+    } else if (b.state === 'stunned') {
+      if (b.t > 2.4 - lost * 0.2) { b.state = 'rise'; b.t = 0; }
+    } else if (b.state === 'rise') {
+      b.y += 4 * DT; if (b.y >= top) { b.state = 'float'; b.t = 0; }
+    }
+    b.x = lim(b.x, ax0, ax1); b.z = lim(b.z, az0, az1);
   } else if (b.type === 'crab') {
     if (b.state !== 'dash' && b.state !== 'stunned') b.yaw += angDiff(Math.atan2(dx, dz), b.yaw) * 0.1;
     if (b.state === 'side') { // scuttle sideways and blow bubbles
@@ -1941,6 +2043,8 @@ function hitBoss(b) {
   else if (b.type === 'hog') { b.state = 'quills'; b.t = 0; }
   else if (b.type === 'owl') { b.state = 'rise'; b.t = 0; }
   else if (b.type === 'golem') { b.state = 'walk'; b.t = 0; b.throws = 0; b.air = false; }
+  else if (b.type === 'frog') { b.state = 'sit'; b.t = 0; L.shots = L.shots.filter(x => x !== b.tg); }
+  else if (b.type === 'storm') { b.state = 'rise'; b.t = 0; }
   else { b.state = 'side'; b.t = 0; b.bub = 0; }
   if (b.hp <= 0) {
     b.defeated = true; b.deadT = 0; b.vy = 8; L.shots = []; bump('boss');
@@ -1959,6 +2063,22 @@ function updateShots() {
       s.r += s.sp * DT;
       if (s.r > A.w * 0.75) s.life = 0;
       if (s.life > 0 && P.y - A.y < 0.35 && Math.abs(Math.hypot(P.x - s.x, P.z - s.z) - s.r) < 0.45) hurt(P.x - s.x, P.z - s.z);
+    } else if (s.kind === 'bolt') {
+      s.t += DT;
+      if (s.t >= s.delay && !s.hit) {
+        s.hit = true; shake = Math.max(shake, 6); sfx.pound(); burst(s.x, A.y + 0.4, s.z, '#fff6a0', 14, 4);
+        if (Math.hypot(P.x - s.x, P.z - s.z) < 1.25 && P.y - A.y < 2.2) hurt(P.x - s.x, P.z - s.z);
+      }
+      if (s.t > s.delay + 0.25) s.life = 0;
+    } else if (s.kind === 'tongue') {
+      s.t += DT;
+      if (s.phase === 'warn') { if (s.t > 0.65) { s.phase = 'out'; s.t = 0; sfx.swing(); } }
+      else if (s.phase === 'out') { s.len = Math.min(9, s.len + 26 * DT); if (s.len >= 9) s.phase = 'in'; }
+      else { s.len -= 18 * DT; if (s.len <= 0) s.life = 0; }
+      if (s.phase !== 'warn' && s.life > 0) {
+        const fx = Math.sin(s.yaw), fz = Math.cos(s.yaw), ex = P.x - s.x, ez = P.z - s.z, along = ex * fx + ez * fz, perp = Math.abs(ex * fz - ez * fx);
+        if (along > 0 && along < s.len && perp < 0.6 && P.y - A.y < 1.4) hurt(fx, fz);
+      }
     } else if (s.kind === 'feather') {
       s.x += s.vx * DT; s.y += s.vy * DT; s.z += s.vz * DT;
       if (s.y < A.y || Math.abs(s.x - A.x) > A.w / 2 || Math.abs(s.z - A.zc) > A.d / 2) s.life = 0;
@@ -1995,10 +2115,10 @@ function buildScene() {
   const th = L.def, rnd = rng(77 + lvlIdx * 31);
   if (G.scene.background) G.scene.background.dispose();
   G.scene.background = canvasTex(4, 256, (c, w, h) => { const gr = c.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, th.sky[0]); gr.addColorStop(1, th.sky[1]); c.fillStyle = gr; c.fillRect(0, 0, w, h); });
-  G.scene.fog = new THREE.Fog(th.sky[1], 32, 130);
+  G.scene.fog = new THREE.Fog(th.sky[1], th.mist ? 14 : 32, th.mist ? 85 : 130);
   G.hemi.color.set(th.cave ? '#b9a6ff' : th.night ? '#9fb4ff' : '#ffffff'); G.hemi.groundColor.set(th.mid); G.hemi.intensity = th.cave ? 0.6 : th.night ? 0.45 : 0.62;
   G.sun.color.set(th.weather === 'ember' ? '#ffcf9a' : th.night ? '#bcd0ff' : '#fff6e0'); G.sun.intensity = th.cave ? 0.5 : th.night ? 0.5 : 0.75;
-  const DECO = { round: ['#3f9b37', '#2f7f2a', '#ff5fa2', '#ffd23f'], cactus: ['#b8801f', '#8a5f17', '#6b8f3a'], pine: ['#ffffff', '#dbe8f7'], shroom: ['#9ef0ff', '#d9a7ff'], spire: ['#5a2433', '#ff8c42'], candy: ['#ff9ad5', '#b28dff', '#ffffff', '#7fd3ff'], palm: ['#fff4dc', '#ff8fb8', '#ffffff', '#e8b56a'], night: ['#2c5c44', '#9ef0a0', '#e8ff6a'], crystal: ['#bff0ff', '#ffffff', '#9fd8ff'] }, DECO0 = DECO[th.tree];
+  const DECO = { round: ['#3f9b37', '#2f7f2a', '#ff5fa2', '#ffd23f'], cactus: ['#b8801f', '#8a5f17', '#6b8f3a'], pine: ['#ffffff', '#dbe8f7'], shroom: ['#9ef0ff', '#d9a7ff'], spire: ['#5a2433', '#ff8c42'], candy: ['#ff9ad5', '#b28dff', '#ffffff', '#7fd3ff'], palm: ['#fff4dc', '#ff8fb8', '#ffffff', '#e8b56a'], night: ['#2c5c44', '#9ef0a0', '#e8ff6a'], crystal: ['#bff0ff', '#ffffff', '#9fd8ff'], autumn: ['#e8742a', '#c94a2a', '#f2b33a'], willow: ['#4f7036', '#8fb06a', '#c9e09a'], tower: ['#bfb8e0', '#ffd23f', '#8a86a8'] }, DECO0 = DECO[th.tree];
   for (const b of L.boxes) {
     const w = b.x1 - b.x0, h = b.y1 - b.y0, d = b.z1 - b.z0, cx = (b.x0 + b.x1) / 2, cy = (b.y0 + b.y1) / 2, cz = (b.z0 + b.z1) / 2;
     let m = null;
@@ -2239,6 +2359,8 @@ function render3D(alpha = 1, dtMs = 16.667) {
       else if (b.type === 'hog') G.bossMesh = hogModel();
       else if (b.type === 'owl') G.bossMesh = owlModel();
       else if (b.type === 'golem') G.bossMesh = golemModel();
+      else if (b.type === 'frog') G.bossMesh = frogModel();
+      else if (b.type === 'storm') G.bossMesh = stormModel();
       else G.bossMesh = crabModel();
       G.world.add(G.bossMesh);
     }
@@ -2271,6 +2393,15 @@ function render3D(alpha = 1, dtMs = 16.667) {
       body.rotation.z = b.state === 'stunned' ? Math.sin(frame * 0.2) * 0.08 : b.state === 'walk' ? Math.sin(frame * 0.18) * 0.05 : 0;
       body.scale.y = b.state === 'leap' && !b.air ? 1 - Math.min(0.15, b.t * 0.3) : 1;
       m.userData.arms.forEach((a, i) => { a.rotation.x = b.state === 'throw' ? -2.7 * Math.min(1, b.t / 0.6) : b.state === 'stunned' ? -0.9 : b.state === 'leap' ? 0.6 : Math.sin(frame * 0.18 + i * Math.PI) * 0.35; });
+    } else if (b.type === 'frog') {
+      m.position.set(b.x, b.y + (b.defeated ? b.h : 0), b.z);
+      m.rotation.set(0, b.yaw, (b.state === 'stunned' ? Math.sin(frame * 0.2) * 0.12 : 0) + (b.defeated ? Math.PI : 0));
+      const body = m.userData.body, sq = b.state === 'crouch' ? Math.min(1, b.t / 0.4) : 0;
+      body.scale.set(1 + sq * 0.15, b.state === 'air' ? 1.15 : 1 - sq * 0.25, 1 + sq * 0.15);
+    } else if (b.type === 'storm') {
+      m.position.set(b.x, b.y + (b.defeated ? b.h : 0), b.z);
+      m.rotation.set(0, b.yaw, (b.state === 'stunned' ? Math.sin(frame * 0.15) * 0.15 : 0) + (b.defeated ? Math.PI : 0));
+      m.userData.body.scale.set(1, b.state === 'stunned' ? 0.8 : 1 + Math.sin(frame * 0.1) * 0.04, 1);
     } else if (b.type === 'crab') {
       m.position.set(b.x, b.y + (b.defeated ? b.h : 0), b.z);
       m.rotation.set(0, b.yaw, b.defeated ? Math.PI : 0);
@@ -2290,6 +2421,16 @@ function render3D(alpha = 1, dtMs = 16.667) {
   for (const s of L.shots) {
     if (!s.mesh) {
       if (s.kind === 'ring') { s.mesh = new THREE.Mesh(G.geo.ring, G.ringMat); s.mesh.rotation.x = Math.PI / 2; }
+      else if (s.kind === 'tongue') {
+        s.mesh = new THREE.Group(); s.mesh.rotation.y = s.yaw;
+        s.tip = mk('box', '#ff6b8a', [0.35, 0.18, 1], [0, 0, 0.5], s.mesh, { emissive: '#5a1020' }); s.ball = mk('sph', '#ff6b8a', [0.3, 0.25, 0.3], [0, 0, 0], s.mesh, { emissive: '#5a1020' });
+        s.warnM = new THREE.Mesh(G.geo.box, mat('#ff4d6d', { transparent: true, opacity: 0.45, emissive: '#7a1020' })); s.warnM.scale.set(0.9, 0.04, 9); s.warnM.position.set(0, -0.85, 4.5); s.mesh.add(s.warnM);
+      }
+      else if (s.kind === 'bolt') {
+        s.mesh = new THREE.Group();
+        s.rg = new THREE.Mesh(G.geo.ring, mat('#ffe066', { emissive: '#8a7a00' })); s.rg.rotation.x = Math.PI / 2; s.rg.position.y = 0.06; s.mesh.add(s.rg);
+        s.beam = mk('cyl', '#fff6a0', [0.3, 9, 0.3], [0, 4.5, 0], s.mesh, { emissive: '#ffe066' }); s.beam.visible = false;
+      }
       else if (s.kind === 'feather') { s.mesh = new THREE.Group(); mk('sph', '#6b5fb0', [0.09, 0.05, 0.38], [0, 0, 0], s.mesh, { emissive: '#2a2050' }); s.mesh.rotation.y = s.yaw; }
       else if (s.kind === 'rock') {
         s.mesh = mk('ico', '#bfeaff', [0.5, 0.5, 0.5], [0, 0, 0], null, { emissive: '#2f6f9a' });
@@ -2303,6 +2444,8 @@ function render3D(alpha = 1, dtMs = 16.667) {
     }
     s.mesh.position.set(s.x, s.kind === 'ring' ? s.y + 0.15 : s.y, s.z);
     if (s.kind === 'ring') s.mesh.scale.set(s.r, s.r, 3);
+    if (s.kind === 'tongue') { const out = s.phase !== 'warn'; s.warnM.visible = !out; s.tip.visible = s.ball.visible = out; s.tip.scale.z = Math.max(0.01, s.len); s.tip.position.z = s.len / 2; s.ball.position.z = s.len; }
+    if (s.kind === 'bolt') { const k = 1.25 * (0.85 + Math.min(1, s.t / s.delay) * 0.15) + Math.sin(frame * 0.6) * 0.05; s.rg.scale.set(k, k, 2); s.beam.visible = s.t >= s.delay; }
   }
   const k = lookKey();
   if (G.bearKey !== k) {
@@ -2360,14 +2503,14 @@ function scr(x, y, z) {
 function draw3(alpha, dtMs) {
   render3D(alpha, dtMs);
   ctx.clearRect(0, 0, VW, VH);
-  for (const p of ambs) { ctx.globalAlpha = 0.85; ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 7); ctx.fill(); }
+  for (const p of ambs) { ctx.globalAlpha = p.streak ? 0.5 : 0.85; if (p.streak) { ctx.strokeStyle = p.color; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x - p.vx * 1.6, p.y - p.vy * 1.6); ctx.stroke(); } else { ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 7); ctx.fill(); } }
   for (const p of parts) { const q = scr(p.x, p.y, p.z); if (!q) continue; ctx.globalAlpha = Math.min(1, p.life / 20); ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(q.x, q.y, p.r, 0, 7); ctx.fill(); }
   ctx.globalAlpha = 1;
   const b = L.boss;
   if (b && b.active && !b.defeated && b.type !== 'mush') {
     const q = scr(b.x, b.y + b.h + 0.9, b.z);
     if (q && b.state === 'stunned') for (let i = 0; i < 3; i++) { const a = frame * 0.12 + i * 2.1; txt('★', q.x + Math.cos(a) * 40, q.y + Math.sin(a) * 9, 22, '#fff27a', 'center'); }
-    if (q && (b.state === 'aim' || b.state === 'raise' || b.state === 'throw')) txt('!', q.x, q.y - 10, 40, '#ff4d6d', 'center');
+    if (q && (b.state === 'aim' || b.state === 'raise' || b.state === 'throw' || (b.state === 'tongue' && b.tg && b.tg.phase === 'warn'))) txt('!', q.x, q.y - 10, 40, '#ff4d6d', 'center');
   }
   if (state === 'play' && banner > 0 && !P.dead) { const q = scr(P.x, P.y + 2.2, P.z); if (q) { ctx.globalAlpha = Math.min(1, banner / 30); txt(save.name, q.x, q.y, 18, '#ffffff', 'center'); ctx.globalAlpha = 1; } }
   if (L.portals) {
