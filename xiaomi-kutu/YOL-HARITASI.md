@@ -70,3 +70,16 @@ Bilgisayar: Windows (PowerShell).
   com.apgsolutionsllc.APGSOLUTIONSLLC0007
 - Toplam kapalı paket: 24 (23 bizim + önceden kapalı YouTube Music). TV kontrolü: Home, YouTube, Netflix,
   Prime Video, Disney+/TOD, sesli arama, Wi-Fi çalışıyor.
+- 9. adım: `pm trim-caches` ile boş depolama 516 MB -> 955 MB. Yeniden başlatma sonrası RAM:
+  kullanılan 1.336 MB -> 1.208 MB, boş 831 MB -> 932 MB. 24 kapalı paket yerinde.
+- YouTube takılması: kullanıcı YouTube'u kaldırıp yeniden yükledi, düzeldi.
+- 11.1: Bu yazılımda (Google TV 11) "İçerik kare hızını eşleştir" yok, atlandı.
+
+## Kalan sıra (kullanıcı kararı)
+
+- [ ] 12. Tarayıcı: TV Bro (kumandaya uygun, açık kaynak). Play Store'da yoksa resmî GitHub sürümü
+      (github.com/truefedex/tv-bro) `adb install` ile.
+- [ ] 13. Projectivy Launcher (Yol 2): Google TV ana ekranı KAPATILMADAN Home tuşunu yönlendirme
+      özelliğiyle. Kumandanın Netflix/YouTube tuşları çalışmaya devam eder.
+- [ ] 14. Çözünürlük kontrolü, kullanılmayan 11 uygulamayı kaldırıp yer açma (kullanıcıya soruldu)
+- [ ] 15. Son: USB hata ayıklamayı kapatmak, son rapor
