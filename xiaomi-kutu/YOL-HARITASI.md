@@ -42,7 +42,7 @@ Bilgisayar: Windows (PowerShell).
       FLauncher kurulur, sonra hem `launcherx` hem `setupwraith` kapatılır. Wi-Fi şifresi bir kez
       yeniden istenir ve kumandanın Netflix/YouTube tuşları çalışmaz hale gelir.
 - [ ] 11. Normal ayarlar: içerik kare hızını eşleştirme, çözünürlük, ekran koruyucu
-- [ ] 12. Yeniden başlatma, son kontrol, ikinci RAM ölçümü
+- [x] 12. Yeniden başlatma, son kontrol, ikinci RAM ölçümü
 
 ## Sonunda elimizde olacaklar
 
@@ -77,9 +77,13 @@ Bilgisayar: Windows (PowerShell).
 
 ## Kalan sıra (kullanıcı kararı)
 
-- [ ] 12. Tarayıcı: TV Bro (kumandaya uygun, açık kaynak). Play Store'da yoksa resmî GitHub sürümü
+- [x] 12. Tarayıcı: TV Bro (kumandaya uygun, açık kaynak). Play Store'da yoksa resmî GitHub sürümü
       (github.com/truefedex/tv-bro) `adb install` ile.
-- [ ] 13. Projectivy Launcher (Yol 2): Google TV ana ekranı KAPATILMADAN Home tuşunu yönlendirme
+- [x] 13. Projectivy Launcher (Yol 2): Google TV ana ekranı KAPATILMADAN Home tuşunu yönlendirme
       özelliğiyle. Kumandanın Netflix/YouTube tuşları çalışmaya devam eder.
 - [ ] 14. Çözünürlük kontrolü, kullanılmayan 11 uygulamayı kaldırıp yer açma (kullanıcıya soruldu)
 - [ ] 15. Son: USB hata ayıklamayı kapatmak, son rapor
+- 12: TV Bro v2.1.6 (geckoExcluded, 6,5 MB, SHA256 doğrulandı) `adb install` ile kuruldu, çalışıyor.
+- 13: Projectivy Launcher (com.spocky.projengmenu) Play Store'dan kuruldu, "Mevcut başlatıcıyı geçersiz kıl"
+  + erişilebilirlik izniyle Home tuşu Projectivy'yi açıyor. YouTube, Netflix ve kumanda kısayol tuşları çalışıyor.
+  Google TV ana ekranı (launcherx) kapatılmadı.
