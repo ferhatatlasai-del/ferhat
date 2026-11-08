@@ -27,11 +27,11 @@ Bilgisayar: Windows (PowerShell).
 ## Adımlar
 
 - [x] 1. Kutuda Geliştirici seçeneklerini açmak
-- [ ] 2. Kutuda USB hata ayıklamayı açmak, IP adresini öğrenmek
-- [ ] 3. Bilgisayara ADB (Google Platform Tools) kurmak
-- [ ] 4. Bilgisayardan kutuya bağlanmak (`adb connect <IP>:5555`, kutuda "İzin ver")
-- [ ] 5. Yedek ve ilk RAM ölçümü, `geri-al.ps1` dosyasını başlatmak
-- [ ] 6. Uygulama listesini çıkarıp gruplara ayırmak, onayınızı almak
+- [x] 2. Kutuda USB hata ayıklamayı açmak, IP adresini öğrenmek
+- [x] 3. Bilgisayara ADB (Google Platform Tools) kurmak
+- [x] 4. Bilgisayardan kutuya bağlanmak (`adb connect <IP>:5555`, kutuda "İzin ver")
+- [x] 5. Yedek ve ilk RAM ölçümü, `geri-al.ps1` dosyasını başlatmak
+- [x] 6. Uygulama listesini çıkarıp gruplara ayırmak, onayınızı almak
       (başlangıç noktası: `KAPATMA-LISTESI.md`, cleanyourtv'nin bu kutu için denenmiş listesi)
       (1) takip/reklam ölçümü, (2) reklam ve öneri servisleri, (3) gereksiz arka plan servisleri,
       (4) hazır gelen uygulamalar, (5) size bağlı olanlar, (6) dokunulmayacaklar
@@ -50,3 +50,15 @@ Bilgisayar: Windows (PowerShell).
 2. Kapatılan uygulamalar listesi ve her birinin ne işe yaradığı
 3. Her şeyi tek seferde geri alan `geri-al.ps1`
 4. Bir şey bozulursa USB hata ayıklamayı kapatma hatırlatması
+
+## İlerleme kaydı
+
+- Kutu: MiTV-AFKR0, yazılım `Xiaomi/jaws/jaws:11/RTT0.211222.001/774`, IP 192.168.1.103
+- İlk ölçüm (önce): Kullanılan RAM 1.336 MB, boş RAM 831 MB (toplam 2,0 GB)
+- Kalacaklar (kullanıcı tercihi): Prime Video, Netflix, YouTube, Google Asistan, Chromecast, Play Oyunlar
+- 1. grup kapatıldı (10 paket): com.miui.tv.analytics, com.xiaomi.statistic, com.google.android.feedback,
+  com.google.android.partnersetup, com.mitv.tvhome.oemtab, com.mitv.tvhome.michannel,
+  com.mitv.tvhome.mitvplus, com.mitv.tvhome.atv, com.xm.webcontent,
+  android.autoinstalls.config.xioami.mibox3. TV kontrolü: Home, YouTube, Netflix, Wi-Fi çalışıyor.
+- 2. grup adayları: com.google.android.marvin.talkback (onaylandı), com.android.printspooler,
+  kullanılmayan üçüncü taraf uygulamalar (kullanıcıya soruldu)
