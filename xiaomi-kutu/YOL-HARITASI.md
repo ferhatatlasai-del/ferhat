@@ -26,7 +26,7 @@ Bilgisayar: Windows (PowerShell).
 
 ## Adımlar
 
-- [ ] 1. Kutuda Geliştirici seçeneklerini açmak
+- [x] 1. Kutuda Geliştirici seçeneklerini açmak
 - [ ] 2. Kutuda USB hata ayıklamayı açmak, IP adresini öğrenmek
 - [ ] 3. Bilgisayara ADB (Google Platform Tools) kurmak
 - [ ] 4. Bilgisayardan kutuya bağlanmak (`adb connect <IP>:5555`, kutuda "İzin ver")
