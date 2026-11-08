@@ -81,9 +81,12 @@ Bilgisayar: Windows (PowerShell).
       (github.com/truefedex/tv-bro) `adb install` ile.
 - [x] 13. Projectivy Launcher (Yol 2): Google TV ana ekranı KAPATILMADAN Home tuşunu yönlendirme
       özelliğiyle. Kumandanın Netflix/YouTube tuşları çalışmaya devam eder.
-- [ ] 14. Çözünürlük kontrolü, kullanılmayan 11 uygulamayı kaldırıp yer açma (kullanıcıya soruldu)
+- [x] 14. Çözünürlük kontrolü, kullanılmayan 11 uygulamayı kaldırıp yer açma (kullanıcıya soruldu)
 - [ ] 15. Son: USB hata ayıklamayı kapatmak, son rapor
 - 12: TV Bro v2.1.6 (geckoExcluded, 6,5 MB, SHA256 doğrulandı) `adb install` ile kuruldu, çalışıyor.
 - 13: Projectivy Launcher (com.spocky.projengmenu) Play Store'dan kuruldu, "Mevcut başlatıcıyı geçersiz kıl"
   + erişilebilirlik izniyle Home tuşu Projectivy'yi açıyor. YouTube, Netflix ve kumanda kısayol tuşları çalışıyor.
   Google TV ana ekranı (launcherx) kapatılmadı.
+- 14: Çözünürlük 1080p 60Hz (TV'nin 4K olup olmadığı soruldu). Kullanıcı onayıyla 11 üçüncü taraf uygulama
+  `adb uninstall` ile kaldırıldı. Boş depolama 544 MB -> 1,5 GB. Kapalı paket: 13. geri-al.ps1 güncellendi.
+- Son rapor: `SON-RAPOR.md`
