@@ -62,3 +62,11 @@ Bilgisayar: Windows (PowerShell).
   android.autoinstalls.config.xioami.mibox3. TV kontrolü: Home, YouTube, Netflix, Wi-Fi çalışıyor.
 - 2. grup adayları: com.google.android.marvin.talkback (onaylandı), com.android.printspooler,
   kullanılmayan üçüncü taraf uygulamalar (kullanıcıya soruldu)
+- 2. grup kapatıldı (2 paket): com.google.android.marvin.talkback, com.android.printspooler
+- Animasyonlar 0.5x yapıldı (window, transition, animator)
+- 3. grup kapatıldı (6 paket, kullanıcının sonradan yüklediği uygulamalar): com.exxen.android, com.mubi,
+  com.bloomberg.btva, com.nvidia.geforcenow, com.valvesoftware.steamlink, com.refuelgames.rally
+- 4. grup kapatıldı (5 paket): dk.logisoft.digger, com.arcelik.chatbot, com.tcl.browser, org.videolan.vlc,
+  com.apgsolutionsllc.APGSOLUTIONSLLC0007
+- Toplam kapalı paket: 24 (23 bizim + önceden kapalı YouTube Music). TV kontrolü: Home, YouTube, Netflix,
+  Prime Video, Disney+/TOD, sesli arama, Wi-Fi çalışıyor.
