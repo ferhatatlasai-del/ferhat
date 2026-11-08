@@ -32,12 +32,15 @@ Bilgisayar: Windows (PowerShell).
 - [ ] 4. Bilgisayardan kutuya bağlanmak (`adb connect <IP>:5555`, kutuda "İzin ver")
 - [ ] 5. Yedek ve ilk RAM ölçümü, `geri-al.ps1` dosyasını başlatmak
 - [ ] 6. Uygulama listesini çıkarıp gruplara ayırmak, onayınızı almak
+      (başlangıç noktası: `KAPATMA-LISTESI.md`, cleanyourtv'nin bu kutu için denenmiş listesi)
       (1) takip/reklam ölçümü, (2) reklam ve öneri servisleri, (3) gereksiz arka plan servisleri,
       (4) hazır gelen uygulamalar, (5) size bağlı olanlar, (6) dokunulmayacaklar
 - [ ] 7. Grupları sırayla kapatmak, her gruptan sonra kontrol
 - [ ] 8. Animasyonları 0,5x yapmak
 - [ ] 9. Önbellekleri temizlemek (`pm trim-caches 999G`)
-- [ ] 10. FLauncher kurmak, varsayılan ana ekran yapmak, sonra Google TV ana ekranını kapatmak
+- [ ] 10. (İsteğe bağlı) Ana ekranı değiştirmek: önce "Yalnızca uygulamalar" modu denenir. Yetmezse
+      FLauncher kurulur, sonra hem `launcherx` hem `setupwraith` kapatılır. Wi-Fi şifresi bir kez
+      yeniden istenir ve kumandanın Netflix/YouTube tuşları çalışmaz hale gelir.
 - [ ] 11. Normal ayarlar: içerik kare hızını eşleştirme, çözünürlük, ekran koruyucu
 - [ ] 12. Yeniden başlatma, son kontrol, ikinci RAM ölçümü
 
