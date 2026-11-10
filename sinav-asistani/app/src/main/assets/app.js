@@ -56,8 +56,10 @@ function fmtDate(ts) {
   return `${p(d.getDate())}.${p(d.getMonth() + 1)}.${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
-/** Modelden gelen SVG'yi güvenli şekilde <img> olarak gösterir (img içinde betik çalışmaz). */
-function figure(svg) {
+/** Soru görselini <img> olarak gösterir (img içinde betik çalışmaz).
+ * q.figure: çizim motorunun tarifi (yeni sınavlar); q.svg: eski sürümle kaydedilmiş sınavlar. */
+function figure(q) {
+  const svg = q.figure ? FIG.render(q.figure) : q.svg;
   if (!svg || !/^\s*<svg[\s>]/i.test(svg) || /<script|<foreignObject|\son\w+=/i.test(svg)) return "";
   const src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg.trim());
   return `<div class="figure"><img alt="Soru görseli" src="${src}"></div>`;
@@ -119,10 +121,10 @@ const SCHEMA = {
       items: {
         type: "object",
         additionalProperties: false,
-        required: ["soru", "svg", "secenekler", "dogru", "cozum", "konu"],
+        required: ["soru", "gorsel", "secenekler", "dogru", "cozum", "konu"],
         properties: {
           soru: { type: "string" },
-          svg: { type: "string", description: "Şekilli soruysa tek parça SVG kodu, değilse boş metin" },
+          gorsel: FIG.SCHEMA,
           secenekler: { type: "array", items: { type: "string" }, description: "Tam olarak 4 seçenek, harf olmadan" },
           dogru: { type: "integer", description: "Doğru seçeneğin sırası, 0-3" },
           cozum: { type: "string", description: "Çocuğun anlayacağı kısa adım adım çözüm" },
@@ -152,8 +154,9 @@ function buildInstructions(f) {
     "- Her soru çoktan seçmeli olsun: tam olarak 4 seçenek, yalnızca biri doğru. Seçeneklerin başına harf yazma.",
     "- Çözümde seçenek harfine (A, B…) atıf yapma; doğru cevabı değeriyle yaz, çünkü seçeneklerin sırası değiştirilecek.",
     "- Soruları konulara dengeli dağıt; işlem, problem, yorum ve görsel soruları karıştır.",
-    "- Uygun sorularda (sayı doğrusu, kesir modeli, geometrik şekil, tablo, grafik, saat, örüntü gibi) 'svg' alanına şekli çiz. SVG kuralları: tek <svg> öğesi, viewBox kullan, genişlik en fazla 400 ve yükseklik en fazla 260, beyaz zemin üzerine koyu çizgiler, yazılar Türkçe ve en az 16 punto, betik, bağlantı ve dış kaynak yok. Şekilsiz sorularda 'svg' boş metin olsun.",
-    "- Şekil soruyu çözmek için gerekiyorsa soruda 'Şekle göre…' gibi ifade kullan; şekil ile soru metni birbiriyle tutarlı olsun.",
+    "- Görseller: Şekli sen çizmiyorsun; 'gorsel' alanında hazır görsel türlerinden birini seçip değerlerini veriyorsun, uygulama ders kitabı düzeninde çiziyor. Türler: sayi_dogrusu, kesir, sutun_grafik, tablo, saat, geometri, aci, kareli_alan, oruntu. Görsel gerçekten soruya katkı sağlıyorsa kullan (matematik ve fen sorularının yaklaşık üçte biri); gerekmiyorsa 'gorsel' null olsun.",
+    "- Görseldeki değerler soru metni ve cevapla birebir tutarlı olsun. Cevabı görselde açık etme: bulunması istenen değeri görselde '?' ile göster.",
+    "- Soru görsele dayanıyorsa metinde 'Yukarıdaki sayı doğrusunda…', 'Tabloya göre…' gibi ifadeler kullan.",
     "- Her sorunun cevabını hesaplayarak kontrol et; cevap anahtarında hata olmasın.",
     "- 'kaynaklar' alanına araştırmada kullandığın sayfaları ekle.",
   ].join("\n");
@@ -196,7 +199,7 @@ function normalizeExam(data) {
     const order = shuffle(choices.map((_, i) => i));
     questions.push({
       text: String(q.soru),
-      svg: String(q.svg || ""),
+      figure: q.gorsel && typeof q.gorsel === "object" && FIG.render(q.gorsel) ? q.gorsel : null,
       choices: order.map((i) => choices[i]),
       correct: order.indexOf(correct),
       explanation: String(q.cozum || ""),
@@ -420,7 +423,7 @@ const SCREENS = {
       <div class="progress"><div style="width:${((state.qi + 1) / total) * 100}%"></div></div>
       <div class="qtext">${state.qi + 1}. ${esc(q.text)}</div>
       <div class="qbody">
-        ${figure(q.svg)}
+        ${figure(q)}
         <div class="choices">
           ${q.choices.map((c, i) => `<button id="c${i}" class="${state.answers[state.qi] === i ? "picked" : ""}" data-act="pick" data-i="${i}"><span class="letter">${letter(i)})</span>${esc(c)}</button>`).join("")}
         </div>
@@ -469,7 +472,7 @@ const SCREENS = {
       return `
         <div class="keyitem focusable" tabindex="0" id="k${n}">
           <div class="qtext">${n + 1}. ${esc(q.text)} ${at ? badge : ""}</div>
-          <div class="qbody">${figure(q.svg)}<div><ol>${opts}</ol></div></div>
+          <div class="qbody">${figure(q)}<div><ol>${opts}</ol></div></div>
           <div class="why"><b>Doğru cevap: ${letter(q.correct)}</b> — ${esc(q.explanation)}</div>
         </div>`;
     }).join("");
