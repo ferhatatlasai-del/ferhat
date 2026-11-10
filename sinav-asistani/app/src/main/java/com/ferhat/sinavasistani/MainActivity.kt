@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.webkit.WebView
@@ -100,6 +101,24 @@ class MainActivity : Activity() {
         @JavascriptInterface
         fun setKey(key: String) {
             prefs.edit().putString("api_key", key.trim()).apply()
+        }
+
+        /** Yazma ekranı açılınca ekran klavyesini göster (yalnızca kullanıcı OK'ye bastığında çağrılır). */
+        @JavascriptInterface
+        fun showKeyboard() {
+            webView.post {
+                webView.requestFocus()
+                val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(webView, InputMethodManager.SHOW_IMPLICIT)
+            }
+        }
+
+        @JavascriptInterface
+        fun hideKeyboard() {
+            webView.post {
+                val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(webView.windowToken, 0)
+            }
         }
 
         @JavascriptInterface

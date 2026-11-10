@@ -131,6 +131,17 @@ code {
 }
 .chip.on { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
 .actions { display: flex; gap: 14px; margin-top: 18px; flex-wrap: wrap; }
+.row .actions { margin-top: 0; }
+button.field {
+  width: 100%;
+  text-align: left;
+  background: var(--panel);
+  border: 2px solid var(--panel-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.actions button.field { width: auto; max-width: 100%; }
 
 /* Bekleme ekranı */
 .center { text-align: center; padding-top: 70px; }

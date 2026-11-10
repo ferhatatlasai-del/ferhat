@@ -424,8 +424,8 @@ const SCREENS = {
       <div class="row"><div class="row-label">Sınav</div>${chips("period", OPTIONS.period, f.period)}</div>
       <div class="row"><div class="row-label">Soru sayısı</div>${chips("count", OPTIONS.count, f.count, (v) => v + " soru")}</div>
       <div class="row"><div class="row-label">Zorluk</div>${chips("level", OPTIONS.level, f.level)}</div>
-      <div class="row"><div class="row-label">Ek istek (isteğe bağlı, klavyedeki mikrofonla söyleyebilirsiniz)</div>
-        <input type="text" id="note" value="${esc(f.note)}" placeholder="Örn: kesirler ağırlıklı olsun, problem sorusu fazla olsun"></div>
+      <div class="row"><div class="row-label">Ek istek (isteğe bağlı)</div>
+        <button class="field" id="note-btn" data-act="edit" data-field="note">✏️ ${f.note.trim() ? esc(f.note) : '<span class="muted">Yok — eklemek için OK\'ye basın</span>'}</button></div>
       <div class="actions">
         <button class="primary" id="make" data-act="make">🚀 Sınavı hazırla</button>
         <button id="back-home" data-act="go" data-to="home">Ana sayfa</button>
@@ -572,13 +572,11 @@ const SCREENS = {
       <div class="top"><h2>⚙️ Ayarlar</h2><button id="set-back" data-act="go" data-to="home">Ana sayfa</button></div>
       <div class="row"><div class="row-label">OpenAI API anahtarı</div>
         <p>${key ? `Kayıtlı ✅ <span class="muted">(${esc(hint)})</span>` : "Kayıtlı değil ❌"}</p>
-        <input type="password" id="key" placeholder="sk-... (kumandayla yazmak yerine bilgisayardan da gönderebilirsiniz)">
-        <div class="actions"><button id="save-key" data-act="save-key">Anahtarı kaydet</button></div>
+        <div class="actions"><button id="key-btn" data-act="edit" data-field="key">🔑 Anahtarı ${key ? "değiştir" : "gir"}</button></div>
         <p class="muted small" style="margin-top:10px">Bilgisayardan göndermek için: <code>adb shell am start -n com.ferhat.sinavasistani/.MainActivity --es api_key "sk-..."</code></p>
       </div>
       <div class="row"><div class="row-label">Model</div>
-        <input type="text" id="model" value="${esc(model())}">
-        <div class="actions"><button id="save-model" data-act="save-model">Modeli kaydet</button></div>
+        <div class="actions"><button class="field" id="model-btn" data-act="edit" data-field="model">🤖 ${esc(model())} <span class="muted">— değiştirmek için OK</span></button></div>
         <p class="muted small" style="margin-top:10px">Varsayılan: ${DEFAULT_MODEL}. Web aramasını destekleyen bir OpenAI modeli olmalı. Daha ucuz bir model (ör. gpt-5.4-mini) token maliyetini düşürür ama soru kalitesi azalabilir.</p>
       </div>
       <div class="row"><div class="row-label">Düşünme seviyesi</div>
@@ -609,7 +607,7 @@ function updateElapsed() {
 /** İlk odaklanacak öğe her ekran için */
 const FIRST_FOCUS = {
   home: "m-new", newExam: "make", loading: "cancel", quiz: "c0", result: "see-key",
-  key: "k0", history: null, detail: "d-solve", settings: "key",
+  key: "k0", history: null, detail: "d-solve", settings: "key-btn", edit: "edit-input",
 };
 
 function render() {
@@ -660,7 +658,6 @@ $app.addEventListener("click", (ev) => {
       break;
     }
     case "make": {
-      state.form.note = (document.getElementById("note") || {}).value || "";
       if (!hasKey()) { state.error = "Önce Ayarlar ekranından OpenAI API anahtarını girin."; render(); break; }
       startGeneration();
       break;
@@ -683,26 +680,94 @@ $app.addEventListener("click", (ev) => {
       go("history");
       break;
     }
-    case "save-key": {
-      const v = (document.getElementById("key").value || "").trim();
-      state.error = v ? "" : "Anahtar boş olamaz.";
-      if (v) bridge().setKey(v);
-      render();
+    case "edit": openEdit(el.dataset.field, el.id); break;
+    case "edit-ok": commitEdit(); break;
+    case "edit-clear": {
+      const inp = document.getElementById("edit-input");
+      if (inp) inp.value = "";
+      commitEdit();
       break;
     }
+    case "edit-cancel": closeEdit(); break;
     case "clear-topics": {
       try { localStorage.removeItem(TOPIC_KEY); } catch (e) { /* yoksay */ }
       state.error = "Konu hafızası temizlendi. Sonraki sınavlarda konular yeniden araştırılacak.";
       render();
       break;
     }
-    case "save-model": {
-      const v = (document.getElementById("model").value || "").trim();
-      bridge().setModel(v || DEFAULT_MODEL);
-      state.error = "Model kaydedildi: " + (v || DEFAULT_MODEL);
-      render();
-      break;
-    }
+  }
+});
+
+/* ---------- Yazı girişi (klavye yalnızca OK'ye basınca açılır) ---------- */
+
+const EDIT_FIELDS = {
+  note: {
+    title: "✏️ Ek istek",
+    help: "Sınava özel isteğinizi yazın ya da klavyedeki mikrofonla söyleyin. Örn: kesirler ağırlıklı olsun, problem sorusu fazla olsun, geometri olmasın.",
+    type: "text", clearable: true, returnTo: "newExam",
+    get: () => state.form.note,
+    set: (v) => { state.form.note = v; },
+  },
+  key: {
+    title: "🔑 OpenAI API anahtarı",
+    help: "sk- ile başlayan anahtarı yazın. Uzun olduğu için bilgisayardan göndermek daha kolaydır (Ayarlar'daki komut).",
+    type: "password", clearable: false, returnTo: "settings",
+    get: () => "",
+    set: (v) => { if (v) { bridge().setKey(v); state.error = "Anahtar kaydedildi."; } },
+  },
+  model: {
+    title: "🤖 Model",
+    help: `OpenAI model adını tam olarak yazın (ör. gpt-5.4-mini). Boş bırakırsanız varsayılan (${DEFAULT_MODEL}) kullanılır.`,
+    type: "text", clearable: false, returnTo: "settings",
+    get: () => model(),
+    set: (v) => { bridge().setModel(v || DEFAULT_MODEL); state.error = "Model kaydedildi: " + (v || DEFAULT_MODEL); },
+  },
+};
+
+function openEdit(field, fromId) {
+  const def = EDIT_FIELDS[field];
+  if (!def) return;
+  state.edit = { field, fromId };
+  go("edit");
+  if (bridge() && bridge().showKeyboard) bridge().showKeyboard();
+}
+
+function closeEdit() {
+  const e = state.edit;
+  if (bridge() && bridge().hideKeyboard) bridge().hideKeyboard();
+  state.edit = null;
+  state.focusId = e ? e.fromId : null;
+  go(e ? EDIT_FIELDS[e.field].returnTo : "home");
+}
+
+function commitEdit() {
+  const e = state.edit;
+  if (!e) return;
+  const inp = document.getElementById("edit-input");
+  EDIT_FIELDS[e.field].set(((inp && inp.value) || "").trim());
+  closeEdit();
+}
+
+SCREENS.edit = function () {
+  const e = state.edit;
+  const def = EDIT_FIELDS[e.field];
+  return `
+    <div class="top"><h2>${esc(def.title)}</h2></div>
+    <p class="muted">${esc(def.help)}</p>
+    <input type="${def.type}" id="edit-input" value="${esc(def.get())}" autocomplete="off">
+    <div class="actions">
+      <button class="primary" id="edit-ok" data-act="edit-ok">✔ Tamam</button>
+      ${def.clearable ? `<button id="edit-clear" data-act="edit-clear">🧹 Temizle</button>` : ""}
+      <button id="edit-cancel" data-act="edit-cancel">Vazgeç</button>
+    </div>
+    <p class="muted small" style="margin-top:12px">Klavyeyi kapatmak için Geri tuşu, kaydetmek için Tamam.</p>`;
+};
+
+// Klavyedeki "Bitti / Enter" tuşu kaydeder.
+$app.addEventListener("keydown", (ev) => {
+  if (ev.target && ev.target.id === "edit-input" && ev.key === "Enter") {
+    ev.preventDefault();
+    commitEdit();
   }
 });
 
@@ -765,6 +830,7 @@ window.handleBack = function () {
   if (s === "home") return false;
   if (s === "loading") { cancelGeneration(); return true; }
   if (s === "quiz" && state.confirmFinish) { state.confirmFinish = false; render(); return true; }
+  if (s === "edit") { closeEdit(); return true; }
   const back = { newExam: "home", quiz: "home", result: "home", key: state.keyFrom, history: "home", detail: "history", settings: "home" };
   state.error = "";
   go(back[s] || "home");
