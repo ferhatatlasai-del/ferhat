@@ -4,6 +4,11 @@
 "use strict";
 
 const DEFAULT_MODEL = "gpt-5.5";
+const MODELS = [
+  { id: "gpt-5.5", label: "GPT-5.5 · en iyi, pahalı" },
+  { id: "gpt-5.4-mini", label: "GPT-5.4 mini · önerilen, ucuz" },
+  { id: "gpt-5.4-nano", label: "GPT-5.4 nano · en ucuz" },
+];
 const POLL_MS = 4000;
 const MAX_WAIT_MS = 12 * 60 * 1000;
 const STORE_KEY = "sinavlar";
@@ -576,8 +581,11 @@ const SCREENS = {
         <p class="muted small" style="margin-top:10px">Bilgisayardan göndermek için: <code>adb shell am start -n com.ferhat.sinavasistani/.MainActivity --es api_key "sk-..."</code></p>
       </div>
       <div class="row"><div class="row-label">Model</div>
-        <div class="actions"><button class="field" id="model-btn" data-act="edit" data-field="model">🤖 ${esc(model())} <span class="muted">— değiştirmek için OK</span></button></div>
-        <p class="muted small" style="margin-top:10px">Varsayılan: ${DEFAULT_MODEL}. Web aramasını destekleyen bir OpenAI modeli olmalı. Daha ucuz bir model (ör. gpt-5.4-mini) token maliyetini düşürür ama soru kalitesi azalabilir.</p>
+        <div class="chips">
+          ${MODELS.map((m) => `<button class="chip ${m.id === model() ? "on" : ""}" id="opt-model-${m.id}" data-act="opt" data-name="model" data-value="${m.id}">${esc(m.label)}</button>`).join("")}
+          <button class="chip ${MODELS.some((m) => m.id === model()) ? "" : "on"}" id="model-btn" data-act="edit" data-field="model">${MODELS.some((m) => m.id === model()) ? "Diğer…" : "Diğer: " + esc(model())}</button>
+        </div>
+        <p class="muted small" style="margin-top:10px">Seçili: <b>${esc(model())}</b>. Ucuz modeller token maliyetini düşürür ama soru kalitesi azalabilir; cevap anahtarını ara sıra kontrol edin. Listede olmayan bir model için "Diğer…".</p>
       </div>
       <div class="row"><div class="row-label">Düşünme seviyesi</div>
         ${chips("effort", ["low", "medium"], prefs().effort, (v) => (v === "low" ? "Düşük (tasarruflu, önerilen)" : "Orta (daha dikkatli, daha çok token)"))}
@@ -652,6 +660,7 @@ $app.addEventListener("click", (ev) => {
       const name = el.dataset.name;
       const raw = el.dataset.value;
       if (name === "effort") setPrefs({ effort: raw === "medium" ? "medium" : "low" });
+      else if (name === "model") { bridge().setModel(raw); state.error = ""; }
       else state.form[name] = typeof OPTIONS[name][0] === "number" ? Number(raw) : raw;
       state.focusId = el.id;
       render();
