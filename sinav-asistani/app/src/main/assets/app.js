@@ -7,6 +7,29 @@ const DEFAULT_MODEL = "gpt-5.5";
 const POLL_MS = 4000;
 const MAX_WAIT_MS = 12 * 60 * 1000;
 const STORE_KEY = "sinavlar";
+const TOPIC_KEY = "konu_hafizasi";   // sınıf+ders+dönem için bulunan konular (yeniden aramamak için)
+const PREF_KEY = "tercihler";        // düşünme seviyesi, toplam kullanım
+
+function prefs() {
+  try { return Object.assign({ effort: "low", totalIn: 0, totalOut: 0 }, JSON.parse(localStorage.getItem(PREF_KEY) || "{}")); }
+  catch (e) { return { effort: "low", totalIn: 0, totalOut: 0 }; }
+}
+function setPrefs(p) { try { localStorage.setItem(PREF_KEY, JSON.stringify(Object.assign(prefs(), p))); } catch (e) { /* yoksay */ } }
+
+function topicKey(f) { return [f.grade, f.subject, f.period, schoolYear()].join("|"); }
+function loadTopics(f) {
+  try { return (JSON.parse(localStorage.getItem(TOPIC_KEY) || "{}"))[topicKey(f)] || null; } catch (e) { return null; }
+}
+function saveTopics(f, konular, kaynaklar) {
+  if (!konular || !konular.length) return;
+  try {
+    const all = JSON.parse(localStorage.getItem(TOPIC_KEY) || "{}");
+    all[topicKey(f)] = { konular, kaynaklar: kaynaklar || [], date: Date.now() };
+    localStorage.setItem(TOPIC_KEY, JSON.stringify(all));
+  } catch (e) { /* yoksay */ }
+}
+function topicCount() { try { return Object.keys(JSON.parse(localStorage.getItem(TOPIC_KEY) || "{}")).length; } catch (e) { return 0; } }
+const nf = (n) => Number(n || 0).toLocaleString("tr-TR");
 
 const OPTIONS = {
   grade: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
@@ -144,11 +167,14 @@ const SCHEMA = {
   },
 };
 
-function buildInstructions(f) {
+function buildInstructions(f, known) {
+  const research = known
+    ? `Bu sınav için konular daha önce MEB kaynaklarından araştırıldı, internette arama yapma. Sorumlu olunan konular: ${known.konular.join("; ")}. 'konular' alanına bu listeyi, 'kaynaklar' alanına boş liste yaz.`
+    : "Önce web aramasıyla bu sınıf, ders ve sınav dönemi için MEB'in güncel öğretim programını (Türkiye Yüzyılı Maarif Modeli uygulanan sınıflarda o programı) ve bu yazılıda sorumlu olunan konuları doğrula. En fazla 2-3 arama yap; MEB ve ölçme değerlendirme merkezlerini tercih et. Örnek yazılı soruları fikir almak için kullanabilirsin ama birebir kopyalama. 'konular' alanına bu yazılıda sorumlu olunan konuların tam listesini yaz (sonraki sınavlarda tekrar kullanılacak).";
   return [
     "Sen Türkiye'de görev yapan deneyimli bir öğretmensin. Evde çalışan bir öğrenci için, okuldaki yazılı sınava hazırlanmasını sağlayacak bir deneme sınavı hazırlıyorsun.",
     `Bugünün tarihi: ${new Date().toLocaleDateString("tr-TR")}. Eğitim-öğretim yılı: ${schoolYear()}.`,
-    "Önce web aramasıyla bu sınıf, ders ve sınav dönemi için MEB'in güncel öğretim programını (Türkiye Yüzyılı Maarif Modeli uygulanan sınıflarda o programı) ve bu yazılıda sorumlu olunan konuları doğrula. MEB, ölçme değerlendirme merkezleri ve güvenilir eğitim sitelerini tercih et; örnek yazılı soruları fikir almak için kullanabilirsin ama soruları birebir kopyalama.",
+    research,
     "Kurallar:",
     "- Tüm metinler Türkçe ve öğrencinin yaşına uygun, açık ve kısa olsun.",
     "- Her soru çoktan seçmeli olsun: tam olarak 4 seçenek, yalnızca biri doğru. Seçeneklerin başına harf yazma.",
@@ -158,6 +184,7 @@ function buildInstructions(f) {
     "- Görseldeki değerler soru metni ve cevapla birebir tutarlı olsun. Cevabı görselde açık etme: bulunması istenen değeri görselde '?' ile göster.",
     "- Soru görsele dayanıyorsa metinde 'Yukarıdaki sayı doğrusunda…', 'Tabloya göre…' gibi ifadeler kullan.",
     "- Her sorunun cevabını hesaplayarak kontrol et; cevap anahtarında hata olmasın.",
+    "- 'cozum' en fazla 2 kısa cümle olsun.",
     "- 'kaynaklar' alanına araştırmada kullandığın sayfaları ekle.",
   ].join("\n");
 }
@@ -219,17 +246,23 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function generateExam(f) {
   const job = state.job;
+  const known = loadTopics(f);
+  job.searching = !known;
   const body = {
     model: model(),
     background: true,
     store: true,
-    reasoning: { effort: "medium" },
-    tools: [{ type: "web_search" }],
-    instructions: buildInstructions(f),
+    reasoning: { effort: prefs().effort },
+    instructions: buildInstructions(f, known),
     input: buildInput(f),
     max_output_tokens: 40000,
     text: { format: { type: "json_schema", name: "sinav", strict: true, schema: SCHEMA } },
   };
+  if (!known) {
+    // Konular ilk kez araştırılıyor: arama sonuçlarını kısa tut, arama sayısını sınırla.
+    body.tools = [{ type: "web_search", search_context_size: "low" }];
+    body.max_tool_calls = 4;
+  }
 
   let res = await api("POST", "/responses", body);
   if (res.code === 400 && /background/i.test(res.body)) {
@@ -273,7 +306,24 @@ async function generateExam(f) {
   const text = outputText(resp);
   let data;
   try { data = JSON.parse(text); } catch (e) { throw new Error("Modelin cevabı okunamadı. Lütfen tekrar deneyin."); }
-  return normalizeExam(data);
+  const exam = normalizeExam(data);
+  if (!known) saveTopics(f, exam.topics, exam.sources);
+  else if (!exam.sources.length) exam.sources = known.kaynaklar || [];
+  const u = resp.usage || {};
+  exam.usage = {
+    input: u.input_tokens || 0,
+    output: u.output_tokens || 0,
+    reasoning: (u.output_tokens_details || {}).reasoning_tokens || 0,
+    searched: !known,
+  };
+  const p = prefs();
+  setPrefs({ totalIn: p.totalIn + exam.usage.input, totalOut: p.totalOut + exam.usage.output });
+  return exam;
+}
+
+function usageText(u) {
+  if (!u) return "";
+  return `Kullanım: ${nf(u.input)} giriş + ${nf(u.output)} çıkış token${u.searched ? " · internette araştırıldı" : " · kayıtlı konular kullanıldı"}`;
 }
 
 async function startGeneration() {
@@ -386,7 +436,8 @@ const SCREENS = {
   loading() {
     const job = state.job || {};
     const f = state.form;
-    const phase = job.status === "queued" ? "Sıraya alındı, birazdan başlayacak…" : "İnternette araştırıyor ve soruları yazıyor…";
+    const phase = job.status === "queued" ? "Sıraya alındı, birazdan başlayacak…"
+      : job.searching ? "Konuları internette araştırıyor ve soruları yazıyor…" : "Kayıtlı konularla soruları yazıyor (internet araması yok)…";
     return `
       <div class="center">
         <div class="spinner"></div>
@@ -505,6 +556,7 @@ const SCREENS = {
       <p>${esc(rec.params.grade)}. sınıf ${esc(rec.params.subject)} · ${esc(rec.params.period)} · ${rec.exam.questions.length} soru · ${esc(rec.params.level)}</p>
       ${rec.exam.topics.length ? `<p class="muted">Konular: ${rec.exam.topics.map(esc).join(", ")}</p>` : ""}
       <p class="muted">${at.length ? "Denemeler: " + at.map((a) => `${a.correct}/${a.total}`).join(", ") : "Henüz çözülmedi."}</p>
+      ${rec.exam.usage ? `<p class="muted small">${esc(usageText(rec.exam.usage))}</p>` : ""}
       <div class="actions">
         <button class="primary" id="d-solve" data-act="solve">▶ Çöz</button>
         <button id="d-key" data-act="key-detail">📋 Cevap anahtarı</button>
@@ -527,7 +579,17 @@ const SCREENS = {
       <div class="row"><div class="row-label">Model</div>
         <input type="text" id="model" value="${esc(model())}">
         <div class="actions"><button id="save-model" data-act="save-model">Modeli kaydet</button></div>
-        <p class="muted small" style="margin-top:10px">Varsayılan: ${DEFAULT_MODEL}. Web aramasını destekleyen bir OpenAI modeli olmalı.</p>
+        <p class="muted small" style="margin-top:10px">Varsayılan: ${DEFAULT_MODEL}. Web aramasını destekleyen bir OpenAI modeli olmalı. Daha ucuz bir model (ör. gpt-5.4-mini) token maliyetini düşürür ama soru kalitesi azalabilir.</p>
+      </div>
+      <div class="row"><div class="row-label">Düşünme seviyesi</div>
+        ${chips("effort", ["low", "medium"], prefs().effort, (v) => (v === "low" ? "Düşük (tasarruflu, önerilen)" : "Orta (daha dikkatli, daha çok token)"))}
+      </div>
+      <div class="row"><div class="row-label">Konu hafızası</div>
+        <p class="muted small">Bir sınıf-ders-dönem için konular bir kez internetten araştırılır, sonraki sınavlarda internet araması yapılmaz. Şu an ${topicCount()} kayıt var.</p>
+        <div class="actions"><button id="clear-topics" data-act="clear-topics">Konu hafızasını temizle</button></div>
+      </div>
+      <div class="row"><div class="row-label">Toplam kullanım (bu cihaz)</div>
+        <p class="muted small">${nf(prefs().totalIn)} giriş + ${nf(prefs().totalOut)} çıkış token</p>
       </div>
       ${state.error ? `<div class="notice">${esc(state.error)}</div>` : ""}`;
   },
@@ -591,7 +653,8 @@ $app.addEventListener("click", (ev) => {
     case "opt": {
       const name = el.dataset.name;
       const raw = el.dataset.value;
-      state.form[name] = typeof OPTIONS[name][0] === "number" ? Number(raw) : raw;
+      if (name === "effort") setPrefs({ effort: raw === "medium" ? "medium" : "low" });
+      else state.form[name] = typeof OPTIONS[name][0] === "number" ? Number(raw) : raw;
       state.focusId = el.id;
       render();
       break;
@@ -624,6 +687,12 @@ $app.addEventListener("click", (ev) => {
       const v = (document.getElementById("key").value || "").trim();
       state.error = v ? "" : "Anahtar boş olamaz.";
       if (v) bridge().setKey(v);
+      render();
+      break;
+    }
+    case "clear-topics": {
+      try { localStorage.removeItem(TOPIC_KEY); } catch (e) { /* yoksay */ }
+      state.error = "Konu hafızası temizlendi. Sonraki sınavlarda konular yeniden araştırılacak.";
       render();
       break;
     }
