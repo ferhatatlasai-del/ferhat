@@ -137,7 +137,29 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 .tb.on { background: color-mix(in srgb, var(--honey) 70%, transparent); }
 #setBtn { position: fixed; z-index: 5; top: calc(10px + env(safe-area-inset-top, 0px)); right: calc(max(12px, env(safe-area-inset-right, 0px)) + 52px);
   width: 42px; height: 42px; border-radius: 12px; border: 3px solid var(--bark); background: var(--cream); color: var(--bark); font-family: var(--display); font-size: 1.25rem; cursor: pointer; }
-#pSettings, #pQuests, #pMap { z-index: 7; }
+#pSettings, #pQuests, #pMap, #pNet { z-index: 7; }
+#netBtn { position: fixed; z-index: 5; top: calc(10px + env(safe-area-inset-top, 0px)); right: calc(max(12px, env(safe-area-inset-right, 0px)) + 208px);
+  width: 42px; height: 42px; border-radius: 12px; border: 3px solid var(--bark); background: var(--cream); color: var(--bark); font-family: var(--display); font-size: 1.15rem; cursor: pointer; }
+#netBtn:focus-visible { outline: 3px solid var(--leaf); outline-offset: 2px; }
+#netBtn.live { background: #c9f2c0; }
+.net { display: grid; gap: 12px; text-align: left; max-height: min(64vh, 34rem); overflow-y: auto; padding-right: 4px; }
+.net h3 { margin: 0; font-family: var(--display); color: var(--honey-deep); font-size: 1.15rem; }
+.net .box { border: 3px solid #e3d3b8; border-radius: 14px; padding: 10px 12px; display: grid; gap: 8px; }
+.net .fr { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; }
+.net .fr2 { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.net input { font-family: var(--display); font-size: 1rem; color: var(--bark); background: #fff; border: 3px solid var(--bark); border-radius: 10px; padding: 4px 8px; min-width: 0; box-sizing: border-box; }
+.net input:focus-visible { outline: 3px solid var(--leaf); outline-offset: 2px; }
+.net .btn { padding: 6px 12px; font-size: .95rem; }
+.net .who2 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.net .who2 b { flex: 1 1 8rem; min-width: 0; overflow-wrap: anywhere; }
+.net .who2 small { opacity: .75; }
+.net .dot2 { width: 10px; height: 10px; border-radius: 50%; background: #bbb; flex: none; }
+.net .dot2.on { background: #3fae4a; }
+.net .msg { font-weight: 800; color: #b5452f; min-height: 1.2em; }
+.net .msg.ok { color: #2f7f2a; }
+.net .code { font-family: var(--display); font-size: 1.4rem; letter-spacing: .12em; color: var(--bark); }
+#nameErr { color: #b5452f; font-weight: 800; margin: 4px 0 0; }
+@media (max-width: 520px) { .net .fr { grid-template-columns: 1fr 1fr; } .net .fr .btn { grid-column: 1 / -1; } }
 #mapBtn { position: fixed; z-index: 5; top: calc(10px + env(safe-area-inset-top, 0px)); right: calc(max(12px, env(safe-area-inset-right, 0px)) + 156px);
   width: 42px; height: 42px; border-radius: 12px; border: 3px solid var(--bark); background: var(--cream); color: var(--bark); font-family: var(--display); font-size: 1.15rem; cursor: pointer; }
 #mapBtn:focus-visible { outline: 3px solid var(--leaf); outline-offset: 2px; }
@@ -190,6 +212,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <button id="pauseBtn" type="button" aria-label="Duraklat" hidden>II</button>
 <button id="setBtn" type="button" aria-label="Ayarlar">&#9881;&#xFE0E;</button>
+<button id="netBtn" type="button" aria-label="Birlikte oyna (O)">&#128101;&#xFE0E;</button>
 <button id="mapBtn" type="button" aria-label="Harita (H)">&#128506;&#xFE0E;</button>
 <button id="questBtn" type="button" aria-label="Görevler">&#128220;<span class="dot" id="questDot" hidden></span></button>
 
@@ -208,7 +231,8 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
     <p>Ayımızın balları on iki bölgeye dağılmış. Bal Köyü'ndeki portallardan bölgelere git, bal ve bozuk para topla, sekiz boss'u yen!</p>
     <div class="who">
       <label for="nameInput">Ayının adı</label>
-      <input id="nameInput" type="text" maxlength="14" autocomplete="off" spellcheck="false" placeholder="Pofuduk">
+      <input id="nameInput" type="text" maxlength="14" autocomplete="off" spellcheck="false" placeholder="Adını yaz" aria-describedby="nameErr" required>
+      <p id="nameErr" role="alert" hidden>Oynamak için ayına bir ad ver.</p>
       <div class="pick" role="radiogroup" aria-label="Karakter seç">
         <button type="button" class="pk" id="pickBoy" role="radio" aria-checked="true" data-g="boy"><canvas width="144" height="144" aria-hidden="true"></canvas><span>Erkek</span></button>
         <button type="button" class="pk" id="pickGirl" role="radio" aria-checked="false" data-g="girl"><canvas width="144" height="144" aria-hidden="true"></canvas><span>Kız</span></button>
@@ -277,6 +301,35 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
       <button class="btn" id="smithBuy" type="button"></button>
       <button class="btn primary" id="smithClose" type="button">Kapat</button>
     </div>
+  </div>
+</div>
+
+<div class="panel" id="pNet" hidden>
+  <div class="card wide">
+    <h2>Birlikte Oyna</h2>
+    <div class="net">
+      <div class="box" id="netOut">
+        <h3>Oda kur</h3>
+        <div class="fr"><input id="nRoomC" maxlength="20" placeholder="Oda adı" aria-label="Kurulacak odanın adı" autocomplete="off"><input id="nPassC" maxlength="20" placeholder="Şifre" aria-label="Odanın şifresi" autocomplete="off"><button class="btn primary" id="nCreate" type="button">Kur</button></div>
+        <h3>Odaya katıl</h3>
+        <div class="fr"><input id="nRoomJ" maxlength="20" placeholder="Oda adı" aria-label="Katılınacak odanın adı" autocomplete="off"><input id="nPassJ" maxlength="20" placeholder="Şifre" aria-label="Odanın şifresi" autocomplete="off"><button class="btn primary" id="nJoin" type="button">Katıl</button></div>
+      </div>
+      <div class="box" id="netIn" hidden>
+        <h3 id="nRoomTitle">Oda</h3>
+        <div id="nPlayers" class="net"></div>
+        <div class="fr2"><input id="nInvite" readonly aria-label="Davet yazısı"><button class="btn" id="nShare" type="button">WhatsApp'ta davet et</button></div>
+        <button class="btn alt" id="nLeave" type="button">Odadan çık</button>
+      </div>
+      <p class="msg" id="nMsg" role="status"></p>
+      <div class="box">
+        <h3>Arkadaşlarım</h3>
+        <div>Senin arkadaş kodun: <span class="code" id="nMyCode"></span></div>
+        <div class="fr2"><input id="nFriendCode" maxlength="6" placeholder="Arkadaşının kodu" aria-label="Arkadaşının kodu" autocomplete="off"><button class="btn" id="nAddFriend" type="button">Arkadaş ekle</button></div>
+        <div id="nFriends"></div>
+      </div>
+      <p class="small">Aynı oda adını ve şifreyi yazan herkes aynı odada buluşur. Bir bölgeye girdiğinizde o bölgede birbirinizi görürsünüz.</p>
+    </div>
+    <button class="btn primary" id="netClose" type="button">Kapat</button>
   </div>
 </div>
 
@@ -552,6 +605,8 @@ addEventListener('keydown', e => {
   if (!pQuest.hidden) { if (e.code === 'Escape' || e.code === 'KeyG') closeQuests(); return; }
   if (e.code === 'KeyG' && splashDone) { openQuests(); return; }
   if (!pMap.hidden) { if (e.code === 'Escape' || e.code === 'KeyH') closeMap(); return; }
+  if (!pNet.hidden) { if (e.code === 'Escape' || e.code === 'KeyO') closeNet(); return; }
+  if (e.code === 'KeyO' && splashDone && (state === 'play' || state === 'pause')) { openNet(); return; }
   if (e.code === 'KeyH' && splashDone && (state === 'play' || state === 'pause')) { openMap(); return; }
   if (!pSmith.hidden) { if (e.code === 'Escape') closeSmith(); return; }
   if (!pShop.hidden) { if (e.code === 'Escape') closeShop(); return; }
@@ -810,6 +865,7 @@ function drawHeart(x, y, full) {
   if (full) { ctx.fillStyle = 'rgba(255,255,255,0.75)'; ctx.beginPath(); ctx.ellipse(x - 5.5, y - 2.5, 2.4, 1.6, -0.6, 0, 7); ctx.fill(); }
 }
 function drawHud() {
+  drawRemoteTags();
   for (let i = 0; i < save.maxHp; i++) drawHeart(30 + i * 34, 28, i < P.hp);
   let hx = 30 + save.maxHp * 34 + 4;
   drawHoneyJar(hx, 33, 1.15); txt('' + honey, hx + 16, 42, 26); hx += 70;
@@ -2788,6 +2844,7 @@ function render3D(alpha = 1, dtMs = 16.667) {
   const gy = P.dead ? null : groundBelow(PX, PZ, PY);
   G.blob.visible = gy !== null;
   if (gy !== null) { G.blob.position.set(PX, gy + 0.03, PZ); G.blob.scale.setScalar(Math.max(0.15, 0.45 - (PY - gy) * 0.04)); G.blob.scale.y = 0.02; }
+  drawRemote(dtMs);
   G.r.render(G.scene, G.cam);
 }
 function scr(x, y, z) {
@@ -2870,6 +2927,7 @@ function genitive(n) { // Turkish possessive suffix: Ali'nin, Mert'in, Pofuduk'u
 }
 const nameInput = $('nameInput');
 function cleanName() { return nameInput.value.trim().replace(/\s+/g, ' ').slice(0, 14) || 'Pofuduk'; }
+const typedName = () => nameInput.value.trim().replace(/\s+/g, ' ').slice(0, 14);
 function refreshWho() {
   $('titleName').textContent = genitive(cleanName()) + ' Bal Macerası';
   document.querySelectorAll('.pk').forEach(b => {
@@ -2878,7 +2936,7 @@ function refreshWho() {
   });
 }
 nameInput.value = save.name === 'Pofuduk' ? '' : save.name;
-nameInput.addEventListener('input', refreshWho);
+nameInput.addEventListener('input', () => { refreshWho(); if (typedName()) $('nameErr').hidden = true; });
 nameInput.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') $('startBtn').click(); });
 document.querySelectorAll('.pk').forEach(b => b.onclick = () => { save.gender = b.dataset.g; refreshWho(); saveGame(); });
 refreshWho();
@@ -3050,6 +3108,243 @@ function openMap() {
 function closeMap() { pMap.hidden = true; if (mapPaused) { mapPaused = false; state = 'play'; } }
 $('mapBtn').onclick = () => { if (pMap.hidden) openMap(); else closeMap(); };
 $('mapClose').onclick = closeMap;
+/* ---------- multiplayer: rooms with a password, friends ---------- */
+// Inside claude.ai the page uses the artifact's live room; a downloaded copy uses PeerJS (WebRTC),
+// with the room creator's browser as the host that checks the password and relays everyone's moves.
+const PEER_LIB = 'https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js';
+const CODE_CH = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+if (!save.code) { save.code = Array.from({ length: 6 }, () => CODE_CH[Math.floor(Math.random() * CODE_CH.length)]).join(''); saveGame(); }
+save.friends = Array.isArray(save.friends) ? save.friends : [];
+const net = { on: false, mode: null, room: '', host: false, me: null, players: new Map(), lobby: null, lobbyTried: false, timer: 0, peer: null, conns: new Set(), conn: null, nroom: null, unsub: [] };
+const slug = t => t.toLowerCase().replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 24);
+const hash36 = t => { let h = 2166136261; for (const ch of t) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619) >>> 0; } return h.toString(36); };
+const clip = (v, n) => String(v == null ? '' : v).replace(/[\u0000-\u001f\u007f-\u009f​-‏‪-‮⁦-⁩]/g, '').slice(0, n);
+const num = (v, lim = 1e4) => { v = +v; return Number.isFinite(v) ? Math.max(-lim, Math.min(lim, v)) : 0; };
+const lvKey = () => !L ? '' : L.hub ? 'hub' : L.tut ? 'tut' : 'L' + lvlIdx;
+const lvName = k => k === 'hub' ? 'Bal Köyü' : k === 'tut' ? 'Öğretici' : /^L\d+$/.test(k) && LEVELS[+k.slice(1)] ? `${+k.slice(1) + 1}. ${LEVELS[+k.slice(1)].name}` : 'Menüde';
+function myState() {
+  const r2 = v => Math.round(v * 100) / 100;
+  return { n: save.name, c: save.code, lv: state === 'title' ? '' : lvKey(), x: P ? r2(P.x) : 0, y: P ? r2(P.y) : 0, z: P ? r2(P.z) : 0, yw: P ? r2(P.yaw) : 0,
+    sp: P ? r2(Math.hypot(P.vx, P.vz)) : 0, air: P ? (P.onGround ? 0 : 1) : 0, fl: P ? Math.round(P.spin || 0) : 0, at: P && P.atkT > 0 ? 1 : 0,
+    g: save.gender, s: save.species, o: save.outfit, a: save.axe };
+}
+// remote players: keep only well-formed values
+function takePlayer(id, st) {
+  if (!st || typeof st !== 'object') return;
+  const old = net.players.get(id) || { id };
+  const p = Object.assign(old, { n: clip(st.n, 14) || 'Ayı', c: clip(st.c, 6).toUpperCase(), lv: clip(st.lv, 8), x: num(st.x), y: num(st.y), z: num(st.z), yw: num(st.yw, 100),
+    sp: num(st.sp, 40), air: !!st.air, fl: num(st.fl, 60), at: !!st.at, g: st.g === 'girl' ? 'girl' : 'boy', s: clip(st.s, 12), o: clip(st.o, 12), a: Math.max(0, Math.min(AXES.length - 1, Math.round(num(st.a, 9)))), seen: Date.now() });
+  if (!SPECIES[p.s]) p.s = 'brown';
+  net.players.set(id, p);
+  const f = save.friends.find(f => f.code === p.c); if (f && f.name !== p.n) { f.name = p.n; saveGame(); }
+  if (p.rx === undefined) { p.rx = p.x; p.ry = p.y; p.rz = p.z; p.ryw = p.yw; p.ph = 0; }
+}
+function dropPlayer(id) { const p = net.players.get(id); if (p && p.mesh) G.scene.remove(p.mesh); net.players.delete(id); }
+function netMsg(t, ok) { const m = $('nMsg'); m.textContent = t; m.className = 'msg' + (ok ? ' ok' : ''); }
+function netReset() {
+  clearInterval(net.timer); net.unsub.forEach(u => { try { u(); } catch (e) {} }); net.unsub = [];
+  for (const id of [...net.players.keys()]) dropPlayer(id);
+  try { if (net.nroom) net.nroom.leave(); } catch (e) {}
+  try { if (net.peer) net.peer.destroy(); } catch (e) {}
+  Object.assign(net, { on: false, mode: null, room: '', host: false, peer: null, conn: null, nroom: null }); net.conns = new Set();
+  if (net.lobby) net.lobby.presence({ c: save.code, n: save.name, r: null }).catch(() => {});
+  renderNet();
+}
+async function getLobby() {
+  if (net.lobbyTried) return net.lobby; net.lobbyTried = true;
+  try { if (window.claude && typeof window.claude.use === 'function') net.lobby = await window.claude.use('room'); } catch (e) { net.lobby = null; }
+  if (net.lobby) {
+    net.lobby.presence({ c: save.code, n: save.name, r: net.room || null }).catch(() => {});
+    net.lobby.onPeers(() => { if (!pNet.hidden) renderFriends(); }, () => {});
+  }
+  return net.lobby;
+}
+function loadPeerLib() {
+  if (window.Peer) return Promise.resolve();
+  return new Promise((ok, no) => { const sc = document.createElement('script'); sc.src = PEER_LIB; sc.onload = ok; sc.onerror = () => no(new Error('lib')); document.head.append(sc); });
+}
+function startTicker(send) { clearInterval(net.timer); net.timer = setInterval(() => { try { send(); } catch (e) {} for (const [id, p] of net.players) if (Date.now() - p.seen > 8000) dropPlayer(id); if (!pNet.hidden && net.on) { $('nRoomTitle').textContent = 'Oda: ' + net.room + ' · ' + (net.players.size + 1) + ' oyuncu'; renderPlayers(); } }, 100); }
+async function netGo(create) {
+  if (net.on) return;
+  const roomTxt = clip($(create ? 'nRoomC' : 'nRoomJ').value.trim(), 20), pass = clip($(create ? 'nPassC' : 'nPassJ').value, 20);
+  if (!slug(roomTxt)) return netMsg('Odaya bir ad ver (harf ya da rakam).');
+  if (!pass) return netMsg('Odaya bir şifre koy.');
+  if (!save.name || save.name === 'Pofuduk' && !typedName()) return netMsg('Önce Ayarlar\'dan ayına bir ad ver.');
+  netMsg(create ? 'Oda kuruluyor...' : 'Odaya bağlanılıyor...', true);
+  $('nCreate').disabled = $('nJoin').disabled = true;
+  try {
+    const lobby = await getLobby();
+    if (lobby) await goClaude(lobby, roomTxt, pass, create); else await goPeer(roomTxt, pass, create);
+  } catch (e) { netReset(); netMsg(e && e.message && e.message.length < 120 && !/^[a-z-]+$/.test(e.message) ? e.message : 'Bağlanılamadı. İnternetini kontrol edip tekrar dene.'); }
+  $('nCreate').disabled = $('nJoin').disabled = false;
+}
+async function goClaude(lobby, roomTxt, pass, create) {
+  const name = ('pf-' + slug(roomTxt) + '-' + hash36(slug(roomTxt) + '|' + pass)).slice(0, 48);
+  const r = await lobby.join(name);
+  Object.assign(net, { mode: 'claude', nroom: r, room: roomTxt, host: create });
+  const others = () => r.peers().filter(p => !(p.isMe && p.sameTab));
+  await new Promise(ok => setTimeout(ok, create ? 1800 : 2500));
+  if (create && others().some(p => p.presence && p.presence.h)) { netReset(); throw new Error('Bu adla ve şifreyle bir oda zaten açık. Ona katılabilirsin.'); }
+  if (!create && !others().length) { netReset(); throw new Error('Oda bulunamadı ya da şifre yanlış.'); }
+  net.on = true;
+  const sync = () => { const seen = new Set(); for (const pr of others()) { if (pr.presence && pr.presence.n) { takePlayer(pr.peer, pr.presence); seen.add(pr.peer); } } for (const id of [...net.players.keys()]) if (!seen.has(id)) dropPlayer(id); };
+  net.unsub.push(r.onPeers(sync, () => { netReset(); netMsg('Oda bağlantısı koptu.'); }));
+  startTicker(() => { r.presence(Object.assign(myState(), { h: create })).catch(() => {}); });
+  lobby.presence({ c: save.code, n: save.name, r: roomTxt }).catch(() => {});
+  netMsg(create ? 'Oda kuruldu! Arkadaşlarına oda adını ve şifreyi söyle.' : 'Odaya katıldın!', true); renderNet();
+}
+async function goPeer(roomTxt, pass, create) {
+  await loadPeerLib();
+  const hostId = 'pofuduk-oda-' + slug(roomTxt), ph = hash36('pofuduk|' + pass), opts = Object.assign({ debug: 0 }, window.PEER_OPTS || {});
+  const peer = create ? new Peer(hostId, opts) : new Peer(opts);
+  Object.assign(net, { mode: 'peer', peer, room: roomTxt, host: create });
+  await new Promise((ok, no) => {
+    const to = setTimeout(() => no(new Error('Sunucuya ulaşılamadı. İnternetini kontrol et.')), 20000);
+    peer.on('open', () => { clearTimeout(to); ok(); });
+    peer.on('error', e => { clearTimeout(to); no(new Error(e.type === 'unavailable-id' ? 'Bu adla bir oda zaten açık. Ona katılabilirsin.' : e.type === 'peer-unavailable' ? 'Bu adla açık bir oda bulunamadı.' : 'Bağlanılamadı (' + e.type + ').')); });
+  });
+  if (create) {
+    peer.on('connection', conn => {
+      conn.on('data', d => {
+        if (!d || typeof d !== 'object') return;
+        if (d.t === 'hi') { if (d.p !== ph) { conn.send({ t: 'no' }); setTimeout(() => conn.close(), 300); return; } conn.ok = true; net.conns.add(conn); conn.send({ t: 'ok' }); takePlayer(conn.peer, d.s); }
+        else if (d.t === 'st' && conn.ok) takePlayer(conn.peer, d.s);
+      });
+      conn.on('close', () => { net.conns.delete(conn); dropPlayer(conn.peer); });
+    });
+    peer.on('error', () => {});
+    peer.on('disconnected', () => { try { peer.reconnect(); } catch (e) {} });
+    net.on = true;
+    startTicker(() => { const all = [Object.assign(myState(), { id: 'host' })]; for (const [id, p] of net.players) all.push({ id, n: p.n, c: p.c, lv: p.lv, x: p.x, y: p.y, z: p.z, yw: p.yw, sp: p.sp, air: p.air ? 1 : 0, fl: p.fl, at: p.at ? 1 : 0, g: p.g, s: p.s, o: p.o, a: p.a }); for (const c of net.conns) if (c.open) c.send({ t: 'all', ps: all }); });
+    netMsg('Oda kuruldu! Arkadaşlarına oda adını ve şifreyi söyle.', true);
+  } else {
+    const conn = peer.connect(hostId, { reliable: true }); net.conn = conn;
+    await new Promise((ok, no) => {
+      const to = setTimeout(() => no(new Error('Oda cevap vermedi.')), 20000);
+      peer.on('error', e => { clearTimeout(to); no(new Error(e.type === 'peer-unavailable' ? 'Bu adla açık bir oda bulunamadı.' : 'Bağlanılamadı (' + e.type + ').')); });
+      conn.on('open', () => conn.send({ t: 'hi', p: ph, s: myState() }));
+      conn.on('data', d => {
+        if (!d || typeof d !== 'object') return;
+        if (d.t === 'ok') { clearTimeout(to); ok(); }
+        else if (d.t === 'no') { clearTimeout(to); no(new Error('Şifre yanlış.')); }
+        else if (d.t === 'all' && Array.isArray(d.ps) && net.on) { const seen = new Set(); for (const st of d.ps.slice(0, 32)) { const id = clip(st && st.id, 64); if (!id || id === peer.id) continue; takePlayer(id, st); seen.add(id); } for (const id of [...net.players.keys()]) if (!seen.has(id)) dropPlayer(id); }
+      });
+      conn.on('close', () => { if (net.on) { netReset(); netMsg('Oda kapandı.'); if (P && L) pop('Oda kapandı', P.x, P.y + 2.4, P.z, '#ffffff', 150); } });
+    });
+    net.on = true;
+    startTicker(() => { if (conn.open) conn.send({ t: 'st', s: myState() }); });
+    netMsg('Odaya katıldın!', true);
+  }
+  renderNet();
+}
+function inviteText() { return `Pofuduk'un Bal Macerası'nda benimle oyna! 👥 Birlikte Oyna > Odaya katıl. Oda: ${net.room} · Şifre: ${$(net.host ? 'nPassC' : 'nPassJ').value}`; }
+function teleportTo(p) { if (!P || p.lv !== lvKey()) return; P.x = p.x + 1.2; P.y = p.y + 0.5; P.z = p.z; P.vx = P.vy = P.vz = 0; G.ct = null; closeNet(); }
+function addFriend(code, name) {
+  code = clip(code, 6).toUpperCase();
+  if (!/^[A-Z0-9]{6}$/.test(code)) return netMsg('Arkadaş kodu 6 harf ya da rakamdır.');
+  if (code === save.code) return netMsg('Bu senin kendi kodun.');
+  if (save.friends.some(f => f.code === code)) return netMsg('Bu kişi zaten arkadaşın.');
+  if (save.friends.length >= 50) return netMsg('En fazla 50 arkadaş ekleyebilirsin.');
+  save.friends.push({ code, name: clip(name, 14) }); saveGame(); sfx.coin(); netMsg((name ? clip(name, 14) : code) + ' arkadaşın oldu!', true); renderNet();
+}
+function rowEl(online, title, sub, buttons) {
+  const row = document.createElement('div'); row.className = 'who2';
+  const d = document.createElement('span'); d.className = 'dot2' + (online ? ' on' : '');
+  const b = document.createElement('b'); b.textContent = title;
+  const sm = document.createElement('small'); sm.textContent = sub;
+  row.append(d, b, sm);
+  for (const [label, fn] of buttons) { const bt = document.createElement('button'); bt.type = 'button'; bt.className = 'btn'; bt.textContent = label; bt.onclick = fn; row.append(bt); }
+  return row;
+}
+let playersSig = '';
+function renderPlayers(force) {
+  // rebuild only when something visible changed, so buttons stay put while being clicked
+  const sig = [lvKey(), save.friends.length, ...[...net.players.values()].map(p => p.n + p.c + p.lv)].join('|');
+  if (!force && sig === playersSig) return; playersSig = sig;
+  const box = $('nPlayers'); box.textContent = '';
+  box.append(rowEl(true, save.name + ' (sen)', lvName(lvKey()) + (net.host ? ' · oda kurucusu' : ''), []));
+  for (const p of net.players.values()) {
+    const fr = save.friends.some(f => f.code === p.c), btns = [];
+    if (p.lv && p.lv === lvKey()) btns.push(['Yanına git', () => teleportTo(p)]);
+    if (!fr && p.c && p.c !== save.code) btns.push(['Arkadaş ekle', () => addFriend(p.c, p.n)]);
+    box.append(rowEl(true, p.n + (fr ? ' ★' : ''), lvName(p.lv), btns));
+  }
+}
+function renderFriends() {
+  const box = $('nFriends'); box.textContent = '';
+  const lobbyPeers = net.lobby ? net.lobby.peers().filter(p => !p.isMe) : [];
+  if (!save.friends.length) { const e = document.createElement('p'); e.className = 'small'; e.textContent = 'Henüz arkadaşın yok. Odadaki oyuncuların yanındaki "Arkadaş ekle" tuşuna bas ya da arkadaşının kodunu yaz.'; box.append(e); return; }
+  for (const f of save.friends) {
+    const inRoom = [...net.players.values()].find(p => p.c === f.code), lp = lobbyPeers.find(p => p.presence && p.presence.c === f.code);
+    const online = !!(inRoom || lp), where = inRoom ? 'Odanda · ' + lvName(inRoom.lv) : lp ? (lp.presence.r ? 'Çevrimiçi · Oda: ' + clip(lp.presence.r, 20) : 'Çevrimiçi') : 'Kod: ' + f.code;
+    const btns = [];
+    if (net.on && !inRoom) btns.push(['Davet et', () => shareInvite()]);
+    btns.push(['Sil', () => { save.friends = save.friends.filter(x => x !== f); saveGame(); renderNet(); }]);
+    box.append(rowEl(online, f.name || 'Arkadaş', where, btns));
+  }
+}
+function renderNet() {
+  $('nMyCode').textContent = save.code;
+  $('netOut').hidden = net.on; $('netIn').hidden = !net.on;
+  $('netBtn').classList.toggle('live', net.on);
+  if (net.on) { $('nRoomTitle').textContent = 'Oda: ' + net.room + ' · ' + (net.players.size + 1) + ' oyuncu'; $('nInvite').value = inviteText(); renderPlayers(true); }
+  renderFriends();
+}
+function shareInvite() {
+  const t = inviteText(); $('nInvite').value = t; $('nInvite').select();
+  try { navigator.clipboard && navigator.clipboard.writeText(t).catch(() => {}); } catch (e) {}
+  const w = window.open('https://wa.me/?text=' + encodeURIComponent(t), '_blank', 'noopener');
+  netMsg(w ? 'WhatsApp açıldı. Mesajı arkadaşına gönder.' : 'Davet yazısı kopyalandı; WhatsApp\'a yapıştırıp gönderebilirsin.', true);
+}
+const pNet = $('pNet'); let netPaused = false;
+function openNet() {
+  audio(); unlockMouse();
+  if (state === 'play') { state = 'pause'; netPaused = true; for (const k in keys) keys[k] = false; stick.x = stick.y = 0; }
+  netMsg(''); renderNet(); pNet.hidden = false; getLobby().then(() => renderFriends());
+  setTimeout(() => (net.on ? $('nLeave') : $('nRoomC')).focus(), 50);
+}
+function closeNet() { pNet.hidden = true; if (netPaused) { netPaused = false; state = 'play'; } }
+$('netBtn').onclick = () => { if (pNet.hidden) openNet(); else closeNet(); };
+$('netClose').onclick = closeNet;
+$('nCreate').onclick = () => netGo(true);
+$('nJoin').onclick = () => netGo(false);
+$('nLeave').onclick = () => { netReset(); netMsg('Odadan çıktın.', true); };
+$('nShare').onclick = shareInvite;
+$('nAddFriend').onclick = () => { addFriend($('nFriendCode').value.trim()); $('nFriendCode').value = ''; };
+pNet.querySelectorAll('input').forEach(i => i.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Escape') closeNet(); if (e.key === 'Enter') { if (i.id === 'nRoomC' || i.id === 'nPassC') netGo(true); else if (i.id === 'nRoomJ' || i.id === 'nPassJ') netGo(false); else if (i.id === 'nFriendCode') $('nAddFriend').click(); } }));
+addEventListener('pagehide', () => { try { if (net.peer) net.peer.destroy(); } catch (e) {} });
+// other players' bears, drawn in the same place as on their screen
+function drawRemote(dtMs) {
+  if (!net.players.size) return;
+  const here = lvKey(), k = 1 - Math.pow(0.75, (dtMs || 16.7) / 16.667);
+  for (const p of net.players.values()) {
+    const show = net.on && p.lv === here && state !== 'title';
+    const lk = p.g + p.s + p.o + p.a;
+    if (show && (!p.mesh || p.lk !== lk)) { if (p.mesh) G.scene.remove(p.mesh); p.mesh = bearModel({ girl: p.g === 'girl', species: p.s, outfit: p.o, axe: p.a }); p.lk = lk; G.scene.add(p.mesh); }
+    if (!p.mesh) continue;
+    p.mesh.visible = show; if (!show) continue;
+    if (Math.hypot(p.x - p.rx, p.z - p.rz) > 8) { p.rx = p.x; p.ry = p.y; p.rz = p.z; }
+    p.rx += (p.x - p.rx) * k; p.ry += (p.y - p.ry) * k; p.rz += (p.z - p.rz) * k; p.ryw += angDiff(p.yw, p.ryw) * k;
+    p.ph += (dtMs || 16.7) / 1000 * Math.min(12, p.sp * 2.2);
+    const pp = p.mesh.userData.parts; p.mesh.position.set(p.rx, p.ry, p.rz);
+    pp.flip.rotation.set(p.fl > 0 ? (1 - p.fl / 30) * Math.PI * 2 : 0, p.ryw, 0, 'YXZ');
+    const wk = p.air ? 0 : Math.sin(p.ph) * Math.min(1, p.sp / 3);
+    pp.legs.forEach((l, i) => { l.rotation.x = p.air ? (i ? 0.35 : -0.25) : (i ? wk : -wk) * 0.7; });
+    pp.arms.forEach((a, i) => { a.rotation.x = p.air ? 0 : (i ? -wk : wk) * 0.6; a.rotation.z = p.air ? a.userData.s * 2.3 : a.userData.s * 0.12; });
+    if (p.at && pp.arms[0]) pp.arms[0].rotation.x = -1.6 + Math.sin(frame * 0.6) * 1.2;
+  }
+}
+function drawRemoteTags() {
+  if (!net.on) return;
+  for (const p of net.players.values()) {
+    if (!p.mesh || !p.mesh.visible) continue;
+    const q = scr(p.rx, p.ry + 2.15, p.rz); if (!q) continue;
+    const fr = save.friends.some(f => f.code === p.c);
+    txt(p.n + (fr ? ' ★' : ''), q.x, q.y, 18, fr ? '#9dffb0' : '#ffffff', 'center');
+  }
+  txt(`👥 ${net.room} · ${net.players.size + 1} oyuncu`, 24, 84, 18, '#c9f2c0');
+}
+
 /* ---------- quest panel ---------- */
 const pQuest = $('pQuests'); let questPaused = false;
 function renderQuests() {
@@ -3079,7 +3374,7 @@ questDotSync();
 /* ---------- settings ---------- */
 const pSet = $('pSettings'); let setPaused = false;
 function syncSettings() {
-  $('setName').value = save.name === 'Pofuduk' ? '' : save.name;
+  $('setName').value = save.name;
   $('setMusic').checked = save.music !== false;
   $('setMusicVol').value = Math.round((save.musicVol ?? 1) * 100); $('vMusic').textContent = $('setMusicVol').value + '%';
   $('setSfxVol').value = Math.round((save.sfxVol ?? 1) * 100); $('vSfx').textContent = $('setSfxVol').value + '%';
@@ -3095,8 +3390,9 @@ function closeSettings() { pSet.hidden = true; saveGame(); if (setPaused) { setP
 $('setBtn').onclick = () => { if (pSet.hidden) openSettings(); else closeSettings(); };
 $('setClose').onclick = closeSettings;
 $('setName').oninput = e => {
-  save.name = e.target.value.trim().replace(/\s+/g, ' ').slice(0, 14) || 'Pofuduk';
-  nameInput.value = save.name === 'Pofuduk' ? '' : save.name; refreshWho();
+  const nm = e.target.value.trim().replace(/\s+/g, ' ').slice(0, 14);
+  if (!nm) return; // a name is required: an empty box keeps the old one
+  save.name = nm; nameInput.value = save.name; refreshWho();
 };
 $('setName').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter' || e.key === 'Escape') closeSettings(); });
 $('setMusic').onchange = e => { save.music = e.target.checked; musicVol(); };
@@ -3106,7 +3402,7 @@ $('setSfxVol').onchange = () => sfx.coin();
 $('setView').oninput = e => { save.viewDist = e.target.value / 100; $('vView').textContent = viewWord(save.viewDist) + ' · ' + e.target.value + '%'; applyView(); };
 $('setCam').oninput = e => { save.camSens = e.target.value / 100; $('vCam').textContent = e.target.value + '%'; };
 function goHub() { saveGame(); honey = 0; lives = 3; loadLevel(-1); setPlaying(); }
-$('startBtn').onclick = () => { audio(); save.name = cleanName(); if (!save.tutDone && !save.unlocked && !Object.values(save.best || {}).some(Boolean)) { saveGame(); startLevel(TUT); } else goHub(); };
+$('startBtn').onclick = () => { audio(); if (!typedName()) { $('nameErr').hidden = false; nameInput.focus(); return; } $('nameErr').hidden = true; save.name = cleanName(); if (!save.tutDone && !save.unlocked && !Object.values(save.best || {}).some(Boolean)) { saveGame(); startLevel(TUT); } else goHub(); };
 pauseBtn.onclick = () => togglePause();
 function togglePause() {
   if (state === 'play') { state = 'pause'; for (const k in keys) keys[k] = false; stick.x = stick.y = 0; showMsg('Duraklatıldı', `${save.name} · ${L.def.name} · ${honey} bal · ${save.coins} para`, 'Devam et', setPlaying, L.hub ? 'Ayarlar' : 'Haritaya dön', () => { saveGame(); if (L.hub) { setPlaying(); openSettings(); } else goHub(); }); }
