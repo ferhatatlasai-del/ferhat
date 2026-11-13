@@ -560,7 +560,7 @@ const QUESTS = [
   { id: 'kangal', name: 'Kangal Kovucu', desc: "Harun'un ölümsüz kangallarını 5 kez sersemlet", stat: 'kangal', goal: 5, reward: 45 },
   { id: 'harun', name: "Harun'u Kov", desc: "Gece köye gelen Harun'u baltayla vurup köyden kov", stat: 'harun', goal: 1, reward: 60 },
   { id: 'sheep', name: 'Kuzu Dostu', desc: "Çoban Beyza'nın 6 kuzusunu sev", stat: 'sheep', goal: 6, reward: 25 },
-  { id: 'sucuk', name: 'Sucuk Ustası', desc: 'Kasaptan aldığın sucuğu konağının ocağında ya da terastaki mangalda 3 kez pişir', stat: 'sucuk', goal: 3, reward: 30 },
+  { id: 'sucuk', name: 'Sucuk Ustası', desc: 'Kasaptan aldığın sucuğu konağının ocağında ya da terastaki mangalı yakıp 3 kez pişir', stat: 'sucuk', goal: 3, reward: 30 },
   { id: 'boss', name: 'Kahraman', desc: '2 boss yen', stat: 'boss', goal: 2, reward: 50 },
   { id: 'cloud', name: 'Bulut Tırmanıcısı', desc: "Bal Köyü'ndeki bir bulut parkurunun tepesindeki sandığa ulaş", stat: 'cloud', goal: 1, reward: 30 },
   { id: 'diamond', name: 'Elmas Usta', desc: "Demirciden Elmas Balta'yı al", stat: 'diamond', goal: 1, reward: 40 },
@@ -1349,16 +1349,17 @@ function mansionModel(parent, h) {
   for (const [x, c2] of [[-2.5, '#ff8fc8'], [2.5, '#ffd23f']]) mk('sph', c2, [0.55, 0.4, 0.55], [x, h2 + 0.35, 2.5], t);
   { const tl = grp(t, 4.5, h2, 4.8); mk('cyl', trim, [0.04, 1.2, 0.04], [0, 0.6, 0], tl); const tube = mk('cyl', '#3d4148', [0.12, 1.0, 0.12], [0, 1.35, 0.2], tl); tube.rotation.x = -0.9; }
   // the roof terrace: a mangal, a table with an umbrella, and two chairs
-  h.smoke = [];
-  for (const [mx, sackSide] of [[2.7, 1], [-3.2, -1]]) { // two mangals, full of charcoal, each with a sack of coal
-    const g = grp(t, mx, hh, -0.3);
+  h.smoke = []; h.grills = [];
+  for (const [gi, [mx, sackSide]] of [[2.7, 1], [-3.2, -1]].entries()) { // two mangals, full of charcoal, each with a sack of coal
+    const g = grp(t, mx, hh, -0.3), gr = { hot: [], smoke: [], flames: [] }; h.grills[gi] = gr;
     for (const [x, z] of [[-0.6, -0.2], [0.6, -0.2], [-0.6, 0.2], [0.6, 0.2]]) mk('cyl', '#2a2a2a', [0.04, 0.75, 0.04], [x, 0.38, z], g);
     mk('box', '#3d3d3d', [1.4, 0.3, 0.6], [0, 0.85, 0], g); mk('box', '#2a1a10', [1.25, 0.04, 0.48], [0, 0.96, 0], g);
     for (let k = 0; k < 22; k++) { const hot = k % 3 === 0, x = -0.55 + (k % 8) * 0.155 + (k % 2) * 0.04, z = -0.17 + Math.floor(k / 8) * 0.16;
-      const c = mk('sph', hot ? '#ff6a1f' : '#1c1c1c', [0.08, 0.06, 0.07], [x, 1.0, z], g, hot ? { emissive: '#c03000' } : null); c.rotation.y = k; c.castShadow = false; }
+      const c = mk('sph', '#1c1c1c', [0.08, 0.06, 0.07], [x, 1.0, z], g); c.rotation.y = k; c.castShadow = false; if (hot) gr.hot.push(c); }
+    for (let k = 0; k < 6; k++) { const f = mk('cone', k % 2 ? '#ffb627' : '#ff5a1f', [0.09, 0.3, 0.09], [-0.5 + k * 0.2, 1.12, (k % 3 - 1) * 0.12], g, { emissive: k % 2 ? '#c07000' : '#b02a00' }); f.castShadow = false; f.userData.k = k; gr.flames.push(f); }
     for (let k = 0; k < 7; k++) mk('box', '#9aa5b1', [0.03, 0.03, 0.55], [-0.6 + k * 0.2, 1.06, 0], g);
     for (let k = 0; k < 4; k++) mk('cyl', '#7a1e1e', [0.06, 0.4, 0.06], [-0.45 + k * 0.3, 1.11, 0], g).rotation.x = Math.PI / 2;
-    for (let k = 0; k < 4; k++) { const s = mk('sph', '#d9d9d9', [0.18, 0.18, 0.18], [0, 1.3, 0], g, { transparent: true, opacity: 0.5 }); s.castShadow = false; h.smoke.push(s); }
+    for (let k = 0; k < 4; k++) { const s = mk('sph', '#d9d9d9', [0.18, 0.18, 0.18], [0, 1.3, 0], g, { transparent: true, opacity: 0.5 }); s.castShadow = false; h.smoke.push(s); gr.smoke.push(s); }
     const sack = grp(t, mx + sackSide * 1.1, hh, -0.2); mk('sph', '#4a4038', [0.32, 0.42, 0.28], [0, 0.4, 0], sack); mk('cyl', '#4a4038', [0.16, 0.14, 0.16], [0, 0.82, 0], sack);
     for (let k = 0; k < 4; k++) mk('sph', '#1c1c1c', [0.07, 0.06, 0.07], [Math.sin(k * 1.7) * 0.12, 0.92, Math.cos(k * 1.7) * 0.1], sack);
     const lbl = canvasTex(128, 48, (c, w, h2) => { c.fillStyle = '#e8dcc0'; c.fillRect(0, 0, w, h2); c.fillStyle = '#2a2a2a'; c.font = '26px "Lilita One", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('KÖMÜR', w / 2, h2 / 2 + 1); });
@@ -2696,6 +2697,7 @@ const homeBtn = document.getElementById('homeBtn'); let homeLbl = '';
 if (isTouch) homeBtn.style.bottom = 'calc(190px + env(safe-area-inset-bottom, 0px))'; // above the touch buttons
 homeBtn.onclick = () => {
   if (state !== 'play' || !L.hub) return;
+  const gi = nearGrill(); if (gi >= 0) { toggleGrill(gi); homeBtn.blur(); return; }
   const i = houseIdxAt(P.x, P.z, P.y); if (i < 0) return;
   if (i === save.home) { if (isNight()) goSleep(); } else chooseHome(i);
   homeBtn.blur();
@@ -2705,6 +2707,7 @@ function syncHomeBtn() {
   if (L.hub && state === 'play' && !sleepT) {
     const i = houseIdxAt(P.x, P.z, P.y);
     if (i >= 0) t = i !== save.home ? (save.home >= 0 ? '🏠 Evimi buraya taşı' : '🏠 Bu ev benim olsun') : isNight() ? '😴 Uyu, sabah olsun' : '';
+    const gi = nearGrill(); if (gi >= 0) t = grillLit(gi) ? '💨 Mangalı söndür' : '🔥 Mangalı yak';
     if (t && !isTouch) t += ' (B)';
   }
   if (t !== homeLbl) { homeLbl = t; homeBtn.textContent = t; homeBtn.hidden = !t; }
@@ -2883,6 +2886,17 @@ function beyzaText() {
   if (n >= 6) return 'Kuzularımın hepsi seni çok sevdi! Görevler\'den (G) ödülünü almayı unutma.';
   return `Merhaba, ben Beyza, köyün minik çobanıyım! Şurada evim, şurada ahırım var. Kuzularımı iyi kangallarım Karabaş ve Pamuk ile koruyorum. Kuzuların yanına gidip onları sev! (${n}/6)`;
 }
+const grillLit = i => !!(save.grillOn || [])[i];
+function nearGrill() { // which mangal the bear is standing at, if any
+  const m = L.mansion; if (!m) return -1;
+  return [m.grill, m.grill2].findIndex(g => g && Math.hypot(P.x - g.x, P.z - g.z) < 2.4 && Math.abs(P.y - g.y) < 1);
+}
+function toggleGrill(i) {
+  const on = save.grillOn = save.grillOn || [false, false], g = [L.mansion.grill, L.mansion.grill2][i];
+  on[i] = !on[i]; saveGame();
+  if (on[i]) { tone(120, 0.5, 'sawtooth', 300, 0.04); tone(600, 0.3, 'triangle', 200, 0.03, 0.1); burst(g.x, g.y + 1.2, g.z, '#ff7b3d', 18, 2.5); pop('Mangal yandı! Yanına gel, sucuk pişsin', g.x, g.y + 2.4, g.z, '#ffd23f', 110); g.armed = false; }
+  else { tone(400, 0.4, 'triangle', 120, 0.03); burst(g.x, g.y + 1.2, g.z, '#d9d9d9', 14, 1.5); pop('Mangal söndü', g.x, g.y + 2.4, g.z, '#ffffff', 80); }
+}
 function cookSucuk(sp, where) {
   if ((save.sucuk || 0) < 1) { pop('Sucuğun yok! Kasaptan al', sp.x, sp.y + 2.2, sp.z, '#ffffff', 90); sfx.hurt(); return; }
   save.sucuk--; P.hp = save.maxHp; bump('sucuk'); saveGame();
@@ -2958,7 +2972,11 @@ function hubStep() {
   if (m && m.wardT) { const dm = Math.hypot(P.x - m.wardT.x, P.z - m.wardT.z); if (dm > 1.8) m.wArmed = true; else if (dm < 0.9 && m.wArmed && Math.abs(P.y - MAN.h1) < 0.8) { m.wArmed = false; saveGame(); openWard('hub'); return; } }
   if (m) for (const [sp, where] of [[m.stove, 'Ocakta'], [m.grill, 'Mangalda'], [m.grill2, 'Mangalda']]) if (sp) {
     const dd = Math.hypot(P.x - sp.x, P.z - sp.z);
-    if (dd > 2.0) sp.armed = true; else if (dd < 1.15 && sp.armed && Math.abs(P.y - sp.y) < 1) { sp.armed = false; cookSucuk(sp, where); }
+    if (dd > 2.0) sp.armed = true; else if (dd < 1.15 && sp.armed && Math.abs(P.y - sp.y) < 1) {
+      sp.armed = false; const gi = sp === m.grill ? 0 : sp === m.grill2 ? 1 : -1;
+      if (gi >= 0 && !grillLit(gi)) pop(isTouch ? 'Mangal sönük! Önce 🔥 tuşuyla yak' : 'Mangal sönük! Önce B ile yak', sp.x, sp.y + 2.2, sp.z, '#ffffff', 100);
+      else cookSucuk(sp, where);
+    }
   }
   if (P.onGround && P.ground && P.ground.bed && !P.dead) { P.vy = 9.5; P.onGround = false; P.ground = null; sfx.djump(); } // boing!
   if (m && (save.decor || []).includes('piano')) { const c = Math.cos(m.yaw), sn = Math.sin(m.yaw), dx = P.x - m.x, dz = P.z - m.z, lx = dx * c - dz * sn, lz = dx * sn + dz * c;
@@ -3552,7 +3570,12 @@ function buildScene() {
 }
 function portalSpin() {
   if (L.mansion) { for (const f of L.mansion.fish || []) { const k = f.userData.k, a = frame * 0.02 * (1 + k * 0.15) + k * 1.3; f.position.set(-5.3 + Math.sin(a * 1.3) * 0.35, f.userData.y + Math.sin(a * 2) * 0.05, -0.9 + Math.cos(a) * 0.85); f.rotation.y = a + Math.PI / 2; }
-    for (const [k, s] of (L.mansion.smoke || []).entries()) { const ph = (frame * 0.012 + (k % 4) / 4) % 1; s.position.set(Math.sin(ph * 9 + k) * 0.15, 1.2 + ph * 1.8, 0); s.scale.setScalar(0.15 + ph * 0.35); s.material.opacity = 0.55 * (1 - ph); }
+    for (const [gi, gr] of (L.mansion.grills || []).entries()) {
+      const lit = grillLit(gi);
+      if (gr.lit !== lit) { gr.lit = lit; for (const c of gr.hot) c.material = lit ? mat('#ff6a1f', { emissive: '#c03000' }) : mat('#1c1c1c'); }
+      for (const [k, s] of gr.smoke.entries()) { s.visible = lit; if (!lit) continue; const ph = (frame * 0.012 + k / 4) % 1; s.position.set(Math.sin(ph * 9 + k) * 0.15, 1.2 + ph * 1.8, 0); s.scale.setScalar(0.15 + ph * 0.35); s.material.opacity = 0.55 * (1 - ph); }
+      for (const f of gr.flames) { f.visible = lit; if (lit) f.scale.set(0.09, 0.22 + Math.abs(Math.sin(frame * 0.3 + f.userData.k * 1.7)) * 0.2, 0.09); }
+    }
     if (L.mansion.jet) L.mansion.jet.scale.set(0.22, 0.5 + Math.sin(frame * 0.2) * 0.12, 0.22); }
   if (L.beyza && L.beyza.mesh) { const bz = L.beyza, m = bz.mesh, u = m.userData, sw = Math.sin(bz.anim) * 0.5 * Math.min(1, bz.sp);
     m.position.set(bz.x, 0, bz.z); m.rotation.y = bz.yaw; u.legs[0].rotation.x = sw; u.legs[1].rotation.x = -sw; u.arms[0].rotation.x = -sw; u.arms[1].rotation.x = -0.3 + sw * 0.3;
