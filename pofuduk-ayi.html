@@ -542,9 +542,9 @@ const QUESTS = [
   { id: 'home', name: 'Yuvam Yuvam', desc: "Bal Köyü'nde bir evin içine gir ve onu kendi evin yap", stat: 'home', goal: 1, reward: 15 },
   { id: 'wolf', name: 'Kurt Kovucu', desc: "Geceleri Bal Köyü'ne gelen kurtlardan 5 tanesini yen", stat: 'wolf', goal: 5, reward: 40 },
   { id: 'decor', name: 'Konak Süsleyici', desc: "Bal Dükkânı'ndan konağın için 3 eşya al", stat: 'decor', goal: 3, reward: 40 },
-  { id: 'kangal', name: 'Kangal Kovucu', desc: "Harun'un kangal köpeklerinden 3 tanesini yen", stat: 'kangal', goal: 3, reward: 45 },
+  { id: 'kangal', name: 'Kangal Kovucu', desc: "Harun'un ölümsüz kangallarını 5 kez sersemlet", stat: 'kangal', goal: 5, reward: 45 },
   { id: 'harun', name: "Harun'u Kov", desc: "Gece köye gelen Harun'u baltayla vurup köyden kov", stat: 'harun', goal: 1, reward: 60 },
-  { id: 'sheep', name: 'Koyun Dostu', desc: "Çoban Beyza'nın 6 koyununu sev", stat: 'sheep', goal: 6, reward: 25 },
+  { id: 'sheep', name: 'Kuzu Dostu', desc: "Çoban Beyza'nın 6 kuzusunu sev", stat: 'sheep', goal: 6, reward: 25 },
   { id: 'boss', name: 'Kahraman', desc: '2 boss yen', stat: 'boss', goal: 2, reward: 50 },
   { id: 'cloud', name: 'Bulut Tırmanıcısı', desc: "Bal Köyü'ndeki bir bulut parkurunun tepesindeki sandığa ulaş", stat: 'cloud', goal: 1, reward: 30 },
   { id: 'diamond', name: 'Elmas Usta', desc: "Demirciden Elmas Balta'yı al", stat: 'diamond', goal: 1, reward: 40 },
@@ -939,7 +939,7 @@ function drawHud() {
   if (L.signs || L.burrow) { // tutorial: show the nearest sign's text; village: Mother Rabbit talks
     let sg = null, bd = 4.2; for (const g of L.signs || []) { const d = Math.hypot(g.x - P.x, g.z - P.z); if (d < bd && Math.abs(g.y - P.y) < 2.5) { bd = d; sg = g; } }
     if (L.burrow && Math.hypot(L.burrow.x - P.x, L.burrow.z - P.z) < 4.6 && P.y < 2.5) sg = { title: 'Anne Tavşan', text: momText() };
-    if (L.beyza && Math.hypot(L.beyza.x - P.x, L.beyza.z - P.z) < 4 && P.y < 2.5) sg = { title: 'Çoban Beyza', text: beyzaText() };
+    if (L.beyza && Math.hypot(L.beyza.x - P.x, L.beyza.z - P.z) < 3.2 && P.y < 2.5) sg = { title: 'Çoban Beyza', text: beyzaText() };
     if (sg) {
       const words = sg.text.split(' '), lines = []; let ln = '';
       for (const w of words) { if ((ln + ' ' + w).length > 52 && ln) { lines.push(ln); ln = w; } else ln = ln ? ln + ' ' + w : w; } lines.push(ln);
@@ -952,7 +952,7 @@ function drawHud() {
     harunMsg--; ctx.globalAlpha = Math.min(1, harunMsg / 30);
     const big = harunTxt.startsWith('Harun\'un'); ctx.fillStyle = big ? 'rgba(120,10,10,0.82)' : 'rgba(40,90,20,0.82)'; rr(VW / 2 - 330, 52, 660, 54, 14); ctx.fill();
     txt(harunTxt, VW / 2, 90, 32, big ? '#ffd6d0' : '#e6ffd0', 'center'); ctx.globalAlpha = 1;
-  } else if (L.hub && L.wolves) { const k = L.wolves.filter(w => w.type === 'kangal' && !w.gone && w.hp > 0 && !w.flee).length; if (k) txt(`⚠ Harun'un kangalları köyde: ${k} (bir ısırık = 2 kalp)`, VW / 2, 74, 19, '#ff8a80', 'center'); }
+  } else if (L.hub && L.wolves) { const k = L.wolves.filter(w => w.type === 'kangal' && !w.gone && w.hp > 0 && !w.flee).length; if (k) txt(`⚠ Harun'un ölümsüz kangalları köyde: ${k} (bir ısırık = 2 kalp)`, VW / 2, 74, 19, '#ff8a80', 'center'); }
   if (L.hub && nightMsg > 0 && banner <= 0) { // waits until the village title has faded
     nightMsg--; ctx.globalAlpha = Math.min(1, nightMsg / 30);
     txt(nightTxt, VW / 2, 170, 40, isNight() ? '#c9d6ff' : '#ffd23f', 'center');
@@ -1398,15 +1398,16 @@ function sheepModel() {
   g.userData = { body: b, head, legs };
   return g;
 }
-function kangalModel() {
+function kangalModel(good) {
   const g = new THREE.Group(), b = grp(g), fur = '#d8b98a', dark = '#2a2420', legs = [];
   mk('sph', fur, [0.46, 0.44, 0.82], [0, 0.72, -0.05], b);
   for (const [sx, sz] of [[-1, 1], [1, 1], [-1, -1], [1, -1]]) { const l = grp(b, sx * 0.22, 0.6, sz * 0.42); mk('cyl', fur, [0.11, 0.6, 0.11], [0, -0.3, 0], l); legs.push(l); }
   const head = grp(b, 0, 1.08, 0.66);
   mk('sph', fur, [0.33, 0.3, 0.32], [0, 0, 0], head); mk('box', dark, [0.24, 0.2, 0.36], [0, -0.08, 0.3], head); mk('sph', '#111111', [0.08, 0.06, 0.05], [0, -0.02, 0.49], head);
-  for (const sx of [-1, 1]) { mk('sph', dark, [0.1, 0.2, 0.06], [sx * 0.27, 0.0, -0.02], head); mk('sph', '#ffe08a', [0.05, 0.045, 0.03], [sx * 0.12, 0.08, 0.27], head, { emissive: '#7a5a00' }); }
-  mk('cyl', '#3d3d3d', [0.36, 0.1, 0.36], [0, 0.88, 0.5], b);
-  for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2; mk('cone', '#c0c6cc', [0.05, 0.12, 0.05], [Math.sin(a) * 0.34, 0.88, 0.5 + Math.cos(a) * 0.34], b).rotation.set(Math.cos(a) * Math.PI / 2, 0, -Math.sin(a) * Math.PI / 2); }
+  for (const sx of [-1, 1]) { mk('sph', dark, [0.1, 0.2, 0.06], [sx * 0.27, 0.0, -0.02], head); mk('sph', good ? '#22160c' : '#ffe08a', [0.05, 0.045, 0.03], [sx * 0.12, 0.08, 0.27], head, good ? null : { emissive: '#7a5a00' }); }
+  mk('cyl', good ? '#3f9b37' : '#3d3d3d', [0.36, 0.1, 0.36], [0, 0.88, 0.5], b);
+  if (good) { mk('sph', '#ffd23f', [0.08, 0.08, 0.04], [0, 0.8, 0.86], b, { emissive: '#5a4300' }); mk('sph', '#ff8fb0', [0.06, 0.03, 0.08], [0, 0.98, 1.0], b); } // a tag on the collar, a tongue out
+  else for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2; mk('cone', '#c0c6cc', [0.05, 0.12, 0.05], [Math.sin(a) * 0.34, 0.88, 0.5 + Math.cos(a) * 0.34], b).rotation.set(Math.cos(a) * Math.PI / 2, 0, -Math.sin(a) * Math.PI / 2); }
   const tail = grp(b, 0, 0.85, -0.82); tail.rotation.x = -0.6; mk('cone', fur, [0.12, 0.5, 0.12], [0, 0, -0.22], tail).rotation.x = -Math.PI / 2;
   g.userData = { body: b, head, legs, tail };
   return g;
@@ -2023,7 +2024,24 @@ function buildHub() {
     }
   }
   // Beyza the shepherd's meadow, somewhere open (no house is moved for it)
-  const pasture = (() => { const sp = findSpot(-34, 62, 9, 60, 6, 60); return sp ? { x: sp.x, z: sp.z, r: 8 } : null; })();
+  const pasture = (() => {
+    const sp = findSpot(-34, 62, 13, 60, 6, 60); if (!sp) return null;
+    const pa = { x: sp.x, z: sp.z, r: 11, yaw: Math.atan2(0 - sp.x, 32 - sp.z) }; // local +z faces the village
+    houses.forEach(o => { if (Math.hypot(o.x - pa.x, o.z - pa.z) < pa.r + 6) o.gone = true; });
+    const c = Math.cos(pa.yaw), sn = Math.sin(pa.yaw), T = (lx, lz) => [pa.x + lx * c + lz * sn, pa.z - lx * sn + lz * c];
+    const shed = (lx, lz, hw, hd, hh, dw) => { // four walls, a door gap at the front and a roof
+      const [x, z] = T(lx, lz), o = { x, z, yaw: pa.yaw, hw, hd, h: hh }, Tb = (a, b) => { const q = Math.cos(o.yaw), s = Math.sin(o.yaw); return [o.x + a * q + b * s, o.z - a * s + b * q]; }, wt = 0.22;
+      for (const [x0, z0, x1, z1] of [[-hw, -hd, hw, -hd + wt], [-hw, -hd, -hw + wt, hd], [hw - wt, -hd, hw, hd], [-hw, hd - wt, -dw, hd], [dw, hd - wt, hw, hd]]) boxes.push(rectBox(Tb, x0, z0, x1, z1, 0, hh, 'deco'));
+      boxes.push(rectBox(Tb, -hw - 0.3, -hd - 0.3, hw + 0.3, hd + 0.3, hh - 0.1, hh + 0.2, 'deco'));
+      for (let k = 1; k < 4; k++) { const ex = (hw + 0.3) * (1 - k / 4); boxes.push(rectBox(Tb, -ex, -hd - 0.3, ex, hd + 0.3, hh, hh + 0.2 + hw * 0.6 * k / 4, 'deco')); }
+      return o;
+    };
+    pa.barn = shed(-4.2, -pa.r + 3.4, 3.0, 2.3, 3.0, 1.0);     // the barn, door facing the meadow
+    pa.home = shed(5.4, -pa.r + 4.6, 1.6, 1.5, 1.9, 0.45);     // Beyza's little house
+    const [dx, dz] = T(-4.2, -pa.r + 3.4 + 3.4); pa.door = { x: dx, z: dz };
+    pa.inBarn = Array.from({ length: 8 }, (_, i) => { const [x, z] = T(-4.2 - 2.0 + (i % 4) * 1.3, -pa.r + 3.4 - 1.2 + Math.floor(i / 4) * 1.4); return { x, z }; });
+    return pa;
+  })();
   // hollow houses: four walls with a doorway at the front, and a few coins inside
   const hitems = [], got = save.houseCoins || [];
   houses.forEach((h, hi) => {
@@ -2098,7 +2116,8 @@ function buildHub() {
   }
   return { def: HUB, hub: true, R, boxes, items: hitems, enemies: [], trees, paths, start: { x: 0, y: 0, z: 50 }, checkpoints: [], cpActive: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, ward, smith, board, tutGate, houses, turtles, parks, mts, burrow, rabbits, babies, mansion, stores, honeyShop, pasture,
     beyza: pasture && { x: pasture.x, z: pasture.z, yaw: 0, tx: pasture.x, tz: pasture.z, t: 0, sp: 0, anim: 0 },
-    sheep: pasture ? Array.from({ length: 6 }, (_, i) => ({ id: i, x: pasture.x + Math.sin(i * 1.05) * 4, z: pasture.z + Math.cos(i * 1.05) * 4, yaw: i, t: i * 0.7, next: 2, rest: false, petT: 0, hop: 0, anim: 0 })) : [] };
+    sheep: pasture ? Array.from({ length: 8 }, (_, i) => ({ id: i, x: pasture.x + Math.sin(i * 0.8) * 4, z: pasture.z + Math.cos(i * 0.8) * 4, yaw: i, t: i * 0.7, next: 2, rest: false, petT: 0, hop: 0, anim: 0 })) : [],
+    dogs: pasture ? ['Karabaş', 'Pamuk'].map((name, i) => ({ name, x: pasture.x + (i ? 3 : -3), z: pasture.z + 2, yaw: 0, a: i * Math.PI, sp: 0, anim: 0, cool: 0, bark: 0 })) : [] };
 }
 function mkBoss(type, c) {
   const base = { type, c, x: c.x, z: c.zc - 3, y: c.y, vx: 0, vz: 0, vy: 0, t: 0, inv: 0, active: false, defeated: false, deadT: 0, yaw: 0, tx: 0, tz: 0, state: type === 'mush' ? 'walk' : type === 'queen' ? 'hover' : 'aim' };
@@ -2295,7 +2314,7 @@ function update() {
     burst(P.x, P.y, P.z, '#c9a27a', 18, 4);
     if (P.ground.kind === 'crate') { const c = P.ground; c.on = false; addCoins(2, P.x, P.y + 0.6, P.z); addHoney(1); burst(P.x, P.y + 0.3, P.z, '#a8743d', 16, 4); P.vy = 6; P.onGround = false; P.ground = null; }
     for (const e of L.enemies) if (e.alive && Math.hypot(e.x - P.x, e.z - P.z) < 2.4 && Math.abs(e.y - P.y) < 1) { if (e.helmet) sfx.clank(); else damageEnemy(e, 1, e.x - P.x, e.z - P.z); }
-    for (const w of L.wolves || []) if (!w.gone && w.hp > 0 && Math.hypot(w.x - P.x, w.z - P.z) < 2.6 && P.y < 1.5) hitWolf(w, 1, w.x - P.x, w.z - P.z);
+    for (const w of L.wolves || []) if (!w.gone && w.hp > 0 && Math.hypot(w.x - P.x, w.z - P.z) < (w.type === 'kangal' ? 3.2 : 2.6) && P.y < 1.5) hitWolf(w, 1, w.x - P.x, w.z - P.z);
   }
   P.squash = P.squash > 0 ? Math.max(0, P.squash - 0.8) : Math.min(0, P.squash + 0.6); // settle exactly at 0, never overshoot
   P.anim += Math.hypot(P.vx, P.vz) * 0.035;
@@ -2633,6 +2652,7 @@ function wolfStep() {
     if (w.hitT > 0) w.hitT--;
     if (w.hp <= 0) { if (++w.dead > 45) w.gone = true; continue; }
     w.t += DT; if (w.bite > 0) w.bite -= DT;
+    if (w.stunT > 0) { w.stunT -= DT; w.sp = 0; if (w.stunT <= 0) w.st = 'wander'; if (!w.flee) continue; }
     const dx = P.x - w.x, dz = P.z - w.z, d = Math.hypot(dx, dz), F = FOE[w.type || 'wolf'];
     let sp = 1.5, want = w.yaw;
     if (!night || w.flee) { w.st = 'leave'; want = Math.atan2(-dx, -dz); sp = 6.5; w.leaveT = (w.leaveT || 0) + DT; if (w.leaveT > 5 || d > 60) { w.gone = true; continue; } }
@@ -2652,8 +2672,15 @@ function wolfStep() {
     }
   }
 }
+function stunKangal(w, kx, kz, push) {
+  w.stunT = 2.5; w.hitT = 14; w.bite = Math.max(w.bite, 1); w.st = 'stun';
+  const m = Math.hypot(kx, kz) || 1, px = w.x + kx / m * push, pz = w.z + kz / m * push;
+  if (!hubBlocked(px, pz, 0.6)) { w.x = px; w.z = pz; }
+  burst(w.x, 1.2, w.z, '#ffd23f', 10, 2); pop('Sersemledi!', w.x, 2.8, w.z, '#ffd23f', 60);
+}
 function hitWolf(w, dmg, kx, kz) {
   if (w.flee) return; // already running away
+  if (w.type === 'kangal') { if ((w.stunT || 0) > 1.5) return; stunKangal(w, kx, kz, 2.5); sfx.clank(); bump('kangal'); return; } // Harun's kangals never die
   w.hp -= dmg; w.hitT = 14; w.bite = Math.max(w.bite, 1);
   const m = Math.hypot(kx, kz) || 1, px = w.x + kx / m * 1.2, pz = w.z + kz / m * 1.2;
   if (!hubBlocked(px, pz, 0.5)) { w.x = px; w.z = pz; }
@@ -2670,31 +2697,65 @@ function hitWolf(w, dmg, kx, kz) {
 }
 function beyzaStep() {
   const bz = L.beyza, pa = L.pasture; if (!bz) return;
+  const night = isNight();
   bz.t += DT; const d = Math.hypot(P.x - bz.x, P.z - bz.z);
-  if (d < 5) { bz.sp = 0; bz.yaw += angDiff(Math.atan2(P.x - bz.x, P.z - bz.z), bz.yaw) * 0.1; }
+  if (d < 4) { bz.sp = 0; bz.yaw += angDiff(Math.atan2(P.x - bz.x, P.z - bz.z), bz.yaw) * 0.1; }
   else {
-    if (bz.t > 4 || Math.hypot(bz.tx - bz.x, bz.tz - bz.z) < 0.3) { bz.t = 0; const a = Math.random() * 6.28, r = Math.random() * pa.r * 0.55; bz.tx = pa.x + Math.sin(a) * r; bz.tz = pa.z + Math.cos(a) * r; }
-    const dd = Math.hypot(bz.tx - bz.x, bz.tz - bz.z); bz.sp = dd > 0.3 ? 1.1 : 0;
+    if (night) { bz.tx = pa.door.x; bz.tz = pa.door.z; } // at night she waits by the barn door
+    else if (bz.t > 4 || Math.hypot(bz.tx - bz.x, bz.tz - bz.z) < 0.3) { bz.t = 0; const a = Math.random() * 6.28, r = Math.random() * pa.r * 0.45; bz.tx = pa.x + Math.sin(a) * r; bz.tz = pa.z + Math.cos(a) * r + 2; }
+    const dd = Math.hypot(bz.tx - bz.x, bz.tz - bz.z); bz.sp = dd > 0.4 ? 0.9 : 0;
     if (bz.sp) { bz.yaw += angDiff(Math.atan2(bz.tx - bz.x, bz.tz - bz.z), bz.yaw) * 0.08; bz.x += Math.sin(bz.yaw) * bz.sp * DT; bz.z += Math.cos(bz.yaw) * bz.sp * DT; }
   }
-  bz.anim += bz.sp * DT * 3;
-  for (const s of L.sheep) {
+  bz.anim += bz.sp * DT * 4;
+  const inShed = (o, x, z, pad) => inRect(o, o, x, z, pad);
+  for (const s of L.sheep) { // lambs
     s.t += DT; if (s.petT > 0) s.petT--; if (s.hop > 0) s.hop -= DT;
     const ds = Math.hypot(P.x - s.x, P.z - s.z);
-    if (ds < 1.4 && s.petT <= 0 && P.y < 1.5) { s.petT = 200; s.hop = 0.45; s.yaw = Math.atan2(P.x - s.x, P.z - s.z); tone(392, 0.25, 'sawtooth', 330, 0.03); tone(392, 0.25, 'sawtooth', 350, 0.03, 0.12); pop('Meee!', s.x, 1.5, s.z, '#ffffff', 60); burst(s.x, 0.9, s.z, '#ffffff', 8, 1.4); bump('sheep', 1, s.id); }
+    if (ds < 1.1 && s.petT <= 0 && P.y < 1.5) { s.petT = 200; s.hop = 0.45; s.yaw = Math.atan2(P.x - s.x, P.z - s.z); tone(523, 0.2, 'sawtooth', 440, 0.03); tone(523, 0.2, 'sawtooth', 466, 0.03, 0.09); pop('Mee!', s.x, 1.1, s.z, '#ffffff', 60); burst(s.x, 0.6, s.z, '#ffffff', 8, 1.2); bump('sheep', 1, s.id); }
     if (s.petT > 150) { s.sp = 0; continue; }
-    if (s.t > s.next) { s.t = 0; s.next = 2 + Math.random() * 3; s.yaw += (Math.random() - 0.5) * 2.4; s.rest = Math.random() < 0.4; }
-    const home = isNight() ? bz : pa, out = Math.hypot(s.x - home.x, s.z - home.z) > (isNight() ? 2.5 : pa.r - 1); // at night the flock gathers round Beyza
-    if (out) { s.yaw += angDiff(Math.atan2(home.x - s.x, home.z - s.z), s.yaw) * 0.1; s.rest = false; }
-    s.sp = s.rest ? 0 : out ? 1.6 : 0.7;
-    s.x += Math.sin(s.yaw) * s.sp * DT; s.z += Math.cos(s.yaw) * s.sp * DT; s.anim += s.sp * DT * 4;
+    let tx = null, tz = null;
+    if (night) { // into the barn: first to the door, then to a spot inside
+      const inside = inShed(pa.barn, s.x, s.z, -0.3), spot = pa.inBarn[s.id % pa.inBarn.length];
+      if (inside || Math.hypot(s.x - pa.door.x, s.z - pa.door.z) < 0.8 || s.atDoor) { s.atDoor = true; tx = spot.x; tz = spot.z; } else { tx = pa.door.x; tz = pa.door.z; }
+    } else s.atDoor = false;
+    if (tx !== null) {
+      const dt2 = Math.hypot(tx - s.x, tz - s.z); s.sp = dt2 > 0.25 ? 1.8 : 0; if (s.sp) s.yaw += angDiff(Math.atan2(tx - s.x, tz - s.z), s.yaw) * 0.2;
+    } else {
+      if (s.t > s.next) { s.t = 0; s.next = 1.5 + Math.random() * 3; s.yaw += (Math.random() - 0.5) * 2.4; s.rest = Math.random() < 0.35; }
+      const out = Math.hypot(s.x - pa.x, s.z - pa.z) > pa.r - 1.2;
+      if (out) { s.yaw += angDiff(Math.atan2(pa.x - s.x, pa.z - s.z), s.yaw) * 0.12; s.rest = false; }
+      s.sp = s.rest ? 0 : out ? 1.5 : 0.8;
+      const nx = s.x + Math.sin(s.yaw) * s.sp * DT, nz = s.z + Math.cos(s.yaw) * s.sp * DT;
+      if (inShed(pa.barn, nx, nz, 0.3) || inShed(pa.home, nx, nz, 0.3)) { s.yaw += Math.PI * 0.7; s.sp = 0; }
+    }
+    s.x += Math.sin(s.yaw) * s.sp * DT; s.z += Math.cos(s.yaw) * s.sp * DT; s.anim += s.sp * DT * 6;
+  }
+  // Beyza's good kangals walk round the lambs and chase Harun's dogs off the meadow
+  const bad = (L.wolves || []).filter(w => w.type === 'kangal' && !w.gone && !w.flee && Math.hypot(w.x - pa.x, w.z - pa.z) < pa.r + 6);
+  for (const g of L.dogs) {
+    if (g.cool > 0) g.cool -= DT; if (g.bark > 0) g.bark -= DT;
+    let tx, tz, sp;
+    const foe = bad.length && g.cool <= 0 ? bad.reduce((a, w) => Math.hypot(w.x - g.x, w.z - g.z) < Math.hypot(a.x - g.x, a.z - g.z) ? w : a) : null;
+    if (foe) {
+      tx = foe.x; tz = foe.z; sp = 8.5; g.st = 'chase';
+      if (Math.hypot(foe.x - g.x, foe.z - g.z) < 2.4) { // a big bark sends it reeling
+        stunKangal(foe, foe.x - pa.x, foe.z - pa.z, 4); g.cool = 1.6; g.bark = 0.6;
+        tone(260, 0.12, 'square', 180, 0.07); tone(240, 0.14, 'square', 170, 0.07, 0.16); pop('Hav hav!', g.x, 2.3, g.z, '#9ef07a', 60);
+      }
+    } else {
+      g.st = 'guard'; g.a += DT * (night ? 0.6 : 0.3);
+      const ctr = night ? pa.door : pa, rr = night ? 3 : 5.5; tx = ctr.x + Math.sin(g.a) * rr; tz = ctr.z + Math.cos(g.a) * rr; sp = 2.6;
+    }
+    const dd = Math.hypot(tx - g.x, tz - g.z); g.sp = dd > 0.4 ? Math.min(sp, dd * 3) : 0;
+    if (g.sp) { g.yaw += angDiff(Math.atan2(tx - g.x, tz - g.z), g.yaw) * 0.2; g.x += Math.sin(g.yaw) * g.sp * DT; g.z += Math.cos(g.yaw) * g.sp * DT; }
+    g.anim += g.sp * DT * 2.2;
   }
 }
 function beyzaText() {
   const n = ((save.stats || {}).sheep || []).length;
-  if (isNight()) return `Gece oldu ${save.name}! Harun'un kangalları geliyor, koyunlarımı yanıma topladım. Kangalları baltanla kov, olur mu?`;
-  if (n >= 6) return 'Bütün koyunlarım seni çok sevdi! Görevler\'den (G) ödülünü almayı unutma.';
-  return `Merhaba, ben Beyza! Bu köyün çobanıyım. Koyunlarımın yanına gidip onları sev, sana "Meee!" derler. (${n}/6)`;
+  if (isNight()) return `Gece oldu ${save.name}! Kuzularım ahıra girdi. İyi kangallarım Karabaş ile Pamuk ahırı bekliyor; Harun'un kangalları gelirse onları havlayarak kovarlar!`;
+  if (n >= 6) return 'Kuzularımın hepsi seni çok sevdi! Görevler\'den (G) ödülünü almayı unutma.';
+  return `Merhaba, ben Beyza, köyün minik çobanıyım! Şurada evim, şurada ahırım var. Kuzularımı iyi kangallarım Karabaş ve Pamuk ile koruyorum. Kuzuların yanına gidip onları sev! (${n}/6)`;
 }
 function momText() {
   const n = ((save.stats || {}).bunny || []).length, f = L.babies.filter(b => b.st === 'follow').length;
@@ -3304,13 +3365,37 @@ function buildScene() {
     if (G.sunMesh) G.sunMesh.material = G.sunMesh.material.clone();
     G.homeMark = null; placeHomeMark();
     for (const b of L.babies) { b.mesh = rabbitModel('#fff6ea'); b.mesh.scale.setScalar(0.62); W.add(b.mesh); }
-    if (L.pasture) { const pa = L.pasture;
-      const mead = mk('cyl', '#7fd36a', [pa.r + 0.5, 0.04, pa.r + 0.5], [pa.x, 0.03, pa.z], W); mead.castShadow = false; mead.receiveShadow = true;
-      for (let k = 0; k < 28; k++) { const a = k / 28 * 6.283; if (k === 0 || k === 27) continue; mk('box', '#8a5a2b', [0.14, 0.9, 0.14], [pa.x + Math.sin(a) * (pa.r + 0.5), 0.45, pa.z + Math.cos(a) * (pa.r + 0.5)], W); }
-      for (let k = 0; k < 14; k++) { const a = (k + 0.5) / 14 * 6.283; if (k === 0 || k === 13) continue; const rl = mk('box', '#a0703c', [0.08, 0.1, 2 * Math.PI * (pa.r + 0.5) / 14], [pa.x + Math.sin(a) * (pa.r + 0.5), 0.7, pa.z + Math.cos(a) * (pa.r + 0.5)], W); rl.rotation.y = a; }
-      for (let k = 0; k < 12; k++) mk('sph', ['#ffffff', '#ffd23f', '#ff8fc8'][k % 3], [0.1, 0.1, 0.1], [pa.x + Math.sin(k * 2.4) * (2 + k % 5), 0.12, pa.z + Math.cos(k * 2.4) * (2 + k % 5)], W);
-      L.beyza.mesh = beyzaModel(); W.add(L.beyza.mesh);
-      for (const s of L.sheep) { s.mesh = sheepModel(); W.add(s.mesh); } }
+    if (L.pasture) { const pa = L.pasture, fr = pa.r + 0.5;
+      const mead = mk('cyl', '#7fd36a', [fr, 0.04, fr], [pa.x, 0.03, pa.z], W); mead.castShadow = false; mead.receiveShadow = true;
+      const gate = Math.atan2(Math.sin(pa.yaw), Math.cos(pa.yaw)); // the gap in the fence faces the village
+      for (let k = 0; k < 40; k++) { const a = k / 40 * 6.283; if (Math.abs(angDiff(a, gate)) < 0.2) continue; mk('box', '#8a5a2b', [0.14, 0.9, 0.14], [pa.x + Math.sin(a) * fr, 0.45, pa.z + Math.cos(a) * fr], W); }
+      for (let k = 0; k < 20; k++) { const a = (k + 0.5) / 20 * 6.283; if (Math.abs(angDiff(a, gate)) < 0.25) continue; const rl = mk('box', '#a0703c', [0.08, 0.1, 2 * Math.PI * fr / 20], [pa.x + Math.sin(a) * fr, 0.7, pa.z + Math.cos(a) * fr], W); rl.rotation.y = a; }
+      for (let k = 0; k < 16; k++) mk('sph', ['#ffffff', '#ffd23f', '#ff8fc8'][k % 3], [0.1, 0.1, 0.1], [pa.x + Math.sin(k * 2.4) * (2 + k % 7), 0.12, pa.z + Math.cos(k * 2.4) * (2 + k % 7)], W);
+      const shedModel = (o, wall, roof, trim) => {
+        const t = grp(W, o.x, 0, o.z); t.rotation.y = o.yaw; const { hw, hd, h: hh } = o, wt = 0.22, dw = o === pa.barn ? 1.0 : 0.45;
+        for (const [x0, z0, x1, z1] of [[-hw, -hd, hw, -hd + wt], [-hw, -hd, -hw + wt, hd], [hw - wt, -hd, hw, hd], [-hw, hd - wt, -dw, hd], [dw, hd - wt, hw, hd]]) mk('box', wall, [x1 - x0, hh, z1 - z0], [(x0 + x1) / 2, hh / 2, (z0 + z1) / 2], t);
+        const rise = hw * 0.6, L2 = Math.hypot(hw, rise) + 0.35, ang = Math.atan2(rise, hw);
+        for (const sd of [-1, 1]) { const rf = mk('box', roof, [L2, 0.18, 2 * hd + 0.5], [sd * hw / 2, hh + rise / 2 + 0.06, 0], t); rf.rotation.z = -sd * ang; }
+        mk('prism', wall, [hw / 0.866, 2 * hd, rise / 1.5], [0, hh + rise / 3, 0], t).rotation.set(-Math.PI / 2, 0, 0);
+        for (const sx of [-1, 1]) mk('box', trim, [0.14, hh, 0.14], [sx * (hw - 0.07), hh / 2, hd - 0.07], t);
+        mk('box', '#c9a26a', [2 * hw - 0.3, 0.05, 2 * hd - 0.3], [0, 0.07, 0], t);
+        return t;
+      };
+      const barn = shedModel(pa.barn, '#b5452f', '#5c3a1c', '#ffffff');
+      for (const sx of [-1, 1]) { const lf = grp(barn, sx * 1.0, 0, pa.barn.hd); lf.rotation.y = sx * 1.9; mk('box', '#b5452f', [1.0, 2.2, 0.1], [sx * -0.5, 1.1, 0], lf); mk('box', '#ffffff', [0.1, 2.3, 0.12], [sx * -0.95, 1.15, 0], lf); }
+      for (const [x, z] of [[-2.2, -1.5], [2.2, -1.5], [2.2, 0.2]]) { mk('box', '#e8c45a', [0.9, 0.55, 0.6], [x, 0.3, z], barn); mk('box', '#d9b24a', [0.92, 0.06, 0.62], [x, 0.58, z], barn); }
+      mk('box', '#7a4a24', [1.6, 0.4, 0.4], [0, 0.2, -1.8], barn); mk('box', '#7fd36a', [1.5, 0.08, 0.32], [0, 0.42, -1.8], barn);
+      const sign = canvasTex(256, 64, (c, w, h2) => { c.fillStyle = '#fff4dc'; c.fillRect(0, 0, w, h2); c.fillStyle = '#b5452f'; c.font = '40px "Lilita One", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('AHIR', w / 2, h2 / 2 + 2); });
+      const sp2 = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.4), new THREE.MeshLambertMaterial({ map: sign })); sp2.position.set(0, 2.65, pa.barn.hd + 0.03); barn.add(sp2);
+      const cot = shedModel(pa.home, '#f3e3c3', '#4f9b4a', '#7a4a24');
+      mk('box', '#ffe08a', [0.55, 0.5, 0.06], [-0.95, 1.1, pa.home.hd + 0.01], cot, { emissive: '#5a4a10' }); mk('box', '#ffe08a', [0.06, 0.5, 0.55], [pa.home.hw + 0.01, 1.1, 0], cot, { emissive: '#5a4a10' });
+      mk('box', '#8d8577', [0.35, 1.0, 0.35], [0.8, 2.6, -0.6], cot);
+      for (let k = 0; k < 5; k++) mk('sph', ['#ff5fa2', '#ffd23f', '#ffffff'][k % 3], [0.12, 0.12, 0.12], [-1.3 + k * 0.6, 0.15, pa.home.hd + 0.35], cot);
+      const plate = canvasTex(256, 64, (c, w, h2) => { c.fillStyle = '#fff4dc'; c.fillRect(0, 0, w, h2); c.fillStyle = '#3f7a3a'; c.font = '34px "Lilita One", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText("Beyza'nın Evi", w / 2, h2 / 2 + 2, w - 16); });
+      const sp3 = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.4), new THREE.MeshLambertMaterial({ map: plate })); sp3.position.set(0, 1.62, pa.home.hd + 0.03); cot.add(sp3);
+      L.beyza.mesh = beyzaModel(); L.beyza.mesh.scale.setScalar(0.5); W.add(L.beyza.mesh); // tiny: smaller than the bear
+      for (const s of L.sheep) { s.mesh = sheepModel(); s.mesh.scale.setScalar(0.58); W.add(s.mesh); }
+      for (const g of L.dogs) { g.mesh = kangalModel(true); W.add(g.mesh); } }
     { const bw = L.burrow, g5 = grp(W, bw.x, 0, bw.z); g5.rotation.y = bw.yaw;
       mk('hemi', '#7a9b3a', [1.25, 0.6, 1.25], [0, 0, -0.2], g5); mk('sph', '#2b1a0e', [0.42, 0.34, 0.12], [0, 0.22, 0.98], g5);
       for (let k = 0; k < 5; k++) mk('sph', ['#ff5fa2', '#ffd23f', '#ffffff'][k % 3], [0.1, 0.1, 0.1], [Math.cos(k * 1.3) * 0.9, 0.35 + (k % 2) * 0.15, Math.sin(k * 1.3) * 0.7 - 0.2], g5);
@@ -3330,6 +3415,8 @@ function portalSpin() {
   if (L.beyza && L.beyza.mesh) { const bz = L.beyza, m = bz.mesh, u = m.userData, sw = Math.sin(bz.anim) * 0.5 * Math.min(1, bz.sp);
     m.position.set(bz.x, 0, bz.z); m.rotation.y = bz.yaw; u.legs[0].rotation.x = sw; u.legs[1].rotation.x = -sw; u.arms[0].rotation.x = -sw; u.arms[1].rotation.x = -0.3 + sw * 0.3;
     u.head.rotation.z = bz.sp ? 0 : Math.sin(frame * 0.03) * 0.08; }
+  if (L.dogs) for (const g of L.dogs) { if (!g.mesh) continue; const u = g.mesh.userData, run = Math.min(1, g.sp / 4); g.mesh.position.set(g.x, 0, g.z); g.mesh.rotation.y = g.yaw;
+    u.legs.forEach((l, i) => { l.rotation.x = Math.sin(g.anim * 3 + (i === 0 || i === 3 ? 0 : Math.PI)) * 0.7 * run; }); u.tail.rotation.x = 0.4 + Math.sin(frame * 0.3) * 0.4; u.head.rotation.x = g.bark > 0 ? -0.35 : 0; }
   if (L.sheep) for (const s of L.sheep) { if (!s.mesh) continue; const u = s.mesh.userData; s.mesh.position.set(s.x, s.hop > 0 ? Math.sin(s.hop / 0.45 * Math.PI) * 0.4 : 0, s.z); s.mesh.rotation.y = s.yaw;
     u.legs.forEach((l, i) => { l.rotation.x = Math.sin(s.anim + (i === 0 || i === 3 ? 0 : Math.PI)) * 0.5 * Math.min(1, s.sp); }); u.head.rotation.x = s.sp ? 0 : 0.5 + Math.sin(frame * 0.05 + s.id) * 0.2; }
   if (L.stores) for (const s of L.stores) if (s.keeper) s.keeper.rotation.y = Math.sin(frame * 0.02 + s.x) * 0.3;
@@ -3390,6 +3477,7 @@ function drawWolves() {
     const base = w.type === 'kangal' ? 1.6 : 1; m.scale.setScalar(base * (w.hitT > 0 && w.hitT % 4 < 2 ? 1.08 : 1));
     const run = Math.min(1, w.sp / 4);
     if (w.type === 'harun') { const sw = Math.sin(w.anim * 2.2) * 0.6 * Math.min(1, w.sp / 2); u.legs[0].rotation.x = sw; u.legs[1].rotation.x = -sw; u.arms[0].rotation.x = -sw * 0.8; u.arms[1].rotation.x = w.st === 'chase' ? -1.2 + Math.sin(frame * 0.2) * 0.4 : sw * 0.8; continue; }
+    u.body.rotation.z = w.stunT > 0 ? Math.sin(frame * 0.4) * 0.25 : 0;
     u.legs.forEach((l, i) => { l.rotation.x = Math.sin(w.anim * 3 + (i === 0 || i === 3 ? 0 : Math.PI)) * 0.7 * run; });
     u.tail.rotation.x = (w.type === 'kangal' ? -0.6 : 0.5) + (w.st === 'chase' ? -0.5 : Math.sin(frame * 0.08) * 0.15); u.head.rotation.x = w.st === 'chase' ? 0.15 : 0;
   }
@@ -3671,7 +3759,8 @@ function draw3(alpha, dtMs) {
       if (qc) txt(left ? `⏱ ${mmss(left)}` : `Hazine Sandığı · ${pk.reward} para`, qc.x, qc.y, 18, left ? '#bfe6ff' : '#ffd23f', 'center');
     }
     for (const s of L.stores) { const qs = Math.hypot(s.x - P.x, s.z - P.z) < 60 ? scr(s.x, STORE.h + STORE.rise + 1.1, s.z) : null; if (qs) txt(s.name, qs.x, qs.y, 20, '#ffd23f', 'center'); }
-    if (L.beyza && Math.hypot(L.beyza.x - P.x, L.beyza.z - P.z) < 45) { const qb = scr(L.beyza.x, 2.9, L.beyza.z); if (qb) txt('Çoban Beyza', qb.x, qb.y, 20, '#9ef07a', 'center'); }
+    if (L.beyza && Math.hypot(L.beyza.x - P.x, L.beyza.z - P.z) < 45) { const qb = scr(L.beyza.x, 1.7, L.beyza.z); if (qb) txt('Çoban Beyza', qb.x, qb.y, 20, '#9ef07a', 'center'); }
+    for (const g of L.dogs || []) if (Math.hypot(g.x - P.x, g.z - P.z) < 30) { const qd = scr(g.x, 1.8, g.z); if (qd) txt(g.name, qd.x, qd.y, 15, '#9ef07a', 'center'); }
     for (const w of L.wolves || []) if (!w.gone && w.hp > 0 && w.type !== 'wolf' && Math.hypot(w.x - P.x, w.z - P.z) < 45) { const qh = scr(w.x, w.type === 'harun' ? 3.0 : w.type === 'kangal' ? 2.6 : 1.9, w.z); if (qh) txt(w.type === 'harun' ? 'Harun' : 'Kangal', qh.x, qh.y, w.type === 'harun' ? 24 : 16, '#ff5a4f', 'center'); }
     const qt = Math.hypot(L.tutGate.x - P.x, L.tutGate.z - P.z) < 18 ? scr(L.tutGate.x, 4.3, L.tutGate.z) : null; if (qt) txt(save.tutDone ? 'Öğretici ✓' : 'Öğretici', qt.x, qt.y, 20, '#ffd23f', 'center');
 
