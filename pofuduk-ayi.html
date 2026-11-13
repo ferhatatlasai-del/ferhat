@@ -289,10 +289,12 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 <div class="panel" id="pButcher" hidden>
   <div class="card">
     <h2>Kasap</h2>
-    <p class="hwallet"><span class="coin" aria-hidden="true"></span> <b id="butCoins">0</b> para · <b id="butSucuk">0</b> sucuk</p>
+    <p class="hwallet"><span class="coin" aria-hidden="true"></span> <b id="butCoins">0</b> para · <b id="butSucuk">0</b> sucuk · <b id="butKomur">0</b> kömür</p>
     <div class="hlist">
       <div class="hrow"><span class="ic"><svg class="sucukImg" viewBox="0 0 64 48" aria-hidden="true"><path d="M8 34 C8 10 56 10 56 34" fill="none" stroke="#5e1414" stroke-width="15" stroke-linecap="round"/><path d="M8 34 C8 10 56 10 56 34" fill="none" stroke="#9a2a24" stroke-width="12" stroke-linecap="round"/><g fill="#f4e1c8"><circle cx="15" cy="23" r="1.6"/><circle cx="22" cy="17" r="1.3"/><circle cx="31" cy="15" r="1.7"/><circle cx="40" cy="16" r="1.2"/><circle cx="47" cy="20" r="1.5"/><circle cx="51" cy="28" r="1.3"/><circle cx="12" cy="30" r="1.1"/><circle cx="27" cy="20" r="1"/><circle cx="37" cy="21" r="1.1"/></g><path d="M14 18 C24 9 40 9 50 18" fill="none" stroke="#c9554d" stroke-width="2" stroke-linecap="round" opacity=".7"/><g stroke="#e8d3a8" stroke-width="2.5" stroke-linecap="round"><path d="M6 40 l-3 5"/><path d="M58 40 l3 5"/></g></svg></span><div><b>1 sucuk</b><small>Konağının ocağında ya da terastaki mangalda pişir: bütün kalplerin dolar!</small></div><button class="btn" id="but1" type="button">5 para</button></div>
       <div class="hrow"><span class="ic"><svg class="sucukImg" viewBox="0 0 64 48" aria-hidden="true"><path d="M8 34 C8 10 56 10 56 34" fill="none" stroke="#5e1414" stroke-width="15" stroke-linecap="round"/><path d="M8 34 C8 10 56 10 56 34" fill="none" stroke="#9a2a24" stroke-width="12" stroke-linecap="round"/><g fill="#f4e1c8"><circle cx="15" cy="23" r="1.6"/><circle cx="22" cy="17" r="1.3"/><circle cx="31" cy="15" r="1.7"/><circle cx="40" cy="16" r="1.2"/><circle cx="47" cy="20" r="1.5"/><circle cx="51" cy="28" r="1.3"/><circle cx="12" cy="30" r="1.1"/><circle cx="27" cy="20" r="1"/><circle cx="37" cy="21" r="1.1"/></g><path d="M14 18 C24 9 40 9 50 18" fill="none" stroke="#c9554d" stroke-width="2" stroke-linecap="round" opacity=".7"/><g stroke="#e8d3a8" stroke-width="2.5" stroke-linecap="round"><path d="M6 40 l-3 5"/><path d="M58 40 l3 5"/></g></svg></span><div><b>5 sucuk</b><small>Bol sucuk, indirimli!</small></div><button class="btn" id="but5" type="button">22 para</button></div>
+      <div class="hrow"><span class="ic"><svg class="sucukImg" viewBox="0 0 64 48" aria-hidden="true"><path d="M18 14 C14 22 12 36 16 44 L48 44 C52 36 50 22 46 14 Z" fill="#4a4038" stroke="#2a241f" stroke-width="2"/><path d="M20 14 L44 14 L40 9 L24 9 Z" fill="#3a322b"/><g fill="#1c1c1c"><circle cx="26" cy="9" r="4"/><circle cx="33" cy="7" r="4.5"/><circle cx="40" cy="9" r="3.6"/></g><circle cx="31" cy="8" r="1.6" fill="#ff6a1f"/><rect x="19" y="24" width="26" height="10" rx="2" fill="#e8dcc0"/><text x="32" y="32" font-size="7.5" font-family="sans-serif" font-weight="800" text-anchor="middle" fill="#2a2a2a">KÖMÜR</text></svg></span><div><b>1 çuval kömür</b><small>Terastaki mangalı yakmak için. Bir çuval mangalı 3 dakika yakar.</small></div><button class="btn" id="kom1" type="button">4 para</button></div>
+      <div class="hrow"><span class="ic"><svg class="sucukImg" viewBox="0 0 64 48" aria-hidden="true"><path d="M18 14 C14 22 12 36 16 44 L48 44 C52 36 50 22 46 14 Z" fill="#4a4038" stroke="#2a241f" stroke-width="2"/><path d="M20 14 L44 14 L40 9 L24 9 Z" fill="#3a322b"/><g fill="#1c1c1c"><circle cx="26" cy="9" r="4"/><circle cx="33" cy="7" r="4.5"/><circle cx="40" cy="9" r="3.6"/></g><circle cx="31" cy="8" r="1.6" fill="#ff6a1f"/><rect x="19" y="24" width="26" height="10" rx="2" fill="#e8dcc0"/><text x="32" y="32" font-size="7.5" font-family="sans-serif" font-weight="800" text-anchor="middle" fill="#2a2a2a">KÖMÜR</text></svg></span><div><b>5 çuval kömür</b><small>Uzun mangal keyfi, indirimli!</small></div><button class="btn" id="kom5" type="button">18 para</button></div>
     </div>
     <p class="small" id="butNote"></p>
     <button class="btn primary" id="butClose" type="button">Kapat</button>
@@ -931,6 +933,11 @@ function drawHud() {
   ctx.fillStyle = '#d9a066'; ctx.beginPath(); ctx.ellipse(hx, 36, 6, 4, 0, 0, 7); ctx.fill();
   txt('× ' + lives, hx + 16, 42, 26);
   txt(L.hub ? 'Bal Köyü' : L.tut ? 'Öğretici' : `${lvlIdx + 1}/${LEVELS.length}`, VW - 14, 78, 22, '#fff4dc', 'right');
+  if (L.hub && save.komur) { // a little sack next to the count
+    const tw = (txt(`Kömür: ${save.komur}`, VW - 14, 144, 17, '#d9d2c4', 'right'), ctx.measureText(`Kömür: ${save.komur}`).width), cx = VW - 14 - tw - 16, cy = 138;
+    ctx.save(); ctx.fillStyle = '#4a4038'; ctx.beginPath(); ctx.moveTo(cx - 6, cy - 6); ctx.lineTo(cx + 6, cy - 6); ctx.lineTo(cx + 8, cy + 8); ctx.lineTo(cx - 8, cy + 8); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#1c1c1c'; for (const dx of [-3, 1, 4]) { ctx.beginPath(); ctx.arc(cx + dx, cy - 7, 2.6, 0, 7); ctx.fill(); } ctx.fillStyle = '#ff6a1f'; ctx.beginPath(); ctx.arc(cx, cy - 8, 1.2, 0, 7); ctx.fill(); ctx.restore();
+  }
   if (L.hub && save.sucuk) { // a little sucuk next to the count
     const tw = (txt(`Sucuk: ${save.sucuk}`, VW - 14, 124, 17, '#ffb3a0', 'right'), ctx.measureText(`Sucuk: ${save.sucuk}`).width), cx = VW - 14 - tw - 18, cy = 122;
     ctx.save(); ctx.lineCap = 'round'; ctx.strokeStyle = '#5e1414'; ctx.lineWidth = 7; ctx.beginPath(); ctx.arc(cx, cy, 8, Math.PI, 0); ctx.stroke(); ctx.strokeStyle = '#9a2a24'; ctx.lineWidth = 5; ctx.stroke();
@@ -957,8 +964,8 @@ function drawHud() {
     if (L.mansion && chestLeft('h')) run.push([chestLeft('h'), 'Konak']);
     for (const pk of L.parks) { const l = chestLeft('c' + pk.id); if (l) run.push([l, `Bulut ${pk.id}`]); }
     run.sort((a, b) => a[0] - b[0]);
-    run.slice(0, 4).forEach(([l, n], i) => txt(`⏱ ${n} sandığı ${mmss(l)}`, VW - 14, 148 + i * 24, 18, '#bfe6ff', 'right'));
-    if (run.length > 4) txt(`+${run.length - 4} sandık daha`, VW - 14, 148 + 4 * 24, 15, '#bfe6ff', 'right');
+    run.slice(0, 4).forEach(([l, n], i) => txt(`⏱ ${n} sandığı ${mmss(l)}`, VW - 14, 168 + i * 24, 18, '#bfe6ff', 'right'));
+    if (run.length > 4) txt(`+${run.length - 4} sandık daha`, VW - 14, 168 + 4 * 24, 15, '#bfe6ff', 'right');
   }
   if (L.signs || L.burrow) { // tutorial: show the nearest sign's text; village: Mother Rabbit talks
     let sg = null, bd = 4.2; for (const g of L.signs || []) { const d = Math.hypot(g.x - P.x, g.z - P.z); if (d < bd && Math.abs(g.y - P.y) < 2.5) { bd = d; sg = g; } }
@@ -2708,7 +2715,7 @@ function syncHomeBtn() {
   if (L.hub && state === 'play' && !sleepT) {
     const i = houseIdxAt(P.x, P.z, P.y);
     if (i >= 0) t = i !== save.home ? (save.home >= 0 ? '🏠 Evimi buraya taşı' : '🏠 Bu ev benim olsun') : isNight() ? '😴 Uyu, sabah olsun' : '';
-    const gi = nearGrill(); if (gi >= 0) t = grillLit(gi) ? '💨 Mangalı söndür' : '🔥 Mangalı yak';
+    const gi = nearGrill(); if (gi >= 0) t = grillLit(gi) ? `💨 Mangalı söndür · ${mmss(((save.grillT || [])[gi] || 0) * 1000)}` : (save.komur || 0) > 0 ? `🔥 Mangalı yak (1 kömür, ${save.komur} var)` : '🔥 Mangalı yak (kömür yok)';
     if (t && !isTouch) t += ' (B)';
   }
   if (t !== homeLbl) { homeLbl = t; homeBtn.textContent = t; homeBtn.hidden = !t; }
@@ -2892,11 +2899,23 @@ function nearGrill() { // which mangal the bear is standing at, if any
   const m = L.mansion; if (!m) return -1;
   return [m.grill, m.grill2].findIndex(g => g && Math.hypot(P.x - g.x, P.z - g.z) < 2.4 && Math.abs(P.y - g.y) < 1);
 }
+const GRILL_S = 180; // one sack of charcoal burns for 3 minutes
 function toggleGrill(i) {
-  const on = save.grillOn = save.grillOn || [false, false], g = [L.mansion.grill, L.mansion.grill2][i];
+  const on = save.grillOn = save.grillOn || [false, false], g = [L.mansion.grill, L.mansion.grill2][i], left = save.grillT = save.grillT || [0, 0];
+  if (!on[i] && (save.komur || 0) < 1) { pop('Kömürün yok! Kasaptan kömür al', g.x, g.y + 2.4, g.z, '#ffffff', 110); sfx.hurt(); return; }
+  if (!on[i]) { save.komur--; left[i] = GRILL_S; }
   on[i] = !on[i]; saveGame();
   if (on[i]) { tone(120, 0.5, 'sawtooth', 300, 0.04); tone(600, 0.3, 'triangle', 200, 0.03, 0.1); burst(g.x, g.y + 1.2, g.z, '#ff7b3d', 18, 2.5); pop('Mangal yandı! Yanına gel, sucuk pişsin', g.x, g.y + 2.4, g.z, '#ffd23f', 110); g.armed = false; }
   else { tone(400, 0.4, 'triangle', 120, 0.03); burst(g.x, g.y + 1.2, g.z, '#d9d9d9', 14, 1.5); pop('Mangal söndü', g.x, g.y + 2.4, g.z, '#ffffff', 80); }
+}
+function grillStep() { // the charcoal burns down; when it is gone the mangal goes out
+  if (!save.grillOn) return; const left = save.grillT = save.grillT || [0, 0];
+  for (let i = 0; i < 2; i++) {
+    if (!save.grillOn[i]) continue;
+    if (!(left[i] > 0)) left[i] = GRILL_S; // lit before charcoal was sold
+    left[i] -= DT;
+    if (left[i] <= 0) { save.grillOn[i] = false; left[i] = 0; saveGame(); const g = L.mansion && [L.mansion.grill, L.mansion.grill2][i]; if (g) { pop('Kömür bitti, mangal söndü', g.x, g.y + 2.4, g.z, '#ffffff', 120); burst(g.x, g.y + 1.2, g.z, '#d9d9d9', 12, 1.2); } }
+  }
 }
 function cookSucuk(sp, where) {
   if ((save.sucuk || 0) < 1) { pop('Sucuğun yok! Kasaptan al', sp.x, sp.y + 2.2, sp.z, '#ffffff', 90); sfx.hurt(); return; }
@@ -2919,7 +2938,7 @@ const chestLeft = key => Math.max(0, ((save.chestT || {})[key] || 0) - Date.now(
 const mmss = ms => { const t = Math.ceil(ms / 1000); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); };
 function openChest(key) { (save.chestT = save.chestT || {})[key] = Date.now() + CHEST_MS; }
 function hubStep() {
-  turtleStep(); rabbitStep(); beyzaStep(); wolfStep(); sleepStep();
+  turtleStep(); rabbitStep(); beyzaStep(); wolfStep(); sleepStep(); grillStep();
   save.peaks = save.peaks || {};
   for (const m of L.mts) {
     const ch = m.chest;
@@ -4064,12 +4083,14 @@ $('honeyClose').onclick = closeHoney;
 /* ---------- the butcher's ---------- */
 const pButcher = $('pButcher');
 function renderButcher(msg) {
-  $('butCoins').textContent = save.coins; $('butSucuk').textContent = save.sucuk || 0;
-  $('but1').disabled = save.coins < 5; $('but5').disabled = save.coins < 22;
-  $('butNote').textContent = msg || (L.mansion ? 'Kasap: "Taze sucuk! Konağının mutfağındaki ocakta ya da terastaki mangalda pişir."' : 'Kasap: "Sucuğu pişirmek için bir konağın olmalı: önce bir eve gir ve \'Bu ev benim olsun\' de!"');
+  $('butCoins').textContent = save.coins; $('butSucuk').textContent = save.sucuk || 0; $('butKomur').textContent = save.komur || 0;
+  $('but1').disabled = save.coins < 5; $('but5').disabled = save.coins < 22; $('kom1').disabled = save.coins < 4; $('kom5').disabled = save.coins < 18;
+  $('butNote').textContent = msg || (L.mansion ? 'Kasap: "Taze sucuk ve mangal kömürü! Sucuğu konağının ocağında ya da kömürle yaktığın mangalda pişir."' : 'Kasap: "Sucuğu pişirmek için bir konağın olmalı: önce bir eve gir ve \'Bu ev benim olsun\' de!"');
 }
 const buySucuk = (n, price) => { if (save.coins < price) return; save.coins -= price; save.sucuk = (save.sucuk || 0) + n; saveGame(); sfx.coin(); renderButcher(`${n} sucuk aldın! Şimdi ${save.sucuk} sucuğun var.`); };
 $('but1').onclick = () => buySucuk(1, 5); $('but5').onclick = () => buySucuk(5, 22);
+const buyKomur = (n, price) => { if (save.coins < price) return; save.coins -= price; save.komur = (save.komur || 0) + n; saveGame(); sfx.coin(); renderButcher(`${n} çuval kömür aldın! Şimdi ${save.komur} çuvalın var.`); };
+$('kom1').onclick = () => buyKomur(1, 4); $('kom5').onclick = () => buyKomur(5, 18);
 function openButcher() { audio(); unlockMouse(); state = 'pause'; for (const k in keys) keys[k] = false; stick.x = stick.y = 0; renderButcher(); pButcher.hidden = false; touchUi.hidden = true; setTimeout(() => $('butClose').focus(), 50); }
 function closeButcher() { pButcher.hidden = true; setPlaying(); }
 $('butClose').onclick = closeButcher;
