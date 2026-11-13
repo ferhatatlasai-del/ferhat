@@ -544,6 +544,7 @@ const QUESTS = [
   { id: 'decor', name: 'Konak Süsleyici', desc: "Bal Dükkânı'ndan konağın için 3 eşya al", stat: 'decor', goal: 3, reward: 40 },
   { id: 'kangal', name: 'Kangal Kovucu', desc: "Harun'un kangal köpeklerinden 3 tanesini yen", stat: 'kangal', goal: 3, reward: 45 },
   { id: 'harun', name: "Harun'u Kov", desc: "Gece köye gelen Harun'u baltayla vurup köyden kov", stat: 'harun', goal: 1, reward: 60 },
+  { id: 'sheep', name: 'Koyun Dostu', desc: "Çoban Beyza'nın 6 koyununu sev", stat: 'sheep', goal: 6, reward: 25 },
   { id: 'boss', name: 'Kahraman', desc: '2 boss yen', stat: 'boss', goal: 2, reward: 50 },
   { id: 'cloud', name: 'Bulut Tırmanıcısı', desc: "Bal Köyü'ndeki bir bulut parkurunun tepesindeki sandığa ulaş", stat: 'cloud', goal: 1, reward: 30 },
   { id: 'diamond', name: 'Elmas Usta', desc: "Demirciden Elmas Balta'yı al", stat: 'diamond', goal: 1, reward: 40 },
@@ -652,6 +653,7 @@ addEventListener('keydown', e => {
 addEventListener('keyup', e => { const k = map[e.code]; if (k) keys[k] = false; if (k === 'fwd') sprint = false; });
 addEventListener('blur', () => { for (const k in keys) keys[k] = false; sprint = false; });
 const isTouch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
+if (!isTouch) { const sp = document.getElementById('splash'); sp.querySelector('.tap').textContent = 'BAŞLAMAK İÇİN TIKLA'; sp.setAttribute('aria-label', 'HG Yapımcılık. Başlamak için tıkla'); }
 document.querySelectorAll('.tb').forEach(b => {
   const k = b.dataset.k;
   const on = e => { e.preventDefault(); audio(); press(k); b.classList.add('on'); };
@@ -937,6 +939,7 @@ function drawHud() {
   if (L.signs || L.burrow) { // tutorial: show the nearest sign's text; village: Mother Rabbit talks
     let sg = null, bd = 4.2; for (const g of L.signs || []) { const d = Math.hypot(g.x - P.x, g.z - P.z); if (d < bd && Math.abs(g.y - P.y) < 2.5) { bd = d; sg = g; } }
     if (L.burrow && Math.hypot(L.burrow.x - P.x, L.burrow.z - P.z) < 4.6 && P.y < 2.5) sg = { title: 'Anne Tavşan', text: momText() };
+    if (L.beyza && Math.hypot(L.beyza.x - P.x, L.beyza.z - P.z) < 4 && P.y < 2.5) sg = { title: 'Çoban Beyza', text: beyzaText() };
     if (sg) {
       const words = sg.text.split(' '), lines = []; let ln = '';
       for (const w of words) { if ((ln + ' ' + w).length > 52 && ln) { lines.push(ln); ln = w; } else ln = ln ? ln + ' ' + w : w; } lines.push(ln);
@@ -1361,6 +1364,38 @@ function rabbitModel(fur, mom) {
   mk('sph', '#ff8fb0', [0.045, 0.035, 0.03], [0, -0.02, 0.21], head);
   if (mom) { mk('cyl', '#ff6b8a', [0.21, 0.07, 0.21], [0, -0.17, -0.02], head); mk('sph', '#ff6b8a', [0.09, 0.07, 0.05], [0.14, -0.15, 0.13], head); }
   g.userData = { body: b, head, ears };
+  return g;
+}
+function beyzaModel() {
+  const g = new THREE.Group(), b = grp(g), legs = [], arms = [], skin = '#f0c9a0', hair = '#6b3a1e';
+  for (const sx of [-1, 1]) { const l = grp(b, sx * 0.14, 0.8, 0); mk('cyl', '#f0c9a0', [0.1, 0.8, 0.1], [0, -0.4, 0], l); mk('box', '#7a4a24', [0.17, 0.14, 0.28], [0, -0.78, 0.05], l); legs.push(l); }
+  mk('cone', '#4f8fcf', [0.55, 0.85, 0.55], [0, 1.15, 0], b); mk('cyl', '#4f8fcf', [0.25, 0.45, 0.22], [0, 1.6, 0], b);
+  mk('box', '#c98a4b', [0.5, 0.4, 0.42], [0, 1.6, 0.02], b); // shepherd's vest
+  for (const sx of [-1, 1]) { const a = grp(b, sx * 0.32, 1.78, 0); mk('cyl', '#4f8fcf', [0.09, 0.55, 0.09], [0, -0.27, 0], a); mk('sph', skin, [0.09, 0.09, 0.09], [0, -0.58, 0], a); arms.push(a); }
+  const crook = grp(arms[1], 0, -0.58, 0.05); mk('cyl', '#8a5a2b', [0.04, 1.9, 0.04], [0, 0.35, 0.12], crook); const hook = mk('torus', '#8a5a2b', [0.18, 0.18, 0.18], [0.1, 1.32, 0.12], crook); hook.rotation.y = Math.PI / 2;
+  const head = grp(b, 0, 2.08, 0);
+  mk('sph', skin, [0.26, 0.28, 0.26], [0, 0, 0], head);
+  for (const sx of [-1, 1]) { mk('sph', '#22160c', [0.04, 0.05, 0.03], [sx * 0.09, 0.03, 0.23], head); mk('sph', '#ff9aa8', [0.05, 0.03, 0.02], [sx * 0.15, -0.05, 0.21], head); }
+  mk('box', '#c2464f', [0.09, 0.025, 0.02], [0, -0.1, 0.25], head);
+  // curly hair: lots of little round curls all over, down to the shoulders
+  for (let k = 0; k < 46; k++) {
+    const a = k * 2.399, y = 0.32 - (k / 46) * 0.62, r = Math.sqrt(Math.max(0.02, 0.1 - y * y * 0.6)) * 0.95 + 0.12;
+    const x = Math.sin(a) * r, z = Math.cos(a) * r;
+    if (z > 0.12 && y < 0.18 && y > -0.2) continue; // keep the face clear
+    mk('sph', k % 3 ? hair : '#7d4524', [0.1, 0.1, 0.1], [x, y, z - 0.03], head);
+  }
+  for (let k = 0; k < 10; k++) { const a = -1.2 + k * 0.27; mk('sph', hair, [0.11, 0.11, 0.11], [Math.sin(a) * 0.22, 0.27 + Math.cos(k) * 0.03, Math.cos(a) * 0.12 + 0.08], head); }
+  for (const sx of [-1, 1]) for (let k = 0; k < 3; k++) mk('sph', hair, [0.1, 0.1, 0.1], [sx * (0.24 + k * 0.03), -0.3 - k * 0.14, -0.06], head);
+  g.userData = { body: b, head, legs, arms };
+  return g;
+}
+function sheepModel() {
+  const g = new THREE.Group(), b = grp(g), legs = [];
+  for (const [sx, sz] of [[-1, 1], [1, 1], [-1, -1], [1, -1]]) { const l = grp(b, sx * 0.2, 0.42, sz * 0.28); mk('cyl', '#2a2420', [0.06, 0.42, 0.06], [0, -0.21, 0], l); legs.push(l); }
+  for (let k = 0; k < 9; k++) mk('sph', k % 2 ? '#ffffff' : '#f2efe6', [0.3, 0.28, 0.3], [Math.sin(k * 2.1) * 0.2, 0.65 + Math.cos(k * 1.3) * 0.1, -0.3 + (k % 4) * 0.2], b);
+  const head = grp(b, 0, 0.78, 0.5); mk('sph', '#2a2420', [0.15, 0.17, 0.2], [0, 0, 0.05], head); mk('sph', '#ffffff', [0.16, 0.1, 0.14], [0, 0.13, -0.02], head);
+  for (const sx of [-1, 1]) { mk('sph', '#2a2420', [0.09, 0.04, 0.05], [sx * 0.16, 0.03, 0], head); mk('sph', '#ffffff', [0.025, 0.025, 0.02], [sx * 0.07, 0.04, 0.2], head); }
+  g.userData = { body: b, head, legs };
   return g;
 }
 function kangalModel() {
@@ -1937,7 +1972,8 @@ function buildHub() {
   // walk-in shops near the middle of the village; small houses in the way give up their spot
   const SR = Math.hypot(STORE.hw, STORE.hd) + 1, stores = [];
   const segDist = (x, z, pa) => { const dx = pa.x1 - pa.x0, dz = pa.z1 - pa.z0, t = Math.max(0, Math.min(1, ((x - pa.x0) * dx + (z - pa.z0) * dz) / (dx * dx + dz * dz))); return Math.hypot(x - pa.x0 - dx * t, z - pa.z0 - dz * t); };
-  const findSpot = (px, pz, rad, maxR, pathCost) => {
+  const bigs = [];
+  const findSpot = (px, pz, rad, maxR, pathCost, goneCost = 8) => {
     let best = null;
     for (let r = 0; r <= maxR; r += 1.5) {
       const n = r ? Math.ceil(r * 2.4) : 1;
@@ -1947,9 +1983,9 @@ function buildHub() {
         if (mts.some(m => Math.hypot(x - m.cx, z - m.cz) < m.r + rad + 1) || spots.some(sp => Math.hypot(x - sp.x, z - sp.z) < rad + 8)) continue;
         if (parks.some(pk => Math.hypot(x - pk.cx, z - pk.cz) < pk.rad + rad + 2.5)) continue;
         if ([goal, board, tutGate, { x: 0, z: 50 }, { x: 0, z: 32 }].some(o => Math.hypot(x - o.x, z - o.z) < rad + 4)) continue;
-        if (stores.some(s => Math.hypot(x - s.x, z - s.z) < rad + SR + 2)) continue;
+        if (stores.some(s => Math.hypot(x - s.x, z - s.z) < rad + SR + 2) || bigs.some(o => Math.hypot(x - o.x, z - o.z) < rad + o.rad + 2)) continue;
         const gone = houses.filter(o => Math.hypot(o.x - x, o.z - z) < rad + 4.2).length;
-        const score = r + gone * 8 + (paths.some(pa => segDist(x, z, pa) < rad + 1) ? pathCost : 0);
+        const score = r + gone * goneCost + (paths.some(pa => segDist(x, z, pa) < rad + 1) ? pathCost : 0);
         if (!best || score < best.score) best = { x, z, score };
       }
     }
@@ -1982,10 +2018,12 @@ function buildHub() {
     }
     if (best) {
       const raw = Math.atan2(-best.x, 20 - best.z), dir = ((Math.round(raw / (Math.PI / 2)) % 4) + 4) % 4;
-      mansion = { x: best.x, z: best.z, dir, yaw: dir * Math.PI / 2, big: true };
+      mansion = { x: best.x, z: best.z, dir, yaw: dir * Math.PI / 2, big: true }; bigs.push({ x: best.x, z: best.z, rad: rad });
       houses.forEach((o, j) => { if (j === save.home || Math.hypot(o.x - best.x, o.z - best.z) < rad + 4.2) o.gone = true; });
     }
   }
+  // Beyza the shepherd's meadow, somewhere open (no house is moved for it)
+  const pasture = (() => { const sp = findSpot(-34, 62, 9, 60, 6, 60); return sp ? { x: sp.x, z: sp.z, r: 8 } : null; })();
   // hollow houses: four walls with a doorway at the front, and a few coins inside
   const hitems = [], got = save.houseCoins || [];
   houses.forEach((h, hi) => {
@@ -2017,7 +2055,7 @@ function buildHub() {
   const segD = (x, z, pa) => { const dx = pa.x1 - pa.x0, dz = pa.z1 - pa.z0, t = Math.max(0, Math.min(1, ((x - pa.x0) * dx + (z - pa.z0) * dz) / (dx * dx + dz * dz))); return Math.hypot(x - pa.x0 - dx * t, z - pa.z0 - dz * t); };
   const offPath = (x, z) => paths.every(pa => segD(x, z, pa) > 2.4) && Math.hypot(x - tutGate.x, z - tutGate.z) > 4;
   for (let i = 0; i < 620; i++) { const x = (rnd() - 0.5) * 2 * (R - 2), z = (rnd() - 0.5) * 2 * (R - 2); if (clear(x, z) && offPath(x, z)) trees.push({ x, y: 0, z, s: 0.7 + rnd() * 0.5 }); }
-  const offMan = (x, z) => (!mansion || Math.hypot(x - mansion.x, z - mansion.z) > Math.hypot(MAN.hw, MAN.hd) + 5) && stores.every(s => Math.hypot(x - s.x, z - s.z) > SR + 5.5); // a clear yard all around
+  const offMan = (x, z) => (!pasture || Math.hypot(x - pasture.x, z - pasture.z) > pasture.r + 2) && (!mansion || Math.hypot(x - mansion.x, z - mansion.z) > Math.hypot(MAN.hw, MAN.hd) + 5) && stores.every(s => Math.hypot(x - s.x, z - s.z) > SR + 5.5); // a clear yard all around
   for (const t of trees) if (!offMan(t.x, t.z)) t.gone = true;
   // the shops move into their buildings now that the trees are placed (the trees still grow where they always did)
   const [shopS, wardS, smithS, honeyS] = stores;
@@ -2058,7 +2096,9 @@ function buildHub() {
     const a = burrow.yaw + (id - 2) * 0.62, hx = burrow.x + Math.sin(a) * 2.1, hz = burrow.z + Math.cos(a) * 2.1, ok = home.includes(id);
     babies.push({ id, lx: x, lz: z, hx, hz, x: ok ? hx : x, y: 0, z: ok ? hz : z, yaw: ok ? a : rr2() * 6.28, st: ok ? 'home' : 'lost', t: rr2() * 5, hop: 0 });
   }
-  return { def: HUB, hub: true, R, boxes, items: hitems, enemies: [], trees, paths, start: { x: 0, y: 0, z: 50 }, checkpoints: [], cpActive: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, ward, smith, board, tutGate, houses, turtles, parks, mts, burrow, rabbits, babies, mansion, stores, honeyShop };
+  return { def: HUB, hub: true, R, boxes, items: hitems, enemies: [], trees, paths, start: { x: 0, y: 0, z: 50 }, checkpoints: [], cpActive: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, ward, smith, board, tutGate, houses, turtles, parks, mts, burrow, rabbits, babies, mansion, stores, honeyShop, pasture,
+    beyza: pasture && { x: pasture.x, z: pasture.z, yaw: 0, tx: pasture.x, tz: pasture.z, t: 0, sp: 0, anim: 0 },
+    sheep: pasture ? Array.from({ length: 6 }, (_, i) => ({ id: i, x: pasture.x + Math.sin(i * 1.05) * 4, z: pasture.z + Math.cos(i * 1.05) * 4, yaw: i, t: i * 0.7, next: 2, rest: false, petT: 0, hop: 0, anim: 0 })) : [] };
 }
 function mkBoss(type, c) {
   const base = { type, c, x: c.x, z: c.zc - 3, y: c.y, vx: 0, vz: 0, vy: 0, t: 0, inv: 0, active: false, defeated: false, deadT: 0, yaw: 0, tx: 0, tz: 0, state: type === 'mush' ? 'walk' : type === 'queen' ? 'hover' : 'aim' };
@@ -2557,7 +2597,7 @@ function syncHomeBtn() {
 /* ---------- wolves (village, at night) ---------- */
 const WOLF_MAX = 4, FOE = { // what comes out at night
   wolf: { hp: 2, run: 5.7, dmg: 1, sight: 17, coins: 3 },
-  kangal: { hp: 3, run: 6.1, dmg: 2, sight: 22, coins: 4 },  // Harun's kangals: fast, and a bite takes two hearts
+  kangal: { hp: 3, run: 7.6, dmg: 2, sight: 24, coins: 4 },  // Harun's kangals: big, faster than a walking bear, and a bite takes two hearts
   harun: { hp: 5, run: 3.4, dmg: 1, sight: 30, coins: 15 },
 };
 let harunMsg = 0, harunTxt = '';
@@ -2605,7 +2645,7 @@ function wolfStep() {
     else { w.x = nx; w.z = nz; }
     w.sp = sp; w.anim += sp * DT * 2.2;
     // touching the bear: a jump on its head defeats it, otherwise it bites
-    const reach = w.type === 'harun' ? 1.0 : w.type === 'kangal' ? 1.25 : 1.15, tall = w.type === 'harun' ? 2.4 : 1.6;
+    const reach = w.type === 'harun' ? 1.0 : w.type === 'kangal' ? 1.7 : 1.15, tall = w.type === 'harun' ? 2.4 : w.type === 'kangal' ? 2.2 : 1.6;
     if (d < reach && P.y < tall && !P.dead && !w.flee) {
       if (P.vy < 0 && P.y > tall * 0.4) { P.vy = keys.jump ? 12 : 8.5; P.pound = false; P.jumps = 1; hitWolf(w, 1, -dx, -dz); }
       else if (w.bite <= 0) { w.bite = 1.2; hurtBy(F.dmg, dx, dz); }
@@ -2628,6 +2668,34 @@ function hitWolf(w, dmg, kx, kz) {
   w.dead = 1; sfx.stomp(); shake = 6; burst(w.x, 0.7, w.z, type === 'kangal' ? '#d8b98a' : '#8a909a', 16, 3);
   addCoins(FOE[type].coins, w.x, 1.8, w.z); bump(type === 'kangal' ? 'kangal' : 'wolf');
 }
+function beyzaStep() {
+  const bz = L.beyza, pa = L.pasture; if (!bz) return;
+  bz.t += DT; const d = Math.hypot(P.x - bz.x, P.z - bz.z);
+  if (d < 5) { bz.sp = 0; bz.yaw += angDiff(Math.atan2(P.x - bz.x, P.z - bz.z), bz.yaw) * 0.1; }
+  else {
+    if (bz.t > 4 || Math.hypot(bz.tx - bz.x, bz.tz - bz.z) < 0.3) { bz.t = 0; const a = Math.random() * 6.28, r = Math.random() * pa.r * 0.55; bz.tx = pa.x + Math.sin(a) * r; bz.tz = pa.z + Math.cos(a) * r; }
+    const dd = Math.hypot(bz.tx - bz.x, bz.tz - bz.z); bz.sp = dd > 0.3 ? 1.1 : 0;
+    if (bz.sp) { bz.yaw += angDiff(Math.atan2(bz.tx - bz.x, bz.tz - bz.z), bz.yaw) * 0.08; bz.x += Math.sin(bz.yaw) * bz.sp * DT; bz.z += Math.cos(bz.yaw) * bz.sp * DT; }
+  }
+  bz.anim += bz.sp * DT * 3;
+  for (const s of L.sheep) {
+    s.t += DT; if (s.petT > 0) s.petT--; if (s.hop > 0) s.hop -= DT;
+    const ds = Math.hypot(P.x - s.x, P.z - s.z);
+    if (ds < 1.4 && s.petT <= 0 && P.y < 1.5) { s.petT = 200; s.hop = 0.45; s.yaw = Math.atan2(P.x - s.x, P.z - s.z); tone(392, 0.25, 'sawtooth', 330, 0.03); tone(392, 0.25, 'sawtooth', 350, 0.03, 0.12); pop('Meee!', s.x, 1.5, s.z, '#ffffff', 60); burst(s.x, 0.9, s.z, '#ffffff', 8, 1.4); bump('sheep', 1, s.id); }
+    if (s.petT > 150) { s.sp = 0; continue; }
+    if (s.t > s.next) { s.t = 0; s.next = 2 + Math.random() * 3; s.yaw += (Math.random() - 0.5) * 2.4; s.rest = Math.random() < 0.4; }
+    const home = isNight() ? bz : pa, out = Math.hypot(s.x - home.x, s.z - home.z) > (isNight() ? 2.5 : pa.r - 1); // at night the flock gathers round Beyza
+    if (out) { s.yaw += angDiff(Math.atan2(home.x - s.x, home.z - s.z), s.yaw) * 0.1; s.rest = false; }
+    s.sp = s.rest ? 0 : out ? 1.6 : 0.7;
+    s.x += Math.sin(s.yaw) * s.sp * DT; s.z += Math.cos(s.yaw) * s.sp * DT; s.anim += s.sp * DT * 4;
+  }
+}
+function beyzaText() {
+  const n = ((save.stats || {}).sheep || []).length;
+  if (isNight()) return `Gece oldu ${save.name}! Harun'un kangalları geliyor, koyunlarımı yanıma topladım. Kangalları baltanla kov, olur mu?`;
+  if (n >= 6) return 'Bütün koyunlarım seni çok sevdi! Görevler\'den (G) ödülünü almayı unutma.';
+  return `Merhaba, ben Beyza! Bu köyün çobanıyım. Koyunlarımın yanına gidip onları sev, sana "Meee!" derler. (${n}/6)`;
+}
 function momText() {
   const n = ((save.stats || {}).bunny || []).length, f = L.babies.filter(b => b.st === 'follow').length;
   if (n >= 5) return `Bütün yavrularım evde! Çok teşekkür ederim ${save.name}. Görevler'den (G) ödülünü almayı unutma.`;
@@ -2641,7 +2709,7 @@ const chestLeft = key => Math.max(0, ((save.chestT || {})[key] || 0) - Date.now(
 const mmss = ms => { const t = Math.ceil(ms / 1000); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); };
 function openChest(key) { (save.chestT = save.chestT || {})[key] = Date.now() + CHEST_MS; }
 function hubStep() {
-  turtleStep(); rabbitStep(); wolfStep(); sleepStep();
+  turtleStep(); rabbitStep(); beyzaStep(); wolfStep(); sleepStep();
   save.peaks = save.peaks || {};
   for (const m of L.mts) {
     const ch = m.chest;
@@ -2716,7 +2784,7 @@ function axeHit() {
   const inArc = (x, z, y, extra) => { const dx = x - P.x, dz = z - P.z, d = Math.hypot(dx, dz); if (d > range + extra || Math.abs(y - P.y) > 1.4) return false; return full || d < 0.6 || (dx * fx + dz * fz) / d > 0.3; };
   let hit = false;
   for (const e of L.enemies) if (e.alive && inArc(e.x, e.z, e.y, e.r)) { damageEnemy(e, dmg, e.x - P.x, e.z - P.z); hit = true; }
-  for (const w of L.wolves || []) if (!w.gone && w.hp > 0 && inArc(w.x, w.z, w.y, 0.6)) { hitWolf(w, dmg, w.x - P.x, w.z - P.z); hit = true; }
+  for (const w of L.wolves || []) if (!w.gone && w.hp > 0 && inArc(w.x, w.z, w.y, w.type === 'kangal' ? 1.0 : 0.6)) { hitWolf(w, dmg, w.x - P.x, w.z - P.z); hit = true; }
   const b = L.boss;
   if (b && b.active && !b.defeated && inArc(b.x, b.z, b.y, b.r)) {
     if (b.inv === 0 && (b.type === 'mush' || b.state === 'stunned')) hitBoss(b); else sfx.clank();
@@ -3236,6 +3304,13 @@ function buildScene() {
     if (G.sunMesh) G.sunMesh.material = G.sunMesh.material.clone();
     G.homeMark = null; placeHomeMark();
     for (const b of L.babies) { b.mesh = rabbitModel('#fff6ea'); b.mesh.scale.setScalar(0.62); W.add(b.mesh); }
+    if (L.pasture) { const pa = L.pasture;
+      const mead = mk('cyl', '#7fd36a', [pa.r + 0.5, 0.04, pa.r + 0.5], [pa.x, 0.03, pa.z], W); mead.castShadow = false; mead.receiveShadow = true;
+      for (let k = 0; k < 28; k++) { const a = k / 28 * 6.283; if (k === 0 || k === 27) continue; mk('box', '#8a5a2b', [0.14, 0.9, 0.14], [pa.x + Math.sin(a) * (pa.r + 0.5), 0.45, pa.z + Math.cos(a) * (pa.r + 0.5)], W); }
+      for (let k = 0; k < 14; k++) { const a = (k + 0.5) / 14 * 6.283; if (k === 0 || k === 13) continue; const rl = mk('box', '#a0703c', [0.08, 0.1, 2 * Math.PI * (pa.r + 0.5) / 14], [pa.x + Math.sin(a) * (pa.r + 0.5), 0.7, pa.z + Math.cos(a) * (pa.r + 0.5)], W); rl.rotation.y = a; }
+      for (let k = 0; k < 12; k++) mk('sph', ['#ffffff', '#ffd23f', '#ff8fc8'][k % 3], [0.1, 0.1, 0.1], [pa.x + Math.sin(k * 2.4) * (2 + k % 5), 0.12, pa.z + Math.cos(k * 2.4) * (2 + k % 5)], W);
+      L.beyza.mesh = beyzaModel(); W.add(L.beyza.mesh);
+      for (const s of L.sheep) { s.mesh = sheepModel(); W.add(s.mesh); } }
     { const bw = L.burrow, g5 = grp(W, bw.x, 0, bw.z); g5.rotation.y = bw.yaw;
       mk('hemi', '#7a9b3a', [1.25, 0.6, 1.25], [0, 0, -0.2], g5); mk('sph', '#2b1a0e', [0.42, 0.34, 0.12], [0, 0.22, 0.98], g5);
       for (let k = 0; k < 5; k++) mk('sph', ['#ff5fa2', '#ffd23f', '#ffffff'][k % 3], [0.1, 0.1, 0.1], [Math.cos(k * 1.3) * 0.9, 0.35 + (k % 2) * 0.15, Math.sin(k * 1.3) * 0.7 - 0.2], g5);
@@ -3252,6 +3327,11 @@ function buildScene() {
 function portalSpin() {
   if (L.mansion) { for (const f of L.mansion.fish || []) { const k = f.userData.k, a = frame * 0.02 * (1 + k * 0.15) + k * 1.3; f.position.set(-3.7 + Math.sin(a * 1.3) * 0.35, f.userData.y + Math.sin(a * 2) * 0.05, 0.5 + Math.cos(a) * 0.85); f.rotation.y = a + Math.PI / 2; }
     if (L.mansion.jet) L.mansion.jet.scale.set(0.22, 0.5 + Math.sin(frame * 0.2) * 0.12, 0.22); }
+  if (L.beyza && L.beyza.mesh) { const bz = L.beyza, m = bz.mesh, u = m.userData, sw = Math.sin(bz.anim) * 0.5 * Math.min(1, bz.sp);
+    m.position.set(bz.x, 0, bz.z); m.rotation.y = bz.yaw; u.legs[0].rotation.x = sw; u.legs[1].rotation.x = -sw; u.arms[0].rotation.x = -sw; u.arms[1].rotation.x = -0.3 + sw * 0.3;
+    u.head.rotation.z = bz.sp ? 0 : Math.sin(frame * 0.03) * 0.08; }
+  if (L.sheep) for (const s of L.sheep) { if (!s.mesh) continue; const u = s.mesh.userData; s.mesh.position.set(s.x, s.hop > 0 ? Math.sin(s.hop / 0.45 * Math.PI) * 0.4 : 0, s.z); s.mesh.rotation.y = s.yaw;
+    u.legs.forEach((l, i) => { l.rotation.x = Math.sin(s.anim + (i === 0 || i === 3 ? 0 : Math.PI)) * 0.5 * Math.min(1, s.sp); }); u.head.rotation.x = s.sp ? 0 : 0.5 + Math.sin(frame * 0.05 + s.id) * 0.2; }
   if (L.stores) for (const s of L.stores) if (s.keeper) s.keeper.rotation.y = Math.sin(frame * 0.02 + s.x) * 0.3;
   if (L.mansion && L.mansion.glow) { L.mansion.glow.visible = !chestLeft('h'); L.mansion.glow.scale.setScalar(1.2 + Math.sin(frame * 0.1) * 0.12); }
   if (L.mts) for (const mt of L.mts) if (mt.glow) { mt.glow.visible = !chestLeft('m' + mt.id); mt.glow.scale.setScalar(1.2 + Math.sin(frame * 0.1) * 0.12); }
@@ -3303,11 +3383,11 @@ function drawWolves() {
   if (!L.wolves) return;
   for (const w of L.wolves) {
     if (w.gone) { if (w.mesh) { w.mesh.parent && w.mesh.parent.remove(w.mesh); w.mesh = null; } continue; }
-    if (!w.mesh) { w.mesh = w.type === 'harun' ? harunModel() : w.type === 'kangal' ? kangalModel() : wolfModel(); if (w.type === 'kangal') w.mesh.scale.setScalar(1.15); G.world.add(w.mesh); }
+    if (!w.mesh) { w.mesh = w.type === 'harun' ? harunModel() : w.type === 'kangal' ? kangalModel() : wolfModel(); if (w.type === 'kangal') w.mesh.scale.setScalar(1.6); G.world.add(w.mesh); }
     const m = w.mesh, u = m.userData;
     m.position.set(w.x, w.y, w.z); m.rotation.y = w.yaw;
     if (w.hp <= 0) { m.scale.set(1.15, Math.max(0.05, 1 - w.dead / 20), 1.15); continue; }
-    const base = w.type === 'kangal' ? 1.15 : 1; m.scale.setScalar(base * (w.hitT > 0 && w.hitT % 4 < 2 ? 1.08 : 1));
+    const base = w.type === 'kangal' ? 1.6 : 1; m.scale.setScalar(base * (w.hitT > 0 && w.hitT % 4 < 2 ? 1.08 : 1));
     const run = Math.min(1, w.sp / 4);
     if (w.type === 'harun') { const sw = Math.sin(w.anim * 2.2) * 0.6 * Math.min(1, w.sp / 2); u.legs[0].rotation.x = sw; u.legs[1].rotation.x = -sw; u.arms[0].rotation.x = -sw * 0.8; u.arms[1].rotation.x = w.st === 'chase' ? -1.2 + Math.sin(frame * 0.2) * 0.4 : sw * 0.8; continue; }
     u.legs.forEach((l, i) => { l.rotation.x = Math.sin(w.anim * 3 + (i === 0 || i === 3 ? 0 : Math.PI)) * 0.7 * run; });
@@ -3591,7 +3671,8 @@ function draw3(alpha, dtMs) {
       if (qc) txt(left ? `⏱ ${mmss(left)}` : `Hazine Sandığı · ${pk.reward} para`, qc.x, qc.y, 18, left ? '#bfe6ff' : '#ffd23f', 'center');
     }
     for (const s of L.stores) { const qs = Math.hypot(s.x - P.x, s.z - P.z) < 60 ? scr(s.x, STORE.h + STORE.rise + 1.1, s.z) : null; if (qs) txt(s.name, qs.x, qs.y, 20, '#ffd23f', 'center'); }
-    for (const w of L.wolves || []) if (!w.gone && w.hp > 0 && w.type !== 'wolf' && Math.hypot(w.x - P.x, w.z - P.z) < 45) { const qh = scr(w.x, w.type === 'harun' ? 3.0 : 1.9, w.z); if (qh) txt(w.type === 'harun' ? 'Harun' : 'Kangal', qh.x, qh.y, w.type === 'harun' ? 24 : 16, '#ff5a4f', 'center'); }
+    if (L.beyza && Math.hypot(L.beyza.x - P.x, L.beyza.z - P.z) < 45) { const qb = scr(L.beyza.x, 2.9, L.beyza.z); if (qb) txt('Çoban Beyza', qb.x, qb.y, 20, '#9ef07a', 'center'); }
+    for (const w of L.wolves || []) if (!w.gone && w.hp > 0 && w.type !== 'wolf' && Math.hypot(w.x - P.x, w.z - P.z) < 45) { const qh = scr(w.x, w.type === 'harun' ? 3.0 : w.type === 'kangal' ? 2.6 : 1.9, w.z); if (qh) txt(w.type === 'harun' ? 'Harun' : 'Kangal', qh.x, qh.y, w.type === 'harun' ? 24 : 16, '#ff5a4f', 'center'); }
     const qt = Math.hypot(L.tutGate.x - P.x, L.tutGate.z - P.z) < 18 ? scr(L.tutGate.x, 4.3, L.tutGate.z) : null; if (qt) txt(save.tutDone ? 'Öğretici ✓' : 'Öğretici', qt.x, qt.y, 20, '#ffd23f', 'center');
 
   }
@@ -3803,7 +3884,7 @@ function mapView(c, bb, [vx, vy, vw, vh], side, me, opt, fs) {
     for (const b of L.babies || []) if (b.st !== 'home') dot(b.x, b.z, fs * 0.38, '#ff8fb8', '#8a2d55');
     for (const pt of L.portals) { dot(pt.x, pt.z, fs * 0.62, pt.locked ? '#9a9a9a' : LEVELS[pt.i].grass, pt.locked ? '#555' : '#3d2a1a'); label(String(pt.i + 1), pt.x, pt.z, fs * 0.8, pt.locked ? '#dddddd' : '#ffffff'); }
     const place = (o, ch, name, col) => { dot(o.x, o.z, fs * 0.6, col); label(ch, o.x, o.z, fs * 0.7); label(name, o.x, o.z, fs * 0.7, '#ffd23f', -fs * 1.05); };
-    place(L.shop, '♥', 'Kalp', '#e63946'); place(L.ward, '★', 'Kıyafet', '#8a5aa8'); place(L.smith, '⚒', 'Demirci', '#5d6670'); place(L.honeyShop, '🍯', 'Bal', '#e89a1a'); if (!opt.board) place(L.board, '▦', 'Harita', '#8a5a2b'); if (L.burrow) place(L.burrow, '✿', 'Anne Tavşan', '#ff8fb8'); { const hs = L.mansion || L.houses[save.home]; if (hs) place(hs, '⌂', L.mansion ? 'Konağım' : 'Evim', '#ffb627'); }
+    place(L.shop, '♥', 'Kalp', '#e63946'); place(L.ward, '★', 'Kıyafet', '#8a5aa8'); place(L.smith, '⚒', 'Demirci', '#5d6670'); place(L.honeyShop, '🍯', 'Bal', '#e89a1a'); if (!opt.board) place(L.board, '▦', 'Harita', '#8a5a2b'); if (L.burrow) place(L.burrow, '✿', 'Anne Tavşan', '#ff8fb8'); if (L.pasture) place(L.pasture, '🐑', 'Beyza', '#7fd36a'); { const hs = L.mansion || L.houses[save.home]; if (hs) place(hs, '⌂', L.mansion ? 'Konağım' : 'Evim', '#ffb627'); }
     if (!opt.board) for (const w of L.wolves || []) if (!w.gone && w.hp > 0) dot(w.x, w.z, w.type === 'harun' ? 5 : 3.4, w.type === 'harun' ? '#ff3b3b' : w.type === 'kangal' ? '#d8b98a' : '#6d7480', '#22252b');
   } else {
     if (L.start) dot(L.start.x, L.start.z, fs * 0.35, '#7fd3ff');
