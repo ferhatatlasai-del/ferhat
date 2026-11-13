@@ -2740,6 +2740,9 @@ function wolfStep() {
     const nx = w.x + Math.sin(w.yaw) * sp * DT, nz = w.z + Math.cos(w.yaw) * sp * DT;
     if ((hubBlocked(nx, nz, 0.5) || houseIdxAt(nx, nz, 0) >= 0 || inStore(nx, nz)) && !hubBlocked(w.x, w.z, 0.5)) { w.wy = w.yaw + Math.PI * (0.5 + Math.random() * 0.5); w.yaw += (Math.random() < 0.5 ? 1 : -1) * 0.25; w.t = 0; }
     else { w.x = nx; w.z = nz; }
+    for (const mt of L.mts) { const ox = w.x - mt.cx, oz = w.z - mt.cz, od = Math.hypot(ox, oz), rr = mt.r + 1.2;
+      if (od < rr && od > 1e-3) { w.x = mt.cx + ox / od * rr; w.z = mt.cz + oz / od * rr; const rad = Math.atan2(ox, oz), t1 = rad + Math.PI / 2, t2 = rad - Math.PI / 2, tg = Math.abs(angDiff(want, t1)) < Math.abs(angDiff(want, t2)) ? t1 : t2; w.yaw += angDiff(tg, w.yaw) * 0.3; } } // walk round it, the way it wanted to go
+    w.prog = (w.prog || 0) + DT; if (w.prog > 1.2) { const moved = Math.hypot(w.x - (w.px ?? w.x), w.z - (w.pz ?? w.z)); if (moved < 0.6 && sp > 1) { w.wy = w.yaw + Math.PI * (0.6 + Math.random() * 0.8); w.yaw = w.wy; w.st = 'wander'; w.bite = Math.max(w.bite, 1.0); } w.prog = 0; w.px = w.x; w.pz = w.z; }
     w.sp = sp; w.anim += sp * DT * 2.2;
     // touching the bear: a jump on its head defeats it, otherwise it bites
     const reach = w.type === 'harun' ? 1.0 : w.type === 'kangal' ? 1.7 : 1.15, tall = w.type === 'harun' ? 2.4 : w.type === 'kangal' ? 2.2 : 1.6;
@@ -2776,15 +2779,22 @@ function beyzaStep() {
   const bz = L.beyza, pa = L.pasture; if (!bz) return;
   const night = isNight();
   bz.t += DT; const d = Math.hypot(P.x - bz.x, P.z - bz.z);
-  if (d < 4) { bz.sp = 0; bz.yaw += angDiff(Math.atan2(P.x - bz.x, P.z - bz.z), bz.yaw) * 0.1; }
+  const inShed = (o, x, z, pad) => inRect(o, o, x, z, pad), clearSpot = (x, z) => !inShed(pa.barn, x, z, 0.8) && !inShed(pa.home, x, z, 0.8) && Math.hypot(x - pa.x, z - pa.z) < pa.r - 1.3;
+  if (d < 2.2) { bz.sp = 0; bz.yaw += angDiff(Math.atan2(P.x - bz.x, P.z - bz.z), bz.yaw) * 0.12; } // stops to say hello
   else {
     if (night) { bz.tx = pa.door.x; bz.tz = pa.door.z; } // at night she waits by the barn door
-    else if (bz.t > 4 || Math.hypot(bz.tx - bz.x, bz.tz - bz.z) < 0.3) { bz.t = 0; const a = Math.random() * 6.28, r = Math.random() * pa.r * 0.45; bz.tx = pa.x + Math.sin(a) * r; bz.tz = pa.z + Math.cos(a) * r + 2; }
-    const dd = Math.hypot(bz.tx - bz.x, bz.tz - bz.z); bz.sp = dd > 0.4 ? 0.9 : 0;
-    if (bz.sp) { bz.yaw += angDiff(Math.atan2(bz.tx - bz.x, bz.tz - bz.z), bz.yaw) * 0.08; bz.x += Math.sin(bz.yaw) * bz.sp * DT; bz.z += Math.cos(bz.yaw) * bz.sp * DT; }
+    else if (bz.t > 5 || Math.hypot(bz.tx - bz.x, bz.tz - bz.z) < 0.35) {
+      bz.t = 0;
+      for (let k = 0; k < 20; k++) { const a = Math.random() * 6.28, r = 1.5 + Math.random() * (pa.r - 3); const x = pa.x + Math.sin(a) * r, z = pa.z + Math.cos(a) * r; if (clearSpot(x, z)) { bz.tx = x; bz.tz = z; break; } }
+    }
+    const dd = Math.hypot(bz.tx - bz.x, bz.tz - bz.z); bz.sp = dd > 0.4 ? 1.3 : 0;
+    if (bz.sp) {
+      bz.yaw += angDiff(Math.atan2(bz.tx - bz.x, bz.tz - bz.z), bz.yaw) * 0.1;
+      const nx = bz.x + Math.sin(bz.yaw) * bz.sp * DT, nz = bz.z + Math.cos(bz.yaw) * bz.sp * DT;
+      if (night || clearSpot(nx, nz)) { bz.x = nx; bz.z = nz; } else bz.t = 99; // something in the way: pick somewhere else
+    }
   }
   bz.anim += bz.sp * DT * 4;
-  const inShed = (o, x, z, pad) => inRect(o, o, x, z, pad);
   for (const s of L.sheep) { // lambs
     s.t += DT; if (s.petT > 0) s.petT--; if (s.hop > 0) s.hop -= DT;
     const ds = Math.hypot(P.x - s.x, P.z - s.z);
