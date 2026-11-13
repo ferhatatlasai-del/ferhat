@@ -160,6 +160,9 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 .net .code { font-family: var(--display); font-size: 1.4rem; letter-spacing: .12em; color: var(--bark); }
 #nameErr { color: #b5452f; font-weight: 800; margin: 4px 0 0; }
 @media (max-width: 520px) { .net .fr { grid-template-columns: 1fr 1fr; } .net .fr .btn { grid-column: 1 / -1; } }
+#homeBtn { position: fixed; z-index: 5; left: 50%; transform: translateX(-50%); bottom: calc(64px + env(safe-area-inset-bottom, 0px)); font-family: var(--display); font-size: 1.05rem; color: var(--bark); background: var(--honey); border: 3px solid var(--bark); border-radius: 14px; box-shadow: 0 4px 0 var(--bark); padding: 8px 16px; cursor: pointer; white-space: nowrap; }
+#homeBtn:focus-visible { outline: 3px solid var(--leaf); outline-offset: 2px; }
+#homeBtn:active { transform: translateX(-50%) translateY(2px); box-shadow: 0 2px 0 var(--bark); }
 #mapBtn { position: fixed; z-index: 5; top: calc(10px + env(safe-area-inset-top, 0px)); right: calc(max(12px, env(safe-area-inset-right, 0px)) + 156px);
   width: 42px; height: 42px; border-radius: 12px; border: 3px solid var(--bark); background: var(--cream); color: var(--bark); font-family: var(--display); font-size: 1.15rem; cursor: pointer; }
 #mapBtn:focus-visible { outline: 3px solid var(--leaf); outline-offset: 2px; }
@@ -213,6 +216,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 <button id="pauseBtn" type="button" aria-label="Duraklat" hidden>II</button>
 <button id="setBtn" type="button" aria-label="Ayarlar">&#9881;&#xFE0E;</button>
 <button id="netBtn" type="button" aria-label="Birlikte oyna (O)">&#128101;&#xFE0E;</button>
+<button id="homeBtn" type="button" hidden></button>
 <button id="mapBtn" type="button" aria-label="Harita (H)">&#128506;&#xFE0E;</button>
 <button id="questBtn" type="button" aria-label="Görevler">&#128220;<span class="dot" id="questDot" hidden></span></button>
 
@@ -497,6 +501,8 @@ const sfx = {
   die: () => [392, 330, 262, 196].forEach((f, i) => tone(f, 0.2, 'triangle', null, 0.09, i * 0.13)),
   boss: () => [196, 185, 175, 147].forEach((f, i) => tone(f, 0.3, 'sawtooth', null, 0.07, i * 0.22)),
   grab: () => tone(520, 0.08, 'triangle', 760, 0.07),
+  howl: () => { tone(330, 1.2, 'triangle', 560, 0.05); tone(560, 0.9, 'triangle', 420, 0.04, 1.1); },
+  growl: () => tone(110, 0.25, 'sawtooth', 70, 0.05),
   swing: () => tone(900, 0.12, 'sawtooth', 300, 0.04),
   hit: () => { tone(180, 0.1, 'square', 90, 0.08); tone(1200, 0.05, 'triangle', null, 0.04); },
   clank: () => { tone(1500, 0.12, 'square', 1300, 0.05); tone(2200, 0.18, 'triangle', null, 0.03, 0.02); },
@@ -515,6 +521,8 @@ const QUESTS = [
   { id: 'turtle', name: 'Kaplumbağa Dostu', desc: "Bal Köyü'ndeki kaplumbağalardan 5 tanesini sev", stat: 'turtle', goal: 5, reward: 20 },
   { id: 'rabbit', name: 'Tavşan Avcısı', desc: "Bal Köyü'ndeki kaçak tavşanlardan 6 tanesini yakala (koşman gerekecek!)", stat: 'rabbit', goal: 6, reward: 30 },
   { id: 'bunny', name: 'Kayıp Yavrular', desc: "Anne Tavşan'ın 5 kayıp yavrusunu bulup yuvasına götür", stat: 'bunny', goal: 5, reward: 50 },
+  { id: 'home', name: 'Yuvam Yuvam', desc: "Bal Köyü'nde bir evin içine gir ve onu kendi evin yap", stat: 'home', goal: 1, reward: 15 },
+  { id: 'wolf', name: 'Kurt Kovucu', desc: "Geceleri Bal Köyü'ne gelen kurtlardan 5 tanesini yen", stat: 'wolf', goal: 5, reward: 40 },
   { id: 'boss', name: 'Kahraman', desc: '2 boss yen', stat: 'boss', goal: 2, reward: 50 },
   { id: 'cloud', name: 'Bulut Tırmanıcısı', desc: "Bal Köyü'ndeki bir bulut parkurunun tepesindeki sandığa ulaş", stat: 'cloud', goal: 1, reward: 30 },
   { id: 'diamond', name: 'Elmas Usta', desc: "Demirciden Elmas Balta'yı al", stat: 'diamond', goal: 1, reward: 40 },
@@ -610,6 +618,7 @@ addEventListener('keydown', e => {
   if (!pNet.hidden) { if (e.code === 'Escape' || e.code === 'KeyO') closeNet(); return; }
   if (e.code === 'KeyO' && splashDone && (state === 'play' || state === 'pause')) { openNet(); return; }
   if (e.code === 'KeyH' && splashDone && (state === 'play' || state === 'pause')) { openMap(); return; }
+  if (e.code === 'KeyB' && state === 'play' && !homeBtn.hidden) { homeBtn.click(); return; }
   if (!pSmith.hidden) { if (e.code === 'Escape') closeSmith(); return; }
   if (!pShop.hidden) { if (e.code === 'Escape') closeShop(); return; }
   if (!pWard.hidden && wardFrom === 'hub') { if (e.code === 'Escape') setPlaying(); return; }
@@ -867,7 +876,7 @@ function drawHeart(x, y, full) {
   if (full) { ctx.fillStyle = 'rgba(255,255,255,0.75)'; ctx.beginPath(); ctx.ellipse(x - 5.5, y - 2.5, 2.4, 1.6, -0.6, 0, 7); ctx.fill(); }
 }
 function drawHud() {
-  drawRemoteTags();
+  drawRemoteTags(); syncHomeBtn();
   for (let i = 0; i < save.maxHp; i++) drawHeart(30 + i * 34, 28, i < P.hp);
   let hx = 30 + save.maxHp * 34 + 4;
   drawHoneyJar(hx, 33, 1.15); txt('' + honey, hx + 16, 42, 26); hx += 70;
@@ -876,6 +885,7 @@ function drawHud() {
   ctx.fillStyle = '#d9a066'; ctx.beginPath(); ctx.ellipse(hx, 36, 6, 4, 0, 0, 7); ctx.fill();
   txt('× ' + lives, hx + 16, 42, 26);
   txt(L.hub ? 'Bal Köyü' : L.tut ? 'Öğretici' : `${lvlIdx + 1}/${LEVELS.length}`, VW - 14, 78, 22, '#fff4dc', 'right');
+  if (L.hub) txt(isNight() ? `☾ Gece · sabaha ${mmss(clockLeft() * 1000)}` : `☀ Gündüz · geceye ${mmss(clockLeft() * 1000)}`, VW - 14, 102, 18, isNight() ? '#c9d6ff' : '#fff27a', 'right');
   const b = L.boss;
   if (b && b.active && !b.defeated) {
     const bw = 300, bx = VW / 2 - bw / 2, by = 64;
@@ -895,8 +905,8 @@ function drawHud() {
     for (const m of L.mts) { const l = chestLeft('m' + m.id); if (l) run.push([l, `Dağ ${m.id + 1}`]); }
     for (const pk of L.parks) { const l = chestLeft('c' + pk.id); if (l) run.push([l, `Bulut ${pk.id}`]); }
     run.sort((a, b) => a[0] - b[0]);
-    run.slice(0, 4).forEach(([l, n], i) => txt(`⏱ ${n} sandığı ${mmss(l)}`, VW - 14, 112 + i * 24, 18, '#bfe6ff', 'right'));
-    if (run.length > 4) txt(`+${run.length - 4} sandık daha`, VW - 14, 112 + 4 * 24, 15, '#bfe6ff', 'right');
+    run.slice(0, 4).forEach(([l, n], i) => txt(`⏱ ${n} sandığı ${mmss(l)}`, VW - 14, 128 + i * 24, 18, '#bfe6ff', 'right'));
+    if (run.length > 4) txt(`+${run.length - 4} sandık daha`, VW - 14, 128 + 4 * 24, 15, '#bfe6ff', 'right');
   }
   if (L.signs || L.burrow) { // tutorial: show the nearest sign's text; village: Mother Rabbit talks
     let sg = null, bd = 4.2; for (const g of L.signs || []) { const d = Math.hypot(g.x - P.x, g.z - P.z); if (d < bd && Math.abs(g.y - P.y) < 2.5) { bd = d; sg = g; } }
@@ -909,6 +919,13 @@ function drawHud() {
       txt(sg.title, VW / 2, py + 36, 26, '#ffd23f', 'center'); lines.forEach((l, i) => txt(l, VW / 2, py + 68 + i * 28, 20, '#fff4dc', 'center'));
     }
   }
+  if (L.hub && nightMsg > 0 && banner <= 0) { // waits until the village title has faded
+    nightMsg--; ctx.globalAlpha = Math.min(1, nightMsg / 30);
+    txt(nightTxt, VW / 2, 170, 40, isNight() ? '#c9d6ff' : '#ffd23f', 'center');
+    if (isNight() && !sleepT) txt(save.home >= 0 ? 'Evine saklan ya da baltanla kov! Evinde uyursan sabah olur.' : 'Bir evin içine saklan ya da baltanla kov! Bir evi kendi evin yaparsan orada uyuyabilirsin.', VW / 2, 204, 20, '#fff4dc', 'center');
+    ctx.globalAlpha = 1;
+  }
+  if (sleepT) { const a = Math.max(0, 1 - Math.abs(sleepT - 75) / 75); ctx.globalAlpha = a * 0.96; ctx.fillStyle = '#0b0f24'; ctx.fillRect(0, 0, VW, VH); ctx.globalAlpha = Math.min(1, a * 1.4); txt('Zzz...', VW / 2, VH / 2, 54, '#c9d6ff', 'center'); ctx.globalAlpha = 1; }
   if (L.babies) { const f = L.babies.filter(b => b.st === 'follow').length; if (f) txt(`Peşindeki yavru: ${f} · Anne Tavşan'a götür!`, VW / 2, VH - 128, 20, '#ffd6e6', 'center'); }
   if (!L.hub && !L.tut) { const gc = (save.gold[lvlIdx] || []).filter(Boolean).length; drawHoneyJar(VW - 128, 72, 0.9); txt(`${gc}/3`, VW - 70, 80, 20, '#ffd23f', 'right'); }
   if (questBanner > 0) { ctx.globalAlpha = Math.min(1, questBanner / 25); txt('Görev tamamlandı: ' + questName, VW / 2, VH - 70, 26, '#ffd23f', 'center'); txt('Ödülünü almak için Görevler düğmesine bas (G)', VW / 2, VH - 44, 16, '#fff4dc', 'center'); ctx.globalAlpha = 1; }
@@ -978,6 +995,7 @@ function init3D() {
   G.sun.shadow.bias = -0.0015;
   G.scene.add(G.sun); G.scene.add(G.sun.target);
   G.homeLight = new THREE.PointLight(0xffd9a0, 0, 7.5, 1.4); G.scene.add(G.homeLight); // lit only inside a house
+  G.lamp = new THREE.PointLight(0xffd59a, 0, 18, 1.1); G.scene.add(G.lamp); // the bear's glow at night
   G.v = new THREE.Vector3();
   G.geo = {
     box: new THREE.BoxGeometry(1, 1, 1), sph: new THREE.SphereGeometry(1, 20, 14),
@@ -1108,6 +1126,18 @@ function rabbitModel(fur, mom) {
   mk('sph', '#ff8fb0', [0.045, 0.035, 0.03], [0, -0.02, 0.21], head);
   if (mom) { mk('cyl', '#ff6b8a', [0.21, 0.07, 0.21], [0, -0.17, -0.02], head); mk('sph', '#ff6b8a', [0.09, 0.07, 0.05], [0.14, -0.15, 0.13], head); }
   g.userData = { body: b, head, ears };
+  return g;
+}
+function wolfModel() {
+  const g = new THREE.Group(), b = grp(g), fur = '#6d7480', dark = '#555b66', legs = [];
+  mk('sph', fur, [0.42, 0.4, 0.78], [0, 0.66, -0.05], b);
+  mk('sph', '#c3c8d0', [0.3, 0.3, 0.38], [0, 0.6, 0.3], b);
+  for (const [sx, sz] of [[-1, 1], [1, 1], [-1, -1], [1, -1]]) { const l = grp(b, sx * 0.2, 0.55, sz * 0.4); mk('cyl', dark, [0.1, 0.55, 0.1], [0, -0.27, 0], l); legs.push(l); }
+  const head = grp(b, 0, 1.0, 0.62);
+  mk('sph', fur, [0.3, 0.28, 0.3], [0, 0, 0], head); mk('box', '#8a909a', [0.2, 0.16, 0.34], [0, -0.08, 0.28], head); mk('sph', '#15151a', [0.07, 0.06, 0.05], [0, -0.03, 0.46], head);
+  for (const sx of [-1, 1]) { mk('cone', dark, [0.1, 0.24, 0.08], [sx * 0.15, 0.27, -0.04], head); mk('sph', '#ffe14d', [0.055, 0.045, 0.03], [sx * 0.12, 0.07, 0.25], head, { emissive: '#ffbb00' }); }
+  const tail = grp(b, 0, 0.78, -0.78); tail.rotation.x = 0.5; mk('cone', fur, [0.13, 0.55, 0.13], [0, 0, -0.24], tail).rotation.x = -Math.PI / 2;
+  g.userData = { body: b, head, legs, tail };
   return g;
 }
 function smithModel(parent, x, y, z, yaw) {
@@ -1719,8 +1749,8 @@ function respawn() {
     setEntryGate(false); L.boss = mkBoss(b.type, b.c); L.shots = [];
     P = newPlayer(L.bossCp);
   } else {
-    const cp = L.cpActive;
-    P = newPlayer(cp ? { x: cp.x + 1.2, y: cp.y, z: cp.z } : L.start);
+    const cp = L.cpActive, hm = L.hub && homeSpot();
+    P = newPlayer(cp ? { x: cp.x + 1.2, y: cp.y, z: cp.z } : hm || L.start); if (hm && !cp) { P.yaw = hm.yaw; G.camYaw = hm.yaw + Math.PI; }
   }
   P.inv = 90; if (USE3D) G.ct = null;
 }
@@ -1810,8 +1840,10 @@ function update() {
   if (keys.camR) { G.camYaw -= 1.8 * (save.camSens || 1) * DT; G.manualT = 90; }
   if (G.manualT > 0) G.manualT--;
 
+  clockStep();
   if (P.dead) {
     P.dead++; P.vy -= 30 * DT; P.y += P.vy * DT;
+    if (P.dead > 100 && L.hub) { respawn(); pop('Evinde dinlendin', P.x, P.y + 2.4, P.z, '#ffffff', 120); jumpPressed = poundPressed = false; return; } // no lives lost in the village
     if (P.dead > 100) { lives--; if (lives <= 0) return gameOver(); respawn(); }
     jumpPressed = poundPressed = false;
     return;
@@ -1873,6 +1905,7 @@ function update() {
     burst(P.x, P.y, P.z, '#c9a27a', 18, 4);
     if (P.ground.kind === 'crate') { const c = P.ground; c.on = false; addCoins(2, P.x, P.y + 0.6, P.z); addHoney(1); burst(P.x, P.y + 0.3, P.z, '#a8743d', 16, 4); P.vy = 6; P.onGround = false; P.ground = null; }
     for (const e of L.enemies) if (e.alive && Math.hypot(e.x - P.x, e.z - P.z) < 2.4 && Math.abs(e.y - P.y) < 1) { if (e.helmet) sfx.clank(); else damageEnemy(e, 1, e.x - P.x, e.z - P.z); }
+    for (const w of L.wolves || []) if (!w.gone && w.hp > 0 && Math.hypot(w.x - P.x, w.z - P.z) < 2.6 && P.y < 1.5) hitWolf(w, 1, w.x - P.x, w.z - P.z);
   }
   P.squash = P.squash > 0 ? Math.max(0, P.squash - 0.8) : Math.min(0, P.squash + 0.6); // settle exactly at 0, never overshoot
   P.anim += Math.hypot(P.vx, P.vz) * 0.035;
@@ -2049,9 +2082,9 @@ function turtleStep() {
     if (t.t > t.next) { t.t = 0; t.next = 2 + Math.random() * 4; t.yaw += (Math.random() - 0.5) * 2.4; t.rest = Math.random() < 0.3; }
     if (t.rest) continue;
     const sp = 0.55 * DT, nx = t.x + Math.sin(t.yaw) * sp, nz = t.z + Math.cos(t.yaw) * sp;
-    const blocked = Math.abs(nx) > R || Math.abs(nz) > R || L.boxes.some(b => (b.kind !== 'ground' || b.y1 > 0.3) && b.kind !== 'vine' && b.y1 > 0.3 && nx > b.x0 - 0.7 && nx < b.x1 + 0.7 && nz > b.z0 - 0.7 && nz < b.z1 + 0.7)
-      || L.portals.some(p => Math.hypot(nx - p.x, nz - p.z) < 5.2);
-    if (blocked) t.yaw += Math.PI * (0.6 + Math.random() * 0.4); else { t.x = nx; t.z = nz; }
+    // stuck already (e.g. born beside a tree)? walk on out instead of spinning on the spot
+    if (hubBlocked(nx, nz, 0.7) && !hubBlocked(t.x, t.z, 0.7)) { t.yaw += Math.PI * (0.6 + Math.random() * 0.4); t.rest = true; t.t = 0; t.next = 0.8 + Math.random(); }
+    else { t.x = nx; t.z = nz; }
   }
 }
 const hubBlocked = (nx, nz, pad) => Math.abs(nx) > L.R - 4 || Math.abs(nz) > L.R - 4 || L.boxes.some(b => b.kind !== 'ground' && b.kind !== 'vine' && b.y1 > 0.3 && b.y0 < 1.2 && nx > b.x0 - pad && nx < b.x1 + pad && nz > b.z0 - pad && nz < b.z1 + pad)
@@ -2072,7 +2105,7 @@ function rabbitStep() {
     if (r.hop > 0) {
       r.hop -= DT;
       const sp = (r.fast ? 8.6 : 2.2) * DT, nx = r.x + Math.sin(r.yaw) * sp, nz = r.z + Math.cos(r.yaw) * sp;
-      if (hubBlocked(nx, nz, 0.4)) r.yaw += Math.PI * (0.5 + Math.random() * 0.5); else { r.x = nx; r.z = nz; }
+      if (hubBlocked(nx, nz, 0.4) && !hubBlocked(r.x, r.z, 0.4)) r.yaw += Math.PI * (0.5 + Math.random() * 0.5); else { r.x = nx; r.z = nz; }
       r.y = Math.sin(Math.max(0, 1 - r.hop / r.hopLen) * Math.PI) * (r.fast ? 0.55 : 0.35);
       if (r.hop <= 0) { r.y = 0; r.wait = scared ? 0.05 : 0.5 + Math.random() * 2.4; }
     } else {
@@ -2111,6 +2144,104 @@ function rabbitStep() {
     }
   }
 }
+/* ---------- day and night ---------- */
+const DAY_S = 420, NIGHT_S = 180, CYC = DAY_S + NIGHT_S, FADE_S = 15; // 7 minutes of day, then 3 of night
+const isNight = () => (save.clock || 0) >= DAY_S;
+function nightAmt() { const c = save.clock || 0; return c < DAY_S - FADE_S ? 0 : c < DAY_S ? (c - DAY_S + FADE_S) / FADE_S : c < CYC - FADE_S ? 1 : (CYC - c) / FADE_S; }
+const clockLeft = () => isNight() ? CYC - (save.clock || 0) : DAY_S - (save.clock || 0);
+let nightMsg = 0, nightTxt = '', sleepT = 0;
+function clockStep() {
+  const was = isNight(); save.clock = ((save.clock || 0) + DT) % CYC;
+  if (!L.hub) return;
+  if (!was && isNight()) { nightMsg = 300; nightTxt = 'Gece oldu! Kurtlar geliyor'; sfx.howl(); }
+  if (was && !isNight()) { nightMsg = 200; nightTxt = 'Günaydın! Kurtlar ormana kaçtı'; sfx.flag(); }
+}
+function houseIdxAt(x, z, y) {
+  if (!L.houses || y > HOUSE.h) return -1;
+  return L.houses.findIndex(hs => { const c = Math.cos(hs.yaw), sn = Math.sin(hs.yaw), dx = x - hs.x, dz = z - hs.z, lx = dx * c - dz * sn, lz = dx * sn + dz * c; return Math.abs(lx) < HOUSE.hw && Math.abs(lz) < HOUSE.hd; });
+}
+function homeSpot() { // just inside your own front door, facing out
+  const hs = L.houses && L.houses[save.home]; if (!hs) return null;
+  const c = Math.cos(hs.yaw), sn = Math.sin(hs.yaw), lz = HOUSE.hd - 1.2;
+  return { x: hs.x + lz * sn, y: 0, z: hs.z + lz * c, yaw: hs.yaw };
+}
+function possessive(n) { // Turkish genitive: Ferhat'ın, Ayşe'nin, Pofuduk'un
+  const vw = 'aeıioöuü', low = n.toLocaleLowerCase('tr'), v = [...low].reverse().find(ch => vw.includes(ch)) || 'e';
+  return n + "'" + (vw.includes(low.slice(-1)) ? 'n' : '') + { a: 'ı', ı: 'ı', e: 'i', i: 'i', o: 'u', u: 'u', ö: 'ü', ü: 'ü' }[v] + 'n';
+}
+function chooseHome(i) {
+  const moved = save.home >= 0; save.home = i; bump('home', 1, 0); saveGame(); sfx.win();
+  const hs = L.houses[i]; burst(hs.x, HOUSE.h + 1, hs.z, '#ffd23f', 30, 4);
+  pop(moved ? 'Evini buraya taşıdın!' : 'Burası artık senin evin!', P.x, P.y + 2.4, P.z, '#ffd23f', 150);
+  if (USE3D) placeHomeMark();
+}
+function goSleep() { if (sleepT) return; sleepT = 150; sfx.flag(); }
+function sleepStep() {
+  if (!sleepT) return; sleepT--;
+  if (sleepT === 75) { save.clock = 0; P.hp = save.maxHp; for (const w of L.wolves || []) w.gone = true; nightMsg = 220; nightTxt = 'Günaydın! Güzel bir uyku çektin'; saveGame(); }
+}
+const homeBtn = document.getElementById('homeBtn'); let homeLbl = '';
+if (isTouch) homeBtn.style.bottom = 'calc(190px + env(safe-area-inset-bottom, 0px))'; // above the touch buttons
+homeBtn.onclick = () => {
+  if (state !== 'play' || !L.hub) return;
+  const i = houseIdxAt(P.x, P.z, P.y); if (i < 0) return;
+  if (i === save.home) { if (isNight()) goSleep(); } else chooseHome(i);
+  homeBtn.blur();
+};
+function syncHomeBtn() {
+  let t = '';
+  if (L.hub && state === 'play' && !sleepT) {
+    const i = houseIdxAt(P.x, P.z, P.y);
+    if (i >= 0) t = i !== save.home ? (save.home >= 0 ? '🏠 Evimi buraya taşı' : '🏠 Bu ev benim olsun') : isNight() ? '😴 Uyu, sabah olsun' : '';
+    if (t && !isTouch) t += ' (B)';
+  }
+  if (t !== homeLbl) { homeLbl = t; homeBtn.textContent = t; homeBtn.hidden = !t; }
+}
+/* ---------- wolves (village, at night) ---------- */
+const WOLF_MAX = 6;
+function wolfStep() {
+  L.wolves = L.wolves || []; const night = isNight() && !sleepT;
+  const inHouse = houseIdxAt(P.x, P.z, P.y) >= 0, safe = inHouse || P.y > 2.4 || P.dead;
+  L.wolfT = (L.wolfT || 0) - DT;
+  if (night && L.wolfT <= 0 && L.wolves.filter(w => !w.gone && w.hp > 0).length < WOLF_MAX) {
+    L.wolfT = 5;
+    for (let k = 0; k < 12; k++) {
+      const a = Math.random() * 6.28, d = 30 + Math.random() * 25, x = P.x + Math.sin(a) * d, z = P.z + Math.cos(a) * d;
+      if (Math.abs(x) > L.R - 8 || Math.abs(z) > L.R - 8 || hubBlocked(x, z, 1)) continue;
+      L.wolves.push({ x, y: 0, z, yaw: a + Math.PI, hp: 2, t: Math.random() * 3, hitT: 0, dead: 0, bite: 0, st: 'wander', sp: 0, anim: 0 }); break;
+    }
+  }
+  for (const w of L.wolves) {
+    if (w.gone) continue;
+    if (w.hitT > 0) w.hitT--;
+    if (w.hp <= 0) { if (++w.dead > 45) w.gone = true; continue; }
+    w.t += DT; if (w.bite > 0) w.bite -= DT;
+    const dx = P.x - w.x, dz = P.z - w.z, d = Math.hypot(dx, dz);
+    let sp = 1.5, want = w.yaw;
+    if (!night) { w.st = 'leave'; want = Math.atan2(-dx, -dz); sp = 6.5; w.leaveT = (w.leaveT || 0) + DT; if (w.leaveT > 5 || d > 60) { w.gone = true; continue; } }
+    else if (w.bite > 0.6) { want = Math.atan2(-dx, -dz); sp = 4; } // backs off after a bite
+    else if (!safe && d < 17) { if (w.st !== 'chase') { w.st = 'chase'; if (d > 6) sfx.growl(); } want = Math.atan2(dx, dz); sp = d < 2 ? 3 : 5.7; }
+    else { w.st = 'wander'; if (w.t > 3) { w.t = 0; w.wy = w.yaw + (Math.random() - 0.5) * 2.4; } want = w.wy ?? w.yaw; if (safe && d < 9) { want = Math.atan2(dx, dz) + Math.PI / 2; sp = 2.4; } } // prowls around a hiding bear
+    w.yaw += angDiff(want, w.yaw) * 0.15;
+    const nx = w.x + Math.sin(w.yaw) * sp * DT, nz = w.z + Math.cos(w.yaw) * sp * DT;
+    if (hubBlocked(nx, nz, 0.5) && !hubBlocked(w.x, w.z, 0.5)) { w.wy = w.yaw + Math.PI * (0.5 + Math.random() * 0.5); w.yaw += (Math.random() < 0.5 ? 1 : -1) * 0.25; w.t = 0; }
+    else { w.x = nx; w.z = nz; }
+    w.sp = sp; w.anim += sp * DT * 2.2;
+    // touching the bear: a jump on its head defeats it, otherwise it bites
+    if (d < 1.15 && P.y < 1.6 && !P.dead) {
+      if (P.vy < 0 && P.y > 0.55) { P.vy = keys.jump ? 12 : 8.5; P.pound = false; P.jumps = 1; hitWolf(w, 1, -dx, -dz); }
+      else if (w.bite <= 0) { w.bite = 1.2; hurt(dx, dz); }
+    }
+  }
+}
+function hitWolf(w, dmg, kx, kz) {
+  w.hp -= dmg; w.hitT = 14; w.bite = Math.max(w.bite, 1);
+  const m = Math.hypot(kx, kz) || 1, px = w.x + kx / m * 1.2, pz = w.z + kz / m * 1.2;
+  if (!hubBlocked(px, pz, 0.5)) { w.x = px; w.z = pz; }
+  if (w.hp > 0) { sfx.stomp(); burst(w.x, 0.8, w.z, '#ffffff', 8, 2); return; }
+  w.dead = 1; sfx.stomp(); shake = 6; burst(w.x, 0.7, w.z, '#8a909a', 16, 3);
+  addCoins(3, w.x, 1.8, w.z); bump('wolf');
+}
 function momText() {
   const n = ((save.stats || {}).bunny || []).length, f = L.babies.filter(b => b.st === 'follow').length;
   if (n >= 5) return `Bütün yavrularım evde! Çok teşekkür ederim ${save.name}. Görevler'den (G) ödülünü almayı unutma.`;
@@ -2124,7 +2255,7 @@ const chestLeft = key => Math.max(0, ((save.chestT || {})[key] || 0) - Date.now(
 const mmss = ms => { const t = Math.ceil(ms / 1000); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); };
 function openChest(key) { (save.chestT = save.chestT || {})[key] = Date.now() + CHEST_MS; }
 function hubStep() {
-  turtleStep(); rabbitStep();
+  turtleStep(); rabbitStep(); wolfStep(); sleepStep();
   save.peaks = save.peaks || {};
   for (const m of L.mts) {
     const ch = m.chest;
@@ -2190,6 +2321,7 @@ function axeHit() {
   const inArc = (x, z, y, extra) => { const dx = x - P.x, dz = z - P.z, d = Math.hypot(dx, dz); if (d > range + extra || Math.abs(y - P.y) > 1.4) return false; return full || d < 0.6 || (dx * fx + dz * fz) / d > 0.3; };
   let hit = false;
   for (const e of L.enemies) if (e.alive && inArc(e.x, e.z, e.y, e.r)) { damageEnemy(e, dmg, e.x - P.x, e.z - P.z); hit = true; }
+  for (const w of L.wolves || []) if (!w.gone && w.hp > 0 && inArc(w.x, w.z, w.y, 0.6)) { hitWolf(w, dmg, w.x - P.x, w.z - P.z); hit = true; }
   const b = L.boss;
   if (b && b.active && !b.defeated && inArc(b.x, b.z, b.y, b.r)) {
     if (b.inv === 0 && (b.type === 'mush' || b.state === 'stunned')) hitBoss(b); else sfx.clank();
@@ -2495,6 +2627,11 @@ function buildScene() {
   G.scene.fog = new THREE.Fog(th.sky[1], th.mist ? 14 : 32, th.mist ? 85 : 130); G.fogBase = [G.scene.fog.near, G.scene.fog.far]; applyView();
   G.hemi.color.set(th.cave ? '#b9a6ff' : th.night ? '#9fb4ff' : '#ffffff'); G.hemi.groundColor.set(th.mid); G.hemi.intensity = th.cave ? 0.6 : th.night ? 0.45 : 0.62;
   G.sun.color.set(th.weather === 'ember' ? '#ffcf9a' : th.night ? '#bcd0ff' : '#fff6e0'); G.sun.intensity = th.cave ? 0.5 : th.night ? 0.5 : 0.75;
+  G.lamp.intensity = 0; G.nightN = -1; G.stars = null; G.homeFlag = null;
+  G.day = { hemi: G.hemi.intensity, sun: G.sun.intensity, hemiC: G.hemi.color.clone(), sunC: G.sun.color.clone(), fog: G.scene.fog.color.clone(), sky0: new THREE.Color(th.sky[0]), sky1: new THREE.Color(th.sky[1]) };
+  if (L.hub) { // the village has a clock: repaint its sky as night falls
+    const cv = document.createElement('canvas'); cv.width = 4; cv.height = 256; G.skyCv = cv; G.scene.background = new THREE.CanvasTexture(cv);
+  } else G.skyCv = null;
   const DECO = { round: ['#3f9b37', '#2f7f2a', '#ff5fa2', '#ffd23f'], cactus: ['#b8801f', '#8a5f17', '#6b8f3a'], pine: ['#ffffff', '#dbe8f7'], shroom: ['#9ef0ff', '#d9a7ff'], spire: ['#5a2433', '#ff8c42'], candy: ['#ff9ad5', '#b28dff', '#ffffff', '#7fd3ff'], palm: ['#fff4dc', '#ff8fb8', '#ffffff', '#e8b56a'], night: ['#2c5c44', '#9ef0a0', '#e8ff6a'], crystal: ['#bff0ff', '#ffffff', '#9fd8ff'], autumn: ['#e8742a', '#c94a2a', '#f2b33a'], willow: ['#4f7036', '#8fb06a', '#c9e09a'], tower: ['#bfb8e0', '#ffd23f', '#8a86a8'] }, DECO0 = DECO[th.tree];
   for (const b of L.boxes) {
     const w = b.x1 - b.x0, h = b.y1 - b.y0, d = b.z1 - b.z0, cx = (b.x0 + b.x1) / 2, cy = (b.y0 + b.y1) / 2, cz = (b.z0 + b.z1) / 2;
@@ -2698,6 +2835,11 @@ function buildScene() {
       pk.glow = mk('torus', '#fff27a', [1.3, 1.3, 1.3], [0, 0.05, 0], c, { emissive: '#8a7a20' }); pk.glow.rotation.x = Math.PI / 2; pk.glow.castShadow = false; }
     for (const t of L.turtles) { t.mesh = turtleModel(t.hue); t.mesh.scale.setScalar(t.s); W.add(t.mesh); }
     for (const r of L.rabbits) { r.mesh = rabbitModel(r.fur); r.mesh.scale.setScalar(r.s); W.add(r.mesh); }
+    { const n = 420, pos = new Float32Array(n * 3); for (let k = 0; k < n; k++) { const a = Math.random() * 6.283, e = 0.08 + Math.random() * 1.4; pos.set([Math.cos(a) * Math.cos(e) * 150, Math.sin(e) * 150, Math.sin(a) * Math.cos(e) * 150], k * 3); }
+      const sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      G.stars = new THREE.Points(sg, new THREE.PointsMaterial({ color: 0xffffff, size: 2, sizeAttenuation: false, transparent: true, opacity: 0, fog: false, depthWrite: false })); G.stars.visible = false; W.add(G.stars); }
+    if (G.sunMesh) G.sunMesh.material = G.sunMesh.material.clone();
+    G.homeMark = null; placeHomeMark();
     for (const b of L.babies) { b.mesh = rabbitModel('#fff6ea'); b.mesh.scale.setScalar(0.62); W.add(b.mesh); }
     { const bw = L.burrow, g5 = grp(W, bw.x, 0, bw.z); g5.rotation.y = bw.yaw;
       mk('hemi', '#7a9b3a', [1.25, 0.6, 1.25], [0, 0, -0.2], g5); mk('sph', '#2b1a0e', [0.42, 0.34, 0.12], [0, 0.22, 0.98], g5);
@@ -2747,6 +2889,44 @@ function portalSpin() {
     u.head.position.z = t.petT > 0 ? 0.88 : 0.82 + Math.sin(frame * 0.05 + t.id) * 0.03;
   }
 }
+function placeHomeMark() {
+  if (G.homeMark) { G.homeMark.parent && G.homeMark.parent.remove(G.homeMark); G.homeMark = null; G.homeFlag = null; }
+  const hs = L.houses && L.houses[save.home]; if (!hs || !G.world) return;
+  const g = grp(G.world, hs.x, 0, hs.z); g.rotation.y = hs.yaw; G.homeMark = g;
+  const fx = HOUSE.hw - 0.5, fz = HOUSE.hd + 0.9; // flag pole beside the front door
+  mk('cyl', '#6b4220', [0.08, 4.6, 0.08], [fx, 2.3, fz], g); mk('sph', '#ffd23f', [0.14, 0.14, 0.14], [fx, 4.65, fz], g, { emissive: '#5a4300' });
+  const fl = grp(g, fx, 4.15, fz); G.homeFlag = fl; mk('box', '#e63946', [0.06, 0.62, 0.95], [0, 0, -0.5], fl);
+  const name = possessive(save.name) + ' Evi';
+  const tex = canvasTex(512, 128, (c, w, hh) => { c.fillStyle = 'rgba(74,44,23,0.9)'; c.beginPath(); if (c.roundRect) c.roundRect(8, 14, w - 16, hh - 28, 26); else c.rect(8, 14, w - 16, hh - 28); c.fill(); c.lineWidth = 6; c.strokeStyle = '#ffd23f'; c.stroke(); c.fillStyle = '#ffd23f'; c.font = '56px "Lilita One", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(name, w / 2, hh / 2 + 3, w - 50); });
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false })); sp.scale.set(4, 1, 1); sp.position.set(0, HOUSE.h + HOUSE.rise + 1.3, 0); g.add(sp);
+}
+function applyNight(n) {
+  const d = G.day; if (!d) return;
+  const q = Math.round(n * 40) / 40;
+  if (q === G.nightN) return; G.nightN = q;
+  const lerp = (a, b) => a.clone().lerp(new THREE.Color(b), q);
+  G.hemi.intensity = d.hemi * (1 - 0.5 * q); G.hemi.color.copy(lerp(d.hemiC, '#8aa0ff'));
+  G.sun.intensity = d.sun * (1 - 0.7 * q); G.sun.color.copy(lerp(d.sunC, '#9fb4ff'));
+  G.scene.fog.color.copy(lerp(d.fog, '#1b2448'));
+  if (G.skyCv) { const c = G.skyCv.getContext('2d'), gr = c.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, lerp(d.sky0, '#070b22').getStyle()); gr.addColorStop(1, lerp(d.sky1, '#2a3566').getStyle()); c.fillStyle = gr; c.fillRect(0, 0, 4, 256); G.scene.background.needsUpdate = true; }
+  if (G.sunMesh) { const s = new THREE.Color(HUB.sun); G.sunMesh.material.color.copy(lerp(s, '#eef2ff')); G.sunMesh.material.emissive.copy(lerp(s, '#c9d6ff')); }
+  if (G.stars) { G.stars.visible = q > 0; G.stars.material.opacity = q; }
+}
+function drawWolves() {
+  if (!L.wolves) return;
+  for (const w of L.wolves) {
+    if (w.gone) { if (w.mesh) { w.mesh.parent && w.mesh.parent.remove(w.mesh); w.mesh = null; } continue; }
+    if (!w.mesh) { w.mesh = wolfModel(); G.world.add(w.mesh); }
+    const m = w.mesh, u = m.userData;
+    m.position.set(w.x, w.y, w.z); m.rotation.y = w.yaw;
+    if (w.hp <= 0) { m.scale.set(1.15, Math.max(0.05, 1 - w.dead / 20), 1.15); continue; }
+    m.scale.setScalar(w.hitT > 0 && w.hitT % 4 < 2 ? 1.08 : 1);
+    const run = Math.min(1, w.sp / 4);
+    u.legs.forEach((l, i) => { l.rotation.x = Math.sin(w.anim * 3 + (i === 0 || i === 3 ? 0 : Math.PI)) * 0.7 * run; });
+    u.tail.rotation.x = 0.5 + (w.st === 'chase' ? -0.5 : Math.sin(frame * 0.08) * 0.15); u.head.rotation.x = w.st === 'chase' ? 0.15 : 0;
+  }
+  L.wolves = L.wolves.filter(w => !w.gone || w.mesh);
+}
 function lookKey() { return save.species + save.outfit + save.gender + save.axe; }
 function render3D(alpha = 1, dtMs = 16.667) {
   const ip = (o, n) => o === undefined ? n : o + (n - o) * alpha;
@@ -2774,6 +2954,12 @@ function render3D(alpha = 1, dtMs = 16.667) {
     if (d < rs && d > 1e-4) cp.set(m.cx + dx / d * rs, cp.y, m.cz + dz / d * rs);
   }
   G.homeLight.intensity += ((hin ? 1.6 : 0) - G.homeLight.intensity) * fk(0.15);
+  if (L.hub) {
+    const nn = nightAmt(); applyNight(nn); drawWolves();
+    G.lamp.intensity = nn * 1.25; G.lamp.position.set(PX, PY + 2.6, PZ);
+    if (G.stars) G.stars.position.set(G.ct.x, 0, G.ct.z);
+    if (G.homeFlag) G.homeFlag.rotation.y = Math.sin(fI * 0.07) * 0.3;
+  }
   if (hin) G.homeLight.position.set(hin.x, HOUSE.h - 0.7, hin.z);
   const fov = P.sprint ? 46 : 40; if (Math.abs(G.cam.fov - fov) > 0.01) { G.cam.fov += (fov - G.cam.fov) * fk(0.12); G.cam.updateProjectionMatrix(); } // a wider view while running
   G.cam.lookAt(G.ct.x, G.ct.y + (hin ? 0 : L.hub ? 1.4 : 0.3), G.ct.z);
@@ -3202,7 +3388,8 @@ function mapView(c, bb, [vx, vy, vw, vh], side, me, opt, fs) {
     for (const b of L.babies || []) if (b.st !== 'home') dot(b.x, b.z, fs * 0.38, '#ff8fb8', '#8a2d55');
     for (const pt of L.portals) { dot(pt.x, pt.z, fs * 0.62, pt.locked ? '#9a9a9a' : LEVELS[pt.i].grass, pt.locked ? '#555' : '#3d2a1a'); label(String(pt.i + 1), pt.x, pt.z, fs * 0.8, pt.locked ? '#dddddd' : '#ffffff'); }
     const place = (o, ch, name, col) => { dot(o.x, o.z, fs * 0.6, col); label(ch, o.x, o.z, fs * 0.7); label(name, o.x, o.z, fs * 0.7, '#ffd23f', -fs * 1.05); };
-    place(L.shop, '♥', 'Dükkân', '#e63946'); place(L.ward, '★', 'Dolap', '#8a5aa8'); place(L.smith, '⚒', 'Demirci', '#5d6670'); if (!opt.board) place(L.board, '▦', 'Harita', '#8a5a2b'); if (L.burrow) place(L.burrow, '✿', 'Anne Tavşan', '#ff8fb8');
+    place(L.shop, '♥', 'Dükkân', '#e63946'); place(L.ward, '★', 'Dolap', '#8a5aa8'); place(L.smith, '⚒', 'Demirci', '#5d6670'); if (!opt.board) place(L.board, '▦', 'Harita', '#8a5a2b'); if (L.burrow) place(L.burrow, '✿', 'Anne Tavşan', '#ff8fb8'); { const hs = L.houses[save.home]; if (hs) place(hs, '⌂', 'Evim', '#ffb627'); }
+    if (!opt.board) for (const w of L.wolves || []) if (!w.gone && w.hp > 0) dot(w.x, w.z, 3.4, '#6d7480', '#22252b');
   } else {
     if (L.start) dot(L.start.x, L.start.z, fs * 0.35, '#7fd3ff');
     for (const cp of L.checkpoints || []) dot(cp.x, cp.z, fs * 0.35, cp === L.cpActive ? '#ffd23f' : '#ffffff');
