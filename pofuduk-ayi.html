@@ -180,6 +180,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 .hrow { display: grid; grid-template-columns: 2.4rem minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 6px 10px; border: 3px solid color-mix(in srgb, var(--bark) 25%, transparent); border-radius: 12px; }
 .hrow.own { background: color-mix(in srgb, var(--leaf) 18%, transparent); }
 .hrow .ic { font-size: 1.7rem; text-align: center; }
+.sucukImg { width: 2.6rem; height: auto; display: block; margin: 0 auto; }
 .hrow b { display: block; font-family: var(--display); font-weight: 400; font-size: 1.1rem; }
 .hrow small { opacity: .8; }
 .hrow .btn { padding: 5px 12px; font-size: .95rem; white-space: nowrap; }
@@ -290,8 +291,8 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
     <h2>Kasap</h2>
     <p class="hwallet"><span class="coin" aria-hidden="true"></span> <b id="butCoins">0</b> para · <b id="butSucuk">0</b> sucuk</p>
     <div class="hlist">
-      <div class="hrow"><span class="ic" aria-hidden="true">🥩</span><div><b>1 sucuk</b><small>Konağının ocağında ya da terastaki mangalda pişir: bütün kalplerin dolar!</small></div><button class="btn" id="but1" type="button">5 para</button></div>
-      <div class="hrow"><span class="ic" aria-hidden="true">🥩</span><div><b>5 sucuk</b><small>Bol sucuk, indirimli!</small></div><button class="btn" id="but5" type="button">22 para</button></div>
+      <div class="hrow"><span class="ic"><svg class="sucukImg" viewBox="0 0 64 48" aria-hidden="true"><path d="M8 34 C8 10 56 10 56 34" fill="none" stroke="#5e1414" stroke-width="15" stroke-linecap="round"/><path d="M8 34 C8 10 56 10 56 34" fill="none" stroke="#9a2a24" stroke-width="12" stroke-linecap="round"/><g fill="#f4e1c8"><circle cx="15" cy="23" r="1.6"/><circle cx="22" cy="17" r="1.3"/><circle cx="31" cy="15" r="1.7"/><circle cx="40" cy="16" r="1.2"/><circle cx="47" cy="20" r="1.5"/><circle cx="51" cy="28" r="1.3"/><circle cx="12" cy="30" r="1.1"/><circle cx="27" cy="20" r="1"/><circle cx="37" cy="21" r="1.1"/></g><path d="M14 18 C24 9 40 9 50 18" fill="none" stroke="#c9554d" stroke-width="2" stroke-linecap="round" opacity=".7"/><g stroke="#e8d3a8" stroke-width="2.5" stroke-linecap="round"><path d="M6 40 l-3 5"/><path d="M58 40 l3 5"/></g></svg></span><div><b>1 sucuk</b><small>Konağının ocağında ya da terastaki mangalda pişir: bütün kalplerin dolar!</small></div><button class="btn" id="but1" type="button">5 para</button></div>
+      <div class="hrow"><span class="ic"><svg class="sucukImg" viewBox="0 0 64 48" aria-hidden="true"><path d="M8 34 C8 10 56 10 56 34" fill="none" stroke="#5e1414" stroke-width="15" stroke-linecap="round"/><path d="M8 34 C8 10 56 10 56 34" fill="none" stroke="#9a2a24" stroke-width="12" stroke-linecap="round"/><g fill="#f4e1c8"><circle cx="15" cy="23" r="1.6"/><circle cx="22" cy="17" r="1.3"/><circle cx="31" cy="15" r="1.7"/><circle cx="40" cy="16" r="1.2"/><circle cx="47" cy="20" r="1.5"/><circle cx="51" cy="28" r="1.3"/><circle cx="12" cy="30" r="1.1"/><circle cx="27" cy="20" r="1"/><circle cx="37" cy="21" r="1.1"/></g><path d="M14 18 C24 9 40 9 50 18" fill="none" stroke="#c9554d" stroke-width="2" stroke-linecap="round" opacity=".7"/><g stroke="#e8d3a8" stroke-width="2.5" stroke-linecap="round"><path d="M6 40 l-3 5"/><path d="M58 40 l3 5"/></g></svg></span><div><b>5 sucuk</b><small>Bol sucuk, indirimli!</small></div><button class="btn" id="but5" type="button">22 para</button></div>
     </div>
     <p class="small" id="butNote"></p>
     <button class="btn primary" id="butClose" type="button">Kapat</button>
@@ -929,7 +930,11 @@ function drawHud() {
   ctx.fillStyle = '#d9a066'; ctx.beginPath(); ctx.ellipse(hx, 36, 6, 4, 0, 0, 7); ctx.fill();
   txt('× ' + lives, hx + 16, 42, 26);
   txt(L.hub ? 'Bal Köyü' : L.tut ? 'Öğretici' : `${lvlIdx + 1}/${LEVELS.length}`, VW - 14, 78, 22, '#fff4dc', 'right');
-  if (L.hub && save.sucuk) txt(`Sucuk: ${save.sucuk}`, VW - 14, 124, 17, '#ffb3a0', 'right');
+  if (L.hub && save.sucuk) { // a little sucuk next to the count
+    const tw = (txt(`Sucuk: ${save.sucuk}`, VW - 14, 124, 17, '#ffb3a0', 'right'), ctx.measureText(`Sucuk: ${save.sucuk}`).width), cx = VW - 14 - tw - 18, cy = 122;
+    ctx.save(); ctx.lineCap = 'round'; ctx.strokeStyle = '#5e1414'; ctx.lineWidth = 7; ctx.beginPath(); ctx.arc(cx, cy, 8, Math.PI, 0); ctx.stroke(); ctx.strokeStyle = '#9a2a24'; ctx.lineWidth = 5; ctx.stroke();
+    ctx.fillStyle = '#f4e1c8'; for (const a of [3.5, 4.2, 5.0, 5.8]) { ctx.beginPath(); ctx.arc(cx + Math.cos(a) * 8, cy + Math.sin(a) * 8, 0.9, 0, 7); ctx.fill(); } ctx.restore();
+  }
   if (L.hub) txt(isNight() ? `☾ Gece · sabaha ${mmss(clockLeft() * 1000)}` : `☀ Gündüz · geceye ${mmss(clockLeft() * 1000)}`, VW - 14, 102, 18, isNight() ? '#c9d6ff' : '#fff27a', 'right');
   const b = L.boss;
   if (b && b.active && !b.defeated) {
@@ -1227,7 +1232,8 @@ MAN.flights = [{ y: 0, x0: MAN.L0, x1: MAN.L1 }, { y: MAN.h1, x0: MAN.R0, x1: MA
 MAN.chest = [3.15, MAN.zb + 0.5];        // 2nd floor, by the back wall
 MAN.ward = [-4.4, MAN.zb + 1.6];         // stand here to open the wardrobe (2nd floor)
 MAN.stove = [4.5, MAN.zb + 1.5];         // kitchen stove (ground floor)
-MAN.grill = [2.7, 0.4];                  // the mangal on the roof terrace
+MAN.grill = [2.7, 0.4];                  // the mangals on the roof terrace
+MAN.grill2 = [-3.2, 0.4];
 MAN.ceil = y => y > MAN.h2 - 0.5 ? MAN.h - 0.3 : y > MAN.h1 - 0.5 ? MAN.h2 - 0.25 : MAN.h1 - 0.25;
 function mansionShell(m) { // walls, floors, stairs, balcony and terrace parapet you can stand on and bump into
   const { hw, hd, h1, h2, h: hh, wt, dw, dh, L0, L1, R0, R1, zb, zf, topZ, run, bw, bd } = MAN, r = (...a) => localRect(m, ...a, { mf: false }), out = [];
@@ -1254,7 +1260,7 @@ function mansionBoxes(m) { // furniture you bump into and stand on
     r(-1.5, zb, 1.5, zb + 3.2, h1, h1 + 0.75, { bed: true }),                           // the big bed (bouncy)
     r(-5.2, zb, -3.6, zb + 0.75, h1, h1 + 2.4), r(2.5, zb + 0.05, 3.8, zb + 0.95, h1, h1 + 1.1), // wardrobe, chest
     r(-3.0, zb, 0.5, zb + 0.5, h2, h2 + 2.2), r(-1.6, -0.6, 1.6, 0.4, h2, h2 + 0.7),   // bookshelf, lounge sofa
-    r(2.0, -0.6, 3.4, 0, hh, hh + 1.0), r(-1.0, 2.0, 1.0, 3.2, hh, hh + 0.8),          // mangal, terrace table
+    r(2.0, -0.6, 3.4, 0, hh, hh + 1.0), r(-3.9, -0.6, -2.5, 0, hh, hh + 1.0), r(-1.0, 2.0, 1.0, 3.2, hh, hh + 0.8), // two mangals, terrace table
   ];
   if (d.includes('piano')) out.push(r(-5.6, zb, -3.6, zb + 1.1, 0, 1.25));
   if (d.includes('aquarium')) out.push(r(-5.9, -2.0, -4.7, 0.2, 0, 1.6));
@@ -1343,14 +1349,26 @@ function mansionModel(parent, h) {
   for (const [x, c2] of [[-2.5, '#ff8fc8'], [2.5, '#ffd23f']]) mk('sph', c2, [0.55, 0.4, 0.55], [x, h2 + 0.35, 2.5], t);
   { const tl = grp(t, 4.5, h2, 4.8); mk('cyl', trim, [0.04, 1.2, 0.04], [0, 0.6, 0], tl); const tube = mk('cyl', '#3d4148', [0.12, 1.0, 0.12], [0, 1.35, 0.2], tl); tube.rotation.x = -0.9; }
   // the roof terrace: a mangal, a table with an umbrella, and two chairs
-  { const g = grp(t, 2.7, hh, -0.3);
+  h.smoke = [];
+  for (const [mx, sackSide] of [[2.7, 1], [-3.2, -1]]) { // two mangals, full of charcoal, each with a sack of coal
+    const g = grp(t, mx, hh, -0.3);
     for (const [x, z] of [[-0.6, -0.2], [0.6, -0.2], [-0.6, 0.2], [0.6, 0.2]]) mk('cyl', '#2a2a2a', [0.04, 0.75, 0.04], [x, 0.38, z], g);
-    mk('box', '#3d3d3d', [1.4, 0.3, 0.6], [0, 0.85, 0], g); mk('box', '#ff5a1f', [1.25, 0.06, 0.48], [0, 0.98, 0], g, { emissive: '#b02a00' });
-    for (let k = 0; k < 7; k++) mk('box', '#9aa5b1', [0.03, 0.03, 0.55], [-0.6 + k * 0.2, 1.03, 0], g);
-    for (let k = 0; k < 4; k++) mk('cyl', '#7a1e1e', [0.06, 0.4, 0.06], [-0.45 + k * 0.3, 1.08, 0], g).rotation.x = Math.PI / 2;
-    h.smoke = []; for (let k = 0; k < 4; k++) { const s = mk('sph', '#d9d9d9', [0.18, 0.18, 0.18], [0, 1.3, 0], g, { transparent: true, opacity: 0.5 }); s.castShadow = false; h.smoke.push(s); } }
-  box(wood, 2.0, 0.1, 1.2, 0, hh + 0.75, 2.6); mk('cyl', trim, [0.06, 0.75, 0.06], [0, hh + 0.38, 2.6], t); mk('cyl', '#c0c6cc', [0.03, 2.3, 0.03], [0, hh + 1.15, 2.6], t); mk('cone', '#e63946', [1.6, 0.6, 1.6], [0, hh + 2.4, 2.6], t);
-  for (const sx of [-1, 1]) { box('#ffffff', 0.6, 0.45, 0.6, sx * 1.5, hh + 0.23, 2.6); box('#ffffff', 0.08, 0.6, 0.6, sx * 1.8, hh + 0.6, 2.6); }
+    mk('box', '#3d3d3d', [1.4, 0.3, 0.6], [0, 0.85, 0], g); mk('box', '#2a1a10', [1.25, 0.04, 0.48], [0, 0.96, 0], g);
+    for (let k = 0; k < 22; k++) { const hot = k % 3 === 0, x = -0.55 + (k % 8) * 0.155 + (k % 2) * 0.04, z = -0.17 + Math.floor(k / 8) * 0.16;
+      const c = mk('sph', hot ? '#ff6a1f' : '#1c1c1c', [0.08, 0.06, 0.07], [x, 1.0, z], g, hot ? { emissive: '#c03000' } : null); c.rotation.y = k; c.castShadow = false; }
+    for (let k = 0; k < 7; k++) mk('box', '#9aa5b1', [0.03, 0.03, 0.55], [-0.6 + k * 0.2, 1.06, 0], g);
+    for (let k = 0; k < 4; k++) mk('cyl', '#7a1e1e', [0.06, 0.4, 0.06], [-0.45 + k * 0.3, 1.11, 0], g).rotation.x = Math.PI / 2;
+    for (let k = 0; k < 4; k++) { const s = mk('sph', '#d9d9d9', [0.18, 0.18, 0.18], [0, 1.3, 0], g, { transparent: true, opacity: 0.5 }); s.castShadow = false; h.smoke.push(s); }
+    const sack = grp(t, mx + sackSide * 1.1, hh, -0.2); mk('sph', '#4a4038', [0.32, 0.42, 0.28], [0, 0.4, 0], sack); mk('cyl', '#4a4038', [0.16, 0.14, 0.16], [0, 0.82, 0], sack);
+    for (let k = 0; k < 4; k++) mk('sph', '#1c1c1c', [0.07, 0.06, 0.07], [Math.sin(k * 1.7) * 0.12, 0.92, Math.cos(k * 1.7) * 0.1], sack);
+    const lbl = canvasTex(128, 48, (c, w, h2) => { c.fillStyle = '#e8dcc0'; c.fillRect(0, 0, w, h2); c.fillStyle = '#2a2a2a'; c.font = '26px "Lilita One", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('KÖMÜR', w / 2, h2 / 2 + 1); });
+    const lp = new THREE.Mesh(new THREE.PlaneGeometry(0.42, 0.16), new THREE.MeshLambertMaterial({ map: lbl })); lp.position.set(0, 0.45, 0.29); sack.add(lp);
+  }
+  box(wood, 2.0, 0.1, 1.2, 0, hh + 0.75, 2.6); for (const [x, z] of [[-0.85, 2.1], [0.85, 2.1], [-0.85, 3.1], [0.85, 3.1]]) mk('cyl', trim, [0.05, 0.75, 0.05], [x, hh + 0.38, z], t);
+  mk('cyl', '#c0c6cc', [0.03, 2.3, 0.03], [0, hh + 1.15, 2.6], t); mk('cone', '#e63946', [1.6, 0.6, 1.6], [0, hh + 2.4, 2.6], t);
+  for (const [x, z] of [[-1.55, 2.6], [1.55, 2.6], [0, 1.45], [0, 3.75]]) { // four stools round the table
+    mk('cyl', '#c08a4e', [0.28, 0.07, 0.28], [x, hh + 0.48, z], t); for (const [dx, dz] of [[-0.15, -0.15], [0.15, -0.15], [-0.15, 0.15], [0.15, 0.15]]) mk('cyl', trim, [0.025, 0.46, 0.025], [x + dx, hh + 0.23, z + dz], t);
+  }
   // things bought with honey jars
   const d = save.decor || [];
   if (d.includes('plants')) for (const [x, y, z] of [[R1 - 0.5, 0, zf - 0.5], [-5.4, 0, zf - 0.5], [-5.4, h1, zf - 0.5], [-dw - 1.3, 0, hd + 0.6], [dw + 1.3, 0, hd + 0.6], [-6.5, hh, 5.4], [6.5, hh, 5.4]]) {
@@ -2143,7 +2161,7 @@ function buildHub() {
     for (const b of mansionShell(m)) boxes.push(b);
     const spot = ([lx, lz], y) => { const [x, z] = T(lx, lz); return { x, y, z, armed: true }; };
     m.chest = spot(MAN.chest, MAN.h1); m.wardT = spot(MAN.ward, MAN.h1); m.wArmed = true;
-    m.stove = spot(MAN.stove, 0); m.grill = spot(MAN.grill, MAN.h);
+    m.stove = spot(MAN.stove, 0); m.grill = spot(MAN.grill, MAN.h); m.grill2 = spot(MAN.grill2, MAN.h);
     for (const b of mansionBoxes(m)) boxes.push(b);
   }
   const clear = (x, z) => !nearAny(x, z) && houses.every(h => Math.hypot(x - h.x, z - h.z) > 5.8);
@@ -2194,7 +2212,8 @@ function buildHub() {
   return { def: HUB, hub: true, R, boxes, items: hitems, enemies: [], trees, paths, start: { x: 0, y: 0, z: 50 }, checkpoints: [], cpActive: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, ward, smith, board, tutGate, houses, turtles, parks, mts, burrow, rabbits, babies, mansion, stores, honeyShop, butcher, pasture,
     beyza: pasture && { x: pasture.x, z: pasture.z, yaw: 0, tx: pasture.x, tz: pasture.z, t: 0, sp: 0, anim: 0 },
     sheep: pasture ? Array.from({ length: 8 }, (_, i) => ({ id: i, x: pasture.x + Math.sin(i * 0.8) * 4, z: pasture.z + Math.cos(i * 0.8) * 4, yaw: i, t: i * 0.7, next: 2, rest: false, petT: 0, hop: 0, anim: 0 })) : [],
-    dogs: pasture ? ['Karabaş', 'Pamuk'].map((name, i) => ({ name, x: pasture.x + (i ? 3 : -3), z: pasture.z + 2, yaw: 0, a: i * Math.PI, sp: 0, anim: 0, cool: 0, bark: 0 })) : [] };
+    dogs: pasture ? ['Karabaş', 'Pamuk'].map((name, i) => ({ name, x: pasture.x + (i ? 3 : -3), z: pasture.z + 2, yaw: 0, a: i * Math.PI, sp: 0, anim: 0, cool: 0, bark: 0 })) : [],
+    pups: pasture ? Array.from({ length: 4 }, (_, i) => ({ id: i, x: pasture.x + Math.sin(i * 1.6) * 2, z: pasture.z + Math.cos(i * 1.6) * 2, yaw: i, sp: 0, anim: 0, t: i, hop: 0, pet: 0, ox: Math.sin(i * 2.3) * 1.3, oz: Math.cos(i * 2.3) * 1.3 })) : [] };
 }
 function mkBoss(type, c) {
   const base = { type, c, x: c.x, z: c.zc - 3, y: c.y, vx: 0, vz: 0, vy: 0, t: 0, inv: 0, active: false, defeated: false, deadT: 0, yaw: 0, tx: 0, tz: 0, state: type === 'mush' ? 'walk' : type === 'queen' ? 'hover' : 'aim' };
@@ -2804,18 +2823,38 @@ function beyzaStep() {
     if (night) { // into the barn: first to the door, then to a spot inside
       const inside = inShed(pa.barn, s.x, s.z, -0.3), spot = pa.inBarn[s.id % pa.inBarn.length];
       if (inside || Math.hypot(s.x - pa.door.x, s.z - pa.door.z) < 0.8 || s.atDoor) { s.atDoor = true; tx = spot.x; tz = spot.z; } else { tx = pa.door.x; tz = pa.door.z; }
-    } else s.atDoor = false;
+    } else {
+      s.atDoor = false;
+      if (inShed(pa.barn, s.x, s.z, 0.3) || inShed(pa.home, s.x, s.z, 0.3)) { // morning: walk out of the barn through the door first
+        const inBarn = inShed(pa.barn, s.x, s.z, -0.2), d2 = Math.hypot(s.x - pa.door.x, s.z - pa.door.z);
+        if (inBarn) { const [bx, bz2] = [pa.barn.x, pa.barn.z]; tx = bx + (pa.door.x - bx) * 0.55; tz = bz2 + (pa.door.z - bz2) * 0.55; if (Math.hypot(s.x - tx, s.z - tz) < 0.4) { tx = pa.door.x; tz = pa.door.z; } }
+        else if (d2 > 0.3) { tx = pa.door.x + (pa.door.x - pa.barn.x) * 0.3; tz = pa.door.z + (pa.door.z - pa.barn.z) * 0.3; }
+      }
+    }
     if (tx !== null) {
-      const dt2 = Math.hypot(tx - s.x, tz - s.z); s.sp = dt2 > 0.25 ? 1.8 : 0; if (s.sp) s.yaw += angDiff(Math.atan2(tx - s.x, tz - s.z), s.yaw) * 0.2;
+      const dt2 = Math.hypot(tx - s.x, tz - s.z); s.sp = dt2 > 0.3 ? Math.min(1.8, dt2 * 2) : 0; if (dt2 > 0.5) s.yaw += angDiff(Math.atan2(tx - s.x, tz - s.z), s.yaw) * 0.15; // only turn while still walking there
     } else {
       if (s.t > s.next) { s.t = 0; s.next = 1.5 + Math.random() * 3; s.yaw += (Math.random() - 0.5) * 2.4; s.rest = Math.random() < 0.35; }
       const out = Math.hypot(s.x - pa.x, s.z - pa.z) > pa.r - 1.2;
-      if (out) { s.yaw += angDiff(Math.atan2(pa.x - s.x, pa.z - s.z), s.yaw) * 0.12; s.rest = false; }
+      if (out) { s.yaw += angDiff(Math.atan2(pa.x - s.x, pa.z - s.z), s.yaw) * 0.06; s.rest = false; }
       s.sp = s.rest ? 0 : out ? 1.5 : 0.8;
       const nx = s.x + Math.sin(s.yaw) * s.sp * DT, nz = s.z + Math.cos(s.yaw) * s.sp * DT;
-      if (inShed(pa.barn, nx, nz, 0.3) || inShed(pa.home, nx, nz, 0.3)) { s.yaw += Math.PI * 0.7; s.sp = 0; }
+      if (s.sp && (inShed(pa.barn, nx, nz, 0.3) || inShed(pa.home, nx, nz, 0.3))) { s.yaw += Math.PI * (0.6 + Math.random() * 0.5); s.sp = 0; s.rest = true; s.t = 0; s.next = 0.8 + Math.random(); } // turn once, then stand a moment
     }
     s.x += Math.sin(s.yaw) * s.sp * DT; s.z += Math.cos(s.yaw) * s.sp * DT; s.anim += s.sp * DT * 6;
+  }
+  // tiny kangal puppies tumble after the big dogs, and yap when you come close
+  for (const u of L.pups) {
+    u.t += DT; if (u.pet > 0) u.pet -= DT; if (u.hop > 0) u.hop -= DT;
+    const mum = L.dogs[u.id % L.dogs.length], dp = Math.hypot(P.x - u.x, P.z - u.z);
+    if (dp < 1.0 && u.pet <= 0 && P.y < 1.5) { u.pet = 3; u.hop = 0.35; tone(1100, 0.07, 'square', 900, 0.03); tone(1150, 0.07, 'square', 950, 0.03, 0.1); pop('Hav!', u.x, 0.9, u.z, '#9ef07a', 50); }
+    if (u.t > 2.5) { u.t = 0; u.ox = (Math.random() - 0.5) * 3; u.oz = (Math.random() - 0.5) * 3; }
+    let tx = mum.x + u.ox, tz = mum.z + u.oz; if (night) { tx = pa.door.x + u.ox * 0.5; tz = pa.door.z + u.oz * 0.5; }
+    if (Math.hypot(tx - pa.x, tz - pa.z) > pa.r - 1) { tx = pa.x + (tx - pa.x) * 0.8; tz = pa.z + (tz - pa.z) * 0.8; }
+    const dd = Math.hypot(tx - u.x, tz - u.z); u.sp = dd > 0.3 ? Math.min(3.5, dd * 2) : 0;
+    if (u.sp) { u.yaw += angDiff(Math.atan2(tx - u.x, tz - u.z), u.yaw) * 0.2; const nx = u.x + Math.sin(u.yaw) * u.sp * DT, nz = u.z + Math.cos(u.yaw) * u.sp * DT; if (!inShed(pa.barn, nx, nz, 0.2) && !inShed(pa.home, nx, nz, 0.2)) { u.x = nx; u.z = nz; } else u.t = 99; }
+    else if (dp < 4) u.yaw += angDiff(Math.atan2(P.x - u.x, P.z - u.z), u.yaw) * 0.1;
+    u.anim += u.sp * DT * 3;
   }
   // Beyza's good kangals walk round the lambs and chase Harun's dogs off the meadow
   const bad = (L.wolves || []).filter(w => w.type === 'kangal' && !w.gone && !w.flee && Math.hypot(w.x - pa.x, w.z - pa.z) < pa.r + 6);
@@ -2917,7 +2956,7 @@ function hubStep() {
   if (dhn > 2.2) hn.armed = true; else if (dhn < 1.1 && hn.armed && P.y < 1) { hn.armed = false; saveGame(); openHoney(); return; }
   const m = L.mansion;
   if (m && m.wardT) { const dm = Math.hypot(P.x - m.wardT.x, P.z - m.wardT.z); if (dm > 1.8) m.wArmed = true; else if (dm < 0.9 && m.wArmed && Math.abs(P.y - MAN.h1) < 0.8) { m.wArmed = false; saveGame(); openWard('hub'); return; } }
-  if (m) for (const [sp, where] of [[m.stove, 'Ocakta'], [m.grill, 'Mangalda']]) if (sp) {
+  if (m) for (const [sp, where] of [[m.stove, 'Ocakta'], [m.grill, 'Mangalda'], [m.grill2, 'Mangalda']]) if (sp) {
     const dd = Math.hypot(P.x - sp.x, P.z - sp.z);
     if (dd > 2.0) sp.armed = true; else if (dd < 1.15 && sp.armed && Math.abs(P.y - sp.y) < 1) { sp.armed = false; cookSucuk(sp, where); }
   }
@@ -3496,7 +3535,8 @@ function buildScene() {
       const sp3 = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.4), new THREE.MeshLambertMaterial({ map: plate })); sp3.position.set(0, 1.62, pa.home.hd + 0.03); cot.add(sp3);
       L.beyza.mesh = beyzaModel(); L.beyza.mesh.scale.setScalar(0.5); W.add(L.beyza.mesh); // tiny: smaller than the bear
       for (const s of L.sheep) { s.mesh = sheepModel(); s.mesh.scale.setScalar(0.58); W.add(s.mesh); }
-      for (const g of L.dogs) { g.mesh = kangalModel(true); W.add(g.mesh); } }
+      for (const g of L.dogs) { g.mesh = kangalModel(true); W.add(g.mesh); }
+      for (const u of L.pups) { u.mesh = kangalModel(true); u.mesh.scale.setScalar(0.36); W.add(u.mesh); } }
     { const bw = L.burrow, g5 = grp(W, bw.x, 0, bw.z); g5.rotation.y = bw.yaw;
       mk('hemi', '#7a9b3a', [1.25, 0.6, 1.25], [0, 0, -0.2], g5); mk('sph', '#2b1a0e', [0.42, 0.34, 0.12], [0, 0.22, 0.98], g5);
       for (let k = 0; k < 5; k++) mk('sph', ['#ff5fa2', '#ffd23f', '#ffffff'][k % 3], [0.1, 0.1, 0.1], [Math.cos(k * 1.3) * 0.9, 0.35 + (k % 2) * 0.15, Math.sin(k * 1.3) * 0.7 - 0.2], g5);
@@ -3512,11 +3552,13 @@ function buildScene() {
 }
 function portalSpin() {
   if (L.mansion) { for (const f of L.mansion.fish || []) { const k = f.userData.k, a = frame * 0.02 * (1 + k * 0.15) + k * 1.3; f.position.set(-5.3 + Math.sin(a * 1.3) * 0.35, f.userData.y + Math.sin(a * 2) * 0.05, -0.9 + Math.cos(a) * 0.85); f.rotation.y = a + Math.PI / 2; }
-    for (const [k, s] of (L.mansion.smoke || []).entries()) { const ph = (frame * 0.012 + k / 4) % 1; s.position.set(Math.sin(ph * 9 + k) * 0.15, 1.2 + ph * 1.8, 0); s.scale.setScalar(0.15 + ph * 0.35); s.material.opacity = 0.55 * (1 - ph); }
+    for (const [k, s] of (L.mansion.smoke || []).entries()) { const ph = (frame * 0.012 + (k % 4) / 4) % 1; s.position.set(Math.sin(ph * 9 + k) * 0.15, 1.2 + ph * 1.8, 0); s.scale.setScalar(0.15 + ph * 0.35); s.material.opacity = 0.55 * (1 - ph); }
     if (L.mansion.jet) L.mansion.jet.scale.set(0.22, 0.5 + Math.sin(frame * 0.2) * 0.12, 0.22); }
   if (L.beyza && L.beyza.mesh) { const bz = L.beyza, m = bz.mesh, u = m.userData, sw = Math.sin(bz.anim) * 0.5 * Math.min(1, bz.sp);
     m.position.set(bz.x, 0, bz.z); m.rotation.y = bz.yaw; u.legs[0].rotation.x = sw; u.legs[1].rotation.x = -sw; u.arms[0].rotation.x = -sw; u.arms[1].rotation.x = -0.3 + sw * 0.3;
     u.head.rotation.z = bz.sp ? 0 : Math.sin(frame * 0.03) * 0.08; }
+  if (L.pups) for (const u of L.pups) { if (!u.mesh) continue; const ud = u.mesh.userData, run = Math.min(1, u.sp / 2); u.mesh.position.set(u.x, u.hop > 0 ? Math.sin(u.hop / 0.35 * Math.PI) * 0.25 : Math.abs(Math.sin(u.anim * 3)) * 0.05 * run, u.z); u.mesh.rotation.y = u.yaw;
+    ud.legs.forEach((l, i) => { l.rotation.x = Math.sin(u.anim * 3 + (i === 0 || i === 3 ? 0 : Math.PI)) * 0.8 * run; }); ud.tail.rotation.x = 0.3 + Math.sin(frame * 0.45 + u.id) * 0.5; ud.head.rotation.z = Math.sin(frame * 0.05 + u.id) * 0.2; }
   if (L.dogs) for (const g of L.dogs) { if (!g.mesh) continue; const u = g.mesh.userData, run = Math.min(1, g.sp / 4); g.mesh.position.set(g.x, 0, g.z); g.mesh.rotation.y = g.yaw;
     u.legs.forEach((l, i) => { l.rotation.x = Math.sin(g.anim * 3 + (i === 0 || i === 3 ? 0 : Math.PI)) * 0.7 * run; }); u.tail.rotation.x = 0.4 + Math.sin(frame * 0.3) * 0.4; u.head.rotation.x = g.bark > 0 ? -0.35 : 0; }
   if (L.sheep) for (const s of L.sheep) { if (!s.mesh) continue; const u = s.mesh.userData; s.mesh.position.set(s.x, s.hop > 0 ? Math.sin(s.hop / 0.45 * Math.PI) * 0.4 : 0, s.z); s.mesh.rotation.y = s.yaw;
