@@ -357,6 +357,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
         <div class="fr2"><input id="nInvite" readonly aria-label="Davet yazısı"><button class="btn" id="nShare" type="button">WhatsApp'ta davet et</button></div>
         <button class="btn alt" id="nLeave" type="button">Odadan çık</button>
       </div>
+      <p class="small" id="nTip">İpucu: İkiniz de oyunu <b>aynı linkten</b> açarsanız en iyisi. Odayı kuran kişi oyunun içinde kalmalı; davet gönderdikten sonra hemen oyuna geri dönsün.</p>
       <p class="msg" id="nMsg" role="status"></p>
       <div class="box">
         <h3>Arkadaşlarım</h3>
@@ -4192,7 +4193,7 @@ const CODE_CH = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 if (!save.code) { save.code = Array.from({ length: 6 }, () => CODE_CH[Math.floor(Math.random() * CODE_CH.length)]).join(''); saveGame(); }
 save.friends = Array.isArray(save.friends) ? save.friends : [];
 const net = { on: false, mode: null, room: '', host: false, me: null, players: new Map(), lobby: null, lobbyTried: false, timer: 0, peer: null, conns: new Set(), conn: null, nroom: null, unsub: [] };
-const slug = t => t.toLowerCase().replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 24);
+const slug = t => String(t).trim().toLocaleLowerCase('tr').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 24);
 const hash36 = t => { let h = 2166136261; for (const ch of t) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619) >>> 0; } return h.toString(36); };
 const clip = (v, n) => String(v == null ? '' : v).replace(/[\u0000-\u001f\u007f-\u009f​-‏‪-‮⁦-⁩]/g, '').slice(0, n);
 const num = (v, lim = 1e4) => { v = +v; return Number.isFinite(v) ? Math.max(-lim, Math.min(lim, v)) : 0; };
@@ -4242,7 +4243,7 @@ function loadPeerLib() {
 function startTicker(send) { clearInterval(net.timer); net.timer = setInterval(() => { try { send(); } catch (e) {} for (const [id, p] of net.players) if (Date.now() - p.seen > 8000) dropPlayer(id); if (!pNet.hidden && net.on) { $('nRoomTitle').textContent = 'Oda: ' + net.room + ' · ' + (net.players.size + 1) + ' oyuncu'; renderPlayers(); } }, 100); }
 async function netGo(create) {
   if (net.on) return;
-  const roomTxt = clip($(create ? 'nRoomC' : 'nRoomJ').value.trim(), 20), pass = clip($(create ? 'nPassC' : 'nPassJ').value, 20);
+  const roomTxt = clip($(create ? 'nRoomC' : 'nRoomJ').value.trim(), 20), pass = clip($(create ? 'nPassC' : 'nPassJ').value.trim(), 20);
   if (!slug(roomTxt)) return netMsg('Odaya bir ad ver (harf ya da rakam).');
   if (!pass) return netMsg('Odaya bir şifre koy.');
   if (!save.name || save.name === 'Pofuduk' && !typedName()) return netMsg('Önce Ayarlar\'dan ayına bir ad ver.');
@@ -4250,7 +4251,8 @@ async function netGo(create) {
   $('nCreate').disabled = $('nJoin').disabled = true;
   try {
     const lobby = await getLobby();
-    if (lobby) await goClaude(lobby, roomTxt, pass, create); else await goPeer(roomTxt, pass, create);
+    try { await goPeer(roomTxt, pass, create); }
+    catch (e) { if (e && e.srv && lobby) { netReset(); netMsg(create ? 'Oda kuruluyor...' : 'Odaya bağlanılıyor...', true); await goClaude(lobby, roomTxt, pass, create); } else throw e; }
   } catch (e) { netReset(); netMsg(e && e.message && e.message.length < 120 && !/^[a-z-]+$/.test(e.message) ? e.message : 'Bağlanılamadı. İnternetini kontrol edip tekrar dene.'); }
   $('nCreate').disabled = $('nJoin').disabled = false;
 }
@@ -4269,16 +4271,28 @@ async function goClaude(lobby, roomTxt, pass, create) {
   lobby.presence({ c: save.code, n: save.name, r: roomTxt }).catch(() => {});
   netMsg(create ? 'Oda kuruldu! Arkadaşlarına oda adını ve şifreyi söyle.' : 'Odaya katıldın!', true); renderNet();
 }
+const srvErr = m => Object.assign(new Error(m), { srv: true });
+const wait = ms => new Promise(f => setTimeout(f, ms));
 async function goPeer(roomTxt, pass, create) {
-  await loadPeerLib();
+  try { await loadPeerLib(); } catch (e) { throw srvErr('Bağlantı kütüphanesi yüklenemedi. İnternetini kontrol et.'); }
   const hostId = 'pofuduk-oda-' + slug(roomTxt), ph = hash36('pofuduk|' + pass), opts = Object.assign({ debug: 0 }, window.PEER_OPTS || {});
-  const peer = create ? new Peer(hostId, opts) : new Peer(opts);
-  Object.assign(net, { mode: 'peer', peer, room: roomTxt, host: create });
-  await new Promise((ok, no) => {
-    const to = setTimeout(() => no(new Error('Sunucuya ulaşılamadı. İnternetini kontrol et.')), 20000);
-    peer.on('open', () => { clearTimeout(to); ok(); });
-    peer.on('error', e => { clearTimeout(to); no(new Error(e.type === 'unavailable-id' ? 'Bu adla bir oda zaten açık. Ona katılabilirsin.' : e.type === 'peer-unavailable' ? 'Bu adla açık bir oda bulunamadı.' : 'Bağlanılamadı (' + e.type + ').')); });
-  });
+  // open a peer; when making a room whose name is still held (e.g. you just reloaded), keep trying for a while
+  let peer = null;
+  for (let tries = 1; ; tries++) {
+    peer = create ? new Peer(hostId, opts) : new Peer(opts);
+    Object.assign(net, { mode: 'peer', peer, room: roomTxt, host: create });
+    const r = await new Promise(ok => {
+      const to = setTimeout(() => ok('timeout'), 20000);
+      peer.on('open', () => { clearTimeout(to); ok('open'); });
+      peer.on('error', e => { clearTimeout(to); ok(e.type || 'error'); });
+    });
+    if (r === 'open') break;
+    try { peer.destroy(); } catch (e) {}
+    if (r === 'unavailable-id' && tries < 5) { netMsg(`Bu oda adı az önce kullanılıyordu, bekleniyor... (${tries}/4)`, true); await wait(5000); continue; }
+    if (r === 'unavailable-id') throw new Error('Bu adla bir oda zaten açık. Ona katılabilir ya da başka bir ad seçebilirsin.');
+    if (r === 'timeout' || r === 'network' || r === 'server-error' || r === 'socket-error' || r === 'socket-closed' || r === 'browser-incompatible') throw srvErr('Sunucuya ulaşılamadı. İnternetini kontrol et.');
+    throw new Error('Bağlanılamadı (' + r + ').');
+  }
   if (create) {
     peer.on('connection', conn => {
       conn.on('data', d => {
@@ -4289,30 +4303,47 @@ async function goPeer(roomTxt, pass, create) {
       conn.on('close', () => { net.conns.delete(conn); dropPlayer(conn.peer); });
     });
     peer.on('error', () => {});
-    peer.on('disconnected', () => { try { peer.reconnect(); } catch (e) {} });
+    peer.on('disconnected', () => { setTimeout(() => { try { if (net.peer === peer && !peer.destroyed && peer.disconnected) peer.reconnect(); } catch (e) {} }, 1000); });
     net.on = true;
     startTicker(() => { const all = [Object.assign(myState(), { id: 'host' })]; for (const [id, p] of net.players) all.push({ id, n: p.n, c: p.c, lv: p.lv, x: p.x, y: p.y, z: p.z, yw: p.yw, sp: p.sp, air: p.air ? 1 : 0, fl: p.fl, at: p.at ? 1 : 0, g: p.g, s: p.s, o: p.o, a: p.a }); for (const c of net.conns) if (c.open) c.send({ t: 'all', ps: all }); });
-    netMsg('Oda kuruldu! Arkadaşlarına oda adını ve şifreyi söyle.', true);
+    netMsg('Oda kuruldu! Arkadaşlarına oda adını ve şifreyi söyle. Sen oyunda kaldıkça oda açık kalır.', true);
   } else {
-    const conn = peer.connect(hostId, { reliable: true }); net.conn = conn;
-    await new Promise((ok, no) => {
-      const to = setTimeout(() => no(new Error('Oda cevap vermedi.')), 20000);
-      peer.on('error', e => { clearTimeout(to); no(new Error(e.type === 'peer-unavailable' ? 'Bu adla açık bir oda bulunamadı.' : 'Bağlanılamadı (' + e.type + ').')); });
-      conn.on('open', () => conn.send({ t: 'hi', p: ph, s: myState() }));
-      conn.on('data', d => {
-        if (!d || typeof d !== 'object') return;
-        if (d.t === 'ok') { clearTimeout(to); ok(); }
-        else if (d.t === 'no') { clearTimeout(to); no(new Error('Şifre yanlış.')); }
-        else if (d.t === 'all' && Array.isArray(d.ps) && net.on) { const seen = new Set(); for (const st of d.ps.slice(0, 32)) { const id = clip(st && st.id, 64); if (!id || id === peer.id) continue; takePlayer(id, st); seen.add(id); } for (const id of [...net.players.keys()]) if (!seen.has(id)) dropPlayer(id); }
+    // look for the room a few times: the person who made it may have just stepped out to send the invite
+    let errHandler = null; peer.on('error', e => errHandler && errHandler(e));
+    const TRIES = 8;
+    for (let k = 1; ; k++) {
+      const conn = peer.connect(hostId, { reliable: true }); net.conn = conn;
+      const r = await new Promise(ok => {
+        const to = setTimeout(() => ok('timeout'), 25000); // opening a connection can take a while: only a missing room is retried
+        errHandler = e => { clearTimeout(to); ok(e.type === 'peer-unavailable' ? 'missing' : 'error:' + e.type); };
+        conn.on('open', () => conn.send({ t: 'hi', p: ph, s: myState() }));
+        conn.on('data', d => {
+          if (!d || typeof d !== 'object') return;
+          if (d.t === 'ok') { clearTimeout(to); ok('ok'); }
+          else if (d.t === 'no') { clearTimeout(to); ok('pass'); }
+          else if (d.t === 'all' && Array.isArray(d.ps) && net.on) { const seen = new Set(); for (const st of d.ps.slice(0, 32)) { const id = clip(st && st.id, 64); if (!id || id === peer.id) continue; takePlayer(id, st); seen.add(id); } for (const id of [...net.players.keys()]) if (!seen.has(id)) dropPlayer(id); }
+        });
+        conn.on('close', () => { if (net.on && net.conn === conn) { netReset(); netMsg('Oda kapandı.'); if (P && L) pop('Oda kapandı', P.x, P.y + 2.4, P.z, '#ffffff', 150); } });
       });
-      conn.on('close', () => { if (net.on) { netReset(); netMsg('Oda kapandı.'); if (P && L) pop('Oda kapandı', P.x, P.y + 2.4, P.z, '#ffffff', 150); } });
-    });
+      errHandler = null;
+      if (r === 'ok') break;
+      try { conn.close(); } catch (e) {}
+      if (r === 'pass') throw new Error('Şifre yanlış.');
+      if (r.startsWith('error:')) throw new Error('Bağlanılamadı (' + r.slice(6) + ').');
+      if (r === 'timeout') throw new Error('Oda cevap vermedi. Odayı kuran kişi oyunda mı? İkiniz de Wi-Fi\'ye bağlanıp tekrar deneyin.');
+      if (k >= TRIES) throw new Error(r === 'timeout' ? 'Oda cevap vermedi. Odayı kuran kişi oyunda mı? İkiniz de Wi-Fi\'ye bağlanıp tekrar deneyin.' : `"${roomTxt}" adında açık bir oda bulunamadı. Odayı kuran kişi oyunun içinde olmalı ve oda adı aynı yazılmalı.`);
+      netMsg(`Oda aranıyor... (${k}/${TRIES - 1}) Odayı kuran kişi oyunun içinde olmalı.`, true);
+      await wait(3500);
+      if (!net.peer || net.peer !== peer) throw new Error('Vazgeçildi.');
+    }
     net.on = true;
-    startTicker(() => { if (conn.open) conn.send({ t: 'st', s: myState() }); });
+    startTicker(() => { if (net.conn && net.conn.open) net.conn.send({ t: 'st', s: myState() }); });
     netMsg('Odaya katıldın!', true);
   }
   renderNet();
 }
+// coming back to the game (e.g. after sending the invite on WhatsApp): put the room back online
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && net.peer && !net.peer.destroyed && net.peer.disconnected) { try { net.peer.reconnect(); } catch (e) {} } });
 function inviteText() { return `Pofuduk'un Bal Macerası'nda benimle oyna! 👥 Birlikte Oyna > Odaya katıl. Oda: ${net.room} · Şifre: ${$(net.host ? 'nPassC' : 'nPassJ').value}`; }
 function teleportTo(p) { if (!P || p.lv !== lvKey()) return; P.x = p.x + 1.2; P.y = p.y + 0.5; P.z = p.z; P.vx = P.vy = P.vz = 0; G.ct = null; closeNet(); }
 function addFriend(code, name) {
@@ -4363,7 +4394,8 @@ function renderNet() {
   $('nMyCode').textContent = save.code;
   $('netOut').hidden = net.on; $('netIn').hidden = !net.on;
   $('netBtn').classList.toggle('live', net.on);
-  if (net.on) { $('nRoomTitle').textContent = 'Oda: ' + net.room + ' · ' + (net.players.size + 1) + ' oyuncu'; $('nInvite').value = inviteText(); renderPlayers(true); }
+  $('nTip').hidden = net.on;
+  if (net.on) { $('nRoomTitle').textContent = 'Oda: ' + net.room + ' · ' + (net.players.size + 1) + ' oyuncu' + (net.mode === 'claude' ? ' · claude.ai' : ''); $('nInvite').value = inviteText(); renderPlayers(true); }
   renderFriends();
 }
 function shareInvite() {
