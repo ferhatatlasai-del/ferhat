@@ -903,6 +903,7 @@ function drawHud() {
   if (L.hub && save.chestT) {
     const run = [];
     for (const m of L.mts) { const l = chestLeft('m' + m.id); if (l) run.push([l, `Dağ ${m.id + 1}`]); }
+    if (L.mansion && chestLeft('h')) run.push([chestLeft('h'), 'Konak']);
     for (const pk of L.parks) { const l = chestLeft('c' + pk.id); if (l) run.push([l, `Bulut ${pk.id}`]); }
     run.sort((a, b) => a[0] - b[0]);
     run.slice(0, 4).forEach(([l, n], i) => txt(`⏱ ${n} sandığı ${mmss(l)}`, VW - 14, 128 + i * 24, 18, '#bfe6ff', 'right'));
@@ -1068,6 +1069,68 @@ function axeModel(tier) { // built in bear art units, handle along +y
 }
 const HOUSE = { hw: 2.7, hd: 2.55, h: 3.2, wt: 0.25, dw: 0.7, rise: 1.7 };
 const houseWalls = () => { const { hw, hd, wt, dw } = HOUSE; return [[-hw, -hd, hw, -hd + wt], [-hw, -hd, -hw + wt, hd], [hw - wt, -hd, hw, hd], [-hw, hd - wt, -dw, hd], [dw, hd - wt, hw, hd]]; };
+// your own home: a big two-storey mansion with a staircase inside
+const MAN = { hw: 6.5, hd: 5.5, h1: 3.6, h: 7.4, wt: 0.3, dw: 1.1, dh: 2.8, rise: 3, steps: 12, run: 0.7, sw: 1.6 };
+MAN.sx0 = -MAN.hw + MAN.wt; MAN.sx1 = MAN.sx0 + MAN.sw; MAN.z1 = MAN.hd - MAN.wt - 1.0; // stair strip along the left wall
+MAN.stepZ = k => MAN.z1 - (k - 1) * MAN.run; MAN.topZ = MAN.stepZ(MAN.steps) - MAN.run / 2;
+MAN.chest = [1.2, -MAN.hd + 1.3]; // upstairs, against the back wall
+const manWalls = () => { const { hw, hd, wt, dw } = MAN; return [[-hw, -hd, hw, -hd + wt], [-hw, -hd, -hw + wt, hd], [hw - wt, -hd, hw, hd], [-hw, hd - wt, -dw, hd], [dw, hd - wt, hw, hd]]; };
+function mansionModel(parent, h) {
+  const { hw, hd, h1, h: hh, wt, dw, dh, rise, sx0, sx1 } = MAN;
+  const t = grp(parent, h.x, 0, h.z); t.rotation.y = h.yaw;
+  const wall = '#f0dcb0', trim = '#6b4220', roof = '#3f63a8', roofDark = '#2c4a86', wood = '#9a6234', glass = '#ffe08a';
+  for (const [x0, z0, x1, z1] of manWalls()) mk('box', wall, [x1 - x0, hh, z1 - z0], [(x0 + x1) / 2, hh / 2, (z0 + z1) / 2], t).receiveShadow = true;
+  mk('box', wall, [2 * dw, hh - dh, wt], [0, dh + (hh - dh) / 2, hd - wt / 2], t);
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) mk('box', trim, [0.4, hh, 0.4], [sx * (hw - 0.15), hh / 2, sz * (hd - 0.15)], t);
+  for (const [w2, d2, x, z] of [[2 * hw + 0.1, 0.14, 0, hd + 0.02], [2 * hw + 0.1, 0.14, 0, -hd - 0.02], [0.14, 2 * hd + 0.1, hw + 0.02, 0], [0.14, 2 * hd + 0.1, -hw - 0.02, 0]]) mk('box', trim, [w2, 0.28, d2], [x, h1, z], t); // band between the floors
+  for (const sx of [-1, 1]) mk('box', trim, [0.18, dh + 0.1, 0.4], [sx * (dw + 0.08), (dh + 0.1) / 2, hd - 0.1], t);
+  mk('box', trim, [2 * dw + 0.5, 0.2, 0.4], [0, dh + 0.1, hd - 0.1], t);
+  mk('box', '#a39a8c', [2 * dw + 1.6, 0.18, 1.4], [0, 0.09, hd + 0.7], t).receiveShadow = true; // doorstep
+  for (const sx of [-1, 1]) { mk('cyl', '#3d2a1a', [0.05, 0.4, 0.05], [sx * (dw + 0.6), dh - 0.2, hd + 0.25], t); mk('sph', '#fff3c0', [0.16, 0.2, 0.16], [sx * (dw + 0.6), dh - 0.5, hd + 0.3], t, { emissive: '#ffd23f' }); }
+  // windows on both floors, all four sides
+  const win = (x, y, z, rotY) => { const g = grp(t, x, y, z); g.rotation.y = rotY; mk('box', glass, [1.05, 1.1, 0.08], [0, 0, 0], g, { emissive: '#5a4a10' }); mk('box', trim, [1.25, 0.14, 0.18], [0, -0.62, 0.04], g); mk('box', trim, [0.08, 1.1, 0.1], [0, 0, 0.05], g); };
+  for (const x of [-3.6, 3.6]) win(x, 1.75, hd + 0.01, 0);
+  for (const x of [-4.2, -1.4, 1.4, 4.2]) { win(x, h1 + 1.75, hd + 0.01, 0); win(x, h1 + 1.75, -hd - 0.01, Math.PI); }
+  for (const z of [-2.8, 0, 2.8]) for (const sx of [-1, 1]) { win(sx * (hw + 0.01), 1.75, z, sx * Math.PI / 2); win(sx * (hw + 0.01), h1 + 1.75, z, sx * Math.PI / 2); }
+  // little balcony over the door
+  mk('box', trim, [3.2, 0.2, 1.3], [0, h1 - 0.1, hd + 0.65], t); for (let k = 0; k < 7; k++) mk('box', trim, [0.08, 0.7, 0.08], [-1.5 + k * 0.5, h1 + 0.35, hd + 1.25], t); mk('box', trim, [3.2, 0.1, 0.12], [0, h1 + 0.72, hd + 1.25], t);
+  // roof
+  const L2 = Math.hypot(hw, rise) + 0.6, ang = Math.atan2(rise, hw);
+  for (const sd of [-1, 1]) { const rf = mk('box', roof, [L2, 0.3, 2 * hd + 0.9], [sd * hw / 2, hh + rise / 2 + 0.1, 0], t); rf.rotation.z = -sd * ang; }
+  mk('box', roofDark, [0.6, 0.32, 2 * hd + 0.95], [0, hh + rise + 0.15, 0], t);
+  mk('prism', wall, [hw / 0.866, 2 * hd, rise / 1.5], [0, hh + rise / 3, 0], t).rotation.set(-Math.PI / 2, 0, 0);
+  for (const [x, z] of [[hw * 0.5, -hd * 0.45], [-hw * 0.55, hd * 0.3]]) mk('box', '#8d8577', [0.8, 2.6, 0.8], [x, hh + rise * 0.7, z], t);
+  // ground floor: living room with a fireplace, sofa and dining table
+  mk('box', '#b07a43', [2 * hw - 0.5, 0.06, 2 * hd - 0.5], [0, 0.11, 0], t).receiveShadow = true;
+  mk('box', '#c94a2a', [4.2, 0.03, 3.2], [2.2, 0.155, -0.8], t).receiveShadow = true;
+  mk('box', '#8d8577', [0.7, 2.4, 2.4], [hw - wt - 0.35, 1.2, -1.2], t); mk('box', '#2a1a10', [0.1, 1.0, 1.3], [hw - wt - 0.72, 0.6, -1.2], t);
+  mk('sph', '#ff7b3d', [0.4, 0.35, 0.45], [hw - wt - 0.75, 0.35, -1.2], t, { emissive: '#ff5a00' }); mk('sph', '#ffd23f', [0.22, 0.25, 0.22], [hw - wt - 0.8, 0.45, -1.2], t, { emissive: '#ffb000' });
+  mk('box', '#7a2f3a', [1.0, 0.45, 2.6], [0.9, 0.24, -1.2], t); mk('box', '#7a2f3a', [0.3, 1.0, 2.6], [0.45, 0.6, -1.2], t); for (const sz of [-1, 1]) mk('box', '#6a2732', [1.0, 0.7, 0.3], [0.9, 0.4, -1.2 + sz * 1.3], t);
+  mk('box', wood, [2.4, 0.12, 1.2], [2.6, 0.82, 3.0], t); for (const [x, z] of [[1.6, 2.6], [3.6, 2.6], [1.6, 3.4], [3.6, 3.4]]) mk('cyl', trim, [0.08, 0.78, 0.08], [x, 0.4, z], t);
+  for (const x of [1.8, 3.4]) for (const sz of [-1, 1]) mk('box', trim, [0.5, 0.5, 0.5], [x, 0.3, 3.0 + sz * 0.95], t);
+  mk('sph', '#ffb627', [0.16, 0.2, 0.16], [2.6, 1.05, 3.0], t, { emissive: '#4a2800' });
+  mk('box', trim, [2.6, 0.12, 0.4], [2.2, 1.7, -hd + wt + 0.25], t); for (let k = 0; k < 5; k++) mk('cyl', '#ffb627', [0.13, 0.24, 0.13], [1.2 + k * 0.5, 1.88, -hd + wt + 0.25], t, { emissive: '#4a2800' });
+  mk('cyl', '#3d2a1a', [0.02, 0.5, 0.02], [1.5, h1 - 0.5, 0], t); mk('sph', '#fff3c0', [0.24, 0.18, 0.24], [1.5, h1 - 0.8, 0], t, { emissive: '#ffd23f' });
+  // the staircase, the landing and the upper floor
+  for (let k = 1; k <= MAN.steps; k++) mk('box', k % 2 ? wood : '#8a5a2b', [MAN.sw, 0.3 * k, MAN.run], [(sx0 + sx1) / 2, 0.15 * k, MAN.stepZ(k)], t).receiveShadow = true;
+  mk('box', wood, [MAN.sw, 0.25, MAN.topZ + hd - wt], [(sx0 + sx1) / 2, h1 - 0.125, (MAN.topZ - hd + wt) / 2], t);
+  mk('box', '#a8743d', [hw - wt - sx1, 0.25, 2 * hd - 2 * wt], [(sx1 + hw - wt) / 2, h1 - 0.125, 0], t).receiveShadow = true;
+  mk('box', trim, [0.1, 0.1, hd - wt - MAN.topZ - MAN.run], [sx1 + 0.05, h1 + 0.9, (hd - wt + MAN.topZ + MAN.run) / 2], t);
+  for (let z = MAN.topZ + MAN.run; z < hd - wt; z += 0.6) mk('box', trim, [0.08, 0.9, 0.08], [sx1 + 0.05, h1 + 0.45, z], t);
+  // upstairs: a big bed, a wardrobe, a rug and the treasure chest
+  mk('box', '#3b6fb0', [3.4, 0.03, 2.6], [1.8, h1 + 0.02, 0.8], t).receiveShadow = true;
+  mk('box', trim, [2.6, 0.5, 3.2], [hw - wt - 1.4, h1 + 0.25, 2.6], t); mk('box', '#e63946', [2.5, 0.2, 2.4], [hw - wt - 1.4, h1 + 0.6, 2.9], t);
+  for (const sx of [-1, 1]) mk('box', '#ffffff', [1.0, 0.2, 0.5], [hw - wt - 1.4 + sx * 0.6, h1 + 0.62, 1.3], t);
+  mk('box', trim, [2.6, 1.3, 0.2], [hw - wt - 1.4, h1 + 0.65, 1.0], t);
+  mk('box', '#7a4a24', [0.7, 2.4, 1.6], [hw - wt - 0.4, h1 + 1.2, -2.2], t); mk('sph', '#ffd23f', [0.06, 0.06, 0.06], [hw - wt - 0.78, h1 + 1.2, -2.0], t, { emissive: '#5a4300' });
+  const [cx, cz] = MAN.chest, c = grp(t, cx, h1, cz);
+  mk('box', '#8a5a2b', [1.3, 0.75, 0.85], [0, 0.38, 0], c); mk('box', '#a06d3a', [1.34, 0.38, 0.9], [0, 0.92, 0], c);
+  for (const sx of [-0.48, 0.48]) mk('box', '#ffd23f', [0.13, 1.14, 0.92], [sx, 0.56, 0], c, { emissive: '#5a4300' });
+  mk('box', '#ffd23f', [0.22, 0.26, 0.06], [0, 0.7, 0.46], c, { emissive: '#5a4300' });
+  h.glow = mk('torus', '#fff27a', [1.3, 1.3, 1.3], [0, 0.05, 0], c, { emissive: '#8a7a20' }); h.glow.rotation.x = Math.PI / 2; h.glow.castShadow = false;
+  mk('cyl', '#3d2a1a', [0.02, 0.5, 0.02], [1.5, hh - 0.25, 0], t); mk('sph', '#fff3c0', [0.24, 0.18, 0.24], [1.5, hh - 0.55, 0], t, { emissive: '#ffd23f' });
+  return t;
+}
 function houseModel(parent, h) {
   const { hw, hd, h: hh, wt, dw, rise } = HOUSE;
   const t = grp(parent, h.x, 0, h.z); t.rotation.y = h.yaw;
@@ -1412,6 +1475,7 @@ const TREE_DIM = { pine: [4.0, 0.5, 0.25], cactus: [2.7, 0.35, 0.35], shroom: [2
 // trees are solid: a trunk you bump into and a crown you can stand on, with one coin on top
 function solidTrees(trees, boxes, items, def, keyed) {
   trees.forEach((t, i) => {
+    if (t.gone) return; // cleared to make room for your mansion (its index, and so its coin key, stays the same)
     const [top, cw, tw] = TREE_DIM[t.kind || def.tree] || TREE_DIM.round, s = t.s, yt = t.y + top * s;
     boxes.push({ x0: t.x - tw * s, x1: t.x + tw * s, z0: t.z - tw * s, z1: t.z + tw * s, y0: t.y, y1: yt - 0.6 * s, kind: 'deco', on: true });
     boxes.push({ x0: t.x - cw * s, x1: t.x + cw * s, z0: t.z - cw * s, z1: t.z + cw * s, y0: yt - 0.9 * s, y1: yt, kind: 'deco', on: true, crown: true });
@@ -1673,28 +1737,70 @@ function buildHub() {
     const raw = Math.atan2(-x, 20 - z), dir = ((Math.round(raw / (Math.PI / 2)) % 4) + 4) % 4;
     houses.push({ x, z, dir, yaw: dir * Math.PI / 2, light: houses.length % 2 === 1, rnd: rnd(), coins: 2 + Math.floor(rnd() * 3) });
   }
+  // your own home becomes a big mansion: built where you chose (or as close as there is room), clearing small houses in the way
+  let mansion = null;
+  const mine = houses[save.home];
+  if (mine) {
+    const rad = Math.hypot(MAN.hw, MAN.hd) + 1, sd = (x, z, pa) => { const dx = pa.x1 - pa.x0, dz = pa.z1 - pa.z0, t = Math.max(0, Math.min(1, ((x - pa.x0) * dx + (z - pa.z0) * dz) / (dx * dx + dz * dz))); return Math.hypot(x - pa.x0 - dx * t, z - pa.z0 - dz * t); };
+    let best = null;
+    for (let r = 0; r <= 22; r += 1.5) {
+      const n = r ? Math.ceil(r * 2.4) : 1;
+      for (let a = 0; a < n; a++) {
+        const x = mine.x + Math.sin(a / n * 6.283) * r, z = mine.z + Math.cos(a / n * 6.283) * r;
+        if (Math.abs(x) > R - rad - 1 || Math.abs(z) > R - rad - 1) continue;
+        if (mts.some(m => Math.hypot(x - m.cx, z - m.cz) < m.r + rad + 1) || spots.some(sp => Math.hypot(x - sp.x, z - sp.z) < rad + 8)) continue;
+        if (parks.some(pk => Math.hypot(x - pk.cx, z - pk.cz) < pk.rad + rad + 2.5)) continue;
+        if ([shop, ward, smith, goal, board, tutGate, { x: 0, z: 50 }, { x: 0, z: 32 }].some(o => Math.hypot(x - o.x, z - o.z) < rad + 4)) continue;
+        const gone = houses.filter((o, j) => j !== save.home && Math.hypot(o.x - x, o.z - z) < rad + 4.2).length;
+        const score = r + gone * 8 + (paths.some(pa => sd(x, z, pa) < rad + 1) ? 25 : 0);
+        if (!best || score < best.score) best = { x, z, score };
+      }
+    }
+    if (best) {
+      const raw = Math.atan2(-best.x, 20 - best.z), dir = ((Math.round(raw / (Math.PI / 2)) % 4) + 4) % 4;
+      mansion = { x: best.x, z: best.z, dir, yaw: dir * Math.PI / 2, big: true };
+      houses.forEach((o, j) => { if (j === save.home || Math.hypot(o.x - best.x, o.z - best.z) < rad + 4.2) o.gone = true; });
+    }
+  }
   // hollow houses: four walls with a doorway at the front, and a few coins inside
   const hitems = [], got = save.houseCoins || [];
   houses.forEach((h, hi) => {
     const T = (lx, lz) => { const c = Math.cos(h.yaw), sn = Math.sin(h.yaw); return [h.x + lx * c + lz * sn, h.z - lx * sn + lz * c]; };
+    if (h.gone) { for (let k = 0; k < h.coins; k++) if (!got.includes(hi + '-' + k)) hitems.push({ kind: 'coin', key: hi + '-' + k, gone: true }); return; } // same count, so the random layout after this stays put
     for (const [x0, z0, x1, z1] of houseWalls()) boxes.push(rectBox(T, x0, z0, x1, z1, 0, HOUSE.h, 'deco'));
     boxes.push(rectBox(T, -HOUSE.hw - 0.3, -HOUSE.hd - 0.35, HOUSE.hw + 0.3, HOUSE.hd + 0.35, HOUSE.h - 0.15, HOUSE.h + 0.2, 'deco'));
     for (let k = 1; k < 4; k++) { const ex = (HOUSE.hw + 0.3) * (1 - k / 4); boxes.push(rectBox(T, -ex, -HOUSE.hd - 0.35, ex, HOUSE.hd + 0.35, HOUSE.h, HOUSE.h + 0.2 + HOUSE.rise * k / 4, 'deco')); }
     for (let k = 0; k < h.coins; k++) { const key = hi + '-' + k, [cx, cz] = T(-0.6 + k * 0.75, -0.6); if (!got.includes(key)) hitems.push({ kind: 'coin', key, x: cx, y: 0.8, z: cz }); }
   });
   hitems.forEach(h => { h.got = false; h.ph = rnd() * 6; });
+  for (let k = hitems.length - 1; k >= 0; k--) if (hitems[k].gone) hitems.splice(k, 1);
+  if (mansion) {
+    const m = mansion, T = (lx, lz) => { const c = Math.cos(m.yaw), sn = Math.sin(m.yaw); return [m.x + lx * c + lz * sn, m.z - lx * sn + lz * c]; };
+    const { hw, hd, h1, h: hh, wt, dw, dh, rise, sx0, sx1 } = MAN;
+    for (const [x0, z0, x1, z1] of manWalls()) boxes.push(rectBox(T, x0, z0, x1, z1, 0, hh, 'deco'));
+    boxes.push(rectBox(T, -dw, hd - wt, dw, hd, dh, hh, 'deco'));
+    boxes.push(rectBox(T, -hw - 0.4, -hd - 0.45, hw + 0.4, hd + 0.45, hh - 0.15, hh + 0.25, 'deco'));
+    for (let k = 1; k < 4; k++) { const ex = (hw + 0.4) * (1 - k / 4); boxes.push(rectBox(T, -ex, -hd - 0.45, ex, hd + 0.45, hh, hh + 0.25 + rise * k / 4, 'deco')); }
+    for (let k = 1; k <= MAN.steps; k++) boxes.push(rectBox(T, sx0, MAN.stepZ(k) - MAN.run / 2, sx1, MAN.stepZ(k) + MAN.run / 2, 0, 0.3 * k, 'deco'));
+    boxes.push(rectBox(T, sx0, -hd + wt, sx1, MAN.topZ, h1 - 0.25, h1, 'deco'));          // landing at the top of the stairs
+    boxes.push(rectBox(T, sx1, -hd + wt, hw - wt, hd - wt, h1 - 0.25, h1, 'deco'));        // upper floor
+    boxes.push(rectBox(T, sx1, MAN.topZ + MAN.run, sx1 + 0.12, hd - wt, h1, h1 + 0.95, 'deco')); // railing by the stairwell
+    const [cx, cz] = T(MAN.chest[0], MAN.chest[1]); m.chest = { x: cx, y: h1, z: cz };
+  }
   const clear = (x, z) => !nearAny(x, z) && houses.every(h => Math.hypot(x - h.x, z - h.z) > 5.8);
   const segD = (x, z, pa) => { const dx = pa.x1 - pa.x0, dz = pa.z1 - pa.z0, t = Math.max(0, Math.min(1, ((x - pa.x0) * dx + (z - pa.z0) * dz) / (dx * dx + dz * dz))); return Math.hypot(x - pa.x0 - dx * t, z - pa.z0 - dz * t); };
   const offPath = (x, z) => paths.every(pa => segD(x, z, pa) > 2.4) && Math.hypot(x - tutGate.x, z - tutGate.z) > 4;
   for (let i = 0; i < 620; i++) { const x = (rnd() - 0.5) * 2 * (R - 2), z = (rnd() - 0.5) * 2 * (R - 2); if (clear(x, z) && offPath(x, z)) trees.push({ x, y: 0, z, s: 0.7 + rnd() * 0.5 }); }
+  const offMan = (x, z) => !mansion || Math.hypot(x - mansion.x, z - mansion.z) > Math.hypot(MAN.hw, MAN.hd) + 5; // a clear yard all around
+  if (mansion) for (const t of trees) if (!offMan(t.x, t.z)) t.gone = true;
   solidTrees(trees, boxes, hitems, HUB, true);
   const turtles = [];
   for (let i = 0; turtles.length < 14 && i < 600; i++) {
     const x = (rnd() - 0.5) * 2 * (R - 8), z = (rnd() - 0.5) * 2 * (R - 8);
-    if (clear(x, z)) turtles.push({ id: turtles.length, x, z, yaw: rnd() * 6.28, t: rnd() * 5, next: 2 + rnd() * 3, s: 0.8 + rnd() * 0.45, hue: ['#3f9b4a', '#5aa65e', '#7a9b3a', '#4f8f6a'][turtles.length % 4], petT: 0, hop: 0 });
+    if (clear(x, z) && offMan(x, z)) turtles.push({ id: turtles.length, x, z, yaw: rnd() * 6.28, t: rnd() * 5, next: 2 + rnd() * 3, s: 0.8 + rnd() * 0.45, hue: ['#3f9b4a', '#5aa65e', '#7a9b3a', '#4f8f6a'][turtles.length % 4], petT: 0, hop: 0 });
   }
   // rabbits: wild ones that run away, and Mother Rabbit's lost babies (own seed, so the rest of the village stays the same)
-  const rr2 = rng(31), freeOf = (x, z, rad) => trees.every(t => Math.hypot(x - t.x, z - t.z) > rad) && houses.every(hs => Math.hypot(x - hs.x, z - hs.z) > 6.5);
+  const rr2 = rng(31), freeOf = (x, z, rad) => trees.every(t => Math.hypot(x - t.x, z - t.z) > rad) && houses.every(hs => Math.hypot(x - hs.x, z - hs.z) > 6.5) && offMan(x, z);
   let burrow = null;
   for (const [x, z] of [[-11, 54], [11, 55], [-13, 60], [13, 61], [-9, 64], [9, 66], [-16, 50], [16, 50]]) if (!burrow && freeOf(x, z, 3.5) && offPath(x, z) && houses.every(hs => Math.hypot(x - hs.x, z - hs.z) > 7.5)) burrow = { x, z };
   burrow = burrow || { x: -11, z: 54 };
@@ -1711,7 +1817,7 @@ function buildHub() {
     const a = burrow.yaw + (id - 2) * 0.62, hx = burrow.x + Math.sin(a) * 2.1, hz = burrow.z + Math.cos(a) * 2.1, ok = home.includes(id);
     babies.push({ id, lx: x, lz: z, hx, hz, x: ok ? hx : x, y: 0, z: ok ? hz : z, yaw: ok ? a : rr2() * 6.28, st: ok ? 'home' : 'lost', t: rr2() * 5, hop: 0 });
   }
-  return { def: HUB, hub: true, R, boxes, items: hitems, enemies: [], trees, paths, start: { x: 0, y: 0, z: 50 }, checkpoints: [], cpActive: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, ward, smith, board, tutGate, houses, turtles, parks, mts, burrow, rabbits, babies };
+  return { def: HUB, hub: true, R, boxes, items: hitems, enemies: [], trees, paths, start: { x: 0, y: 0, z: 50 }, checkpoints: [], cpActive: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, ward, smith, board, tutGate, houses, turtles, parks, mts, burrow, rabbits, babies, mansion };
 }
 function mkBoss(type, c) {
   const base = { type, c, x: c.x, z: c.zc - 3, y: c.y, vx: 0, vz: 0, vy: 0, t: 0, inv: 0, active: false, defeated: false, deadT: 0, yaw: 0, tx: 0, tz: 0, state: type === 'mush' ? 'walk' : type === 'queen' ? 'hover' : 'aim' };
@@ -2145,7 +2251,7 @@ function rabbitStep() {
   }
 }
 /* ---------- day and night ---------- */
-const DAY_S = 420, NIGHT_S = 180, CYC = DAY_S + NIGHT_S, FADE_S = 15; // 7 minutes of day, then 3 of night
+const DAY_S = 180, NIGHT_S = 180, CYC = DAY_S + NIGHT_S, FADE_S = 15; // 3 minutes of day, then 3 of night
 const isNight = () => (save.clock || 0) >= DAY_S;
 function nightAmt() { const c = save.clock || 0; return c < DAY_S - FADE_S ? 0 : c < DAY_S ? (c - DAY_S + FADE_S) / FADE_S : c < CYC - FADE_S ? 1 : (CYC - c) / FADE_S; }
 const clockLeft = () => isNight() ? CYC - (save.clock || 0) : DAY_S - (save.clock || 0);
@@ -2156,13 +2262,15 @@ function clockStep() {
   if (!was && isNight()) { nightMsg = 300; nightTxt = 'Gece oldu! Kurtlar geliyor'; sfx.howl(); }
   if (was && !isNight()) { nightMsg = 200; nightTxt = 'Günaydın! Kurtlar ormana kaçtı'; sfx.flag(); }
 }
+const inRect = (hs, D, x, z, pad = 0) => { const c = Math.cos(hs.yaw), sn = Math.sin(hs.yaw), dx = x - hs.x, dz = z - hs.z, lx = dx * c - dz * sn, lz = dx * sn + dz * c; return Math.abs(lx) < D.hw + pad && Math.abs(lz) < D.hd + pad; };
 function houseIdxAt(x, z, y) {
+  if (L.mansion && y < MAN.h && inRect(L.mansion, MAN, x, z)) return save.home;
   if (!L.houses || y > HOUSE.h) return -1;
-  return L.houses.findIndex(hs => { const c = Math.cos(hs.yaw), sn = Math.sin(hs.yaw), dx = x - hs.x, dz = z - hs.z, lx = dx * c - dz * sn, lz = dx * sn + dz * c; return Math.abs(lx) < HOUSE.hw && Math.abs(lz) < HOUSE.hd; });
+  return L.houses.findIndex(hs => { if (hs.gone) return false; const c = Math.cos(hs.yaw), sn = Math.sin(hs.yaw), dx = x - hs.x, dz = z - hs.z, lx = dx * c - dz * sn, lz = dx * sn + dz * c; return Math.abs(lx) < HOUSE.hw && Math.abs(lz) < HOUSE.hd; });
 }
 function homeSpot() { // just inside your own front door, facing out
-  const hs = L.houses && L.houses[save.home]; if (!hs) return null;
-  const c = Math.cos(hs.yaw), sn = Math.sin(hs.yaw), lz = HOUSE.hd - 1.2;
+  const hs = L.mansion || L.houses && L.houses[save.home]; if (!hs) return null;
+  const c = Math.cos(hs.yaw), sn = Math.sin(hs.yaw), lz = (hs.big ? MAN : HOUSE).hd - 1.4;
   return { x: hs.x + lz * sn, y: 0, z: hs.z + lz * c, yaw: hs.yaw };
 }
 function possessive(n) { // Turkish genitive: Ferhat'ın, Ayşe'nin, Pofuduk'un
@@ -2171,9 +2279,14 @@ function possessive(n) { // Turkish genitive: Ferhat'ın, Ayşe'nin, Pofuduk'un
 }
 function chooseHome(i) {
   const moved = save.home >= 0; save.home = i; bump('home', 1, 0); saveGame(); sfx.win();
-  const hs = L.houses[i]; burst(hs.x, HOUSE.h + 1, hs.z, '#ffd23f', 30, 4);
-  pop(moved ? 'Evini buraya taşıdın!' : 'Burası artık senin evin!', P.x, P.y + 2.4, P.z, '#ffd23f', 150);
-  if (USE3D) placeHomeMark();
+  const hp = P.hp, wasLives = lives; loadLevel(-1); lives = wasLives; P.hp = hp; banner = 0;
+  const m = L.mansion;
+  if (m) { // stand in front of your new mansion, looking at it
+    const d = MAN.hd + 9; P.x = m.x + Math.sin(m.yaw) * d; P.z = m.z + Math.cos(m.yaw) * d; P.yaw = m.yaw + Math.PI; P.ox = P.x; P.oz = P.z;
+    if (USE3D) { G.camYaw = m.yaw; G.oCamYaw = undefined; G.ct = null; G.manualT = 120; }
+    burst(m.x, MAN.h + 2, m.z, '#ffd23f', 40, 6);
+  }
+  pop(moved ? 'Konağın yeni yerinde!' : 'Konağın hazır! İçeri gir', P.x, P.y + 2.6, P.z, '#ffd23f', 200);
 }
 function goSleep() { if (sleepT) return; sleepT = 150; sfx.flag(); }
 function sleepStep() {
@@ -2224,7 +2337,7 @@ function wolfStep() {
     else { w.st = 'wander'; if (w.t > 3) { w.t = 0; w.wy = w.yaw + (Math.random() - 0.5) * 2.4; } want = w.wy ?? w.yaw; if (safe && d < 9) { want = Math.atan2(dx, dz) + Math.PI / 2; sp = 2.4; } } // prowls around a hiding bear
     w.yaw += angDiff(want, w.yaw) * 0.15;
     const nx = w.x + Math.sin(w.yaw) * sp * DT, nz = w.z + Math.cos(w.yaw) * sp * DT;
-    if (hubBlocked(nx, nz, 0.5) && !hubBlocked(w.x, w.z, 0.5)) { w.wy = w.yaw + Math.PI * (0.5 + Math.random() * 0.5); w.yaw += (Math.random() < 0.5 ? 1 : -1) * 0.25; w.t = 0; }
+    if ((hubBlocked(nx, nz, 0.5) || houseIdxAt(nx, nz, 0) >= 0) && !hubBlocked(w.x, w.z, 0.5)) { w.wy = w.yaw + Math.PI * (0.5 + Math.random() * 0.5); w.yaw += (Math.random() < 0.5 ? 1 : -1) * 0.25; w.t = 0; }
     else { w.x = nx; w.z = nz; }
     w.sp = sp; w.anim += sp * DT * 2.2;
     // touching the bear: a jump on its head defeats it, otherwise it bites
@@ -2264,6 +2377,8 @@ function hubStep() {
     pop(save.peaks[m.id] ? 'Sandık yenilenmişti!' : 'Dağın zirvesi!', ch.x, ch.y + 2.8, ch.z, '#ffffff', 120); save.peaks[m.id] = true;
     saveGame();
   }
+  if (L.mansion) { const ch = L.mansion.chest;
+    if (!chestLeft('h') && Math.hypot(P.x - ch.x, P.z - ch.z) < 1.5 && Math.abs(P.y - ch.y) < 1.2) { openChest('h'); sfx.win(); burst(ch.x, ch.y + 1, ch.z, '#ffd23f', 30, 5); addCoins(25, ch.x, ch.y + 2, ch.z); pop('Konak sandığı!', ch.x, ch.y + 2.8, ch.z, '#ffffff', 120); saveGame(); } }
   save.cloudChests = save.cloudChests || (save.cloudChest ? { 1: true } : {});
   for (const pk of L.parks) {
     const ch = pk.chest;
@@ -2695,7 +2810,7 @@ function buildScene() {
     }
     if (m) G.boxMeshes.set(b, m);
   }
-  for (const t of L.trees) treeModel(t.kind || th.tree, W, t.x, t.y, t.z, t.s, rnd);
+  for (const t of L.trees) if (!t.gone) treeModel(t.kind || th.tree, W, t.x, t.y, t.z, t.s, rnd);
   if (L.signs) for (const sg of L.signs) {
     const g4 = grp(W, sg.x, sg.y, sg.z); g4.rotation.y = sg.x < 0 ? 0.35 : -0.35; // face the path, which runs toward -z
     mk('cyl', '#6b4220', [0.09, 1.25, 0.09], [0, 0.62, 0], g4);
@@ -2804,7 +2919,8 @@ function buildScene() {
       const face = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 1.79), new THREE.MeshLambertMaterial({ map: tex, emissive: '#222', emissiveIntensity: 0.4 }));
       face.position.set(0, 1.85, 0.09); g2.add(face);
       mk('box', '#5c3a1c', [3.1, 0.16, 0.36], [0, 2.92, 0], g2); }
-    for (const h of L.houses) houseModel(W, h);
+    for (const h of L.houses) if (!h.gone) houseModel(W, h);
+    if (L.mansion) mansionModel(W, L.mansion);
     const nSteps = L.mts.reduce((a, m) => a + m.steps.length, 0);
     const stepTop = new THREE.InstancedMesh(G.geo.box, new THREE.MeshLambertMaterial({ color: '#c9bcae' }), nSteps), stepBody = new THREE.InstancedMesh(G.geo.box, new THREE.MeshLambertMaterial({ color: '#8d8378' }), nSteps);
     stepTop.frustumCulled = stepBody.frustumCulled = false; stepTop.castShadow = stepTop.receiveShadow = stepBody.castShadow = true; W.add(stepTop); W.add(stepBody);
@@ -2868,6 +2984,7 @@ function buildScene() {
   G.ringMat = mat('#ffffff', { transparent: true, opacity: 0.85, emissive: '#555555' });
 }
 function portalSpin() {
+  if (L.mansion && L.mansion.glow) { L.mansion.glow.visible = !chestLeft('h'); L.mansion.glow.scale.setScalar(1.2 + Math.sin(frame * 0.1) * 0.12); }
   if (L.mts) for (const mt of L.mts) if (mt.glow) { mt.glow.visible = !chestLeft('m' + mt.id); mt.glow.scale.setScalar(1.2 + Math.sin(frame * 0.1) * 0.12); }
   if (L.parks) for (const pk of L.parks) if (pk.glow) { pk.glow.visible = !chestLeft('c' + pk.id); pk.glow.scale.setScalar(1.2 + Math.sin(frame * 0.1) * 0.12); }
   if (L.portals) for (const p of L.portals) if (p.disc) p.disc.rotation.z -= 0.03;
@@ -2891,14 +3008,15 @@ function portalSpin() {
 }
 function placeHomeMark() {
   if (G.homeMark) { G.homeMark.parent && G.homeMark.parent.remove(G.homeMark); G.homeMark = null; G.homeFlag = null; }
-  const hs = L.houses && L.houses[save.home]; if (!hs || !G.world) return;
+  const hs = L.mansion || L.houses && L.houses[save.home]; if (!hs || !G.world) return;
+  const D = hs.big ? MAN : HOUSE, ph = hs.big ? 9.5 : 4.6;
   const g = grp(G.world, hs.x, 0, hs.z); g.rotation.y = hs.yaw; G.homeMark = g;
-  const fx = HOUSE.hw - 0.5, fz = HOUSE.hd + 0.9; // flag pole beside the front door
-  mk('cyl', '#6b4220', [0.08, 4.6, 0.08], [fx, 2.3, fz], g); mk('sph', '#ffd23f', [0.14, 0.14, 0.14], [fx, 4.65, fz], g, { emissive: '#5a4300' });
-  const fl = grp(g, fx, 4.15, fz); G.homeFlag = fl; mk('box', '#e63946', [0.06, 0.62, 0.95], [0, 0, -0.5], fl);
+  const fx = D.hw - 0.5, fz = D.hd + (hs.big ? 1.6 : 0.9); // flag pole beside the front door
+  mk('cyl', '#6b4220', [0.08, ph, 0.08], [fx, ph / 2, fz], g); mk('sph', '#ffd23f', [0.14, 0.14, 0.14], [fx, ph + 0.05, fz], g, { emissive: '#5a4300' });
+  const fl = grp(g, fx, ph - 0.45, fz); G.homeFlag = fl; mk('box', '#e63946', [0.06, 0.62, 0.95], [0, 0, -0.5], fl);
   const name = possessive(save.name) + ' Evi';
   const tex = canvasTex(512, 128, (c, w, hh) => { c.fillStyle = 'rgba(74,44,23,0.9)'; c.beginPath(); if (c.roundRect) c.roundRect(8, 14, w - 16, hh - 28, 26); else c.rect(8, 14, w - 16, hh - 28); c.fill(); c.lineWidth = 6; c.strokeStyle = '#ffd23f'; c.stroke(); c.fillStyle = '#ffd23f'; c.font = '56px "Lilita One", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(name, w / 2, hh / 2 + 3, w - 50); });
-  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false })); sp.scale.set(4, 1, 1); sp.position.set(0, HOUSE.h + HOUSE.rise + 1.3, 0); g.add(sp);
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false })); sp.scale.set(hs.big ? 6 : 4, hs.big ? 1.5 : 1, 1); sp.position.set(0, D.h + D.rise + (hs.big ? 2 : 1.3), 0); g.add(sp);
 }
 function applyNight(n) {
   const d = G.day; if (!d) return;
@@ -2936,17 +3054,19 @@ function render3D(alpha = 1, dtMs = 16.667) {
   const tgt = new THREE.Vector3(PX, PY + 1.1, PZ);
   if (bf) { tgt.x += (bf.x - PX) * 0.3; tgt.z += (bf.z - PZ) * 0.3; tgt.y = Math.max(tgt.y, bf.c.y + (bf.type === 'queen' ? 3.2 : 1.6)); }
   const toHouse = (h, x, z) => { const c = Math.cos(h.yaw), sn = Math.sin(h.yaw), dx = x - h.x, dz = z - h.z; return [dx * c - dz * sn, dx * sn + dz * c]; };
-  const hin = L.houses ? L.houses.find(h => { const [lx, lz] = toHouse(h, PX, PZ); return Math.abs(lx) < HOUSE.hw && lz > -HOUSE.hd && lz < HOUSE.hd - 0.9 && PY < HOUSE.h; }) : null;
-  G.dist = (G.dist || 7.4) + ((bf ? 11.5 : hin ? 2.4 : L.hub ? 9.5 : 7.4) - (G.dist || 7.4)) * fk(hin ? 0.2 : 0.05);
+  const inside = (h, D) => { const [lx, lz] = toHouse(h, PX, PZ); return Math.abs(lx) < D.hw && lz > -D.hd && lz < D.hd - 0.9 && PY < D.h; };
+  const hin = L.mansion && inside(L.mansion, MAN) ? L.mansion : L.houses ? L.houses.find(h => !h.gone && inside(h, HOUSE)) : null;
+  const HD = hin && hin.big ? MAN : HOUSE, ceil = hin && hin.big ? (PY > MAN.h1 - 0.5 ? MAN.h : MAN.h1 - 0.25) : HOUSE.h;
+  G.dist = (G.dist || 7.4) + ((bf ? 11.5 : hin ? (hin.big ? 4.2 : 2.4) : L.hub ? 9.5 : 7.4) - (G.dist || 7.4)) * fk(hin ? 0.2 : 0.05);
   if (!G.ct) G.ct = tgt.clone(); else G.ct.lerp(tgt, fk(P.dead ? 0.02 : 0.15));
   const cy = state === 'play' && G.oCamYaw !== undefined ? G.oCamYaw + angDiff(G.camYaw, G.oCamYaw) * alpha : G.camYaw, sx = shake ? (Math.random() - 0.5) * shake * 0.02 : 0, sy = shake ? (Math.random() - 0.5) * shake * 0.02 : 0;
   G.cam.position.set(G.ct.x + Math.sin(cy) * G.dist + sx, G.ct.y + G.dist * (L.hub ? 0.3 : 0.48) + sy, G.ct.z + Math.cos(cy) * G.dist);
   if (hin) { // keep the camera inside the room so the roof and walls can stay closed
     let [lx, lz] = toHouse(hin, G.cam.position.x, G.cam.position.z);
-    lx = Math.max(-HOUSE.hw + 0.4, Math.min(HOUSE.hw - 0.4, lx)); lz = Math.max(-HOUSE.hd + 0.4, Math.min(HOUSE.hd - 0.4, lz));
+    lx = Math.max(-HD.hw + 0.4, Math.min(HD.hw - 0.4, lx)); lz = Math.max(-HD.hd + 0.4, Math.min(HD.hd - 0.4, lz));
     const c = Math.cos(hin.yaw), sn = Math.sin(hin.yaw);
     const nx = hin.x + lx * c + lz * sn, nz = hin.z - lx * sn + lz * c, near = Math.hypot(nx - PX, nz - PZ);
-    G.cam.position.set(nx, near < 1.6 ? HOUSE.h - 0.3 : Math.min(HOUSE.h - 0.35, G.cam.position.y), nz); // too close: look down from the ceiling
+    G.cam.position.set(nx, near < 1.6 ? ceil - 0.3 : Math.min(ceil - 0.35, G.cam.position.y), nz); // too close: look down from the ceiling
   }
   if (L.mts) for (const m of L.mts) { // never let the camera sink into a mountain
     const cp = G.cam.position; if (cp.y > m.yEnd + 0.6) continue;
@@ -2960,7 +3080,7 @@ function render3D(alpha = 1, dtMs = 16.667) {
     if (G.stars) G.stars.position.set(G.ct.x, 0, G.ct.z);
     if (G.homeFlag) G.homeFlag.rotation.y = Math.sin(fI * 0.07) * 0.3;
   }
-  if (hin) G.homeLight.position.set(hin.x, HOUSE.h - 0.7, hin.z);
+  if (hin) { G.homeLight.position.set(hin.big ? PX : hin.x, ceil - 0.7, hin.big ? PZ : hin.z); G.homeLight.distance = hin.big ? 11 : 7.5; }
   const fov = P.sprint ? 46 : 40; if (Math.abs(G.cam.fov - fov) > 0.01) { G.cam.fov += (fov - G.cam.fov) * fk(0.12); G.cam.updateProjectionMatrix(); } // a wider view while running
   G.cam.lookAt(G.ct.x, G.ct.y + (hin ? 0 : L.hub ? 1.4 : 0.3), G.ct.z);
   const snap = v => Math.round(v * 25) / 25, lx = snap(G.ct.x), ly = snap(G.ct.y), lz = snap(G.ct.z); // keeps shadows from shimmering
@@ -3378,7 +3498,9 @@ function mapView(c, bb, [vx, vy, vw, vh], side, me, opt, fs) {
   if (L.hub) {
     for (const m of L.mts) { dot(m.cx, m.cz, m.r * sc, m.col); dot(m.cx, m.cz, Math.max(2, m.rTop * sc), '#b5d6a0'); label('▲', m.cx, m.cz, fs * 0.8, chestLeft('m' + m.id) ? '#ffffff' : '#ffd23f'); }
     for (const pk of L.parks) { const [px, py] = T(pk.cx, pk.cz); c.setLineDash([4, 4]); c.beginPath(); c.arc(px, py, pk.rad * sc, 0, Math.PI * 2); c.strokeStyle = '#ffffff'; c.lineWidth = 2.5; c.stroke(); c.setLineDash([]); label('☁', pk.cx, pk.cz, fs); }
+    if (L.mansion) { const m = L.mansion, [px, py] = T(m.x, m.z); c.save(); c.translate(px, py); c.rotate(-m.yaw); c.fillStyle = '#3f63a8'; c.fillRect(-MAN.hw * sc, -MAN.hd * sc, 2 * MAN.hw * sc, 2 * MAN.hd * sc); c.strokeStyle = '#ffd23f'; c.lineWidth = 2; c.strokeRect(-MAN.hw * sc, -MAN.hd * sc, 2 * MAN.hw * sc, 2 * MAN.hd * sc); c.restore(); }
     for (const hs of L.houses) {
+      if (hs.gone) continue;
       const [px, py] = T(hs.x, hs.z); c.save(); c.translate(px, py); c.rotate(-hs.yaw);
       c.fillStyle = hs.rnd < 0.5 ? '#b5452f' : '#7a4a24'; c.fillRect(-HOUSE.hw * sc, -HOUSE.hd * sc, 2 * HOUSE.hw * sc, 2 * HOUSE.hd * sc);
       c.strokeStyle = '#3d2a1a'; c.lineWidth = 1; c.strokeRect(-HOUSE.hw * sc, -HOUSE.hd * sc, 2 * HOUSE.hw * sc, 2 * HOUSE.hd * sc); c.restore();
@@ -3388,7 +3510,7 @@ function mapView(c, bb, [vx, vy, vw, vh], side, me, opt, fs) {
     for (const b of L.babies || []) if (b.st !== 'home') dot(b.x, b.z, fs * 0.38, '#ff8fb8', '#8a2d55');
     for (const pt of L.portals) { dot(pt.x, pt.z, fs * 0.62, pt.locked ? '#9a9a9a' : LEVELS[pt.i].grass, pt.locked ? '#555' : '#3d2a1a'); label(String(pt.i + 1), pt.x, pt.z, fs * 0.8, pt.locked ? '#dddddd' : '#ffffff'); }
     const place = (o, ch, name, col) => { dot(o.x, o.z, fs * 0.6, col); label(ch, o.x, o.z, fs * 0.7); label(name, o.x, o.z, fs * 0.7, '#ffd23f', -fs * 1.05); };
-    place(L.shop, '♥', 'Dükkân', '#e63946'); place(L.ward, '★', 'Dolap', '#8a5aa8'); place(L.smith, '⚒', 'Demirci', '#5d6670'); if (!opt.board) place(L.board, '▦', 'Harita', '#8a5a2b'); if (L.burrow) place(L.burrow, '✿', 'Anne Tavşan', '#ff8fb8'); { const hs = L.houses[save.home]; if (hs) place(hs, '⌂', 'Evim', '#ffb627'); }
+    place(L.shop, '♥', 'Dükkân', '#e63946'); place(L.ward, '★', 'Dolap', '#8a5aa8'); place(L.smith, '⚒', 'Demirci', '#5d6670'); if (!opt.board) place(L.board, '▦', 'Harita', '#8a5a2b'); if (L.burrow) place(L.burrow, '✿', 'Anne Tavşan', '#ff8fb8'); { const hs = L.mansion || L.houses[save.home]; if (hs) place(hs, '⌂', L.mansion ? 'Konağım' : 'Evim', '#ffb627'); }
     if (!opt.board) for (const w of L.wolves || []) if (!w.gone && w.hp > 0) dot(w.x, w.z, 3.4, '#6d7480', '#22252b');
   } else {
     if (L.start) dot(L.start.x, L.start.z, fs * 0.35, '#7fd3ff');
