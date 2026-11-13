@@ -233,6 +233,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
   <div class="grp">
     <div class="tb" data-k="pound" aria-label="Yere çakıl">▼</div>
     <div class="tb" data-k="attack" id="tbAxe" aria-label="Balta">🪓</div>
+    <div class="tb" id="tbRun" role="button" aria-label="Hızlı koş" aria-pressed="false">🏃</div>
     <div class="tb big" data-k="jump" aria-label="Zıpla">▲</div>
   </div>
 </div>
@@ -281,6 +282,19 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
       <p class="small" id="shopNote"></p>
     </div>
     <button class="btn primary" id="shopClose" type="button">Kapat</button>
+  </div>
+</div>
+
+<div class="panel" id="pButcher" hidden>
+  <div class="card">
+    <h2>Kasap</h2>
+    <p class="hwallet"><span class="coin" aria-hidden="true"></span> <b id="butCoins">0</b> para · <b id="butSucuk">0</b> sucuk</p>
+    <div class="hlist">
+      <div class="hrow"><span class="ic" aria-hidden="true">🥩</span><div><b>1 sucuk</b><small>Konağının ocağında ya da terastaki mangalda pişir: bütün kalplerin dolar!</small></div><button class="btn" id="but1" type="button">5 para</button></div>
+      <div class="hrow"><span class="ic" aria-hidden="true">🥩</span><div><b>5 sucuk</b><small>Bol sucuk, indirimli!</small></div><button class="btn" id="but5" type="button">22 para</button></div>
+    </div>
+    <p class="small" id="butNote"></p>
+    <button class="btn primary" id="butClose" type="button">Kapat</button>
   </div>
 </div>
 
@@ -545,6 +559,7 @@ const QUESTS = [
   { id: 'kangal', name: 'Kangal Kovucu', desc: "Harun'un ölümsüz kangallarını 5 kez sersemlet", stat: 'kangal', goal: 5, reward: 45 },
   { id: 'harun', name: "Harun'u Kov", desc: "Gece köye gelen Harun'u baltayla vurup köyden kov", stat: 'harun', goal: 1, reward: 60 },
   { id: 'sheep', name: 'Kuzu Dostu', desc: "Çoban Beyza'nın 6 kuzusunu sev", stat: 'sheep', goal: 6, reward: 25 },
+  { id: 'sucuk', name: 'Sucuk Ustası', desc: 'Kasaptan aldığın sucuğu konağının ocağında ya da terastaki mangalda 3 kez pişir', stat: 'sucuk', goal: 3, reward: 30 },
   { id: 'boss', name: 'Kahraman', desc: '2 boss yen', stat: 'boss', goal: 2, reward: 50 },
   { id: 'cloud', name: 'Bulut Tırmanıcısı', desc: "Bal Köyü'ndeki bir bulut parkurunun tepesindeki sandığa ulaş", stat: 'cloud', goal: 1, reward: 30 },
   { id: 'diamond', name: 'Elmas Usta', desc: "Demirciden Elmas Balta'yı al", stat: 'diamond', goal: 1, reward: 40 },
@@ -626,7 +641,7 @@ let jumpPressed = false, poundPressed = false;
 const stick = { x: 0, y: 0, id: null };
 const map = { ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right', ArrowUp: 'fwd', KeyW: 'fwd', ArrowDown: 'back', KeyS: 'back',
   Space: 'jump', ShiftLeft: 'pound', ShiftRight: 'pound', KeyC: 'pound', KeyK: 'pound', KeyQ: 'camL', KeyE: 'camR', KeyR: 'camUp', KeyV: 'camDown', KeyF: 'attack' };
-let attackPressed = false, lastFwd = -1e9, sprint = false; // double-tap W (or Up) to run
+let attackPressed = false, lastFwd = -1e9, sprint = false, touchRun = false; // double-tap W (or Up) to run
 function press(k) { if (!keys[k]) { if (k === 'jump') jumpPressed = true; if (k === 'pound') poundPressed = true; if (k === 'attack') attackPressed = true; } keys[k] = true; }
 addEventListener('keydown', e => {
   const k = map[e.code];
@@ -644,6 +659,7 @@ addEventListener('keydown', e => {
   if (!pSmith.hidden) { if (e.code === 'Escape') closeSmith(); return; }
   if (!pShop.hidden) { if (e.code === 'Escape') closeShop(); return; }
   if (!document.getElementById('pHoney').hidden) { if (e.code === 'Escape') closeHoney(); return; }
+  if (!document.getElementById('pButcher').hidden) { if (e.code === 'Escape') closeButcher(); return; }
   if (!pWard.hidden && wardFrom === 'hub') { if (e.code === 'Escape') setPlaying(); return; }
   if (e.code === 'KeyP' || e.code === 'Escape') togglePause();
   if (e.code === 'KeyM') { muted = !muted; musicVol(); }
@@ -654,7 +670,8 @@ addEventListener('keyup', e => { const k = map[e.code]; if (k) keys[k] = false; 
 addEventListener('blur', () => { for (const k in keys) keys[k] = false; sprint = false; });
 const isTouch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
 if (!isTouch) { const sp = document.getElementById('splash'); sp.querySelector('.tap').textContent = 'BAŞLAMAK İÇİN TIKLA'; sp.setAttribute('aria-label', 'HG Yapımcılık. Başlamak için tıkla'); }
-document.querySelectorAll('.tb').forEach(b => {
+{ const rb = document.getElementById('tbRun'); rb.addEventListener('pointerdown', e => { e.preventDefault(); audio(); touchRun = !touchRun; rb.classList.toggle('on', touchRun); rb.setAttribute('aria-pressed', touchRun); }); }
+document.querySelectorAll('.tb[data-k]').forEach(b => {
   const k = b.dataset.k;
   const on = e => { e.preventDefault(); audio(); press(k); b.classList.add('on'); };
   const off = e => { e.preventDefault(); keys[k] = false; b.classList.remove('on'); };
@@ -912,6 +929,7 @@ function drawHud() {
   ctx.fillStyle = '#d9a066'; ctx.beginPath(); ctx.ellipse(hx, 36, 6, 4, 0, 0, 7); ctx.fill();
   txt('× ' + lives, hx + 16, 42, 26);
   txt(L.hub ? 'Bal Köyü' : L.tut ? 'Öğretici' : `${lvlIdx + 1}/${LEVELS.length}`, VW - 14, 78, 22, '#fff4dc', 'right');
+  if (L.hub && save.sucuk) txt(`Sucuk: ${save.sucuk}`, VW - 14, 124, 17, '#ffb3a0', 'right');
   if (L.hub) txt(isNight() ? `☾ Gece · sabaha ${mmss(clockLeft() * 1000)}` : `☀ Gündüz · geceye ${mmss(clockLeft() * 1000)}`, VW - 14, 102, 18, isNight() ? '#c9d6ff' : '#fff27a', 'right');
   const b = L.boss;
   if (b && b.active && !b.defeated) {
@@ -933,8 +951,8 @@ function drawHud() {
     if (L.mansion && chestLeft('h')) run.push([chestLeft('h'), 'Konak']);
     for (const pk of L.parks) { const l = chestLeft('c' + pk.id); if (l) run.push([l, `Bulut ${pk.id}`]); }
     run.sort((a, b) => a[0] - b[0]);
-    run.slice(0, 4).forEach(([l, n], i) => txt(`⏱ ${n} sandığı ${mmss(l)}`, VW - 14, 128 + i * 24, 18, '#bfe6ff', 'right'));
-    if (run.length > 4) txt(`+${run.length - 4} sandık daha`, VW - 14, 128 + 4 * 24, 15, '#bfe6ff', 'right');
+    run.slice(0, 4).forEach(([l, n], i) => txt(`⏱ ${n} sandığı ${mmss(l)}`, VW - 14, 148 + i * 24, 18, '#bfe6ff', 'right'));
+    if (run.length > 4) txt(`+${run.length - 4} sandık daha`, VW - 14, 148 + 4 * 24, 15, '#bfe6ff', 'right');
   }
   if (L.signs || L.burrow) { // tutorial: show the nearest sign's text; village: Mother Rabbit talks
     let sg = null, bd = 4.2; for (const g of L.signs || []) { const d = Math.hypot(g.x - P.x, g.z - P.z); if (d < bd && Math.abs(g.y - P.y) < 2.5) { bd = d; sg = g; } }
@@ -1104,12 +1122,14 @@ const HOUSE = { hw: 2.7, hd: 2.55, h: 3.2, wt: 0.25, dw: 0.7, rise: 1.7 };
 const houseWalls = () => { const { hw, hd, wt, dw } = HOUSE; return [[-hw, -hd, hw, -hd + wt], [-hw, -hd, -hw + wt, hd], [hw - wt, -hd, hw, hd], [-hw, hd - wt, -dw, hd], [dw, hd - wt, hw, hd]]; };
 // walk-in shops: the heart shop, the clothes shop, the smithy and the honey shop
 const STORE = { hw: 4.6, hd: 4.2, h: 4.4, wt: 0.3, dw: 1.2, dh: 3.0, rise: 2.4 };
-const storeWalls = () => { const { hw, hd, wt, dw } = STORE; return [[-hw, -hd, hw, -hd + wt], [-hw, -hd, -hw + wt, hd], [hw - wt, -hd, hw, hd], [-hw, hd - wt, -dw, hd], [dw, hd - wt, hw, hd]]; };
+const STORE_S = { hw: 3.4, hd: 3.2, h: 3.6, wt: 0.3, dw: 1.0, dh: 2.8, rise: 2.0 }; // the little butcher's
+const storeWalls = (D = STORE) => { const { hw, hd, wt, dw } = D; return [[-hw, -hd, hw, -hd + wt], [-hw, -hd, -hw + wt, hd], [hw - wt, -hd, hw, hd], [-hw, hd - wt, -dw, hd], [dw, hd - wt, hw, hd]]; };
 const STORE_LOOK = {
   shop: { name: 'Kalp Dükkânı', wall: '#f7c6cf', roof: '#e63946', roofDark: '#b52c37', ink: '#c22f3c' },
   ward: { name: 'Kıyafet Dükkânı', wall: '#dccbf2', roof: '#7a4fb0', roofDark: '#5c3a8a', ink: '#6a3fa0' },
   smith: { name: 'Demirci', wall: '#b3a99d', roof: '#4a4f57', roofDark: '#33373d', ink: '#3d4148' },
   honey: { name: 'Bal Dükkânı', wall: '#ffe39a', roof: '#e89a1a', roofDark: '#b8740c', ink: '#9a5c00' },
+  butcher: { name: 'Kasap', wall: '#f4f1ea', roof: '#8a2a2a', roofDark: '#5e1c1c', ink: '#8a2a2a' },
 };
 const OUT_COL = { cap: '#e63946', flower: '#ff8fc8', glasses: '#2b2b2b', pirate: '#3a2a1a', viking: '#9aa5b1', cape: '#d62828', wizard: '#5a3fa8', crown: '#ffd23f' };
 // things to buy with honey jars; they go into your mansion
@@ -1131,9 +1151,9 @@ function npcBear(fur, apron) {
   return g;
 }
 function storeModel(parent, s) {
-  const { hw, hd, h: hh, wt, dw, dh, rise } = STORE, lk = STORE_LOOK[s.kind], trim = '#6b4220', wood = '#8a5a2b';
+  const SD = s.D || STORE, { hw, hd, h: hh, wt, dw, dh, rise } = SD, lk = STORE_LOOK[s.kind], trim = '#6b4220', wood = '#8a5a2b';
   const t = grp(parent, s.x, 0, s.z); t.rotation.y = s.yaw;
-  for (const [x0, z0, x1, z1] of storeWalls()) mk('box', lk.wall, [x1 - x0, hh, z1 - z0], [(x0 + x1) / 2, hh / 2, (z0 + z1) / 2], t).receiveShadow = true;
+  for (const [x0, z0, x1, z1] of storeWalls(SD)) mk('box', lk.wall, [x1 - x0, hh, z1 - z0], [(x0 + x1) / 2, hh / 2, (z0 + z1) / 2], t).receiveShadow = true;
   mk('box', lk.wall, [2 * dw, hh - dh, wt], [0, dh + (hh - dh) / 2, hd - wt / 2], t);
   for (const sx of [-1, 1]) for (const sz of [-1, 1]) mk('box', trim, [0.35, hh, 0.35], [sx * (hw - 0.13), hh / 2, sz * (hd - 0.13)], t);
   for (const sx of [-1, 1]) mk('box', trim, [0.18, dh + 0.1, 0.4], [sx * (dw + 0.08), (dh + 0.1) / 2, hd - 0.1], t);
@@ -1141,9 +1161,9 @@ function storeModel(parent, s) {
   // striped awning over the door and a big sign
   for (let k = 0; k < 6; k++) { const a = mk('box', k % 2 ? '#ffffff' : lk.roof, [0.62, 0.08, 1.3], [-1.55 + k * 0.62, dh + 0.55, hd + 0.55], t); a.rotation.x = 0.35; }
   const sign = canvasTex(512, 128, (c, w, h2) => { c.fillStyle = '#fff4dc'; c.fillRect(0, 0, w, h2); c.lineWidth = 10; c.strokeStyle = lk.ink; c.strokeRect(5, 5, w - 10, h2 - 10); c.fillStyle = lk.ink; c.font = '64px "Lilita One", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(lk.name, w / 2, h2 / 2 + 4, w - 40); });
-  const sp = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 1.15), new THREE.MeshLambertMaterial({ map: sign, emissive: '#222222' })); sp.position.set(0, hh - 0.35, hd + 0.04); t.add(sp);
-  for (const x of [-3.0, 3.0]) { mk('box', '#ffe08a', [1.3, 1.1, 0.08], [x, 1.8, hd + 0.01], t, { emissive: '#5a4a10' }); mk('box', trim, [1.5, 0.14, 0.16], [x, 1.18, hd + 0.04], t); }
-  for (const sx of [-1, 1]) for (const z of [-1.6, 1.6]) mk('box', '#ffe08a', [0.08, 1.1, 1.2], [sx * (hw + 0.01), 1.9, z], t, { emissive: '#5a4a10' });
+  const sp = new THREE.Mesh(new THREE.PlaneGeometry(Math.min(4.6, 2 * hw - 0.8), Math.min(4.6, 2 * hw - 0.8) / 4), new THREE.MeshLambertMaterial({ map: sign, emissive: '#222222' })); sp.position.set(0, hh - 0.35, hd + 0.04); t.add(sp);
+  for (const x of [-(hw - 1.6), hw - 1.6]) { mk('box', '#ffe08a', [Math.min(1.3, hw - dw - 0.9), 1.1, 0.08], [x, 1.8, hd + 0.01], t, { emissive: '#5a4a10' }); mk('box', trim, [1.5, 0.14, 0.16], [x, 1.18, hd + 0.04], t); }
+  for (const sx of [-1, 1]) for (const z of [-hd * 0.4, hd * 0.4]) mk('box', '#ffe08a', [0.08, 1.1, 1.2], [sx * (hw + 0.01), 1.9, z], t, { emissive: '#5a4a10' });
   const L2 = Math.hypot(hw, rise) + 0.5, ang = Math.atan2(rise, hw);
   for (const sd of [-1, 1]) { const rf = mk('box', lk.roof, [L2, 0.26, 2 * hd + 0.8], [sd * hw / 2, hh + rise / 2 + 0.1, 0], t); rf.rotation.z = -sd * ang; }
   mk('box', lk.roofDark, [0.55, 0.28, 2 * hd + 0.85], [0, hh + rise + 0.13, 0], t);
@@ -1151,9 +1171,9 @@ function storeModel(parent, s) {
   // inside: floor, counter, shelves, a lamp and the shopkeeper
   mk('box', '#b07a43', [2 * hw - 0.5, 0.06, 2 * hd - 0.5], [0, 0.11, 0], t).receiveShadow = true;
   const cz = -hd + wt + 1.7;
-  mk('box', wood, [5.2, 1.05, 0.8], [0, 0.53, cz], t); mk('box', '#c08a4e', [5.4, 0.1, 1.0], [0, 1.1, cz], t);
+  const cw = Math.min(5.2, 2 * hw - 1.6); mk('box', wood, [cw, 1.05, 0.8], [0, 0.53, cz], t); mk('box', '#c08a4e', [cw + 0.2, 0.1, 1.0], [0, 1.1, cz], t);
   mk('cyl', '#3d2a1a', [0.02, 0.6, 0.02], [0, hh - 0.3, 0.5], t); mk('sph', '#fff3c0', [0.26, 0.2, 0.26], [0, hh - 0.65, 0.5], t, { emissive: '#ffd23f' });
-  const keeper = s.kind === 'shop' ? rabbitModel('#f3e3d3', true) : s.kind === 'ward' ? rabbitModel('#ffffff', true) : s.kind === 'smith' ? npcBear('#7a5a3a', '#3d3d3d') : npcBear('#c98a4b', '#ffd23f');
+  const keeper = s.kind === 'shop' ? rabbitModel('#f3e3d3', true) : s.kind === 'ward' ? rabbitModel('#ffffff', true) : s.kind === 'smith' ? npcBear('#7a5a3a', '#3d3d3d') : s.kind === 'butcher' ? npcBear('#a8774a', '#ffffff') : npcBear('#c98a4b', '#ffd23f');
   keeper.scale.setScalar(s.kind === 'shop' || s.kind === 'ward' ? 1.7 : 1); keeper.position.set(0, 0, -hd + wt + 0.75); t.add(keeper); s.keeper = keeper;
   const shelf = y => mk('box', trim, [7.4, 0.12, 0.45], [0, y, -hd + wt + 0.25], t);
   if (s.kind === 'shop') {
@@ -1176,6 +1196,14 @@ function storeModel(parent, s) {
     mk('box', '#7d7f86', [0.7, hh + rise, 0.7], [hw - 1.2, (hh + rise) / 2 + 0.7, -hd + wt + 0.6], t);
     mk('box', '#5d6670', [0.9, 0.5, 0.5], [-2.8, 0.55, 1.0], t); mk('box', '#5d6670', [0.4, 0.4, 0.35], [-2.8, 0.2, 1.0], t); mk('box', '#5d6670', [1.2, 0.18, 0.55], [-2.8, 0.85, 1.0], t);
     for (let k = 1; k < AXES.length; k++) { const a = AXES[k], x = -3.6 + (k - 1) * 1.15, z = -hd + wt + 0.08; mk('box', '#9a6234', [0.08, 1.0, 0.06], [x, 2.4, z], t); mk('box', a.head, [0.45, 0.32, 0.08], [x + 0.15, 2.8, z + 0.02], t, a.glow ? { emissive: '#3a3000' } : null); }
+  } else if (s.kind === 'butcher') {
+    mk('cyl', '#ffffff', [0.3, 0.3, 0.3], [0, 2.15, -hd + wt + 0.75], t); // the butcher's white hat
+    const rod = mk('cyl', '#c0c6cc', [0.03, 2 * hw - 1.2, 0.03], [0, 2.6, -hd + wt + 0.3], t); rod.rotation.z = Math.PI / 2;
+    for (let k = 0; k < 9; k++) { const x = -hw + 1.1 + k * (2 * hw - 2.2) / 8, r2 = mk('torus', '#7a1e1e', [0.28, 0.28, 0.5], [x, 2.25, -hd + wt + 0.3], t); r2.rotation.y = Math.PI / 2; }
+    mk('box', '#cfe8ff', [cw, 0.5, 0.6], [0, 1.4, cz + 0.05], t, { transparent: true, opacity: 0.45, emissive: '#2a4a6a' });
+    for (let k = 0; k < 5; k++) mk('cyl', '#8a2020', [0.07, 0.6, 0.07], [-1.2 + k * 0.6, 1.25, cz], t).rotation.z = Math.PI / 2;
+    mk('box', '#c0c6cc', [0.5, 0.3, 0.04], [hw - 0.9, 2.0, -hd + wt + 0.05], t); mk('box', trim, [0.12, 0.35, 0.05], [hw - 0.6, 1.75, -hd + wt + 0.05], t);
+    for (const sx of [-1, 1]) for (let k = 0; k < 3; k++) mk('torus', '#7a1e1e', [0.25, 0.25, 0.45], [sx * (dw + 0.6), 2.2 - k * 0.12, hd + 0.35 + k * 0.05], t);
   } else {
     shelf(1.7); shelf(2.7);
     for (let k = 0; k < 13; k++) for (const y of [1.88, 2.88]) mk('cyl', '#ffb627', [0.15, 0.26, 0.15], [-3.3 + k * 0.55, y, -hd + wt + 0.25], t, { emissive: '#4a2800' });
@@ -1190,106 +1218,162 @@ function localRect(hs, x0, z0, x1, z1, y0, y1, extra) {
   const c = Math.cos(hs.yaw), sn = Math.sin(hs.yaw), T = (lx, lz) => [hs.x + lx * c + lz * sn, hs.z - lx * sn + lz * c], a = T(x0, z0), b = T(x1, z1);
   return Object.assign({ x0: Math.min(a[0], b[0]), z0: Math.min(a[1], b[1]), x1: Math.max(a[0], b[0]), z1: Math.max(a[1], b[1]), y0, y1, kind: 'deco', on: true, mf: true }, extra || {});
 }
+const MAN = { hw: 8, hd: 6.5, h1: 3.6, h2: 7.2, h: 10.8, wt: 0.3, dw: 1.1, dh: 2.8, rise: 1.0, steps: 12, run: 0.7, sw: 1.6, bw: 4.5, bd: 2.8 };
+MAN.L0 = -MAN.hw + MAN.wt; MAN.L1 = MAN.L0 + MAN.sw; MAN.R1 = MAN.hw - MAN.wt; MAN.R0 = MAN.R1 - MAN.sw; // stair strips: left and right walls
+MAN.sx0 = MAN.L0; MAN.sx1 = MAN.L1;
+MAN.zb = -MAN.hd + MAN.wt; MAN.zf = MAN.hd - MAN.wt; MAN.z1 = MAN.zf - 1.0;
+MAN.stepZ = k => MAN.z1 - (k - 1) * MAN.run; MAN.topZ = MAN.stepZ(MAN.steps) - MAN.run / 2;
+MAN.flights = [{ y: 0, x0: MAN.L0, x1: MAN.L1 }, { y: MAN.h1, x0: MAN.R0, x1: MAN.R1 }, { y: MAN.h2, x0: MAN.L0, x1: MAN.L1 }]; // ground→2nd, 2nd→3rd, 3rd→roof
+MAN.chest = [3.15, MAN.zb + 0.5];        // 2nd floor, by the back wall
+MAN.ward = [-4.4, MAN.zb + 1.6];         // stand here to open the wardrobe (2nd floor)
+MAN.stove = [4.5, MAN.zb + 1.5];         // kitchen stove (ground floor)
+MAN.grill = [2.7, 0.4];                  // the mangal on the roof terrace
+MAN.ceil = y => y > MAN.h2 - 0.5 ? MAN.h - 0.3 : y > MAN.h1 - 0.5 ? MAN.h2 - 0.25 : MAN.h1 - 0.25;
+function mansionShell(m) { // walls, floors, stairs, balcony and terrace parapet you can stand on and bump into
+  const { hw, hd, h1, h2, h: hh, wt, dw, dh, L0, L1, R0, R1, zb, zf, topZ, run, bw, bd } = MAN, r = (...a) => localRect(m, ...a, { mf: false }), out = [];
+  out.push(r(-hw, -hd, hw, -hd + wt, 0, hh), r(-hw, -hd, -hw + wt, hd, 0, hh), r(hw - wt, -hd, hw, hd, 0, hh), r(-hw, hd - wt, -dw, hd, 0, hh), r(dw, hd - wt, hw, hd, 0, hh));
+  out.push(r(-dw, hd - wt, dw, hd, dh, h1), r(-dw, hd - wt, dw, hd, h1 + 2.6, hh)); // over the front door / over the balcony door
+  for (const f of MAN.flights) for (let k = 1; k <= MAN.steps; k++) out.push(r(f.x0, MAN.stepZ(k) - run / 2, f.x1, MAN.stepZ(k) + run / 2, f.y, f.y + 0.3 * k));
+  // 2nd floor: open over the left stairs, landing at the back
+  out.push(r(L1, zb, R1, zf, h1 - 0.25, h1), r(L0, zb, L1, topZ, h1 - 0.25, h1), r(L1, topZ + run, L1 + 0.12, zf, h1, h1 + 0.95));
+  // 3rd floor: open over the right stairs
+  out.push(r(L0, zb, R0, zf, h2 - 0.25, h2), r(R0, zb, R1, topZ, h2 - 0.25, h2), r(R0 - 0.12, topZ + run, R0, zf, h2, h2 + 0.95));
+  // roof terrace: open over the left stairs, with a parapet all round
+  out.push(r(L1, -hd, hw, hd, hh - 0.3, hh), r(-hw, -hd, L0, hd, hh - 0.3, hh), r(L0, -hd, L1, topZ, hh - 0.3, hh), r(L0, zf, L1, hd, hh - 0.3, hh), r(L1, topZ + run, L1 + 0.12, zf, hh, hh + 0.95));
+  out.push(r(-hw, -hd, hw, -hd + 0.25, hh, hh + 1.0), r(-hw, hd - 0.25, hw, hd, hh, hh + 1.0), r(-hw, -hd, -hw + 0.25, hd, hh, hh + 1.0), r(hw - 0.25, -hd, hw, hd, hh, hh + 1.0));
+  // the balcony on the 2nd floor
+  out.push(r(-bw, hd, bw, hd + bd, h1 - 0.25, h1), r(-bw, hd + bd - 0.15, bw, hd + bd, h1, h1 + 1.0), r(-bw, hd, -bw + 0.15, hd + bd, h1, h1 + 1.0), r(bw - 0.15, hd, bw, hd + bd, h1, h1 + 1.0));
+  return out;
+}
 function mansionBoxes(m) { // furniture you bump into and stand on
-  const { hw, hd, h1, wt } = MAN, d = save.decor || [], r = (...a) => localRect(m, ...a);
-  const out = [r(hw - wt - 0.7, -2.4, hw - wt, 0, 0, 2.4), r(0.3, -2.5, 1.4, 0.1, 0, 0.75), r(1.4, 2.4, 3.8, 3.6, 0, 0.88),
-    r(hw - wt - 2.7, 1.0, hw - wt - 0.1, 4.2, h1, h1 + 0.75, { bed: true }), r(hw - wt - 0.75, -3.0, hw - wt, -1.4, h1, h1 + 2.4), r(0.55, -hd + 0.85, 1.85, -hd + 1.75, h1, h1 + 1.1)];
-  if (d.includes('piano')) out.push(r(-4.2, -hd + wt, -2.2, -hd + wt + 1.1, 0, 1.25));
-  if (d.includes('aquarium')) out.push(r(-4.3, -0.6, -3.1, 1.6, 0, 1.6));
+  const { hw, hd, h1, h2, h: hh, R1, zb } = MAN, d = save.decor || [], r = (...a) => localRect(m, ...a);
+  const out = [
+    r(R1 - 0.7, 0.2, R1, 2.6, 0, 2.4), r(3.6, 0.1, 4.7, 2.7, 0, 0.75),                 // fireplace, sofa
+    r(1.5, zb, R1, zb + 0.8, 0, 1.0), r(R1 - 1.0, zb + 0.8, R1, zb + 1.9, 0, 2.2),     // kitchen counter, fridge
+    r(2.6, -3.6, 4.6, -2.4, 0, 0.85), r(-5.0, 3.0, -2.6, 4.2, 0, 0.85),                // kitchen table, dining table
+    r(-1.5, zb, 1.5, zb + 3.2, h1, h1 + 0.75, { bed: true }),                           // the big bed (bouncy)
+    r(-5.2, zb, -3.6, zb + 0.75, h1, h1 + 2.4), r(2.5, zb + 0.05, 3.8, zb + 0.95, h1, h1 + 1.1), // wardrobe, chest
+    r(-3.0, zb, 0.5, zb + 0.5, h2, h2 + 2.2), r(-1.6, -0.6, 1.6, 0.4, h2, h2 + 0.7),   // bookshelf, lounge sofa
+    r(2.0, -0.6, 3.4, 0, hh, hh + 1.0), r(-1.0, 2.0, 1.0, 3.2, hh, hh + 0.8),          // mangal, terrace table
+  ];
+  if (d.includes('piano')) out.push(r(-5.6, zb, -3.6, zb + 1.1, 0, 1.25));
+  if (d.includes('aquarium')) out.push(r(-5.9, -2.0, -4.7, 0.2, 0, 1.6));
   if (d.includes('fountain')) out.push(r(-1.4, hd + 3.6, 1.4, hd + 6.4, 0, 0.8));
   return out;
 }
-const MAN = { hw: 6.5, hd: 5.5, h1: 3.6, h: 7.4, wt: 0.3, dw: 1.1, dh: 2.8, rise: 3, steps: 12, run: 0.7, sw: 1.6 };
-MAN.sx0 = -MAN.hw + MAN.wt; MAN.sx1 = MAN.sx0 + MAN.sw; MAN.z1 = MAN.hd - MAN.wt - 1.0; // stair strip along the left wall
-MAN.stepZ = k => MAN.z1 - (k - 1) * MAN.run; MAN.topZ = MAN.stepZ(MAN.steps) - MAN.run / 2;
-MAN.chest = [1.2, -MAN.hd + 1.3]; // upstairs, against the back wall
-const manWalls = () => { const { hw, hd, wt, dw } = MAN; return [[-hw, -hd, hw, -hd + wt], [-hw, -hd, -hw + wt, hd], [hw - wt, -hd, hw, hd], [-hw, hd - wt, -dw, hd], [dw, hd - wt, hw, hd]]; };
 function mansionModel(parent, h) {
-  const { hw, hd, h1, h: hh, wt, dw, dh, rise, sx0, sx1 } = MAN;
+  const { hw, hd, h1, h2, h: hh, wt, dw, dh, L0, L1, R0, R1, zb, zf, topZ, run, bw, bd } = MAN;
   const t = grp(parent, h.x, 0, h.z); t.rotation.y = h.yaw;
-  const wall = '#f0dcb0', trim = '#6b4220', roof = '#3f63a8', roofDark = '#2c4a86', wood = '#9a6234', glass = '#ffe08a';
-  for (const [x0, z0, x1, z1] of manWalls()) mk('box', wall, [x1 - x0, hh, z1 - z0], [(x0 + x1) / 2, hh / 2, (z0 + z1) / 2], t).receiveShadow = true;
-  mk('box', wall, [2 * dw, hh - dh, wt], [0, dh + (hh - dh) / 2, hd - wt / 2], t);
-  for (const sx of [-1, 1]) for (const sz of [-1, 1]) mk('box', trim, [0.4, hh, 0.4], [sx * (hw - 0.15), hh / 2, sz * (hd - 0.15)], t);
-  for (const [w2, d2, x, z] of [[2 * hw + 0.1, 0.14, 0, hd + 0.02], [2 * hw + 0.1, 0.14, 0, -hd - 0.02], [0.14, 2 * hd + 0.1, hw + 0.02, 0], [0.14, 2 * hd + 0.1, -hw - 0.02, 0]]) mk('box', trim, [w2, 0.28, d2], [x, h1, z], t); // band between the floors
-  for (const sx of [-1, 1]) mk('box', trim, [0.18, dh + 0.1, 0.4], [sx * (dw + 0.08), (dh + 0.1) / 2, hd - 0.1], t);
-  mk('box', trim, [2 * dw + 0.5, 0.2, 0.4], [0, dh + 0.1, hd - 0.1], t);
-  mk('box', '#a39a8c', [2 * dw + 1.6, 0.18, 1.4], [0, 0.09, hd + 0.7], t).receiveShadow = true; // doorstep
+  const wall = '#f0dcb0', trim = '#6b4220', wood = '#9a6234', glass = '#ffe08a', floorC = '#a8743d';
+  const box = (c, sx, sy, sz, x, y, z, o) => mk('box', c, [sx, sy, sz], [x, y, z], t, o);
+  // outside walls (the front has the door and, upstairs, the balcony door)
+  box(wall, 2 * hw, hh, wt, 0, hh / 2, -hd + wt / 2); box(wall, wt, hh, 2 * hd, -hw + wt / 2, hh / 2, 0); box(wall, wt, hh, 2 * hd, hw - wt / 2, hh / 2, 0);
+  for (const sx of [-1, 1]) box(wall, hw - dw, hh, wt, sx * (hw + dw) / 2, hh / 2, hd - wt / 2);
+  box(wall, 2 * dw, h1 - dh, wt, 0, (dh + h1) / 2, hd - wt / 2); box(wall, 2 * dw, hh - h1 - 2.6, wt, 0, (h1 + 2.6 + hh) / 2, hd - wt / 2);
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) box(trim, 0.45, hh + 0.2, 0.45, sx * (hw - 0.17), hh / 2, sz * (hd - 0.17));
+  for (const y of [h1, h2]) { box(trim, 2 * hw + 0.12, 0.3, 0.14, 0, y, hd + 0.02); box(trim, 2 * hw + 0.12, 0.3, 0.14, 0, y, -hd - 0.02); box(trim, 0.14, 0.3, 2 * hd + 0.12, hw + 0.02, y, 0); box(trim, 0.14, 0.3, 2 * hd + 0.12, -hw - 0.02, y, 0); }
+  for (const y of [0, h1]) { const top = y ? h1 + 2.6 : dh; for (const sx of [-1, 1]) box(trim, 0.18, top - y + 0.1, 0.4, sx * (dw + 0.08), (y + top) / 2, hd - 0.1); box(trim, 2 * dw + 0.5, 0.2, 0.4, 0, top + 0.1, hd - 0.1); }
+  box('#a39a8c', 2 * dw + 1.6, 0.18, 1.4, 0, 0.09, hd + 0.7).receiveShadow = true;
   for (const sx of [-1, 1]) { mk('cyl', '#3d2a1a', [0.05, 0.4, 0.05], [sx * (dw + 0.6), dh - 0.2, hd + 0.25], t); mk('sph', '#fff3c0', [0.16, 0.2, 0.16], [sx * (dw + 0.6), dh - 0.5, hd + 0.3], t, { emissive: '#ffd23f' }); }
-  // windows on both floors, all four sides
-  const win = (x, y, z, rotY) => { const g = grp(t, x, y, z); g.rotation.y = rotY; mk('box', glass, [1.05, 1.1, 0.08], [0, 0, 0], g, { emissive: '#5a4a10' }); mk('box', trim, [1.25, 0.14, 0.18], [0, -0.62, 0.04], g); mk('box', trim, [0.08, 1.1, 0.1], [0, 0, 0.05], g); };
-  for (const x of [-3.6, 3.6]) win(x, 1.75, hd + 0.01, 0);
-  for (const x of [-4.2, -1.4, 1.4, 4.2]) { win(x, h1 + 1.75, hd + 0.01, 0); win(x, h1 + 1.75, -hd - 0.01, Math.PI); }
-  for (const z of [-2.8, 0, 2.8]) for (const sx of [-1, 1]) { win(sx * (hw + 0.01), 1.75, z, sx * Math.PI / 2); win(sx * (hw + 0.01), h1 + 1.75, z, sx * Math.PI / 2); }
-  // little balcony over the door
-  mk('box', trim, [3.2, 0.2, 1.3], [0, h1 - 0.1, hd + 0.65], t); for (let k = 0; k < 7; k++) mk('box', trim, [0.08, 0.7, 0.08], [-1.5 + k * 0.5, h1 + 0.35, hd + 1.25], t); mk('box', trim, [3.2, 0.1, 0.12], [0, h1 + 0.72, hd + 1.25], t);
-  // roof
-  const L2 = Math.hypot(hw, rise) + 0.6, ang = Math.atan2(rise, hw);
-  for (const sd of [-1, 1]) { const rf = mk('box', roof, [L2, 0.3, 2 * hd + 0.9], [sd * hw / 2, hh + rise / 2 + 0.1, 0], t); rf.rotation.z = -sd * ang; }
-  mk('box', roofDark, [0.6, 0.32, 2 * hd + 0.95], [0, hh + rise + 0.15, 0], t);
-  mk('prism', wall, [hw / 0.866, 2 * hd, rise / 1.5], [0, hh + rise / 3, 0], t).rotation.set(-Math.PI / 2, 0, 0);
-  for (const [x, z] of [[hw * 0.5, -hd * 0.45], [-hw * 0.55, hd * 0.3]]) mk('box', '#8d8577', [0.8, 2.6, 0.8], [x, hh + rise * 0.7, z], t);
-  // ground floor: living room with a fireplace, sofa and dining table
-  mk('box', '#b07a43', [2 * hw - 0.5, 0.06, 2 * hd - 0.5], [0, 0.11, 0], t).receiveShadow = true;
-  mk('box', '#c94a2a', [4.2, 0.03, 3.2], [2.2, 0.155, -0.8], t).receiveShadow = true;
-  mk('box', '#8d8577', [0.7, 2.4, 2.4], [hw - wt - 0.35, 1.2, -1.2], t); mk('box', '#2a1a10', [0.1, 1.0, 1.3], [hw - wt - 0.72, 0.6, -1.2], t);
-  mk('sph', '#ff7b3d', [0.4, 0.35, 0.45], [hw - wt - 0.75, 0.35, -1.2], t, { emissive: '#ff5a00' }); mk('sph', '#ffd23f', [0.22, 0.25, 0.22], [hw - wt - 0.8, 0.45, -1.2], t, { emissive: '#ffb000' });
-  mk('box', '#7a2f3a', [1.0, 0.45, 2.6], [0.9, 0.24, -1.2], t); mk('box', '#7a2f3a', [0.3, 1.0, 2.6], [0.45, 0.6, -1.2], t); for (const sz of [-1, 1]) mk('box', '#6a2732', [1.0, 0.7, 0.3], [0.9, 0.4, -1.2 + sz * 1.3], t);
-  mk('box', wood, [2.4, 0.12, 1.2], [2.6, 0.82, 3.0], t); for (const [x, z] of [[1.6, 2.6], [3.6, 2.6], [1.6, 3.4], [3.6, 3.4]]) mk('cyl', trim, [0.08, 0.78, 0.08], [x, 0.4, z], t);
-  for (const x of [1.8, 3.4]) for (const sz of [-1, 1]) mk('box', trim, [0.5, 0.5, 0.5], [x, 0.3, 3.0 + sz * 0.95], t);
-  mk('sph', '#ffb627', [0.16, 0.2, 0.16], [2.6, 1.05, 3.0], t, { emissive: '#4a2800' });
-  mk('box', trim, [2.6, 0.12, 0.4], [2.2, 1.7, -hd + wt + 0.25], t); for (let k = 0; k < 5; k++) mk('cyl', '#ffb627', [0.13, 0.24, 0.13], [1.2 + k * 0.5, 1.88, -hd + wt + 0.25], t, { emissive: '#4a2800' });
+  const win = (x, y, z, rotY) => { const g = grp(t, x, y, z); g.rotation.y = rotY; mk('box', glass, [1.05, 1.15, 0.08], [0, 0, 0], g, { emissive: '#5a4a10' }); mk('box', trim, [1.25, 0.14, 0.18], [0, -0.64, 0.04], g); mk('box', trim, [0.08, 1.15, 0.1], [0, 0, 0.05], g); };
+  for (const x of [-6, -3.3, 3.3, 6]) win(x, 1.75, hd + 0.01, 0);
+  for (const x of [-6, -3, 3, 6]) win(x, h1 + 1.75, hd + 0.01, 0);
+  for (const x of [-6, -3, 0, 3, 6]) { win(x, h2 + 1.75, hd + 0.01, 0); for (const y of [1.75, h1 + 1.75, h2 + 1.75]) win(x, y, -hd - 0.01, Math.PI); }
+  for (const z of [-4, -1.3, 1.3, 4]) for (const sx of [-1, 1]) for (const y of [1.75, h1 + 1.75, h2 + 1.75]) win(sx * (hw + 0.01), y, z, sx * Math.PI / 2);
+  // the balcony: a wide wooden deck with railings
+  box(wood, 2 * bw, 0.25, bd, 0, h1 - 0.125, hd + bd / 2).receiveShadow = true;
+  box(trim, 2 * bw, 0.1, 0.12, 0, h1 + 0.95, hd + bd - 0.06); for (const sx of [-1, 1]) box(trim, 0.12, 0.1, bd, sx * (bw - 0.06), h1 + 0.95, hd + bd / 2);
+  for (let k = 0; k <= 18; k++) box(trim, 0.08, 0.95, 0.08, -bw + k * bw / 9, h1 + 0.47, hd + bd - 0.06);
+  for (const sx of [-1, 1]) for (let k = 1; k < 6; k++) box(trim, 0.08, 0.95, 0.08, sx * (bw - 0.06), h1 + 0.47, hd + k * bd / 6);
+  for (const sx of [-1, 1]) { box('#b5452f', 0.3, 0.4, 0.3, sx * (bw - 0.6), h1 + 0.2, hd + bd - 0.5); mk('sph', '#3f9b37', [0.35, 0.35, 0.35], [sx * (bw - 0.6), h1 + 0.6, hd + bd - 0.5], t); }
+  box('#7a4a24', 1.6, 0.1, 0.6, -2.2, h1 + 0.45, hd + 1.2); for (const x of [-2.9, -1.5]) box('#7a4a24', 0.08, 0.45, 0.5, x, h1 + 0.22, hd + 1.2); // a bench
+  // floors and ceilings
+  box('#b07a43', 2 * hw - 0.5, 0.06, 2 * hd - 0.5, 0, 0.11, 0).receiveShadow = true;
+  box(floorC, R1 - L1, 0.25, zf - zb, (L1 + R1) / 2, h1 - 0.125, (zb + zf) / 2).receiveShadow = true; box(floorC, L1 - L0, 0.25, topZ - zb, (L0 + L1) / 2, h1 - 0.125, (zb + topZ) / 2);
+  box(floorC, R0 - L0, 0.25, zf - zb, (L0 + R0) / 2, h2 - 0.125, (zb + zf) / 2).receiveShadow = true; box(floorC, R1 - R0, 0.25, topZ - zb, (R0 + R1) / 2, h2 - 0.125, (zb + topZ) / 2);
+  box('#c9b08a', hw - L1, 0.3, 2 * hd, (L1 + hw) / 2, hh - 0.15, 0).receiveShadow = true; box('#c9b08a', L0 + hw, 0.3, 2 * hd, (-hw + L0) / 2, hh - 0.15, 0);
+  box('#c9b08a', L1 - L0, 0.3, topZ + hd, (L0 + L1) / 2, hh - 0.15, (-hd + topZ) / 2); box('#c9b08a', L1 - L0, 0.3, hd - zf, (L0 + L1) / 2, hh - 0.15, (zf + hd) / 2);
+  // stairs and railings
+  MAN.flights.forEach((f, i) => { for (let k = 1; k <= MAN.steps; k++) box(k % 2 ? wood : '#8a5a2b', f.x1 - f.x0, 0.3 * k, run, (f.x0 + f.x1) / 2, f.y + 0.15 * k, MAN.stepZ(k)).receiveShadow = true; });
+  const rail = (x, y) => { box(trim, 0.1, 0.1, zf - topZ - run, x, y + 0.9, (zf + topZ + run) / 2); for (let z = topZ + run; z < zf; z += 0.6) box(trim, 0.08, 0.9, 0.08, x, y + 0.45, z); };
+  rail(L1 + 0.05, h1); rail(R0 - 0.05, h2); rail(L1 + 0.05, hh);
+  // the parapet round the roof terrace, with fairy lights
+  for (const [sx, sz, ax] of [[2 * hw, 0.25, 0], [2 * hw, 0.25, 1], [0.25, 2 * hd, 2], [0.25, 2 * hd, 3]]) { const x = ax === 2 ? -hw + 0.125 : ax === 3 ? hw - 0.125 : 0, z = ax === 0 ? -hd + 0.125 : ax === 1 ? hd - 0.125 : 0; box(wall, sx, 1.0, sz, x, hh + 0.5, z); box(trim, sx + 0.1, 0.12, sz + 0.1, x, hh + 1.03, z); }
+  for (let k = 0; k < 24; k++) { const a = k / 24, x = -hw + 0.2 + a * (2 * hw - 0.4); mk('sph', ['#ffd23f', '#ff5fa2', '#7fd3ff', '#9ef07a'][k % 4], [0.09, 0.09, 0.09], [x, hh + 1.25 + Math.sin(a * 37) * 0.06, hd - 0.15], t, { emissive: '#7a6a20' }); }
+  for (const [x, z] of [[hw * 0.55, -hd * 0.55], [-hw * 0.55, -hd * 0.5]]) box('#8d8577', 0.8, 1.8, 0.8, x, hh + 0.9, z);
+  // ground floor: living room, dining table and the kitchen
+  box('#c94a2a', 3.4, 0.03, 3.4, 4.6, 0.155, 1.4).receiveShadow = true;
+  box('#8d8577', 0.7, 2.4, 2.4, R1 - 0.35, 1.2, 1.4); box('#2a1a10', 0.1, 1.0, 1.3, R1 - 0.72, 0.6, 1.4);
+  mk('sph', '#ff7b3d', [0.4, 0.35, 0.45], [R1 - 0.75, 0.35, 1.4], t, { emissive: '#ff5a00' }); mk('sph', '#ffd23f', [0.22, 0.25, 0.22], [R1 - 0.8, 0.45, 1.4], t, { emissive: '#ffb000' });
+  box('#7a2f3a', 1.0, 0.45, 2.6, 4.15, 0.24, 1.4); box('#7a2f3a', 0.3, 1.0, 2.6, 3.75, 0.6, 1.4); for (const sz of [-1, 1]) box('#6a2732', 1.0, 0.7, 0.3, 4.15, 0.4, 1.4 + sz * 1.3);
+  box(wood, 2.4, 0.12, 1.2, -3.8, 0.82, 3.6); for (const [x, z] of [[-4.8, 3.2], [-2.8, 3.2], [-4.8, 4.0], [-2.8, 4.0]]) mk('cyl', trim, [0.08, 0.78, 0.08], [x, 0.4, z], t);
+  for (const x of [-4.6, -3.0]) for (const sz of [-1, 1]) box(trim, 0.5, 0.5, 0.5, x, 0.3, 3.6 + sz * 0.95);
+  mk('sph', '#ffb627', [0.16, 0.2, 0.16], [-3.8, 1.05, 3.6], t, { emissive: '#4a2800' });
+  // kitchen: counter with cupboards, a sink, a stove with a pot and the fridge
+  box('#f4f1ea', R1 - 1.5, 0.95, 0.8, (1.5 + R1) / 2, 0.48, zb + 0.4); box('#5d6670', R1 - 1.4, 0.08, 0.86, (1.5 + R1) / 2, 0.98, zb + 0.42);
+  for (let x = 2.0; x < R1 - 1.2; x += 0.9) box('#d9cfc0', 0.8, 0.7, 0.04, x, 0.45, zb + 0.82);
+  box('#c0c6cc', 0.8, 0.12, 0.5, 2.4, 0.98, zb + 0.4); mk('cyl', '#c0c6cc', [0.03, 0.35, 0.03], [2.4, 1.2, zb + 0.15], t);
+  box('#2a2a2a', 1.2, 0.06, 0.7, 4.5, 1.03, zb + 0.4); for (const [dx, dz] of [[-0.3, -0.15], [0.3, -0.15], [-0.3, 0.15], [0.3, 0.15]]) mk('cyl', '#ff5a1f', [0.14, 0.02, 0.14], [4.5 + dx, 1.07, zb + 0.4 + dz], t, { emissive: '#7a1a00' });
+  mk('cyl', '#9aa5b1', [0.25, 0.3, 0.25], [4.2, 1.25, zb + 0.4], t); box('#2a2a2a', 0.5, 0.06, 0.06, 4.6, 1.3, zb + 0.4);
+  box('#ffffff', 1.0, 2.2, 1.1, R1 - 0.5, 1.1, zb + 1.35); box('#c0c6cc', 0.06, 0.6, 0.06, R1 - 1.02, 1.4, zb + 1.85); box('#e8e8e8', 1.0, 0.03, 1.1, R1 - 0.5, 1.5, zb + 1.35);
+  for (let k = 0; k < 3; k++) { mk('cyl', '#3d2a1a', [0.02, 0.4, 0.02], [2.0 + k * 0.6, 2.4, zb + 0.15], t); mk('cyl', '#5d6670', [0.2, 0.04, 0.2], [2.0 + k * 0.6, 2.15, zb + 0.2], t).rotation.x = Math.PI / 2; }
+  box(wood, 2.0, 0.1, 1.2, 3.6, 0.82, -3.0); for (const [x, z] of [[2.8, -3.4], [4.4, -3.4], [2.8, -2.6], [4.4, -2.6]]) mk('cyl', trim, [0.07, 0.78, 0.07], [x, 0.4, z], t);
+  box('#7a1e1e', 0.6, 0.1, 0.4, 3.6, 0.9, -3.0); // a plate of sucuk
   mk('cyl', '#3d2a1a', [0.02, 0.5, 0.02], [1.5, h1 - 0.5, 0], t); mk('sph', '#fff3c0', [0.24, 0.18, 0.24], [1.5, h1 - 0.8, 0], t, { emissive: '#ffd23f' });
-  // the staircase, the landing and the upper floor
-  for (let k = 1; k <= MAN.steps; k++) mk('box', k % 2 ? wood : '#8a5a2b', [MAN.sw, 0.3 * k, MAN.run], [(sx0 + sx1) / 2, 0.15 * k, MAN.stepZ(k)], t).receiveShadow = true;
-  mk('box', wood, [MAN.sw, 0.25, MAN.topZ + hd - wt], [(sx0 + sx1) / 2, h1 - 0.125, (MAN.topZ - hd + wt) / 2], t);
-  mk('box', '#a8743d', [hw - wt - sx1, 0.25, 2 * hd - 2 * wt], [(sx1 + hw - wt) / 2, h1 - 0.125, 0], t).receiveShadow = true;
-  mk('box', trim, [0.1, 0.1, hd - wt - MAN.topZ - MAN.run], [sx1 + 0.05, h1 + 0.9, (hd - wt + MAN.topZ + MAN.run) / 2], t);
-  for (let z = MAN.topZ + MAN.run; z < hd - wt; z += 0.6) mk('box', trim, [0.08, 0.9, 0.08], [sx1 + 0.05, h1 + 0.45, z], t);
-  // upstairs: a big bed, a wardrobe, a rug and the treasure chest
-  mk('box', '#3b6fb0', [3.4, 0.03, 2.6], [1.8, h1 + 0.02, 0.8], t).receiveShadow = true;
-  mk('box', trim, [2.6, 0.5, 3.2], [hw - wt - 1.4, h1 + 0.25, 2.6], t); mk('box', '#e63946', [2.5, 0.2, 2.4], [hw - wt - 1.4, h1 + 0.6, 2.9], t);
-  for (const sx of [-1, 1]) mk('box', '#ffffff', [1.0, 0.2, 0.5], [hw - wt - 1.4 + sx * 0.6, h1 + 0.62, 1.3], t);
-  mk('box', trim, [2.6, 1.3, 0.2], [hw - wt - 1.4, h1 + 0.65, 1.0], t);
-  { // open wardrobe: everything you have bought hangs inside
-    const wx = hw - wt - 0.4, dk = '#7a4a24';
-    mk('box', dk, [0.1, 2.4, 1.6], [hw - wt - 0.05, h1 + 1.2, -2.2], t); mk('box', dk, [0.75, 0.1, 1.6], [wx, h1 + 2.4, -2.2], t); mk('box', dk, [0.75, 0.1, 1.6], [wx, h1 + 0.05, -2.2], t);
-    for (const z of [-3.0, -1.4]) mk('box', dk, [0.75, 2.4, 0.08], [wx, h1 + 1.2, z], t);
-    const rod = mk('cyl', '#c0c6cc', [0.03, 1.5, 0.03], [wx, h1 + 2.1, -2.2], t); rod.rotation.x = Math.PI / 2;
+  // 2nd floor: the bedroom
+  box('#3b6fb0', 4.0, 0.03, 3.0, 0, h1 + 0.02, -1.0).receiveShadow = true;
+  box(trim, 3.0, 0.5, 3.2, 0, h1 + 0.25, zb + 1.6); box('#e63946', 2.9, 0.2, 2.5, 0, h1 + 0.6, zb + 1.95); for (const sx of [-1, 1]) box('#ffffff', 1.1, 0.2, 0.5, sx * 0.7, h1 + 0.62, zb + 0.5);
+  box(trim, 3.0, 1.4, 0.2, 0, h1 + 0.7, zb + 0.05);
+  for (const sx of [-1, 1]) { box('#7a4a24', 0.6, 0.6, 0.5, sx * 2.0, h1 + 0.3, zb + 0.3); mk('sph', '#fff3c0', [0.15, 0.18, 0.15], [sx * 2.0, h1 + 0.8, zb + 0.3], t, { emissive: '#ffd23f' }); }
+  { const wx = -4.4, wz = zb + 0.38, dk = '#7a4a24'; // open wardrobe: everything you have bought hangs inside
+    box(dk, 1.6, 2.4, 0.1, wx, h1 + 1.2, zb + 0.05); box(dk, 1.6, 0.1, 0.75, wx, h1 + 2.4, wz); box(dk, 1.6, 0.1, 0.75, wx, h1 + 0.05, wz); for (const sx of [-1, 1]) box(dk, 0.08, 2.4, 0.75, wx + sx * 0.8, h1 + 1.2, wz);
+    const rod = mk('cyl', '#c0c6cc', [0.03, 1.5, 0.03], [wx, h1 + 2.1, wz], t); rod.rotation.z = Math.PI / 2;
     const own = (save.owned || []).filter(o => o !== 'none'), n = own.length;
-    own.forEach((o, i) => { const z = -2.2 + (n > 1 ? (i / (n - 1) - 0.5) * 1.3 : 0); mk('cyl', '#c0c6cc', [0.01, 0.15, 0.01], [wx, h1 + 2.0, z], t); mk('box', OUT_COL[o] || '#888888', [0.5, 0.75, 0.1], [wx, h1 + 1.55, z], t); });
-    if (o_cur(save.outfit)) mk('sph', '#ffd23f', [0.07, 0.07, 0.07], [wx - 0.42, h1 + 2.3, -2.2], t, { emissive: '#5a4300' });
-  }
-  const [cx, cz] = MAN.chest, c = grp(t, cx, h1, cz);
-  mk('box', '#8a5a2b', [1.3, 0.75, 0.85], [0, 0.38, 0], c); mk('box', '#a06d3a', [1.34, 0.38, 0.9], [0, 0.92, 0], c);
-  for (const sx of [-0.48, 0.48]) mk('box', '#ffd23f', [0.13, 1.14, 0.92], [sx, 0.56, 0], c, { emissive: '#5a4300' });
-  mk('box', '#ffd23f', [0.22, 0.26, 0.06], [0, 0.7, 0.46], c, { emissive: '#5a4300' });
-  h.glow = mk('torus', '#fff27a', [1.3, 1.3, 1.3], [0, 0.05, 0], c, { emissive: '#8a7a20' }); h.glow.rotation.x = Math.PI / 2; h.glow.castShadow = false;
-  mk('cyl', '#3d2a1a', [0.02, 0.5, 0.02], [1.5, hh - 0.25, 0], t); mk('sph', '#fff3c0', [0.24, 0.18, 0.24], [1.5, hh - 0.55, 0], t, { emissive: '#ffd23f' });
+    own.forEach((o, i) => { const x = wx + (n > 1 ? (i / (n - 1) - 0.5) * 1.3 : 0); mk('cyl', '#c0c6cc', [0.01, 0.15, 0.01], [x, h1 + 2.0, wz], t); box(OUT_COL[o] || '#888888', 0.1, 0.75, 0.5, x, h1 + 1.55, wz); }); }
+  { const c = grp(t, MAN.chest[0], h1, MAN.chest[1]);
+    mk('box', '#8a5a2b', [1.3, 0.75, 0.85], [0, 0.38, 0], c); mk('box', '#a06d3a', [1.34, 0.38, 0.9], [0, 0.92, 0], c);
+    for (const sx of [-0.48, 0.48]) mk('box', '#ffd23f', [0.13, 1.14, 0.92], [sx, 0.56, 0], c, { emissive: '#5a4300' });
+    mk('box', '#ffd23f', [0.22, 0.26, 0.06], [0, 0.7, 0.46], c, { emissive: '#5a4300' });
+    h.glow = mk('torus', '#fff27a', [1.3, 1.3, 1.3], [0, 0.05, 0], c, { emissive: '#8a7a20' }); h.glow.rotation.x = Math.PI / 2; h.glow.castShadow = false; }
+  mk('cyl', '#3d2a1a', [0.02, 0.5, 0.02], [0, h2 - 0.5, 0], t); mk('sph', '#fff3c0', [0.24, 0.18, 0.24], [0, h2 - 0.8, 0], t, { emissive: '#ffd23f' });
+  // 3rd floor: a lounge with a bookshelf, a sofa, bean bags and a telescope
+  box('#7fb069', 5.0, 0.03, 3.6, 0, h2 + 0.02, 1.0).receiveShadow = true;
+  box(trim, 3.5, 2.2, 0.5, -1.25, h2 + 1.1, zb + 0.25); for (let k = 0; k < 18; k++) box(['#e63946', '#3b6fb0', '#ffd23f', '#5aa65e', '#8a5aa8'][k % 5], 0.12, 0.42, 0.3, -2.8 + (k % 9) * 0.34, h2 + 0.75 + Math.floor(k / 9) * 0.75, zb + 0.32);
+  box('#3b6fb0', 3.2, 0.45, 1.0, 0, h2 + 0.24, -0.1); box('#3b6fb0', 3.2, 0.9, 0.3, 0, h2 + 0.55, -0.55);
+  for (const [x, c2] of [[-2.5, '#ff8fc8'], [2.5, '#ffd23f']]) mk('sph', c2, [0.55, 0.4, 0.55], [x, h2 + 0.35, 2.5], t);
+  { const tl = grp(t, 4.5, h2, 4.8); mk('cyl', trim, [0.04, 1.2, 0.04], [0, 0.6, 0], tl); const tube = mk('cyl', '#3d4148', [0.12, 1.0, 0.12], [0, 1.35, 0.2], tl); tube.rotation.x = -0.9; }
+  // the roof terrace: a mangal, a table with an umbrella, and two chairs
+  { const g = grp(t, 2.7, hh, -0.3);
+    for (const [x, z] of [[-0.6, -0.2], [0.6, -0.2], [-0.6, 0.2], [0.6, 0.2]]) mk('cyl', '#2a2a2a', [0.04, 0.75, 0.04], [x, 0.38, z], g);
+    mk('box', '#3d3d3d', [1.4, 0.3, 0.6], [0, 0.85, 0], g); mk('box', '#ff5a1f', [1.25, 0.06, 0.48], [0, 0.98, 0], g, { emissive: '#b02a00' });
+    for (let k = 0; k < 7; k++) mk('box', '#9aa5b1', [0.03, 0.03, 0.55], [-0.6 + k * 0.2, 1.03, 0], g);
+    for (let k = 0; k < 4; k++) mk('cyl', '#7a1e1e', [0.06, 0.4, 0.06], [-0.45 + k * 0.3, 1.08, 0], g).rotation.x = Math.PI / 2;
+    h.smoke = []; for (let k = 0; k < 4; k++) { const s = mk('sph', '#d9d9d9', [0.18, 0.18, 0.18], [0, 1.3, 0], g, { transparent: true, opacity: 0.5 }); s.castShadow = false; h.smoke.push(s); } }
+  box(wood, 2.0, 0.1, 1.2, 0, hh + 0.75, 2.6); mk('cyl', trim, [0.06, 0.75, 0.06], [0, hh + 0.38, 2.6], t); mk('cyl', '#c0c6cc', [0.03, 2.3, 0.03], [0, hh + 1.15, 2.6], t); mk('cone', '#e63946', [1.6, 0.6, 1.6], [0, hh + 2.4, 2.6], t);
+  for (const sx of [-1, 1]) { box('#ffffff', 0.6, 0.45, 0.6, sx * 1.5, hh + 0.23, 2.6); box('#ffffff', 0.08, 0.6, 0.6, sx * 1.8, hh + 0.6, 2.6); }
   // things bought with honey jars
   const d = save.decor || [];
-  if (d.includes('plants')) for (const [x, y, z] of [[hw - wt - 0.5, 0, hd - wt - 0.5], [-3.9, 0, hd - wt - 0.5], [hw - wt - 0.5, h1, -hd + wt + 0.5], [-dw - 1.3, 0, hd + 0.6], [dw + 1.3, 0, hd + 0.6]]) {
+  if (d.includes('plants')) for (const [x, y, z] of [[R1 - 0.5, 0, zf - 0.5], [-5.4, 0, zf - 0.5], [-5.4, h1, zf - 0.5], [-dw - 1.3, 0, hd + 0.6], [dw + 1.3, 0, hd + 0.6], [-6.5, hh, 5.4], [6.5, hh, 5.4]]) {
     mk('cyl', '#b5452f', [0.28, 0.45, 0.28], [x, y + 0.22, z], t); mk('sph', '#3f9b37', [0.42, 0.42, 0.42], [x, y + 0.75, z], t);
     for (let k = 0; k < 3; k++) mk('sph', ['#ff5fa2', '#ffd23f', '#ffffff'][k], [0.1, 0.1, 0.1], [x + Math.cos(k * 2.1) * 0.25, y + 1.0, z + Math.sin(k * 2.1) * 0.25], t);
   }
-  if (d.includes('teddy')) { const b2 = grp(t, hw - wt - 1.4, h1 + 0.75, 1.7); mk('sph', '#b07a43', [0.24, 0.26, 0.22], [0, 0.22, 0], b2); mk('sph', '#b07a43', [0.19, 0.18, 0.18], [0, 0.6, 0], b2); for (const sx of [-1, 1]) { mk('sph', '#b07a43', [0.08, 0.08, 0.06], [sx * 0.15, 0.76, 0], b2); mk('sph', '#22160c', [0.03, 0.03, 0.03], [sx * 0.07, 0.64, 0.16], b2); } mk('box', '#e63946', [0.2, 0.1, 0.05], [0, 0.45, 0.18], b2); }
+  if (d.includes('teddy')) { const b2 = grp(t, 0, h1 + 0.75, zb + 2.4); mk('sph', '#b07a43', [0.24, 0.26, 0.22], [0, 0.22, 0], b2); mk('sph', '#b07a43', [0.19, 0.18, 0.18], [0, 0.6, 0], b2); for (const sx of [-1, 1]) { mk('sph', '#b07a43', [0.08, 0.08, 0.06], [sx * 0.15, 0.76, 0], b2); mk('sph', '#22160c', [0.03, 0.03, 0.03], [sx * 0.07, 0.64, 0.16], b2); } mk('box', '#e63946', [0.2, 0.1, 0.05], [0, 0.45, 0.18], b2); }
   if (d.includes('painting')) {
-    const art = canvasTex(256, 160, (c, w, h2) => { const g2 = c.createLinearGradient(0, 0, 0, h2); g2.addColorStop(0, '#7fd3ff'); g2.addColorStop(1, '#d9f3ff'); c.fillStyle = g2; c.fillRect(0, 0, w, h2); c.fillStyle = '#5cc04a'; c.fillRect(0, h2 * 0.68, w, h2); c.fillStyle = '#fff1a8'; c.beginPath(); c.arc(w * 0.8, h2 * 0.25, 20, 0, 7); c.fill(); c.fillStyle = '#ffb627'; c.fillRect(w * 0.18, h2 * 0.38, 70, 70); c.fillStyle = '#e63946'; c.fillRect(w * 0.16, h2 * 0.33, 78, 16); c.fillStyle = '#7a4a24'; c.font = '30px "Lilita One", sans-serif'; c.fillText('BAL', w * 0.2, h2 * 0.72); c.fillStyle = '#8a5a2b'; c.beginPath(); c.arc(w * 0.6, h2 * 0.62, 30, 0, 7); c.fill(); c.beginPath(); c.arc(w * 0.6 - 22, h2 * 0.62 - 26, 11, 0, 7); c.arc(w * 0.6 + 22, h2 * 0.62 - 26, 11, 0, 7); c.fill(); });
-    mk('box', '#ffd23f', [2.5, 1.7, 0.08], [-1.8, 2.0, -hd + wt + 0.05], t, { emissive: '#3a2a00' });
-    const pl = new THREE.Mesh(new THREE.PlaneGeometry(2.25, 1.45), new THREE.MeshLambertMaterial({ map: art })); pl.position.set(-1.8, 2.0, -hd + wt + 0.1); t.add(pl);
+    const art = canvasTex(256, 160, (c, w, h2_) => { const g2 = c.createLinearGradient(0, 0, 0, h2_); g2.addColorStop(0, '#7fd3ff'); g2.addColorStop(1, '#d9f3ff'); c.fillStyle = g2; c.fillRect(0, 0, w, h2_); c.fillStyle = '#5cc04a'; c.fillRect(0, h2_ * 0.68, w, h2_); c.fillStyle = '#fff1a8'; c.beginPath(); c.arc(w * 0.8, h2_ * 0.25, 20, 0, 7); c.fill(); c.fillStyle = '#ffb627'; c.fillRect(w * 0.18, h2_ * 0.38, 70, 70); c.fillStyle = '#e63946'; c.fillRect(w * 0.16, h2_ * 0.33, 78, 16); c.fillStyle = '#7a4a24'; c.font = '30px "Lilita One", sans-serif'; c.fillText('BAL', w * 0.2, h2_ * 0.72); c.fillStyle = '#8a5a2b'; c.beginPath(); c.arc(w * 0.6, h2_ * 0.62, 30, 0, 7); c.fill(); c.beginPath(); c.arc(w * 0.6 - 22, h2_ * 0.62 - 26, 11, 0, 7); c.arc(w * 0.6 + 22, h2_ * 0.62 - 26, 11, 0, 7); c.fill(); });
+    box('#ffd23f', 2.5, 1.7, 0.08, -1.6, 2.0, zb + 0.05, { emissive: '#3a2a00' });
+    const pl = new THREE.Mesh(new THREE.PlaneGeometry(2.25, 1.45), new THREE.MeshLambertMaterial({ map: art })); pl.position.set(-1.6, 2.0, zb + 0.1); t.add(pl);
   }
-  if (d.includes('lamp')) { mk('gem', '#ffe14d', [0.55, 0.55, 0.55], [-1.0, hh - 0.9, 0.5], t, { emissive: '#ffcc00' }); mk('cyl', '#3d2a1a', [0.02, 0.6, 0.02], [-1.0, hh - 0.3, 0.5], t); }
+  if (d.includes('lamp')) { mk('gem', '#ffe14d', [0.55, 0.55, 0.55], [1.5, hh - 1.0, 1.5], t, { emissive: '#ffcc00' }); mk('cyl', '#3d2a1a', [0.02, 0.5, 0.02], [1.5, hh - 0.55, 1.5], t); }
   h.fish = [];
   if (d.includes('aquarium')) {
-    mk('box', trim, [1.2, 0.6, 2.2], [-3.7, 0.3, 0.5], t); mk('box', '#9fe2ff', [1.15, 1.0, 2.15], [-3.7, 1.1, 0.5], t, { transparent: true, opacity: 0.5, emissive: '#1a5a7a' });
-    mk('box', '#e8d39a', [1.1, 0.1, 2.1], [-3.7, 0.65, 0.5], t);
-    for (let k = 0; k < 5; k++) { const f = mk('sph', ['#ff7b3d', '#ffd23f', '#ff5fa2', '#7fd3ff', '#ffffff'][k], [0.1, 0.08, 0.16], [-3.7, 0.9 + k * 0.1, 0.5], t, { emissive: '#3a2a00' }); f.userData = { k, y: 0.85 + (k % 3) * 0.18 }; h.fish.push(f); }
+    box(trim, 1.2, 0.6, 2.2, -5.3, 0.3, -0.9); box('#9fe2ff', 1.15, 1.0, 2.15, -5.3, 1.1, -0.9, { transparent: true, opacity: 0.5, emissive: '#1a5a7a' }); box('#e8d39a', 1.1, 0.1, 2.1, -5.3, 0.65, -0.9);
+    for (let k = 0; k < 5; k++) { const f = mk('sph', ['#ff7b3d', '#ffd23f', '#ff5fa2', '#7fd3ff', '#ffffff'][k], [0.1, 0.08, 0.16], [-5.3, 0.9 + k * 0.1, -0.9], t, { emissive: '#3a2a00' }); f.userData = { k, y: 0.85 + (k % 3) * 0.18 }; h.fish.push(f); }
   }
   if (d.includes('piano')) {
-    const pz = -hd + wt + 0.55; mk('box', '#1a1a1a', [2.0, 0.85, 1.0], [-3.2, 0.82, pz], t); mk('box', '#1a1a1a', [2.0, 0.6, 0.15], [-3.2, 1.5, pz - 0.42], t);
-    for (const x of [-4.1, -2.3]) mk('box', '#1a1a1a', [0.12, 0.42, 0.12], [x, 0.2, pz + 0.3], t);
-    mk('box', '#ffffff', [1.85, 0.06, 0.28], [-3.2, 1.26, pz + 0.42], t); for (let k = 0; k < 9; k++) if (k % 7 !== 2) mk('box', '#111111', [0.08, 0.05, 0.16], [-4.0 + k * 0.2, 1.3, pz + 0.36], t);
-    mk('box', '#5c3a1c', [1.0, 0.45, 0.4], [-3.2, 0.23, pz + 1.0], t);
+    const pz = zb + 0.55; box('#1a1a1a', 2.0, 0.85, 1.0, -4.6, 0.82, pz); box('#1a1a1a', 2.0, 0.6, 0.15, -4.6, 1.5, pz - 0.42);
+    for (const x of [-5.5, -3.7]) box('#1a1a1a', 0.12, 0.42, 0.12, x, 0.2, pz + 0.3);
+    box('#ffffff', 1.85, 0.06, 0.28, -4.6, 1.26, pz + 0.42); for (let k = 0; k < 9; k++) if (k % 7 !== 2) box('#111111', 0.08, 0.05, 0.16, -5.4 + k * 0.2, 1.3, pz + 0.36);
+    box('#5c3a1c', 1.0, 0.45, 0.4, -4.6, 0.23, pz + 1.0);
   }
   if (d.includes('fountain')) {
     const fz = hd + 5; mk('cyl', '#d9c27a', [1.4, 0.5, 1.4], [0, 0.25, fz], t); mk('cyl', '#ffb627', [1.2, 0.08, 1.2], [0, 0.52, fz], t, { emissive: '#7a4a00' });
@@ -1992,10 +2076,10 @@ function buildHub() {
     }
     return best;
   };
-  for (const [kind, px, pz] of [['shop', 20, 30], ['ward', -18, 38], ['smith', 0, -16], ['honey', 18, 10]]) {
-    const b = findSpot(px, pz, SR, 30, 12) || { x: px, z: pz };
+  for (const [kind, px, pz] of [['shop', 20, 30], ['ward', -18, 38], ['smith', 0, -16], ['honey', 18, 10], ['butcher', -6, 14]]) {
+    const D = kind === 'butcher' ? STORE_S : STORE, b = findSpot(px, pz, Math.hypot(D.hw, D.hd) + 1, 30, 12) || { x: px, z: pz };
     const raw = Math.atan2(0 - b.x, 36 - b.z), dir = ((Math.round(raw / (Math.PI / 2)) % 4) + 4) % 4;
-    stores.push({ kind, name: STORE_LOOK[kind].name, x: b.x, z: b.z, y: 0, dir, yaw: dir * Math.PI / 2, armed: true, store: true });
+    stores.push({ kind, name: STORE_LOOK[kind].name, x: b.x, z: b.z, y: 0, dir, yaw: dir * Math.PI / 2, armed: true, store: true, D });
     houses.forEach(o => { if (Math.hypot(o.x - b.x, o.z - b.z) < SR + 4.2) o.gone = true; });
   }
   // your own home becomes a big mansion: built where you chose (or as close as there is room), clearing small houses in the way
@@ -2056,17 +2140,10 @@ function buildHub() {
   for (let k = hitems.length - 1; k >= 0; k--) if (hitems[k].gone) hitems.splice(k, 1);
   if (mansion) {
     const m = mansion, T = (lx, lz) => { const c = Math.cos(m.yaw), sn = Math.sin(m.yaw); return [m.x + lx * c + lz * sn, m.z - lx * sn + lz * c]; };
-    const { hw, hd, h1, h: hh, wt, dw, dh, rise, sx0, sx1 } = MAN;
-    for (const [x0, z0, x1, z1] of manWalls()) boxes.push(rectBox(T, x0, z0, x1, z1, 0, hh, 'deco'));
-    boxes.push(rectBox(T, -dw, hd - wt, dw, hd, dh, hh, 'deco'));
-    boxes.push(rectBox(T, -hw - 0.4, -hd - 0.45, hw + 0.4, hd + 0.45, hh - 0.15, hh + 0.25, 'deco'));
-    for (let k = 1; k < 4; k++) { const ex = (hw + 0.4) * (1 - k / 4); boxes.push(rectBox(T, -ex, -hd - 0.45, ex, hd + 0.45, hh, hh + 0.25 + rise * k / 4, 'deco')); }
-    for (let k = 1; k <= MAN.steps; k++) boxes.push(rectBox(T, sx0, MAN.stepZ(k) - MAN.run / 2, sx1, MAN.stepZ(k) + MAN.run / 2, 0, 0.3 * k, 'deco'));
-    boxes.push(rectBox(T, sx0, -hd + wt, sx1, MAN.topZ, h1 - 0.25, h1, 'deco'));          // landing at the top of the stairs
-    boxes.push(rectBox(T, sx1, -hd + wt, hw - wt, hd - wt, h1 - 0.25, h1, 'deco'));        // upper floor
-    boxes.push(rectBox(T, sx1, MAN.topZ + MAN.run, sx1 + 0.12, hd - wt, h1, h1 + 0.95, 'deco')); // railing by the stairwell
-    const [cx, cz] = T(MAN.chest[0], MAN.chest[1]); m.chest = { x: cx, y: h1, z: cz };
-    const [wx, wz] = T(hw - wt - 1.4, -2.2); m.wardT = { x: wx, z: wz }; m.wArmed = true;
+    for (const b of mansionShell(m)) boxes.push(b);
+    const spot = ([lx, lz], y) => { const [x, z] = T(lx, lz); return { x, y, z, armed: true }; };
+    m.chest = spot(MAN.chest, MAN.h1); m.wardT = spot(MAN.ward, MAN.h1); m.wArmed = true;
+    m.stove = spot(MAN.stove, 0); m.grill = spot(MAN.grill, MAN.h);
     for (const b of mansionBoxes(m)) boxes.push(b);
   }
   const clear = (x, z) => !nearAny(x, z) && houses.every(h => Math.hypot(x - h.x, z - h.z) > 5.8);
@@ -2078,15 +2155,15 @@ function buildHub() {
   // the shops move into their buildings now that the trees are placed (the trees still grow where they always did)
   const [shopS, wardS, smithS, honeyS] = stores;
   for (const [o, s] of [[shop, shopS], [ward, wardS], [smith, smithS]]) { Object.assign(o, s); stores[stores.indexOf(s)] = o; }
-  const honeyShop = stores[3];
+  const honeyShop = stores[3], butcher = stores[4];
   for (const s of stores) {
     const T = (lx, lz) => { const c = Math.cos(s.yaw), sn = Math.sin(s.yaw); return [s.x + lx * c + lz * sn, s.z - lx * sn + lz * c]; };
-    const { hw, hd, h: hh, wt, dw, dh, rise } = STORE;
-    for (const [x0, z0, x1, z1] of storeWalls()) boxes.push(rectBox(T, x0, z0, x1, z1, 0, hh, 'deco'));
+    const { hw, hd, h: hh, wt, dw, dh, rise } = s.D;
+    for (const [x0, z0, x1, z1] of storeWalls(s.D)) boxes.push(rectBox(T, x0, z0, x1, z1, 0, hh, 'deco'));
     boxes.push(rectBox(T, -dw, hd - wt, dw, hd, dh, hh, 'deco'));
     boxes.push(rectBox(T, -hw - 0.35, -hd - 0.4, hw + 0.35, hd + 0.4, hh - 0.15, hh + 0.22, 'deco'));
     for (let k = 1; k < 4; k++) { const ex = (hw + 0.35) * (1 - k / 4); boxes.push(rectBox(T, -ex, -hd - 0.4, ex, hd + 0.4, hh, hh + 0.22 + rise * k / 4, 'deco')); }
-    boxes.push(rectBox(T, -2.6, -hd + wt + 1.3, 2.6, -hd + wt + 2.1, 0, 1.1, 'deco')); // counter
+    const ch = Math.min(2.6, hw - 0.8); boxes.push(rectBox(T, -ch, -hd + wt + 1.3, ch, -hd + wt + 2.1, 0, 1.1, 'deco')); // counter
     if (s.kind === 'smith') boxes.push(rectBox(T, hw - 2.0, -hd + wt, hw - wt, -hd + wt + 1.35, 0, 1.4, 'deco')); // forge
     const [tx, tz] = T(0, -hd + wt + 2.8); s.tx = tx; s.tz = tz; // stand at the counter to shop
   }
@@ -2114,7 +2191,7 @@ function buildHub() {
     const a = burrow.yaw + (id - 2) * 0.62, hx = burrow.x + Math.sin(a) * 2.1, hz = burrow.z + Math.cos(a) * 2.1, ok = home.includes(id);
     babies.push({ id, lx: x, lz: z, hx, hz, x: ok ? hx : x, y: 0, z: ok ? hz : z, yaw: ok ? a : rr2() * 6.28, st: ok ? 'home' : 'lost', t: rr2() * 5, hop: 0 });
   }
-  return { def: HUB, hub: true, R, boxes, items: hitems, enemies: [], trees, paths, start: { x: 0, y: 0, z: 50 }, checkpoints: [], cpActive: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, ward, smith, board, tutGate, houses, turtles, parks, mts, burrow, rabbits, babies, mansion, stores, honeyShop, pasture,
+  return { def: HUB, hub: true, R, boxes, items: hitems, enemies: [], trees, paths, start: { x: 0, y: 0, z: 50 }, checkpoints: [], cpActive: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, ward, smith, board, tutGate, houses, turtles, parks, mts, burrow, rabbits, babies, mansion, stores, honeyShop, butcher, pasture,
     beyza: pasture && { x: pasture.x, z: pasture.z, yaw: 0, tx: pasture.x, tz: pasture.z, t: 0, sp: 0, anim: 0 },
     sheep: pasture ? Array.from({ length: 8 }, (_, i) => ({ id: i, x: pasture.x + Math.sin(i * 0.8) * 4, z: pasture.z + Math.cos(i * 0.8) * 4, yaw: i, t: i * 0.7, next: 2, rest: false, petT: 0, hop: 0, anim: 0 })) : [],
     dogs: pasture ? ['Karabaş', 'Pamuk'].map((name, i) => ({ name, x: pasture.x + (i ? 3 : -3), z: pasture.z + 2, yaw: 0, a: i * Math.PI, sp: 0, anim: 0, cool: 0, bark: 0 })) : [] };
@@ -2267,7 +2344,7 @@ function update() {
   phys: {
   if (P.hang) { hangStep(wx, wz); break phys; }
   if (P.vine) { vineStep(wx, wz); break phys; }
-  P.sprint = sprint && keys.fwd && wm > 0.3;
+  P.sprint = ((sprint && keys.fwd) || touchRun) && wm > 0.3;
   const ice = L.def.friction > 0.9, max = P.sprint ? 10.5 : 6.5;
   if (P.sprint && P.onGround && frame % 5 === 0) burst(P.x - Math.sin(P.yaw) * 0.4, P.y + 0.1, P.z - Math.cos(P.yaw) * 0.4, '#e8dcc0', 2, 1.2);
   if (!P.pound) {
@@ -2634,7 +2711,7 @@ function harunArrives() {
 }
 function wolfStep() {
   L.wolves = L.wolves || []; const night = isNight() && !sleepT;
-  const inStore = (x, z) => L.stores && L.stores.some(s => inRect(s, STORE, x, z, 0.3));
+  const inStore = (x, z) => L.stores && L.stores.some(s => inRect(s, s.D || STORE, x, z, 0.3));
   const inHouse = houseIdxAt(P.x, P.z, P.y) >= 0 || inStore(P.x, P.z), safe = inHouse || P.y > 2.4 || P.dead;
   L.wolfT = (L.wolfT || 0) - DT;
   if (!night) L.harunCame = false;
@@ -2757,6 +2834,14 @@ function beyzaText() {
   if (n >= 6) return 'Kuzularımın hepsi seni çok sevdi! Görevler\'den (G) ödülünü almayı unutma.';
   return `Merhaba, ben Beyza, köyün minik çobanıyım! Şurada evim, şurada ahırım var. Kuzularımı iyi kangallarım Karabaş ve Pamuk ile koruyorum. Kuzuların yanına gidip onları sev! (${n}/6)`;
 }
+function cookSucuk(sp, where) {
+  if ((save.sucuk || 0) < 1) { pop('Sucuğun yok! Kasaptan al', sp.x, sp.y + 2.2, sp.z, '#ffffff', 90); sfx.hurt(); return; }
+  save.sucuk--; P.hp = save.maxHp; bump('sucuk'); saveGame();
+  for (let k = 0; k < 6; k++) tone(180 + Math.random() * 900, 0.08, 'sawtooth', null, 0.015, k * 0.07); // sizzle
+  setTimeout(() => sfx.life(), 500);
+  burst(sp.x, sp.y + 1.3, sp.z, '#d9d9d9', 14, 1.5); burst(sp.x, sp.y + 1.1, sp.z, '#ff7b3d', 8, 2);
+  pop(`Cız cız! ${where}: sucuk ekmek`, sp.x, sp.y + 2.6, sp.z, '#ffd23f', 120); pop('Kalplerin doldu!', P.x, P.y + 2.2, P.z, '#ff6b8a', 100);
+}
 function momText() {
   const n = ((save.stats || {}).bunny || []).length, f = L.babies.filter(b => b.st === 'follow').length;
   if (n >= 5) return `Bütün yavrularım evde! Çok teşekkür ederim ${save.name}. Görevler'den (G) ödülünü almayı unutma.`;
@@ -2816,13 +2901,19 @@ function hubStep() {
   if (dbd > 2.2) bd.armed = true; else if (dbd < 1.0 && bd.armed && P.y < 1) { bd.armed = false; openMap(); return; }
   const wd = L.ward, dw = Math.hypot(P.x - wd.tx, P.z - wd.tz);
   if (dw > 2.2) wd.armed = true; else if (dw < 1.1 && wd.armed && Math.abs(P.y - wd.y) < 1) { wd.armed = false; saveGame(); openWard('hub'); return; }
+  const bu = L.butcher, dbu = Math.hypot(P.x - bu.tx, P.z - bu.tz);
+  if (dbu > 2.0) bu.armed = true; else if (dbu < 1.1 && bu.armed && P.y < 1) { bu.armed = false; saveGame(); openButcher(); return; }
   const hn = L.honeyShop, dhn = Math.hypot(P.x - hn.tx, P.z - hn.tz);
   if (dhn > 2.2) hn.armed = true; else if (dhn < 1.1 && hn.armed && P.y < 1) { hn.armed = false; saveGame(); openHoney(); return; }
   const m = L.mansion;
   if (m && m.wardT) { const dm = Math.hypot(P.x - m.wardT.x, P.z - m.wardT.z); if (dm > 1.8) m.wArmed = true; else if (dm < 0.9 && m.wArmed && Math.abs(P.y - MAN.h1) < 0.8) { m.wArmed = false; saveGame(); openWard('hub'); return; } }
+  if (m) for (const [sp, where] of [[m.stove, 'Ocakta'], [m.grill, 'Mangalda']]) if (sp) {
+    const dd = Math.hypot(P.x - sp.x, P.z - sp.z);
+    if (dd > 2.0) sp.armed = true; else if (dd < 1.15 && sp.armed && Math.abs(P.y - sp.y) < 1) { sp.armed = false; cookSucuk(sp, where); }
+  }
   if (P.onGround && P.ground && P.ground.bed && !P.dead) { P.vy = 9.5; P.onGround = false; P.ground = null; sfx.djump(); } // boing!
   if (m && (save.decor || []).includes('piano')) { const c = Math.cos(m.yaw), sn = Math.sin(m.yaw), dx = P.x - m.x, dz = P.z - m.z, lx = dx * c - dz * sn, lz = dx * sn + dz * c;
-    if (P.y < 0.5 && lx > -4.4 && lx < -2.0 && lz > -MAN.hd + 1.2 && lz < -MAN.hd + 2.4 && Math.hypot(P.vx, P.vz) > 0.5 && frame % 12 === 0) tone([523, 587, 659, 698, 784, 880, 988][Math.floor((lx + 4.4) / 2.4 * 7) % 7], 0.3, 'triangle', null, 0.06); }
+    if (P.y < 0.5 && lx > -5.8 && lx < -3.4 && lz > MAN.zb + 1.1 && lz < MAN.zb + 2.3 && Math.hypot(P.vx, P.vz) > 0.5 && frame % 12 === 0) tone([523, 587, 659, 698, 784, 880, 988][Math.floor((lx + 5.8) / 2.4 * 7) % 7], 0.3, 'triangle', null, 0.06); }
 }
 /* ---------- axe ---------- */
 function startAttack() {
@@ -3410,7 +3501,8 @@ function buildScene() {
   G.ringMat = mat('#ffffff', { transparent: true, opacity: 0.85, emissive: '#555555' });
 }
 function portalSpin() {
-  if (L.mansion) { for (const f of L.mansion.fish || []) { const k = f.userData.k, a = frame * 0.02 * (1 + k * 0.15) + k * 1.3; f.position.set(-3.7 + Math.sin(a * 1.3) * 0.35, f.userData.y + Math.sin(a * 2) * 0.05, 0.5 + Math.cos(a) * 0.85); f.rotation.y = a + Math.PI / 2; }
+  if (L.mansion) { for (const f of L.mansion.fish || []) { const k = f.userData.k, a = frame * 0.02 * (1 + k * 0.15) + k * 1.3; f.position.set(-5.3 + Math.sin(a * 1.3) * 0.35, f.userData.y + Math.sin(a * 2) * 0.05, -0.9 + Math.cos(a) * 0.85); f.rotation.y = a + Math.PI / 2; }
+    for (const [k, s] of (L.mansion.smoke || []).entries()) { const ph = (frame * 0.012 + k / 4) % 1; s.position.set(Math.sin(ph * 9 + k) * 0.15, 1.2 + ph * 1.8, 0); s.scale.setScalar(0.15 + ph * 0.35); s.material.opacity = 0.55 * (1 - ph); }
     if (L.mansion.jet) L.mansion.jet.scale.set(0.22, 0.5 + Math.sin(frame * 0.2) * 0.12, 0.22); }
   if (L.beyza && L.beyza.mesh) { const bz = L.beyza, m = bz.mesh, u = m.userData, sw = Math.sin(bz.anim) * 0.5 * Math.min(1, bz.sp);
     m.position.set(bz.x, 0, bz.z); m.rotation.y = bz.yaw; u.legs[0].rotation.x = sw; u.legs[1].rotation.x = -sw; u.arms[0].rotation.x = -sw; u.arms[1].rotation.x = -0.3 + sw * 0.3;
@@ -3445,9 +3537,9 @@ function portalSpin() {
 function placeHomeMark() {
   if (G.homeMark) { G.homeMark.parent && G.homeMark.parent.remove(G.homeMark); G.homeMark = null; G.homeFlag = null; }
   const hs = L.mansion || L.houses && L.houses[save.home]; if (!hs || !G.world) return;
-  const D = hs.big ? MAN : HOUSE, ph = hs.big ? 9.5 : 4.6;
+  const D = hs.big ? MAN : HOUSE, ph = hs.big ? 13.5 : 4.6;
   const g = grp(G.world, hs.x, 0, hs.z); g.rotation.y = hs.yaw; G.homeMark = g;
-  const fx = D.hw - 0.5, fz = D.hd + (hs.big ? 1.6 : 0.9); // flag pole beside the front door
+  const fx = D.hw - 0.5, fz = D.hd + (hs.big ? 3.4 : 0.9); // flag pole beside the front door
   mk('cyl', '#6b4220', [0.08, ph, 0.08], [fx, ph / 2, fz], g); mk('sph', '#ffd23f', [0.14, 0.14, 0.14], [fx, ph + 0.05, fz], g, { emissive: '#5a4300' });
   const fl = grp(g, fx, ph - 0.45, fz); G.homeFlag = fl; mk('box', '#e63946', [0.06, 0.62, 0.95], [0, 0, -0.5], fl);
   const name = possessive(save.name) + ' Evi';
@@ -3493,8 +3585,8 @@ function render3D(alpha = 1, dtMs = 16.667) {
   if (bf) { tgt.x += (bf.x - PX) * 0.3; tgt.z += (bf.z - PZ) * 0.3; tgt.y = Math.max(tgt.y, bf.c.y + (bf.type === 'queen' ? 3.2 : 1.6)); }
   const toHouse = (h, x, z) => { const c = Math.cos(h.yaw), sn = Math.sin(h.yaw), dx = x - h.x, dz = z - h.z; return [dx * c - dz * sn, dx * sn + dz * c]; };
   const inside = (h, D) => { const [lx, lz] = toHouse(h, PX, PZ); return Math.abs(lx) < D.hw && lz > -D.hd && lz < D.hd - 0.9 && PY < D.h; };
-  const hin = L.mansion && inside(L.mansion, MAN) ? L.mansion : (L.stores && L.stores.find(s => inside(s, STORE))) || (L.houses ? L.houses.find(h => !h.gone && inside(h, HOUSE)) : null);
-  const HD = hin && hin.big ? MAN : hin && hin.store ? STORE : HOUSE, ceil = hin && hin.big ? (PY > MAN.h1 - 0.5 ? MAN.h : MAN.h1 - 0.25) : HD.h;
+  const hin = L.mansion && inside(L.mansion, MAN) ? L.mansion : (L.stores && L.stores.find(s => inside(s, s.D || STORE))) || (L.houses ? L.houses.find(h => !h.gone && inside(h, HOUSE)) : null);
+  const HD = hin && hin.big ? MAN : hin && hin.store ? (hin.D || STORE) : HOUSE, ceil = hin && hin.big ? MAN.ceil(PY) : HD.h;
   G.dist = (G.dist || 7.4) + ((bf ? 11.5 : hin ? (hin.big ? 4.2 : hin.store ? 3.6 : 2.4) : L.hub ? 9.5 : 7.4) - (G.dist || 7.4)) * fk(hin ? 0.2 : 0.05);
   if (!G.ct) G.ct = tgt.clone(); else G.ct.lerp(tgt, fk(P.dead ? 0.02 : 0.15));
   const cy = state === 'play' && G.oCamYaw !== undefined ? G.oCamYaw + angDiff(G.camYaw, G.oCamYaw) * alpha : G.camYaw, sx = shake ? (Math.random() - 0.5) * shake * 0.02 : 0, sy = shake ? (Math.random() - 0.5) * shake * 0.02 : 0;
@@ -3758,7 +3850,7 @@ function draw3(alpha, dtMs) {
       const ch = pk.chest, qc = Math.hypot(ch.x - P.x, ch.z - P.z) < 40 ? scr(ch.x, ch.y + 2.2, ch.z) : null;
       if (qc) txt(left ? `⏱ ${mmss(left)}` : `Hazine Sandığı · ${pk.reward} para`, qc.x, qc.y, 18, left ? '#bfe6ff' : '#ffd23f', 'center');
     }
-    for (const s of L.stores) { const qs = Math.hypot(s.x - P.x, s.z - P.z) < 60 ? scr(s.x, STORE.h + STORE.rise + 1.1, s.z) : null; if (qs) txt(s.name, qs.x, qs.y, 20, '#ffd23f', 'center'); }
+    for (const s of L.stores) { const qs = Math.hypot(s.x - P.x, s.z - P.z) < 60 ? scr(s.x, (s.D || STORE).h + (s.D || STORE).rise + 1.1, s.z) : null; if (qs) txt(s.name, qs.x, qs.y, 20, '#ffd23f', 'center'); }
     if (L.beyza && Math.hypot(L.beyza.x - P.x, L.beyza.z - P.z) < 45) { const qb = scr(L.beyza.x, 1.7, L.beyza.z); if (qb) txt('Çoban Beyza', qb.x, qb.y, 20, '#9ef07a', 'center'); }
     for (const g of L.dogs || []) if (Math.hypot(g.x - P.x, g.z - P.z) < 30) { const qd = scr(g.x, 1.8, g.z); if (qd) txt(g.name, qd.x, qd.y, 15, '#9ef07a', 'center'); }
     for (const w of L.wolves || []) if (!w.gone && w.hp > 0 && w.type !== 'wolf' && Math.hypot(w.x - P.x, w.z - P.z) < 45) { const qh = scr(w.x, w.type === 'harun' ? 3.0 : w.type === 'kangal' ? 2.6 : 1.9, w.z); if (qh) txt(w.type === 'harun' ? 'Harun' : 'Kangal', qh.x, qh.y, w.type === 'harun' ? 24 : 16, '#ff5a4f', 'center'); }
@@ -3778,7 +3870,7 @@ const msgTitle = $('msgTitle'), msgText = $('msgText'), msgBtn = $('msgBtn'), ms
 const touchUi = $('touch'), pauseBtn = $('pauseBtn');
 let act1 = null, act2 = null;
 function unlockMouse() { if (document.pointerLockElement) { try { document.exitPointerLock(); } catch (e) {} } }
-function hideAll() { pTitle.hidden = pMsg.hidden = pWard.hidden = true; document.getElementById('pSmith').hidden = true; document.getElementById('pShop').hidden = true; document.getElementById('pHoney').hidden = true; touchUi.hidden = true; pauseBtn.hidden = true; }
+function hideAll() { pTitle.hidden = pMsg.hidden = pWard.hidden = true; document.getElementById('pSmith').hidden = true; document.getElementById('pShop').hidden = true; document.getElementById('pHoney').hidden = true; document.getElementById('pButcher').hidden = true; touchUi.hidden = true; pauseBtn.hidden = true; }
 function showMsg(title, text, b1, a1, b2, a2) {
   unlockMouse();
   hideAll();
@@ -3893,6 +3985,18 @@ function openHoney() {
 }
 function closeHoney() { pHoney.hidden = true; setPlaying(); }
 $('honeyClose').onclick = closeHoney;
+/* ---------- the butcher's ---------- */
+const pButcher = $('pButcher');
+function renderButcher(msg) {
+  $('butCoins').textContent = save.coins; $('butSucuk').textContent = save.sucuk || 0;
+  $('but1').disabled = save.coins < 5; $('but5').disabled = save.coins < 22;
+  $('butNote').textContent = msg || (L.mansion ? 'Kasap: "Taze sucuk! Konağının mutfağındaki ocakta ya da terastaki mangalda pişir."' : 'Kasap: "Sucuğu pişirmek için bir konağın olmalı: önce bir eve gir ve \'Bu ev benim olsun\' de!"');
+}
+const buySucuk = (n, price) => { if (save.coins < price) return; save.coins -= price; save.sucuk = (save.sucuk || 0) + n; saveGame(); sfx.coin(); renderButcher(`${n} sucuk aldın! Şimdi ${save.sucuk} sucuğun var.`); };
+$('but1').onclick = () => buySucuk(1, 5); $('but5').onclick = () => buySucuk(5, 22);
+function openButcher() { audio(); unlockMouse(); state = 'pause'; for (const k in keys) keys[k] = false; stick.x = stick.y = 0; renderButcher(); pButcher.hidden = false; touchUi.hidden = true; setTimeout(() => $('butClose').focus(), 50); }
+function closeButcher() { pButcher.hidden = true; setPlaying(); }
+$('butClose').onclick = closeButcher;
 /* ---------- smithy ---------- */
 const pSmith = $('pSmith'); let smithPaused = false, smithGift = false;
 function renderSmith() {
@@ -3973,7 +4077,7 @@ function mapView(c, bb, [vx, vy, vw, vh], side, me, opt, fs) {
     for (const b of L.babies || []) if (b.st !== 'home') dot(b.x, b.z, fs * 0.38, '#ff8fb8', '#8a2d55');
     for (const pt of L.portals) { dot(pt.x, pt.z, fs * 0.62, pt.locked ? '#9a9a9a' : LEVELS[pt.i].grass, pt.locked ? '#555' : '#3d2a1a'); label(String(pt.i + 1), pt.x, pt.z, fs * 0.8, pt.locked ? '#dddddd' : '#ffffff'); }
     const place = (o, ch, name, col) => { dot(o.x, o.z, fs * 0.6, col); label(ch, o.x, o.z, fs * 0.7); label(name, o.x, o.z, fs * 0.7, '#ffd23f', -fs * 1.05); };
-    place(L.shop, '♥', 'Kalp', '#e63946'); place(L.ward, '★', 'Kıyafet', '#8a5aa8'); place(L.smith, '⚒', 'Demirci', '#5d6670'); place(L.honeyShop, '🍯', 'Bal', '#e89a1a'); if (!opt.board) place(L.board, '▦', 'Harita', '#8a5a2b'); if (L.burrow) place(L.burrow, '✿', 'Anne Tavşan', '#ff8fb8'); if (L.pasture) place(L.pasture, '🐑', 'Beyza', '#7fd36a'); { const hs = L.mansion || L.houses[save.home]; if (hs) place(hs, '⌂', L.mansion ? 'Konağım' : 'Evim', '#ffb627'); }
+    place(L.shop, '♥', 'Kalp', '#e63946'); place(L.ward, '★', 'Kıyafet', '#8a5aa8'); place(L.smith, '⚒', 'Demirci', '#5d6670'); place(L.honeyShop, '🍯', 'Bal', '#e89a1a'); if (L.butcher) place(L.butcher, '🔪', 'Kasap', '#8a2a2a'); if (!opt.board) place(L.board, '▦', 'Harita', '#8a5a2b'); if (L.burrow) place(L.burrow, '✿', 'Anne Tavşan', '#ff8fb8'); if (L.pasture) place(L.pasture, '🐑', 'Beyza', '#7fd36a'); { const hs = L.mansion || L.houses[save.home]; if (hs) place(hs, '⌂', L.mansion ? 'Konağım' : 'Evim', '#ffb627'); }
     if (!opt.board) for (const w of L.wolves || []) if (!w.gone && w.hp > 0) dot(w.x, w.z, w.type === 'harun' ? 5 : 3.4, w.type === 'harun' ? '#ff3b3b' : w.type === 'kangal' ? '#d8b98a' : '#6d7480', '#22252b');
   } else {
     if (L.start) dot(L.start.x, L.start.z, fs * 0.35, '#7fd3ff');
@@ -3996,7 +4100,7 @@ function openMap() {
   if (state === 'play') { state = 'pause'; mapPaused = true; for (const k in keys) keys[k] = false; stick.x = stick.y = 0; }
   $('mapTitle').textContent = L.hub ? 'Bal Köyü Haritası' : L.tut ? 'Öğretici Bahçe Haritası' : `${lvlIdx + 1}. ${L.def.name} Haritası`;
   const cv2 = $('mapCv'); drawMap(cv2.getContext('2d'), cv2.width, cv2.height);
-  const keyItems = L.hub ? [['#ff3b3b', 'Sen'], ['#9a9a9a', 'Portal (numaralı)'], ['#b5452f', 'Ev'], ['#9aa7b8', 'Dağ'], ['#ffffff', 'Bulut parkuru'], ['#e63946', 'Kalp Dükkânı'], ['#8a5aa8', 'Kıyafet Dükkânı'], ['#5d6670', 'Demirci'], ['#e89a1a', 'Bal Dükkânı'], ['#5aa65e', 'Kaplumbağa'], ['#eadfce', 'Tavşan'], ['#ff8fb8', 'Kayıp yavru']]
+  const keyItems = L.hub ? [['#ff3b3b', 'Sen'], ['#9a9a9a', 'Portal (numaralı)'], ['#b5452f', 'Ev'], ['#9aa7b8', 'Dağ'], ['#ffffff', 'Bulut parkuru'], ['#e63946', 'Kalp Dükkânı'], ['#8a5aa8', 'Kıyafet Dükkânı'], ['#5d6670', 'Demirci'], ['#e89a1a', 'Bal Dükkânı'], ['#8a2a2a', 'Kasap'], ['#5aa65e', 'Kaplumbağa'], ['#eadfce', 'Tavşan'], ['#ff8fb8', 'Kayıp yavru']]
     : [['#ff3b3b', 'Sen'], ['#7fd3ff', 'Başlangıç'], ['#ffffff', 'Kontrol noktası'], ['#ffd23f', 'Son kontrol noktası'], ['#ff5fa2', 'Bitiş'], ['#b07a43', 'Platform'], ['#5d6670', 'Diken']];
   const mk2 = $('mapKey'); mk2.innerHTML = '';
   for (const [col, t] of keyItems) { const sp = document.createElement('span'); const i = document.createElement('i'); i.style.background = col; sp.append(i, t); mk2.append(sp); }
