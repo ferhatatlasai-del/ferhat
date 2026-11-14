@@ -1,0 +1,26 @@
+name: Günlük içerik taslağı
+
+on:
+  schedule:
+    - cron: "0 6 * * *"   # her gün 06:00 UTC (09:00 TR)
+  workflow_dispatch:       # elle de çalıştırılabilir
+
+permissions:
+  contents: write
+
+jobs:
+  taslak:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Taslak üret
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python3 ajan/uret.py
+      - name: Taslağı depoya kaydet
+        run: |
+          git config user.name "icerik-ajani"
+          git config user.email "icerik-ajani@users.noreply.github.com"
+          git add taslaklar
+          git diff --cached --quiet || git commit -m "Günlük taslak ekle"
+          git push
