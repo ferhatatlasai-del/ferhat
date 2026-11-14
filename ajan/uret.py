@@ -69,6 +69,8 @@ JSON şeması:
 Kullanılmayan alanları boş liste bırak.
 
 KALİTE KURALLARI:
+- Ürün sayısı azsa aynı ürünü FARKLI açıyla işle (baskı süreci, renk seçenekleri, kullanım, ipucu,
+  önce/sonra); aynı kancayı ve aynı caption'ı tekrar etme.
 - Konuyu EKİPMAN VE ÜRÜNLER listesindeki ürünlerden seç. Listede olmayan bir ürünü, yazıcıyı veya
   malzemeyi sanki hesap sahibi basmış gibi anlatma. Liste boşsa konuyu "fikir/ipucu" sütunundan seç
   ve cekim_notu'nda hesap sahibinden hangi gerçek ürünü basıp çekeceğini iste.

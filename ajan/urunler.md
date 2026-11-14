@@ -15,7 +15,8 @@ bilgiyi uydurmaz. Yeni bir ürün bastıkça en alta ekle.
 - **Ürün adı** | hangi yazıcıda | süre (varsa) | not (renk, malzeme, kimin tasarımı, sorun/çözüm)
 -->
 
-- (henüz eklenmedi)
+- **Telefon tutucu** | Bambu Lab A1 Combo | süre: ? | renk/malzeme/tasarımcı: ?
+- **Anahtarlık** | Bambu Lab A1 Combo | süre: ? | renk/malzeme/tasarımcı: ?
 
 ## Başkalarının tasarımları
 <!-- Basarken kullandığın modelin adı ve tasarımcısı. Paylaşırken kredi vermek için. -->
