@@ -10,6 +10,7 @@ import datetime
 import json
 import os
 import pathlib
+import re
 import sys
 import urllib.request
 
@@ -62,7 +63,17 @@ JSON şeması:
   "carousel_slaytlari": ["slayt 1 metni", "slayt 2 metni"],
   "cekim_notu": "kullanıcının gerçekten çekmesi/basması gereken şey"
 }}
-Kullanılmayan alanları boş liste bırak."""
+Kullanılmayan alanları boş liste bırak.
+
+KALİTE KURALLARI:
+- Genel listeler yasak ("organizer, hediyelik, dekor" gibi). Konu TEK, SOMUT bir ürün olsun
+  (ör. "kulaklık standı", "kablo tutucu", "buzdolabı magnet seti") ve belirli bir sorunu çözsün.
+- Kanca merak uyandırmalı, soru kalıbı ("biliyor musun?") kullanma. Rakam veya çelişki tercih et.
+- Caption'a hashtag YAZMA, hashtag'ler yalnızca "hashtagler" alanında olsun.
+- Slayt ve sahne metinlerine numara YAZMA.
+- Caption 3-6 kısa satır, sonunda tek net bir çağrı (kaydet, yorum yap, sıradaki ne olsun).
+- cekim_notu: hesap sahibinin kendi yazıcısında ne basıp hangi planları çekeceğini söyle.
+  Süre/gram bilmiyorsan uydurma, "yaklaşık" de ya da yazma."""
     return sistem, kullanici
 
 
@@ -88,6 +99,20 @@ def openai_cagir(sistem, kullanici):
     return json.loads(veri["choices"][0]["message"]["content"])
 
 
+def caption_temizle(caption):
+    """Model hashtag'leri caption'a da yazarsa kaldır (ayrıca ekliyoruz)."""
+    satirlar = [
+        s for s in caption.splitlines()
+        if not (s.strip() and all(k.startswith("#") for k in s.split()))
+    ]
+    return "\n".join(satirlar).strip()
+
+
+def numara_temizle(metin):
+    """Başındaki '1.' gibi numaraları at; numarayı biz ekliyoruz."""
+    return re.sub(r"^\s*\d+[.)]\s*", "", metin)
+
+
 def markdown_yaz(t, bugun):
     satirlar = [
         f"# {t['konu']}",
@@ -101,9 +126,9 @@ def markdown_yaz(t, bugun):
         t.get("kanca", ""),
         "",
         "## Caption",
-        t.get("caption", ""),
+        caption_temizle(t.get("caption", "")),
         "",
-        " ".join(t.get("hashtagler", [])),
+        " ".join(dict.fromkeys(t.get("hashtagler", []))),
         "",
         "## Çekim / basım notu",
         t.get("cekim_notu", ""),
@@ -112,9 +137,9 @@ def markdown_yaz(t, bugun):
         t.get("gorsel_promptu", ""),
     ]
     if t.get("reels_senaryosu"):
-        satirlar += ["", "## Reels senaryosu"] + [f"{i}. {s}" for i, s in enumerate(t["reels_senaryosu"], 1)]
+        satirlar += ["", "## Reels senaryosu"] + [f"{i}. {numara_temizle(s)}" for i, s in enumerate(t["reels_senaryosu"], 1)]
     if t.get("carousel_slaytlari"):
-        satirlar += ["", "## Carousel slaytları"] + [f"{i}. {s}" for i, s in enumerate(t["carousel_slaytlari"], 1)]
+        satirlar += ["", "## Carousel slaytları"] + [f"{i}. {numara_temizle(s)}" for i, s in enumerate(t["carousel_slaytlari"], 1)]
     return "\n".join(satirlar) + "\n"
 
 
