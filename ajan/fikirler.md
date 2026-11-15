@@ -11,8 +11,10 @@ tekrar etmemek için son konuları kontrol eder. Yeni fikirler buraya eklenebili
 - Evde işe yarayan küçük parçalar (kıskaç, askı, kapak)
 - Garip ama işe yarayan şeyler
 - Zararsız şakalar ve fidget oyuncakları
-- "Başarısız baskı" ve sorun giderme hikâyeleri (Nozzle Notu serisi için)
-- Filament renkleri ve dokular (ipek, mat, şeffaf) görsel karşılaştırmaları
+- Baskı hataları ve sorun giderme ("Doktor Notu" serisi için): iplik çekmesi, köşe kalkması, katman kayması
+- Filament türleri ve dokular (ipek, mat, şeffaf) görsel karşılaştırmaları
+- "Başlangıç rehberi": ilk baskı için basit, kolay nesneler
+- Mevsimlik ve hediyelik basit fikirler
 
 ## Eklemek için
 İzlediğin ya da denemek istediğin fikirleri buraya yaz.

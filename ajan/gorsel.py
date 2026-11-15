@@ -2,7 +2,7 @@
 """OpenAI görsel API'siyle görsel üretir ve gorseller/ klasörüne PNG olarak kaydeder.
 
 Kullanım:
-    OPENAI_API_KEY=... python3 ajan/gorsel.py --n 3                  # Nozzle ana görseli
+    OPENAI_API_KEY=... python3 ajan/gorsel.py --n 3                  # Doktor Filament ana görseli
     OPENAI_API_KEY=... python3 ajan/gorsel.py --prompt "..." --ad kapak --n 2
     python3 ajan/gorsel.py --dry-run                                  # API çağırmadan prompt'u gösterir
 """
@@ -22,18 +22,18 @@ CIKTI = KOK / "gorseller"
 MODEL = os.environ.get("OPENAI_IMAGE_MODEL") or "gpt-image-1"
 YEDEK_MODEL = "gpt-image-1"
 
-NOZZLE_PROMPT_SONU = (
-    " Full body, front view, standing, centered on a plain light gray studio background,"
-    " soft even lighting, clean silhouette, cute rounded shapes. No text, no logo, no watermark."
+PERSONA_PROMPT_SONU = (
+    " Waist-up portrait, facing the camera, warm friendly smile, soft studio lighting, photorealistic."
+    " No text, no letters, no readable text on clothing, no logos, no watermark."
 )
 
 
-def nozzle_prompt():
-    """Nozzle tarifini kanal.md'den alır (tek kaynak)."""
+def persona_prompt():
+    """Doktor Filament tarifini kanal.md'den alır (tek kaynak)."""
     metin = (KOK / "ajan" / "kanal.md").read_text(encoding="utf-8")
-    m = re.search(r'"(Nozzle: [^"]+)"', metin)
-    tarif = m.group(1) if m else "Nozzle: a small friendly cartoon robot with a copper-brass 3D printer nozzle as its head"
-    return tarif + NOZZLE_PROMPT_SONU
+    m = re.search(r'"(Doctor Filament: [^"]+)"', metin)
+    tarif = m.group(1) if m else "Doctor Filament: a fictional, eccentric but friendly inventor character"
+    return tarif + PERSONA_PROMPT_SONU
 
 
 def uret(model, prompt, n, boyut, kalite):
@@ -66,15 +66,15 @@ def hata_ozeti(e):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--prompt", default="", help="Boşsa Nozzle ana görseli promptu kullanılır")
-    ap.add_argument("--ad", default="nozzle", help="Dosya adı öneki")
+    ap.add_argument("--prompt", default="", help="Boşsa Doktor Filament ana görseli promptu kullanılır")
+    ap.add_argument("--ad", default="doktor-filament", help="Dosya adı öneki")
     ap.add_argument("--n", type=int, default=3)
     ap.add_argument("--boyut", default="1024x1536", help="1024x1024 | 1024x1536 | 1536x1024")
     ap.add_argument("--kalite", default="medium", help="low | medium | high")
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
 
-    prompt = a.prompt.strip() or nozzle_prompt()
+    prompt = a.prompt.strip() or persona_prompt()
     n = max(1, min(a.n, 6))
     if a.dry_run:
         print(f"model={MODEL} n={n} boyut={a.boyut} kalite={a.kalite}\n{prompt}")
