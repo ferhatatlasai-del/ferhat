@@ -1,0 +1,22 @@
+# Güncel Hesap Durumu
+
+(Otomatik çekildi: 2026-11-15. Elle düzenleme, üzerine yazılır.)
+
+- **Hesap:** @gurtechs3d
+- **Takipçi:** 420
+- **Takip edilen:** 167
+- **Gönderi sayısı:** 13
+
+## Son gönderiler (yeniden eskiye)
+- 2025-11-26 | VIDEO | beğeni 4 · yorum 0 | ""
+- 2025-11-26 | VIDEO | beğeni 0 · yorum 0 | ""
+- 2025-11-26 | VIDEO | beğeni 0 · yorum 0 | ""
+- 2025-11-26 | VIDEO | beğeni 3 · yorum 0 | ""
+- 2025-11-25 | CAROUSEL_ALBUM | beğeni 9 · yorum 0 | ""
+- 2025-11-25 | VIDEO | beğeni 5 · yorum 0 | ""
+- 2025-11-24 | VIDEO | beğeni 7 · yorum 0 | ""
+- 2025-11-23 | VIDEO | beğeni 8 · yorum 0 | ""
+- 2025-11-20 | VIDEO | beğeni 10 · yorum 0 | ""
+- 2025-11-20 | IMAGE | beğeni 1 · yorum 0 | ""
+- 2025-11-20 | VIDEO | beğeni 5 · yorum 0 | ""
+- 2025-11-20 | VIDEO | beğeni 5 · yorum 0 | ""
