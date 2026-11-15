@@ -33,10 +33,15 @@ def nozzle_tarifi():
 
 def yasak_uyarilari(t):
     """Dolgu sözcüklerini ve boş kancayı bulup taslağın sonuna uyarı olarak yazar."""
-    metin = json.dumps(t, ensure_ascii=False).lower()
+    t_ = {k: v for k, v in t.items() if k not in ("seri", "konu")}
+    metin = json.dumps(t_, ensure_ascii=False).lower()
     uyari = [f"Dolgu sözcüğü bulundu: \"{k}\"" for k in YASAK_SOZCUKLER if k in metin]
     if re.search(r"\d+\s*(saniye|dakika|dk|sn)[a-zçğıöşü]*\s*(de|da|içinde)?\s*bas", metin):
         uyari.append("Gerçek baskı süresi iddiası olabilir ('X saniyede basılıyor'). Doğru mu, kontrol et; hızlandırılmış video ise öyle yaz.")
+    for sh in t.get("sahneler", []):
+        if re.search(r"[^\x00-\u024f\u2000-\u206f\u2190-\u21ff\U0001F000-\U0001FFFF\u2600-\u27bf]", sh.get("sahne_promptu", "")):
+            uyari.append("Sahne promptunda İngilizce dışı karakter var (Kiril vb.); video aracına yapıştırmadan önce düzelt.")
+            break
     return uyari
 
 
@@ -105,6 +110,8 @@ JSON şeması:
 KALİTE KURALLARI:
 - 4-7 sahne; sahne sürelerinin TOPLAMI sure_sn'ye eşit olsun.
 - sahne_promptu o sahnenin somut eylemini ve görüntüsünü içersin (ör. "close-up of a printer nozzle laying orange filament layer by layer"). Boş ya da genel prompt yazma.
+- sahne_promptu YALNIZCA İngilizce (Latin harfleri) olsun, başka dilden kelime karıştırma.
+- nozzle_gorunur true ise sahne_promptu Nozzle'un NE YAPTIĞINI de söylesin (ör. "Nozzle points at the print bed"); Nozzle sahnede yoksa false yap. Gerçek yazıcının nozzle'ı ile karakter Nozzle'u karıştırma: karakterden "the robot Nozzle", yazıcı parçasından "printer nozzle" diye bahset.
 - "10 Saniyede Basım" serisi, uzun bir baskının videoda 10 saniyeye HIZLANDIRILMASI demektir. Baskının gerçekten 10 saniyede yapıldığını ASLA iddia etme. Gerçek baskı süresi, gram, maliyet yazma.
 - Kanca merak uyandırsın ama DOĞRU olsun: doğrulanabilir bir rakam (ör. katman sayısı gibi) uydurma; çelişki ya da soru kullan. Yasak sözcükler: mükemmel, harika, muhteşem, eğlenceli, inanılmaz, "biliyor musun".
 - Her zaman 5-8 hashtag döndür.

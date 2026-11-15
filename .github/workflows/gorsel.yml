@@ -1,0 +1,38 @@
+name: Görsel üret (Nozzle)
+
+on:
+  workflow_dispatch:
+    inputs:
+      adet:
+        description: "Kaç görsel (1-6)"
+        default: "3"
+      prompt:
+        description: "Boş bırakırsan Nozzle ana görseli promptu kullanılır"
+        default: ""
+      ad:
+        description: "Dosya adı öneki"
+        default: "nozzle"
+
+permissions:
+  contents: write
+
+jobs:
+  gorsel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Görsel üret
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_IMAGE_MODEL: ${{ vars.OPENAI_IMAGE_MODEL || 'gpt-image-1' }}
+          ADET: ${{ inputs.adet }}
+          PROMPT: ${{ inputs.prompt }}
+          AD: ${{ inputs.ad }}
+        run: python3 ajan/gorsel.py --n "$ADET" --ad "$AD" --prompt "$PROMPT"
+      - name: Görselleri depoya kaydet
+        run: |
+          git config user.name "icerik-ajani"
+          git config user.email "icerik-ajani@users.noreply.github.com"
+          git add gorseller
+          git diff --cached --quiet || git commit -m "Görsel ekle"
+          git push
