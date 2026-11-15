@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Günlük Instagram içerik taslağı üretir (OpenAI API, ek bağımlılık yok).
+"""Günlük kısa video taslağı üretir (Nozzle karakteri; Instagram, YouTube Shorts, Facebook). OpenAI API, ek bağımlılık yok.
 
 Kullanım:
     OPENAI_API_KEY=... python3 ajan/uret.py            # taslak üretir
@@ -17,6 +17,7 @@ import urllib.request
 KOK = pathlib.Path(__file__).resolve().parent.parent
 TASLAK_DIZINI = KOK / "taslaklar"
 MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+YZ_SATIRI = "🤖 Nozzle yapay zekâ ile üretilmiş bir karakterdir."
 
 
 def oku(yol):
@@ -41,55 +42,51 @@ def hesap_durumu():
 
 def prompt_olustur(bugun):
     sistem = (
-        "Sen bir Instagram içerik ajanısın. Aşağıdaki kanal profiline ve stratejiye "
-        "kesinlikle uy. Yalnızca geçerli JSON döndür."
+        "Sen kısa video içerik ajanısın. Kanal profiline ve stratejiye kesinlikle uy. "
+        "Yalnızca geçerli JSON döndür."
     )
-    kullanici = f"""# KANAL PROFİLİ
+    kullanici = f"""# KANAL PROFİLİ VE KURALLAR
 {oku('ajan/kanal.md')}
 
 # STRATEJİ NOTLARI
 {oku('ajan/strateji.md')}
 
-# EKİPMAN VE ÜRÜNLER (tek gerçek kaynak)
-{oku('ajan/urunler.md')}
+# FİKİR HAVUZU (başlangıç tohumları)
+{oku('ajan/fikirler.md')}
 
-# GÜNCEL HESAP DURUMU (gerçek veri; en iyi giden içerik tipine ağırlık ver, sayı uydurma)
+# GÜNCEL HESAP DURUMU (gerçek veri, sayı uydurma)
 {hesap_durumu()}
 
 # SON KONULAR (tekrar etme)
 {json.dumps(gecmis_konular(), ensure_ascii=False)}
 
 # GÖREV
-Bugünün tarihi: {bugun}. Bugün için TEK bir gönderi taslağı üret.
+Bugünün tarihi: {bugun}. Bugün için TEK bir kısa video planı üret (20-30 saniye, dikey).
+Seriyi son konulara bakarak değiştir (aynı seriyi art arda kullanma).
 JSON şeması:
 {{
   "konu": "kısa başlık",
-  "sutun": "içerik sütunlarından biri",
-  "format": "reels | carousel | tek_gorsel",
-  "kanca": "ilk satır / ilk 3 saniyede söylenecek cümle",
-  "caption": "tam caption, kanca dahil, Türkçe",
+  "seri": "10 Saniyede Basım | Basılabilir 5 Şey | Nozzle Notu",
+  "sure_sn": 25,
+  "kanca": "ilk 2 saniyede söylenen/yazılan cümle",
+  "sahneler": [
+    {{"sure_sn": 3, "gorsel": "Türkçe sahne tarifi", "ekran_yazisi": "ekrandaki kısa yazı",
+      "seslendirme": "Nozzle'un söyleyeceği cümle", "video_promptu": "İngilizce, video aracı için; Nozzle görünüm tarifini aynen içerir"}}
+  ],
+  "instagram_caption": "Türkçe, 3-5 kısa satır, sonunda tek çağrı",
+  "youtube_baslik": "en fazla 60 karakter",
+  "youtube_aciklama": "2-3 cümle, Türkçe",
+  "facebook_caption": "Türkçe, 2-4 kısa satır",
   "hashtagler": ["#..."],
-  "gorsel_promptu": "görsel üretimi için İngilizce, ayrıntılı prompt",
-  "reels_senaryosu": ["sahne 1", "sahne 2"],
-  "carousel_slaytlari": ["slayt 1 metni", "slayt 2 metni"],
-  "cekim_notu": "kullanıcının gerçekten çekmesi/basması gereken şey"
+  "model_notu": "gösterilen nesne için nasıl bir serbest lisanslı model ya da basit kendi tasarım aranmalı"
 }}
-Kullanılmayan alanları boş liste bırak.
 
 KALİTE KURALLARI:
-- Ürün sayısı azsa aynı ürünü FARKLI açıyla işle (baskı süreci, renk seçenekleri, kullanım, ipucu,
-  önce/sonra); aynı kancayı ve aynı caption'ı tekrar etme.
-- Konuyu EKİPMAN VE ÜRÜNLER listesindeki ürünlerden seç. Listede olmayan bir ürünü, yazıcıyı veya
-  malzemeyi sanki hesap sahibi basmış gibi anlatma. Liste boşsa konuyu "fikir/ipucu" sütunundan seç
-  ve cekim_notu'nda hesap sahibinden hangi gerçek ürünü basıp çekeceğini iste.
-- Genel listeler yasak ("organizer, hediyelik, dekor" gibi). Konu TEK, SOMUT bir ürün olsun
-  (ör. "kulaklık standı", "kablo tutucu", "buzdolabı magnet seti") ve belirli bir sorunu çözsün.
-- Kanca merak uyandırmalı, soru kalıbı ("biliyor musun?") kullanma. Rakam veya çelişki tercih et.
-- Caption'a hashtag YAZMA, hashtag'ler yalnızca "hashtagler" alanında olsun.
-- Slayt ve sahne metinlerine numara YAZMA.
-- Caption 3-6 kısa satır, sonunda tek net bir çağrı (kaydet, yorum yap, sıradaki ne olsun).
-- cekim_notu: hesap sahibinin kendi yazıcısında ne basıp hangi planları çekeceğini söyle.
-  Süre/gram bilmiyorsan uydurma, "yaklaşık" de ya da yazma."""
+- 4-7 sahne, toplam süre sure_sn ile uyumlu. Her sahnenin video_promptu Nozzle'un görünüm tarifini kelimesi kelimesine içersin.
+- Kanca merak uyandırsın: rakam, çelişki ya da şaşırtıcı bir iddia. "Biliyor musun?" ve "mükemmel/harika" gibi dolgu yok.
+- Gösterilen nesne gerçekten 3D yazıcıyla basılabilir olsun. Belirli bir model adı, tasarımcı, süre, gram ya da fiyat UYDURMA.
+- Caption ve açıklamalara hashtag YAZMA ve yapay zekâ açıklaması YAZMA (kod ekler). Sahnelere numara yazma.
+- Üç platform metni birbirinin kopyası olmasın; YouTube başlığı arama odaklı, Instagram ve Facebook daha samimi olsun."""
     return sistem, kullanici
 
 
@@ -130,32 +127,49 @@ def numara_temizle(metin):
 
 
 def markdown_yaz(t, bugun):
+    hashtag = " ".join(dict.fromkeys(t.get("hashtagler", [])))
     satirlar = [
         f"# {t['konu']}",
         "",
         f"- **Tarih:** {bugun}",
-        f"- **Sütun:** {t.get('sutun', '')}",
-        f"- **Format:** {t.get('format', '')}",
+        f"- **Seri:** {t.get('seri', '')}",
+        f"- **Süre:** {t.get('sure_sn', '')} sn, dikey 9:16",
         "- **Durum:** onay bekliyor",
         "",
         "## Kanca",
         t.get("kanca", ""),
         "",
-        "## Caption",
-        caption_temizle(t.get("caption", "")),
-        "",
-        " ".join(dict.fromkeys(t.get("hashtagler", []))),
-        "",
-        "## Çekim / basım notu",
-        t.get("cekim_notu", ""),
-        "",
-        "## Görsel promptu",
-        t.get("gorsel_promptu", ""),
+        "## Sahneler",
     ]
-    if t.get("reels_senaryosu"):
-        satirlar += ["", "## Reels senaryosu"] + [f"{i}. {numara_temizle(s)}" for i, s in enumerate(t["reels_senaryosu"], 1)]
-    if t.get("carousel_slaytlari"):
-        satirlar += ["", "## Carousel slaytları"] + [f"{i}. {numara_temizle(s)}" for i, s in enumerate(t["carousel_slaytlari"], 1)]
+    for i, sh in enumerate(t.get("sahneler", []), 1):
+        satirlar += [
+            f"### Sahne {i} ({sh.get('sure_sn', '?')} sn)",
+            f"- **Görsel:** {sh.get('gorsel', '')}",
+            f"- **Ekran yazısı:** {sh.get('ekran_yazisi', '')}",
+            f"- **Nozzle der ki:** {sh.get('seslendirme', '')}",
+            f"- **Video promptu:** {sh.get('video_promptu', '')}",
+            "",
+        ]
+    satirlar += [
+        "## Instagram caption",
+        caption_temizle(t.get("instagram_caption", "")),
+        YZ_SATIRI,
+        "",
+        hashtag,
+        "",
+        "## YouTube Shorts",
+        f"**Başlık:** {t.get('youtube_baslik', '')[:100]}",
+        "",
+        caption_temizle(t.get("youtube_aciklama", "")),
+        YZ_SATIRI,
+        "",
+        "## Facebook caption",
+        caption_temizle(t.get("facebook_caption", "")),
+        YZ_SATIRI,
+        "",
+        "## Model / lisans notu",
+        t.get("model_notu", ""),
+    ]
     return "\n".join(satirlar) + "\n"
 
 
