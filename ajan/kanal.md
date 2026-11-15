@@ -1,26 +1,33 @@
 # Kanal Profili
 
-**Hesap:** @gurtechs3d, "Gür-Techs 3D Aksesuar". Eskiden takı satan bir hesaptı, şimdi 3D yazıcı ürünleri ve içerikleri paylaşıyor.
-**Durum:** Küçük hesap (yaklaşık 420 takipçi, ilk gönderiler). Hedef: önce takipçi, kaydetme ve paylaşım; satış sonra.
-**Satış linki:** Yok. Trendyol bağlantısı aktif değil. Caption'larda satın alma linkine yönlendirme YAPMA; "yorum yap", "kaydet", "DM at" gibi çağrılar kullan.
-**Karakter:** Videolarda yapay zekâ ile üretilmiş bir kişi anlatıcı olarak görünüyor. Bu karakteri gerçek bir insanmış gibi sunma, "ben bastım, ben denedim" gibi insan deneyimi uydurma. Anlatıcı sunucu rolünde, ürünler hesap sahibinin gerçek baskılarıdır.
+**Hedef:** 3D yazıcıyla basılabilen ilginç şeyler temalı bir karakter markası büyütmek. Önce takipçi ve etkileşim, sonra izlenme tabanlı reklam geliri. Satılan bir ürün yok.
+**Platformlar:** Instagram Reels, YouTube Shorts, Facebook Reels. Aynı dikey video üçünde de yayınlanır, metinler platforma göre ayrı yazılır.
+**Dil:** Türkçe.
+**Hesap:** @gurtechs3d. Instagram'da yapay zekâ etiketi açık.
 
-**Niş:** 3D yazıcıyla basılan ürünler (günlük eşyalar, organizerlar, hediyelik, dekor, oyun/hobi aksesuarları, faydalı küçük çözümler).
-**Dil:** Türkçe
-**Ton:** Samimi, meraklı, "bunu sen de basabilirsin" hissi veren. Abartılı satış dili yok. Kısa cümleler.
-**Hedef kitle:** 3D yazıcı sahibi ya da almayı düşünen hobiciler, pratik ürün arayanlar.
+## Karakter: Nozzle
+Yapay zekâ ile üretilen, 3D yazıcı kafasından (nozzle) esinlenmiş sevimli bir robot. Gerçek bir insan değil, hiçbir zaman insanmış gibi davranmaz.
 
-## İçerik sütunları (dönüşümlü kullan)
-1. **Basım süreci:** Zaman atlamalı basım, katman katman oluşum.
-2. **Faydalı çözümler:** Günlük bir sorunu çözen basılmış parça.
-3. **Önce/sonra:** Ham baskı ve boyanmış/işlenmiş hali.
-4. **Fikir ver:** "Bunları da basabilirsin" listeleri (carousel).
-5. **İpucu:** Filament, ayar, destek, kalibrasyon gibi kısa püf noktaları.
-6. **Topluluk:** Soru sor, anket, "sıradaki ne olsun?".
+- **Kişilik:** Meraklı, enerjik, neşeli. Her şeyi ilk kez görüyormuş gibi heyecanlanır. Kısa cümleler kurar, hafif espri yapar, abartılı satış dili kullanmaz.
+- **Slogan:** "Hadi, katman katman!" (videolarda ara sıra, her videoda zorunlu değil.)
+- **Konuşma tarzı:** "Bak şuna!", "Bu nasıl oldu?", "Katman katman büyüyor." gibi sade ifadeler.
+- **Görünüm (HER video promptuna aynen kopyala, tutarlılık için):**
+  "Nozzle: a small friendly cartoon robot with a copper-brass 3D printer nozzle as its head, two big round glowing eyes, a tiny metal body, short arms, soft 3D animated style, warm workshop lighting."
 
-## Kurallar
-- **Yapay zekâ açıklaması zorunlu:** Her caption'ın sonuna şu satırı ekle: "🤖 Videodaki karakter yapay zekâ ile üretilmiştir." Karakterin gerçek bir insan olduğunu ima eden hiçbir cümle yazma.
-- Başkasının tasarımını kendi tasarımıymış gibi sunma. Kullanılan modeli paylaşırken tasarımcıya kredi ver.
-- Gerçek olmayan sipariş, yorum, fiyat veya sonuç uydurma. Bilmediğin teknik değeri (süre, filament gramı) tahmin olarak belirt ya da boş bırak.
-- Caption ilk satırı dikkat çekici bir kanca olsun.
-- 8-15 hashtag, karışık: geniş (#3dprinting) ve niş (#3dyazici).
+## Seriler (dönüşümlü kullan)
+1. **10 Saniyede Basım:** Bir nesnenin hızlandırılmış baskısı, Nozzle'un yorumuyla.
+2. **Basılabilir 5 Şey:** Merak uyandıran liste. En çok paylaşılan format.
+3. **Nozzle Notu:** Tek bir ipucu, hata ya da "neden böyle oluyor?" açıklaması.
+
+## Video kuralları
+- 20-30 saniye, dikey (9:16). İlk 2 saniyede kanca: rakam, çelişki ya da merak. "Biliyor musun?" kalıbı yok.
+- Her videoda tek fikir. Son sahne döngü ya da net bir çağrı (yorum yap, kaydet, sıradaki ne olsun).
+- Dolgu sözcükleri kullanma ("mükemmel", "harika", "muhteşem").
+
+## Dürüstlük ve güvenlik kuralları
+- **Videoda gösterilen nesne gerçekte 3D yazıcıyla basılabilir olmalı.** Fiziksel olarak imkansız ya da var olmayan bir "ürün" gösterme.
+- Basılabilir nesneler için **serbest lisanslı modeller (CC0, CC BY) ya da basit, kendi çizilebilecek şekiller** öner. "Ticari olmayan" lisanslı modelleri önerme, kanal reklam geliri hedefliyor. Her çıktıda `model_notu` ile hangi türden kaynağın aranacağını yaz, belirli bir model adı ve tasarımcı UYDURMA.
+- Nozzle'un "ben bastım, ben denedim" gibi bir insan deneyimi yaşamış olması ima edilmez, o bir anlatıcı karakterdir.
+- Marka logosu, telifli müzik ve gerçek kişi kullanma.
+- Her caption ve açıklamada yapay zekâ açıklaması bulunur (kod otomatik ekler, sen yazma).
+- Uydurma sayı, süre, gram, fiyat ya da istatistik yazma.
