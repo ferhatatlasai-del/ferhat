@@ -34,6 +34,11 @@ def gecmis_konular(adet=20):
     return konular
 
 
+def hesap_durumu():
+    yol = KOK / "ajan" / "hesap_durumu.md"
+    return yol.read_text(encoding="utf-8") if yol.exists() else "(Henüz otomatik hesap verisi yok.)"
+
+
 def prompt_olustur(bugun):
     sistem = (
         "Sen bir Instagram içerik ajanısın. Aşağıdaki kanal profiline ve stratejiye "
@@ -47,6 +52,9 @@ def prompt_olustur(bugun):
 
 # EKİPMAN VE ÜRÜNLER (tek gerçek kaynak)
 {oku('ajan/urunler.md')}
+
+# GÜNCEL HESAP DURUMU (gerçek veri; en iyi giden içerik tipine ağırlık ver, sayı uydurma)
+{hesap_durumu()}
 
 # SON KONULAR (tekrar etme)
 {json.dumps(gecmis_konular(), ensure_ascii=False)}
