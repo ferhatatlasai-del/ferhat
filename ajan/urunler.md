@@ -20,3 +20,7 @@ bilgiyi uydurmaz. Yeni bir ürün bastıkça en alta ekle.
 
 ## Başkalarının tasarımları
 <!-- Basarken kullandığın modelin adı ve tasarımcısı. Paylaşırken kredi vermek için. -->
+
+## Hesap geçmişi
+- Hesap daha önce takı satıyordu; takipçilerin bir kısmı takı döneminden. 3D baskıya yeni geçildi.
+- Son videoyu yaklaşık 391 kişi izledi (referans başlangıç değeri).
