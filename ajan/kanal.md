@@ -11,8 +11,13 @@ Yapay zekâ ile üretilen, 3D yazıcı kafasından (nozzle) esinlenmiş sevimli 
 - **Kişilik:** Meraklı, enerjik, neşeli. Her şeyi ilk kez görüyormuş gibi heyecanlanır. Kısa cümleler kurar, hafif espri yapar, abartılı satış dili kullanmaz.
 - **Slogan:** "Hadi, katman katman!" (videolarda ara sıra, her videoda zorunlu değil.)
 - **Konuşma tarzı:** "Bak şuna!", "Bu nasıl oldu?", "Katman katman büyüyor." gibi sade ifadeler.
-- **Görünüm (HER video promptuna aynen kopyala, tutarlılık için):**
-  "Nozzle: a small friendly cartoon robot with a copper-brass 3D printer nozzle as its head, two big round glowing eyes, a tiny metal body, short arms, soft 3D animated style, warm workshop lighting."
+- **Görünüm (HER video promptuna aynen kopyala, tutarlılık için).** Resmi referans görseli Gemini ile üretildi; video araçlarına bu tarifle birlikte HER ZAMAN referans görsel de verilir:
+  "Nozzle: a small friendly cartoon robot toy with a smooth rounded weathered-copper head, a small brass cone nozzle tip pointing down at the neck with a thin orange filament strand, two big round glowing amber eyes and a wide friendly smile, brushed brass body, glossy orange plastic arm segments with grey joints, black hands, soft 3D-rendered toy style, warm workshop lighting."
+
+## İmza cümleler (seslendirmede AYNEN kullanılır)
+- **Açılış (ilk sahne, ~4 sn):** "Kafam sıcak, merakım daha sıcak! Ben Nozzle, hadi katman katman!"
+- **Kapanış (son sahne, ~4 sn):** "Sıradaki baskı ne olsun? Yorumlara yaz, ben katman katman getireyim!"
+- **Ses aracı için telaffuz notu:** Seslendirme aracına "Nozzle" yerine "Nozıl" yaz; ekran yazısı ve caption'da Nozzle kalır.
 
 ## Seriler (dönüşümlü kullan)
 1. **10 Saniyede Basım:** Bir nesnenin hızlandırılmış baskısı, Nozzle'un yorumuyla.
