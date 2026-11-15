@@ -45,6 +45,9 @@ def prompt_olustur(bugun):
 # STRATEJİ NOTLARI
 {oku('ajan/strateji.md')}
 
+# EKİPMAN VE ÜRÜNLER (tek gerçek kaynak)
+{oku('ajan/urunler.md')}
+
 # SON KONULAR (tekrar etme)
 {json.dumps(gecmis_konular(), ensure_ascii=False)}
 
@@ -66,6 +69,11 @@ JSON şeması:
 Kullanılmayan alanları boş liste bırak.
 
 KALİTE KURALLARI:
+- Ürün sayısı azsa aynı ürünü FARKLI açıyla işle (baskı süreci, renk seçenekleri, kullanım, ipucu,
+  önce/sonra); aynı kancayı ve aynı caption'ı tekrar etme.
+- Konuyu EKİPMAN VE ÜRÜNLER listesindeki ürünlerden seç. Listede olmayan bir ürünü, yazıcıyı veya
+  malzemeyi sanki hesap sahibi basmış gibi anlatma. Liste boşsa konuyu "fikir/ipucu" sütunundan seç
+  ve cekim_notu'nda hesap sahibinden hangi gerçek ürünü basıp çekeceğini iste.
 - Genel listeler yasak ("organizer, hediyelik, dekor" gibi). Konu TEK, SOMUT bir ürün olsun
   (ör. "kulaklık standı", "kablo tutucu", "buzdolabı magnet seti") ve belirli bir sorunu çözsün.
 - Kanca merak uyandırmalı, soru kalıbı ("biliyor musun?") kullanma. Rakam veya çelişki tercih et.
