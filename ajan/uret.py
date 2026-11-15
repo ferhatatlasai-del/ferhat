@@ -31,6 +31,29 @@ def nozzle_tarifi():
     return m.group(1) if m else "Nozzle: a small friendly cartoon robot with a copper-brass 3D printer nozzle as its head."
 
 
+def imza_cumleler():
+    """Açılış ve kapanış imza cümlelerini kanal.md'den alır (tek kaynak)."""
+    metin = oku("ajan/kanal.md")
+    a = re.search(r'\*\*Açılış[^*]*\*\*\s*"([^"]+)"', metin)
+    k = re.search(r'\*\*Kapanış[^*]*\*\*\s*"([^"]+)"', metin)
+    return (a.group(1) if a else ""), (k.group(1) if k else "")
+
+
+def _norm(metin):
+    return re.sub(r"[^\w ]", "", metin.lower()).split()
+
+
+def imza_uyarilari(t):
+    acilis, kapanis = imza_cumleler()
+    sahneler = t.get("sahneler", [])
+    uyari = []
+    if acilis and sahneler and " ".join(_norm(acilis)) not in " ".join(_norm(sahneler[0].get("seslendirme", ""))):
+        uyari.append("İlk sahne seslendirmesi imza açılış cümlesini aynen içermiyor.")
+    if kapanis and sahneler and " ".join(_norm(kapanis)) not in " ".join(_norm(sahneler[-1].get("seslendirme", ""))):
+        uyari.append("Son sahne seslendirmesi imza kapanış cümlesini aynen içermiyor.")
+    return uyari
+
+
 def yasak_uyarilari(t):
     """Dolgu sözcüklerini ve boş kancayı bulup taslağın sonuna uyarı olarak yazar."""
     t_ = {k: v for k, v in t.items() if k not in ("seri", "konu")}
@@ -38,6 +61,7 @@ def yasak_uyarilari(t):
     uyari = [f"Dolgu sözcüğü bulundu: \"{k}\"" for k in YASAK_SOZCUKLER if k in metin]
     if re.search(r"\d+\s*(saniye|dakika|dk|sn)[a-zçğıöşü]*\s*(de|da|içinde)?\s*bas", metin):
         uyari.append("Gerçek baskı süresi iddiası olabilir ('X saniyede basılıyor'). Doğru mu, kontrol et; hızlandırılmış video ise öyle yaz.")
+    uyari += imza_uyarilari(t)
     for sh in t.get("sahneler", []):
         if re.search(r"[^\x00-\u024f\u2000-\u206f\u2190-\u21ff\U0001F000-\U0001FFFF\u2600-\u27bf]", sh.get("sahne_promptu", "")):
             uyari.append("Sahne promptunda İngilizce dışı karakter var (Kiril vb.); video aracına yapıştırmadan önce düzelt.")
@@ -109,6 +133,7 @@ JSON şeması:
 
 KALİTE KURALLARI:
 - 4-7 sahne; sahne sürelerinin TOPLAMI sure_sn'ye eşit olsun.
+- İLK sahnenin seslendirmesi, kanal.md'deki İmza cümleler bölümündeki AÇILIŞ cümlesi olsun (kelimesi kelimesine). SON sahnenin seslendirmesi KAPANIŞ cümlesi olsun. Bu cümleleri değiştirme, çevirme, kısaltma; araya başka cümle ekleme. Aradaki sahneler konuyu anlatsın.
 - sahne_promptu o sahnenin somut eylemini ve görüntüsünü içersin (ör. "close-up of a printer nozzle laying orange filament layer by layer"). Boş ya da genel prompt yazma.
 - sahne_promptu YALNIZCA İngilizce (Latin harfleri) olsun, başka dilden kelime karıştırma.
 - nozzle_gorunur true ise sahne_promptu Nozzle'un NE YAPTIĞINI de söylesin (ör. "Nozzle points at the print bed"); Nozzle sahnede yoksa false yap. Gerçek yazıcının nozzle'ı ile karakter Nozzle'u karıştırma: karakterden "the robot Nozzle", yazıcı parçasından "printer nozzle" diye bahset.

@@ -14,6 +14,11 @@ Yapay zekâ ile üretilen, 3D yazıcı kafasından (nozzle) esinlenmiş sevimli 
 - **Görünüm (HER video promptuna aynen kopyala, tutarlılık için).** Resmi referans görseli Gemini ile üretildi; video araçlarına bu tarifle birlikte HER ZAMAN referans görsel de verilir:
   "Nozzle: a small friendly cartoon robot toy with a smooth rounded weathered-copper head, a small brass cone nozzle tip pointing down at the neck with a thin orange filament strand, two big round glowing amber eyes and a wide friendly smile, brushed brass body, glossy orange plastic arm segments with grey joints, black hands, soft 3D-rendered toy style, warm workshop lighting."
 
+## İmza cümleler (seslendirmede AYNEN kullanılır)
+- **Açılış (ilk sahne, ~4 sn):** "Kafam sıcak, merakım daha sıcak! Ben Nozzle, hadi katman katman!"
+- **Kapanış (son sahne, ~4 sn):** "Sıradaki baskı ne olsun? Yorumlara yaz, ben katman katman getireyim!"
+- **Ses aracı için telaffuz notu:** Seslendirme aracına "Nozzle" yerine "Nozıl" yaz; ekran yazısı ve caption'da Nozzle kalır.
+
 ## Seriler (dönüşümlü kullan)
 1. **10 Saniyede Basım:** Bir nesnenin hızlandırılmış baskısı, Nozzle'un yorumuyla.
 2. **Basılabilir 5 Şey:** Merak uyandıran liste. En çok paylaşılan format.
