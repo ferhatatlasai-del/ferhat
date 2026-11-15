@@ -1,4 +1,4 @@
-name: Görsel üret (Nozzle)
+name: Görsel üret (Doktor Filament)
 
 on:
   workflow_dispatch:
@@ -7,11 +7,11 @@ on:
         description: "Kaç görsel (1-6)"
         default: "3"
       prompt:
-        description: "Boş bırakırsan Nozzle ana görseli promptu kullanılır"
+        description: "Boş bırakırsan Doktor Filament ana görseli promptu kullanılır"
         default: ""
       ad:
         description: "Dosya adı öneki"
-        default: "nozzle"
+        default: "doktor-filament"
 
 permissions:
   contents: write
