@@ -13,6 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Hesap durumunu çek (anahtar yoksa atlanır)
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: python3 ajan/istatistik.py
       - name: Taslak üret
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -21,6 +25,6 @@ jobs:
         run: |
           git config user.name "icerik-ajani"
           git config user.email "icerik-ajani@users.noreply.github.com"
-          git add taslaklar
+          git add taslaklar ajan/hesap_durumu.md 2>/dev/null || git add taslaklar
           git diff --cached --quiet || git commit -m "Günlük taslak ekle"
           git push
