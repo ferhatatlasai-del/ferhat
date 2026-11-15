@@ -1,0 +1,36 @@
+name: Instagram'a yayınla (Reels)
+
+on:
+  workflow_dispatch:
+    inputs:
+      video:
+        description: "Depodaki video yolu"
+        default: "videolar/doktor_filament_acilis_v2.mp4"
+      aciklama:
+        description: "Açıklama dosyası"
+        default: "yayin/doktor_filament_acilis.txt"
+      onay:
+        description: "Gerçekten yayınlamak için EVET yaz. Başka bir şey yazarsan yalnızca kontrol yapılır, yayınlanmaz."
+        default: "HAYIR"
+
+permissions:
+  contents: read
+
+jobs:
+  yayinla:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Yayın (onay EVET değilse yalnızca kontrol)
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: "17841457188392262"
+          VIDEO: ${{ inputs.video }}
+          ACIKLAMA: ${{ inputs.aciklama }}
+          ONAY: ${{ inputs.onay }}
+        run: |
+          EK=""
+          if [ "$ONAY" = "EVET" ]; then EK="--yayinla"; fi
+          python3 ajan/yayinla.py \
+            --video-url "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${GITHUB_SHA}/${VIDEO}" \
+            --aciklama-dosyasi "$ACIKLAMA" $EK
