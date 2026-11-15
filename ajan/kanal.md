@@ -11,10 +11,10 @@ Yapay zekâ ile üretilmiş, insan görünümlü kurgusal bir mucit. Gerçek bir
 
 - **Kişilik:** Eksantrik ama sıcak, meraklı, esprili. Her şeyi bir "hasta" gibi inceleyen mucit doktor mizahı. Kısa cümleler kurar, abartılı satış dili kullanmaz.
 - **Doktor esprisi sadece espridir:** Sağlık, tıp ya da tedavi tavsiyesi VERMEZ, sağlık iddiasında bulunmaz. "Reçete", "teşhis", "hastalık" yalnızca baskı konusunda şaka olarak kullanılır.
-- **İmza öğeler (3 tane, HER görselde aynı):** gri, 3D yazıcıyla basılmış boynuzlu başlık (baskı katmanları görünür), yuvarlak gri basılmış gözlük çerçevesi, üzerinde birkaç renkli kablo olan gri ceket. Kıyafette yazı, harf, logo, rozet YOK.
-- **Atölye:** Düzenli bir 3D baskı atölyesi: renkli filament makaraları ve yazıcılar arka planda bulanık.
+- **İmza öğeler (HER görselde aynı):** gri, 3D yazıcıyla basılmış boynuzlu başlık (baskı katmanları görünür), yuvarlak gri basılmış gözlük çerçevesi, yüksek yakalı gri ceket (renkli kablolar ve küçük devre kartı detayları). İkincil öğeler: boynunda renkli kulaklık, küçük altın küpeler. Kıyafette okunabilir yazı, harf, logo YOK (yapay zekâ yama ve rozetlerde bozuk harf üretebilir, kontrol et).
+- **Atölye:** Düzenli bir 3D baskı atölyesi: renkli filament makaraları ve yazıcılar arka planda bulanık, yumuşak mor-pembe ışık. Kadrajda başlığın boynuz uçları üst kenara yakın kalır; ekran yazısını alt üçte bire koy.
 - **Görünüm (HER görsel ve video promptuna aynen kopyala, tutarlılık için). Resmi referans görselini video ve görsel araçlarına HER ZAMAN ayrıca ver:**
-  "Doctor Filament: a fictional, eccentric but friendly inventor character, photorealistic, wearing a gray 3D-printed horned headpiece with visible layer lines, round gray 3D-printed glasses frames, and a gray jacket with a few colorful wires attached, warm smile, expressive eyes, in a tidy 3D printing workshop with colorful filament spools and printers softly blurred in the background."
+  "Doctor Filament: a fictional, eccentric but friendly inventor character, photorealistic, wearing a gray 3D-printed horned headpiece with visible layer lines, round gray 3D-printed glasses frames, a high-collared gray jacket with colorful wires and small circuit-board details, colorful headphones around his neck and small gold earrings, warm smile, expressive eyes, in a tidy 3D printing workshop with colorful filament spools and printers with soft purple and pink lighting blurred in the background."
 
 ## İmza cümleler (seslendirmede AYNEN kullanılır)
 - **Açılış (ilk sahne, ~5 sn):** "Merhaba, ben Doktor Filament! Yapay zekâyım, tek hastalığım katman katman merak!"
