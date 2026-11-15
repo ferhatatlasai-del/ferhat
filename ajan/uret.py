@@ -40,7 +40,13 @@ def imza_cumleler():
 
 
 def _norm(metin):
-    return re.sub(r"[^\w ]", "", metin.lower()).split()
+    metin = metin.lower().replace("nozıl", "nozzle")
+    return re.sub(r"[^\w ]", "", metin).split()
+
+
+def robot_var_mi(sahne_promptu):
+    """Karakter ancak promptta 'robot' kelimesi geçiyorsa sahnededir (yazıcı nozzle'ı ile karışmasın)."""
+    return bool(re.search(r"\brobot\b", sahne_promptu.lower()))
 
 
 def imza_uyarilari(t):
@@ -62,6 +68,9 @@ def yasak_uyarilari(t):
     if re.search(r"\d+\s*(saniye|dakika|dk|sn)[a-zçğıöşü]*\s*(de|da|içinde)?\s*bas", metin):
         uyari.append("Gerçek baskı süresi iddiası olabilir ('X saniyede basılıyor'). Doğru mu, kontrol et; hızlandırılmış video ise öyle yaz.")
     uyari += imza_uyarilari(t)
+    for i, sh in enumerate(t.get("sahneler", []), 1):
+        if sh.get("nozzle_gorunur") and not robot_var_mi(sh.get("sahne_promptu", "")):
+            uyari.append(f"Sahne {i}: Nozzle görünür işaretli ama promptta 'robot' yok; Nozzle tarifi eklenmedi.")
     for sh in t.get("sahneler", []):
         if re.search(r"[^\x00-\u024f\u2000-\u206f\u2190-\u21ff\U0001F000-\U0001FFFF\u2600-\u27bf]", sh.get("sahne_promptu", "")):
             uyari.append("Sahne promptunda İngilizce dışı karakter var (Kiril vb.); video aracına yapıştırmadan önce düzelt.")
@@ -136,7 +145,8 @@ KALİTE KURALLARI:
 - İLK sahnenin seslendirmesi, kanal.md'deki İmza cümleler bölümündeki AÇILIŞ cümlesi olsun (kelimesi kelimesine). SON sahnenin seslendirmesi KAPANIŞ cümlesi olsun. Bu cümleleri değiştirme, çevirme, kısaltma; araya başka cümle ekleme. Aradaki sahneler konuyu anlatsın.
 - sahne_promptu o sahnenin somut eylemini ve görüntüsünü içersin (ör. "close-up of a printer nozzle laying orange filament layer by layer"). Boş ya da genel prompt yazma.
 - sahne_promptu YALNIZCA İngilizce (Latin harfleri) olsun, başka dilden kelime karıştırma.
-- nozzle_gorunur true ise sahne_promptu Nozzle'un NE YAPTIĞINI de söylesin (ör. "Nozzle points at the print bed"); Nozzle sahnede yoksa false yap. Gerçek yazıcının nozzle'ı ile karakter Nozzle'u karıştırma: karakterden "the robot Nozzle", yazıcı parçasından "printer nozzle" diye bahset.
+- nozzle_gorunur true ise sahne_promptu Nozzle'un NE YAPTIĞINI de söylesin (ör. "Nozzle points at the print bed"); Nozzle sahnede yoksa false yap. Karakterden HER ZAMAN "the robot Nozzle", yazıcı parçasından "printer nozzle" diye bahset. Sahnede karakter yoksa "robot" kelimesini hiç kullanma ve nozzle_gorunur'u false yap.
+- Seslendirme metinlerinde karakter adını "Nozzle" diye yaz ("Nozıl" yazma, telaffuzu kod ayarlar).
 - "10 Saniyede Basım" serisi, uzun bir baskının videoda 10 saniyeye HIZLANDIRILMASI demektir. Baskının gerçekten 10 saniyede yapıldığını ASLA iddia etme. Gerçek baskı süresi, gram, maliyet yazma.
 - Kanca merak uyandırsın ama DOĞRU olsun: doğrulanabilir bir rakam (ör. katman sayısı gibi) uydurma; çelişki ya da soru kullan. Yasak sözcükler: mükemmel, harika, muhteşem, eğlenceli, inanılmaz, "biliyor musun".
 - Her zaman 5-8 hashtag döndür.
@@ -201,6 +211,17 @@ def numara_temizle(metin):
     return re.sub(r"^\s*\d+[.)]\s*", "", metin)
 
 
+def video_promptu(sh, nozzle):
+    sp = (sh.get("sahne_promptu") or "").strip()
+    if sp and sp[-1] not in ".!?":
+        sp += "."
+    parcalar = [sp]
+    if sh.get("nozzle_gorunur") and robot_var_mi(sp):
+        parcalar.append(nozzle if nozzle.endswith(".") else nozzle + ".")
+    parcalar.append(VIDEO_SONEKI)
+    return " ".join(p for p in parcalar if p)
+
+
 def markdown_yaz(t, bugun):
     hashtag = " ".join(dict.fromkeys(t.get("hashtagler") or VARSAYILAN_ETIKETLER))
     toplam = sum(int(sh.get("sure_sn") or 0) for sh in t.get("sahneler", []))
@@ -223,8 +244,9 @@ def markdown_yaz(t, bugun):
             f"### Sahne {i} ({sh.get('sure_sn', '?')} sn)",
             f"- **Görsel:** {sh.get('gorsel', '')}",
             f"- **Ekran yazısı:** {sh.get('ekran_yazisi', '')}",
-            f"- **Nozzle der ki:** {sh.get('seslendirme', '')}",
-            f"- **Video promptu (Higgsfield'a yapıştır):** {sh.get('sahne_promptu', '')} {nozzle if sh.get('nozzle_gorunur') else ''} {VIDEO_SONEKI}".replace("  ", " "),
+            f"- **Nozzle der ki:** {re.sub('Nozıl|nozıl', 'Nozzle', sh.get('seslendirme', ''))}",
+            f"- **Ses aracına yapıştır (telaffuzlu):** {re.sub('Nozzle|nozzle|Nozıl|nozıl', 'Nozıl', sh.get('seslendirme', ''))}",
+            f"- **Video promptu (Higgsfield'a yapıştır):** {video_promptu(sh, nozzle)}",
             "",
         ]
     satirlar += [
