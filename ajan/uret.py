@@ -12,11 +12,13 @@ import os
 import pathlib
 import re
 import sys
+import urllib.error
 import urllib.request
 
 KOK = pathlib.Path(__file__).resolve().parent.parent
 TASLAK_DIZINI = KOK / "taslaklar"
-MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+MODEL = os.environ.get("OPENAI_MODEL") or "gpt-4o-mini"
+YEDEK_MODEL = "gpt-4o-mini"
 YZ_SATIRI = "🤖 Nozzle yapay zekâ ile üretilmiş bir karakterdir."
 VARSAYILAN_ETIKETLER = ["#3dprinting", "#3dyazici", "#3dprint", "#nozzle", "#shorts"]
 YASAK_SOZCUKLER = ["mükemmel", "harika", "muhteşem", "eğlenceli", "biliyor musun", "inanılmaz"]
@@ -112,12 +114,12 @@ KALİTE KURALLARI:
     return sistem, kullanici
 
 
-def openai_cagir(sistem, kullanici):
+def _istek(model, sistem, kullanici):
     anahtar = os.environ.get("OPENAI_API_KEY")
     if not anahtar:
         sys.exit("OPENAI_API_KEY ortam değişkeni tanımlı değil.")
     govde = json.dumps({
-        "model": MODEL,
+        "model": model,
         "response_format": {"type": "json_object"},
         "messages": [
             {"role": "system", "content": sistem},
@@ -129,9 +131,28 @@ def openai_cagir(sistem, kullanici):
         data=govde,
         headers={"Content-Type": "application/json", "Authorization": f"Bearer {anahtar}"},
     )
-    with urllib.request.urlopen(istek, timeout=120) as yanit:
+    with urllib.request.urlopen(istek, timeout=180) as yanit:
         veri = json.load(yanit)
     return json.loads(veri["choices"][0]["message"]["content"])
+
+
+def openai_cagir(sistem, kullanici):
+    """Seçilen modeli dener; model bulunamaz ya da parametre reddedilirse yedek modele düşer."""
+    try:
+        sonuc = _istek(MODEL, sistem, kullanici)
+        print(f"Model: {MODEL}")
+        return sonuc
+    except urllib.error.HTTPError as e:
+        if MODEL == YEDEK_MODEL or e.code not in (400, 404):
+            raise
+        try:
+            mesaj = json.loads(e.read().decode("utf-8")).get("error", {}).get("message", "")[:200]
+        except Exception:
+            mesaj = ""
+        print(f"UYARI: '{MODEL}' modeli kullanılamadı (HTTP {e.code}: {mesaj}). Yedek model: {YEDEK_MODEL}")
+        sonuc = _istek(YEDEK_MODEL, sistem, kullanici)
+        print(f"Model: {YEDEK_MODEL} (yedek)")
+        return sonuc
 
 
 def caption_temizle(caption):
