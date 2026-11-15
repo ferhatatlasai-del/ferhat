@@ -18,6 +18,24 @@ KOK = pathlib.Path(__file__).resolve().parent.parent
 TASLAK_DIZINI = KOK / "taslaklar"
 MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
 YZ_SATIRI = "🤖 Nozzle yapay zekâ ile üretilmiş bir karakterdir."
+VARSAYILAN_ETIKETLER = ["#3dprinting", "#3dyazici", "#3dprint", "#nozzle", "#shorts"]
+YASAK_SOZCUKLER = ["mükemmel", "harika", "muhteşem", "eğlenceli", "biliyor musun", "inanılmaz"]
+VIDEO_SONEKI = "Vertical 9:16 short-form video, smooth camera motion, no on-screen text, no logos, no watermark."
+
+
+def nozzle_tarifi():
+    """Nozzle'un sabit görünüm tarifini kanal.md'den alır (tek kaynak)."""
+    m = re.search(r'"(Nozzle: [^"]+)"', oku("ajan/kanal.md"))
+    return m.group(1) if m else "Nozzle: a small friendly cartoon robot with a copper-brass 3D printer nozzle as its head."
+
+
+def yasak_uyarilari(t):
+    """Dolgu sözcüklerini ve boş kancayı bulup taslağın sonuna uyarı olarak yazar."""
+    metin = json.dumps(t, ensure_ascii=False).lower()
+    uyari = [f"Dolgu sözcüğü bulundu: \"{k}\"" for k in YASAK_SOZCUKLER if k in metin]
+    if re.search(r"\d+\s*(saniye|dakika|dk|sn)[a-zçğıöşü]*\s*(de|da|içinde)?\s*bas", metin):
+        uyari.append("Gerçek baskı süresi iddiası olabilir ('X saniyede basılıyor'). Doğru mu, kontrol et; hızlandırılmış video ise öyle yaz.")
+    return uyari
 
 
 def oku(yol):
@@ -71,7 +89,8 @@ JSON şeması:
   "kanca": "ilk 2 saniyede söylenen/yazılan cümle",
   "sahneler": [
     {{"sure_sn": 3, "gorsel": "Türkçe sahne tarifi", "ekran_yazisi": "ekrandaki kısa yazı",
-      "seslendirme": "Nozzle'un söyleyeceği cümle", "video_promptu": "İngilizce, video aracı için; Nozzle görünüm tarifini aynen içerir"}}
+      "seslendirme": "Nozzle'un söyleyeceği cümle", "nozzle_gorunur": true,
+      "sahne_promptu": "İngilizce. SADECE bu sahnede ne olduğunu anlat: özne, hareket, kamera, ışık. Nozzle'un görünüşünü ANLATMA, kod ekler."}}
   ],
   "instagram_caption": "Türkçe, 3-5 kısa satır, sonunda tek çağrı",
   "youtube_baslik": "en fazla 60 karakter",
@@ -82,8 +101,11 @@ JSON şeması:
 }}
 
 KALİTE KURALLARI:
-- 4-7 sahne, toplam süre sure_sn ile uyumlu. Her sahnenin video_promptu Nozzle'un görünüm tarifini kelimesi kelimesine içersin.
-- Kanca merak uyandırsın: rakam, çelişki ya da şaşırtıcı bir iddia. "Biliyor musun?" ve "mükemmel/harika" gibi dolgu yok.
+- 4-7 sahne; sahne sürelerinin TOPLAMI sure_sn'ye eşit olsun.
+- sahne_promptu o sahnenin somut eylemini ve görüntüsünü içersin (ör. "close-up of a printer nozzle laying orange filament layer by layer"). Boş ya da genel prompt yazma.
+- "10 Saniyede Basım" serisi, uzun bir baskının videoda 10 saniyeye HIZLANDIRILMASI demektir. Baskının gerçekten 10 saniyede yapıldığını ASLA iddia etme. Gerçek baskı süresi, gram, maliyet yazma.
+- Kanca merak uyandırsın ama DOĞRU olsun: doğrulanabilir bir rakam (ör. katman sayısı gibi) uydurma; çelişki ya da soru kullan. Yasak sözcükler: mükemmel, harika, muhteşem, eğlenceli, inanılmaz, "biliyor musun".
+- Her zaman 5-8 hashtag döndür.
 - Gösterilen nesne gerçekten 3D yazıcıyla basılabilir olsun. Belirli bir model adı, tasarımcı, süre, gram ya da fiyat UYDURMA.
 - Caption ve açıklamalara hashtag YAZMA ve yapay zekâ açıklaması YAZMA (kod ekler). Sahnelere numara yazma.
 - Üç platform metni birbirinin kopyası olmasın; YouTube başlığı arama odaklı, Instagram ve Facebook daha samimi olsun."""
@@ -127,13 +149,15 @@ def numara_temizle(metin):
 
 
 def markdown_yaz(t, bugun):
-    hashtag = " ".join(dict.fromkeys(t.get("hashtagler", [])))
+    hashtag = " ".join(dict.fromkeys(t.get("hashtagler") or VARSAYILAN_ETIKETLER))
+    toplam = sum(int(sh.get("sure_sn") or 0) for sh in t.get("sahneler", []))
+    nozzle = nozzle_tarifi()
     satirlar = [
         f"# {t['konu']}",
         "",
         f"- **Tarih:** {bugun}",
         f"- **Seri:** {t.get('seri', '')}",
-        f"- **Süre:** {t.get('sure_sn', '')} sn, dikey 9:16",
+        f"- **Süre:** {toplam} sn (sahne toplamı), dikey 9:16",
         "- **Durum:** onay bekliyor",
         "",
         "## Kanca",
@@ -147,7 +171,7 @@ def markdown_yaz(t, bugun):
             f"- **Görsel:** {sh.get('gorsel', '')}",
             f"- **Ekran yazısı:** {sh.get('ekran_yazisi', '')}",
             f"- **Nozzle der ki:** {sh.get('seslendirme', '')}",
-            f"- **Video promptu:** {sh.get('video_promptu', '')}",
+            f"- **Video promptu (Higgsfield'a yapıştır):** {sh.get('sahne_promptu', '')} {nozzle if sh.get('nozzle_gorunur') else ''} {VIDEO_SONEKI}".replace("  ", " "),
             "",
         ]
     satirlar += [
@@ -170,6 +194,9 @@ def markdown_yaz(t, bugun):
         "## Model / lisans notu",
         t.get("model_notu", ""),
     ]
+    uyarilar = yasak_uyarilari(t)
+    if uyarilar:
+        satirlar += ["", "## ⚠ Kontrol et"] + [f"- {u}" for u in uyarilar]
     return "\n".join(satirlar) + "\n"
 
 
