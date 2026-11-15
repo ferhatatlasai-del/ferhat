@@ -98,6 +98,29 @@ def imza_uyarilari(t):
 LATIN_DISI = re.compile(r"[^\x00-ɏ -⁯←-⇿\U0001F000-\U0001FFFF☀-➿]")
 
 
+KARMASIK_MEKANIZMA = re.compile(r"hinge|fold|articulat|flex|spring|gear|mechanism|chain", re.I)
+
+
+def carousel_uyarilari(t, slaytlar):
+    """Seri ve slayt düzeni, karakter dağılımı, metin uzunluğu ve basılabilirlik denetimi."""
+    uyari = []
+    seri = (t.get("seri") or "").lower()
+    if "5 şey" in seri and len(slaytlar) != 7:
+        uyari.append(f"'Basılabilir 5 Şey' serisi tam 7 slayt olmalı (kanca + 5 nesne + çağrı); {len(slaytlar)} slayt var.")
+    karakterli = [i for i, sl in enumerate(slaytlar, 1) if sl.get("karakter_gorunur")]
+    if len(karakterli) > 3 or (karakterli and len(slaytlar) > 2 and len(karakterli) == len(slaytlar)):
+        uyari.append(f"Karakter {len(karakterli)} slaytta görünüyor; yalnızca ilk ve son slaytta olmalı, ortada nesne yakın planı olmalı.")
+    for i, sl in enumerate(slaytlar, 1):
+        kelime = len((sl.get("metin") or "").split())
+        if kelime > 12:
+            uyari.append(f"Slayt {i}: metin {kelime} kelime, en fazla 12 olmalı.")
+    if slaytlar and slaytlar[0].get("metin", "").strip().endswith("?") and len(slaytlar[0]["metin"].split()) < 6:
+        uyari.append("1. slayt metni kısa bir soru: tek başına anlaşılıyor mu, net bir vaat içeriyor mu, kontrol et.")
+    if any(KARMASIK_MEKANIZMA.search(sl.get("gorsel_promptu") or "") for sl in slaytlar):
+        uyari.append("Menteşe, katlama, zincir gibi karmaşık bir mekanizma var: yapay zekâ görseli yanlış çizebilir, görselin gerçekten basılabilir göründüğünü kontrol et.")
+    return uyari
+
+
 def yasak_uyarilari(t):
     """Dolgu sözcüğü, yanlış süre iddiası, imza uyumu, yabancı karakter ve karakter tutarlılığı denetimi."""
     t_ = {k: v for k, v in t.items() if k not in ("seri", "konu", "format")}
@@ -113,8 +136,10 @@ def yasak_uyarilari(t):
         ogeler = [(f"Sahne {i}", sh.get("sahne_promptu", ""), sh.get("karakter_gorunur"))
                   for i, sh in enumerate(t.get("sahneler") or [], 1)]
     else:
+        slaytlar = t.get("slaytlar") or []
         ogeler = [(f"Slayt {i}", sl.get("gorsel_promptu", ""), sl.get("karakter_gorunur"))
-                  for i, sl in enumerate(t.get("slaytlar") or [], 1)]
+                  for i, sl in enumerate(slaytlar, 1)]
+        uyari += carousel_uyarilari(t, slaytlar)
     for ad, prompt, gorunur in ogeler:
         if gorunur and not karakter_var_mi(prompt):
             uyari.append(f"{ad}: karakter görünür işaretli ama promptta 'Doctor Filament' yok; karakter tarifi eklenmedi.")
@@ -173,7 +198,11 @@ JSON şeması (kullanılmayan alanı boş liste bırak):
 }}
 
 KALİTE KURALLARI:
-- format "carousel" ise 6-8 slayt üret, "sahneler" boş kalsın. 1. slayt güçlü kanca, son slayt yorum çağrısı (kapanış cümlesine yakın). Slayt metni en fazla 12 kelime.
+- format "carousel" ise "sahneler" boş kalsın. Slayt metni en fazla 12 kelime.
+  * seri "Basılabilir 5 Şey" ise TAM 7 slayt: 1. slayt kanca, 2-6. slaytlar BEŞ FARKLI basılabilir nesne (her slayt bir nesne, tek nesneyi yedi slaytta anlatma), 7. slayt yorum çağrısı (kapanış cümlesine yakın).
+  * seri "Doktor Notu" ise 6-7 slayt: sorun/merak, tek ipucunun adımları, çağrı. "Katman Katman" ise 6-8 slayt: bir nesnenin oluşumu adım adım.
+  * Karakter yalnızca 1. ve son slaytta görünsün (karakter_gorunur true); ortadaki slaytlar nesnenin yakın planı olsun (karakter_gorunur false, promptta "Doctor Filament" adı geçmesin).
+  * 1. slayt metni TEK BAŞINA anlaşılır, net bir vaat ya da merak olsun. Belirsiz kısa soru yazma.
 - format "reels" ise 4-7 sahne üret, "slaytlar" boş kalsın. Sahne sürelerinin TOPLAMI sure_sn'ye eşit olsun.
 - Reels'te İLK sahnenin seslendirmesi İmza cümleler bölümündeki AÇILIŞ cümlesi, SON sahnenin seslendirmesi KAPANIŞ cümlesi olsun (kelimesi kelimesine, değiştirme, kısaltma, çevirme, araya ekleme yapma). Aradaki sahneler konuyu anlatsın.
 - gorsel_promptu ve sahne_promptu YALNIZCA İngilizce (Latin harfleri) olsun, somut eylem ve görüntü içersin, boş ya da genel olmasın. Görselde yazı isteme.
@@ -182,6 +211,7 @@ KALİTE KURALLARI:
 - Kanca doğru ve merak uyandıran olsun: doğrulanabilir bir rakam (ör. katman sayısı) uydurma; çelişki ya da soru kullan. Yasak sözcükler: mükemmel, harika, muhteşem, eğlenceli, inanılmaz, "biliyor musun".
 - Gösterilen nesne gerçekten 3D yazıcıyla basılabilir olsun. Belirli model adı, tasarımcı, süre, gram, fiyat UYDURMA. "10 saniyede basılıyor" gibi gerçek baskı süresi iddiası YASAK.
 - Caption ve açıklamalara hashtag YAZMA ve yapay zekâ açıklaması YAZMA (kod ekler). Slayt ve sahne metinlerine numara yazma. Her zaman 5-8 hashtag döndür.
+- Türkçe doğal konuşma dilinde olsun; çeviri gibi ya da anlamsız kalıp cümleler yazma (ör. "en sessiz yardımcı", "baskı devreye girer"). Yüksek sesle okuyunca doğal durmayan cümleyi sadeleştir.
 - Üç platform metni birbirinin kopyası olmasın; YouTube başlığı arama odaklı, Instagram ve Facebook daha samimi olsun."""
     return sistem, kullanici
 
@@ -307,7 +337,8 @@ def markdown_yaz(t, bugun):
         "",
         hashtag,
         "",
-        "## YouTube Shorts",
+        "## YouTube Shorts" + (" (slayt gösterisi videosu olarak)" if bicim != "reels" else ""),
+        *(["Not: Carousel video değildir. YouTube için slaytlar Claude'a yüklenir, yazı eklenip dikey bir slayt gösterisi videosuna çevrilir."] if bicim != "reels" else []),
         f"**Başlık:** {(t.get('youtube_baslik') or '')[:100]}",
         "",
         caption_temizle(t.get("youtube_aciklama", "")),
