@@ -16,6 +16,7 @@ jobs:
       - name: Hesap durumunu çek (anahtar yoksa atlanır)
         env:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: "17841457188392262"
         run: python3 ajan/istatistik.py
       - name: Taslak üret
         env:
