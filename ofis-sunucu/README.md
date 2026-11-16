@@ -17,3 +17,11 @@ Ofis sayfasını sunar ve GitHub'daki içerik ajanını (`icerik-direktif.yml`) 
 5. GitHub > Actions > "Ajan Ofisi'ni Fly'a yükle" > onay kutusuna `EVET`.
 
 Her komutta `-a gurtechs-ajan-ofisi` yaz; yanlış uygulamaya dokunma.
+
+## Panelden video yayınlama
+- Panelde "Video yayınla" kartı: MP4 seç (en fazla 30 MB), önizle, yükle, başlık ve açıklama yaz, onay kutusundan sonra yayınla.
+- Sunucu videoyu ve metinleri depoya kaydeder (`videolar/yukleme_*.mp4`, `yayin/yukleme_*_instagram.txt`, `_youtube.txt`) ve mevcut `yayinla.yml` ile `youtube-yukle.yml` iş akışlarını `onay=EVET` ile çalıştırır.
+- Açıklamaya "Doktor Filament yapay zekâ ile üretilmiş bir karakterdir." satırı kodla eklenir, YouTube için #Shorts da.
+- Saatte en fazla 6 yayın. Onay verilmeden hiçbir şey yayınlanmaz.
+- **GitHub anahtarında `Contents: Read and write` izni gerekir** (videoyu depoya kaydetmek için). Anahtar yalnızca bu depoya erişir.
+- Not: Depo herkese açıksa yüklenen video, yayınlanmadan önce de depoda görünür.
