@@ -1,0 +1,71 @@
+{
+  "konu": "Tek Parça Kapaklı Mini Kutu Mucizesi",
+  "format": "reels",
+  "seri": "Katman Katman",
+  "kanca": "Kapağı ayrı değil. Menteşesi de ayrı değil.",
+  "slaytlar": [],
+  "sure_sn": 24,
+  "sahneler": [
+    {
+      "sure_sn": 5,
+      "gorsel": "Doktor Filament, tezgâhta tek parça basılmış kapaklı mini kutuyu eline alıyor; atölye arka planda yumuşak mor-pembe ışıkta bulanık.",
+      "ekran_yazisi": "Kapağı ayrı değil. Menteşesi de ayrı değil.",
+      "seslendirme": "Merhaba, ben Doktor Filament! Yapay zekâyım, tek hastalığım katman katman merak!",
+      "karakter_gorunur": true,
+      "sahne_promptu": "Doctor Filament holds a single-piece 3D printed mini box with an integrated lid hinge on a workbench, tidy 3D printing workshop, colorful filament spools and printers blurred in the background, soft purple and pink lighting, cinematic close-up"
+    },
+    {
+      "sure_sn": 5,
+      "gorsel": "Tek parça kutunun kapak çizgisi ve menteşe bölgesi yakın planda gösteriliyor.",
+      "ekran_yazisi": "Her şey tek baskıda birleşiyor.",
+      "seslendirme": "Burada ayrı parça yok. Kapak, gövdeyle birlikte doğuyor.",
+      "karakter_gorunur": false,
+      "sahne_promptu": "Close-up macro shot of a single-piece printable mini box, integrated lid and hinge area visible, clean surface, workshop lighting, shallow depth of field"
+    },
+    {
+      "sure_sn": 5,
+      "gorsel": "Kutu kapağı parmakla açılıyor, menteşe tek parça olarak esniyor.",
+      "ekran_yazisi": "Menteşe esner, kutu açılır.",
+      "seslendirme": "İnce boşluklar sayesinde parça sıkışmadan hareket eder.",
+      "karakter_gorunur": false,
+      "sahne_promptu": "Macro shot of a print-in-place hinge on a mini box opening smoothly by hand, visible layer lines, no separate hardware, soft workshop background"
+    },
+    {
+      "sure_sn": 5,
+      "gorsel": "Kutunun içi ve birleşim noktaları yakın planda, temiz detaylar vurgulanıyor.",
+      "ekran_yazisi": "Destek değil, doğru boşluk lazım.",
+      "seslendirme": "Destek istemez. Ama tolerans ister. Küçük farklar işi çözer.",
+      "karakter_gorunur": false,
+      "sahne_promptu": "Detailed close-up of the inside edge and hinge clearance of a print-in-place box, technical product-style lighting, crisp focus on the mechanism"
+    },
+    {
+      "sure_sn": 4,
+      "gorsel": "Kutunun yanında başka küçük basılabilir günlük parçalar kısa kısa görünür, atölye düzenli.",
+      "ekran_yazisi": "Bu fikir küçük ama akıllı.",
+      "seslendirme": "Bazen en tatlı sürpriz, tek parçada saklanır.",
+      "karakter_gorunur": false,
+      "sahne_promptu": "Small print-in-place box resting beside other simple 3D printed workshop objects, neat desk, colorful filament spools blurred, soft purple pink glow"
+    },
+    {
+      "sure_sn": 5,
+      "gorsel": "Doktor Filament kutuyu kameraya doğru uzatıyor, arka plan yine atölye.",
+      "ekran_yazisi": "Sıradaki baskı ne olsun?",
+      "seslendirme": "Sıradaki baskı ne olsun? Yorumlara yaz, reçeteyi ben yazayım!",
+      "karakter_gorunur": true,
+      "sahne_promptu": "Doctor Filament presents the finished single-piece mini box toward the camera in a tidy 3D printing workshop, warm smile, blurred printers and filament spools behind, soft purple and pink lighting"
+    }
+  ],
+  "instagram_caption": "Kapağı ayrı değil.\nMenteşesi de ayrı değil.\n\nTek parça kutu fikri tam böyle bir şey.\n\nYorumlara sıradaki baskıyı yaz.",
+  "youtube_baslik": "Tek Parça Kapaklı Mini Kutu Nasıl Çalışır?",
+  "youtube_aciklama": "Bu videoda tek baskıda çalışan kapaklı mini kutunun mantığını kısa kısa görüyoruz. Print-in-place menteşe neden bazen sorunsuz, bazen nazlı olur; Doktor Filament anlatıyor.",
+  "facebook_caption": "Tek parça basılan bir kutu, kapak ve menteşeyi ayrı parçaya ihtiyaç duymadan bir araya getiriyor.\n\nKüçük gibi duruyor, ama mekanizma tarafı çok tatlı.\n\nSıradaki fikri yorum bırak.",
+  "hashtagler": [
+    "#3dyazıcı",
+    "#3dbaskı",
+    "#printinplace",
+    "#doktorfilament",
+    "#gurtechs3d",
+    "#3dprintturkiye"
+  ],
+  "model_notu": "CC0 veya CC BY lisanslı, print-in-place menteşeli küçük kutu modeli ara; ya da kendi çizdiğin basit kutu formunda, ayrı destek istemeyen tek parça kapak/menteşe geometrisi kullan. Ticari olmayan lisanslardan kaçın."
+}
