@@ -7,7 +7,8 @@ const crypto = require('crypto');
 
 const PORT = +process.env.PORT || 3000;
 const REPO = process.env.GH_REPO || 'ferhatatlasai-del/ferhat';
-const TOKEN = process.env.GITHUB_TOKEN || '';
+// Anahtarın başındaki/sonundaki boşluk, satır sonu ve tırnakları temizle (komut satırından gelebiliyor)
+const TOKEN = (process.env.GITHUB_TOKEN || '').trim().replace(/^["']+|["']+$/g, '').trim();
 const SIFRE = process.env.PANEL_SIFRE || '';
 const AKIS = 'icerik-direktif.yml';
 const PUBLIC = path.join(__dirname, 'public');
@@ -105,5 +106,11 @@ http.createServer(async (req, res) => {
       res.writeHead(200, { 'Content-Type': TURLER[path.extname(dosya)] || 'application/octet-stream', 'Cache-Control': 'no-cache' });
       res.end(d);
     });
-  } catch (e) { json(res, 500, { hata: 'Sunucu hatası.' }); }
+  } catch (e) {
+    const m = String((e && e.message) || e);
+    const guvenli = TOKEN ? m.split(TOKEN).join('***') : m;
+    console.error('hata:', e && e.name, guvenli.slice(0, 300));
+    const gecersiz = /invalid header|ERR_INVALID_CHAR/i.test(m);
+    json(res, 500, { hata: gecersiz ? 'GitHub anahtarında geçersiz karakter var. Anahtarı yeniden kaydet.' : 'Sunucu hatası (' + ((e && e.name) || '?') + ').' });
+  }
 }).listen(PORT, () => console.log('Ajan ofisi dinliyor: ' + PORT));
