@@ -1,0 +1,35 @@
+name: Ajan Ofisi'ni Fly'a yükle
+
+on:
+  workflow_dispatch:
+    inputs:
+      onay:
+        description: "Gerçekten yüklemek için EVET yaz. Başka bir şey yazarsan yalnızca kontrol edilir."
+        default: "HAYIR"
+
+permissions:
+  contents: read
+
+jobs:
+  yukle:
+    runs-on: ubuntu-latest
+    env:
+      UYGULAMA: gurtechs-ajan-ofisi
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      ONAY: ${{ inputs.onay }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Uygulama adını doğrula (Kalıp Takip'e asla dokunma)
+        run: |
+          if [ "$UYGULAMA" = "alkor-kalip-sistem" ]; then echo "Bu uygulamaya dokunulmaz."; exit 1; fi
+          grep -q "^app = \"$UYGULAMA\"" ofis-sunucu/fly.toml || { echo "fly.toml uygulama adı uyuşmuyor."; exit 1; }
+          if [ -z "$FLY_API_TOKEN" ]; then echo "FLY_API_TOKEN gizli anahtarı yok."; exit 1; fi
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Kontrol ya da yükleme
+        run: |
+          if [ "$ONAY" = "EVET" ]; then
+            flyctl deploy --remote-only --config ofis-sunucu/fly.toml --dockerfile ofis-sunucu/Dockerfile -a "$UYGULAMA" ofis-sunucu
+          else
+            echo "KONTROL MODU: yüklenmedi. Uygulama: $UYGULAMA"
+            flyctl status -a "$UYGULAMA" || true
+          fi

@@ -148,7 +148,21 @@ def yasak_uyarilari(t):
     return uyari
 
 
-def prompt_olustur(bugun):
+def direktif_blogu(direktif):
+    """Kanal sahibinin o güne özel isteği. Kanal kurallarını (yapay zekâ açıklaması, güvenlik, lisans) aşamaz."""
+    direktif = " ".join((direktif or "").split())[:500]
+    if not direktif:
+        return ""
+    return (
+        "# SAHİBİN BUGÜNKÜ DİREKTİFİ\n"
+        f"\"{direktif}\"\n"
+        "Bu istek konuyu ve tarzı belirler. Yukarıdaki kanal profilindeki kuralları (yapay zekâ karakteri açıklaması, "
+        "sağlık iddiası olmaması, basılabilir nesneler, ücretsiz lisans, marka logosu olmaması) asla aşma. "
+        "Başkasının içeriğini kopyalama; yalnızca tarzdan ve konu başlığından esinlen.\n\n"
+    )
+
+
+def prompt_olustur(bugun, direktif=""):
     sistem = (
         "Sen sosyal medya içerik ajanısın. Kanal profiline ve stratejiye kesinlikle uy. "
         "Yalnızca geçerli JSON döndür."
@@ -168,7 +182,7 @@ def prompt_olustur(bugun):
 # SON İÇERİKLER (konuyu ve formatı tekrar etme)
 {json.dumps(gecmis_konular(), ensure_ascii=False)}
 
-# GÖREV
+{direktif_blogu(direktif)}# GÖREV
 Bugünün tarihi: {bugun}. Bugün için TEK bir içerik planı üret. Format "carousel" ya da "reels" olabilir;
 son içeriklere bakarak formatı ve seriyi değiştir (aynısını art arda üretme). Video klip kredisi sınırlı olduğu için
 emin değilsen "carousel" seç.
@@ -360,17 +374,21 @@ def markdown_yaz(t, bugun):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry-run", action="store_true", help="API çağırma, sadece prompt'u yazdır")
+    ap.add_argument("--direktif", default="", help="Sahibinin o güne özel isteği (isteğe bağlı)")
     args = ap.parse_args()
 
     bugun = datetime.date.today().isoformat()
-    sistem, kullanici = prompt_olustur(bugun)
+    sistem, kullanici = prompt_olustur(bugun, args.direktif)
     if args.dry_run:
         print(sistem, "\n---\n", kullanici)
         return
 
     taslak = openai_cagir(sistem, kullanici)
     TASLAK_DIZINI.mkdir(exist_ok=True)
-    cikti = TASLAK_DIZINI / f"{bugun}.md"
+    if args.direktif.strip():
+        cikti = TASLAK_DIZINI / f"{bugun}_direktif_{datetime.datetime.now(datetime.timezone.utc):%H%M%S}.md"
+    else:
+        cikti = TASLAK_DIZINI / f"{bugun}.md"
     cikti.write_text(markdown_yaz(taslak, bugun), encoding="utf-8")
     print(f"Taslak yazıldı: {cikti.relative_to(KOK)}")
 
