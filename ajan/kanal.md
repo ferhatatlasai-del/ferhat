@@ -26,10 +26,17 @@ Yapay zekâ ile üretilmiş, insan görünümlü kurgusal bir mucit. Gerçek bir
 3. **Katman Katman:** Bir nesnenin nasıl oluştuğunu sade anlatan kısa içerik.
 
 ## Format kuralları
-- **Carousel (Instagram):** 6-8 slayt, dikey 4:5. 1. slayt güçlü kanca, son slayt yorum çağrısı. Her slaytta tek fikir, kısa metin (en fazla 12 kelime).
+- **Carousel (Instagram):** dikey 4:5. Her slaytta tek fikir, kısa metin (en fazla 12 kelime).
+  - **Basılabilir 5 Şey:** TAM 7 slayt. 1. slayt kanca, 2-6. slaytlar BEŞ FARKLI basılabilir nesne (her slayt bir nesne), 7. slayt yorum çağrısı. Tek bir nesneyi yedi slaytta anlatma.
+  - **Doktor Notu:** 6-7 slayt. 1. slayt sorun ya da merak, ortada tek ipucunun adımları, son slayt çağrı.
+  - **Katman Katman:** 6-8 slayt. Bir nesnenin oluşumunu adım adım anlatır.
+  - **Karakter dağılımı:** Doktor Filament yalnızca 1. ve son slaytta görünür (ya da en fazla bir ortadaki slaytta). Ortadaki slaytlar nesnenin yakın planıdır, karakter yoktur (karakter_gorunur false).
+  - **1. slayt metni tek başına anlaşılır olmalı:** net bir vaat ya da merak. Belirsiz soru ("Kitap neden eğiliyor?") kullanma.
 - **Reels / Shorts:** 15-30 saniye, dikey 9:16. İlk 2 saniyede kanca. Sahneler sabit görsellerden ya da kısa kliplerden oluşabilir.
 - Son birkaç içeriğe bakarak formatı ve seriyi DEĞİŞTİR; aynısını art arda üretme.
 - Dolgu sözcükleri kullanma ("mükemmel", "harika", "muhteşem").
+- **Doğal konuşma Türkçesi:** Çeviri gibi ya da anlamsız kalıp cümleler yazma ("en sessiz yardımcı", "baskı devreye girer" gibi). Cümleyi yüksek sesle okuyunca doğal duruyorsa kullan, durmuyorsa sadeleştir.
+- **YouTube:** Carousel video değildir; YouTube Shorts için carousel'in slaytları bir slayt gösterisi videosuna çevrilir. Bu yüzden YouTube metni o video için yazılır.
 
 ## Dürüstlük ve güvenlik kuralları
 - **Görseldeki nesne gerçekte 3D yazıcıyla basılabilir olmalı.** Fiziksel olarak imkansız ya da var olmayan "ürün" gösterme.

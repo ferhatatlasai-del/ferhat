@@ -1,0 +1,39 @@
+name: YouTube'a yükle (Shorts)
+
+on:
+  workflow_dispatch:
+    inputs:
+      video:
+        description: "Depodaki video yolu"
+        default: "videolar/doktor_filament_acilis_v2.mp4"
+      metin:
+        description: "Başlık ve açıklama dosyası (ilk satır başlık)"
+        default: "yayin/doktor_filament_youtube.txt"
+      gizlilik:
+        description: "public, unlisted ya da private"
+        default: "public"
+      onay:
+        description: "Gerçekten yüklemek için EVET yaz. Başka bir şey yazarsan yalnızca bağlantı kontrol edilir, yüklenmez."
+        default: "HAYIR"
+
+permissions:
+  contents: read
+
+jobs:
+  youtube:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Yükleme (onay EVET değilse yalnızca kontrol)
+        env:
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          VIDEO: ${{ inputs.video }}
+          METIN: ${{ inputs.metin }}
+          GIZLILIK: ${{ inputs.gizlilik }}
+          ONAY: ${{ inputs.onay }}
+        run: |
+          EK=""
+          if [ "$ONAY" = "EVET" ]; then EK="--yukle"; fi
+          python3 ajan/youtube_yukle.py --video "$VIDEO" --metin-dosyasi "$METIN" --gizlilik "$GIZLILIK" $EK
