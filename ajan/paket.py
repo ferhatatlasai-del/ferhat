@@ -25,10 +25,14 @@ import uret  # noqa: E402
 KOK = uret.KOK
 MAKS_KLIP_SN = 8
 MAKS_KELIME_SN = 2.6
+HEDEF_KELIME_SN = 2.3   # süreyi uzatırken kullanılan rahat konuşma hızı
+import re  # noqa: E402
+PARCA = re.compile(r"hinge|latch|lid|clasp|mechanism|gear|spring|joint|flap", re.I)
+HAREKET = re.compile(r"flex\w*|snapp\w*|open(?:ing|s)\b|clos(?:ing|es)\b|shut|slid\w*|rotat\w*|fold\w*|swing\w*|press\w*|moving|unlock\w*", re.I)
 
 
 def reels_paketi(t, persona):
-    sahneler, uyarilar = [], []
+    sahneler, uyarilar, notlar, mekanik = [], [], [], []
     for i, sh in enumerate(t.get("sahneler") or [], 1):
         sure = int(sh.get("sure_sn") or 0)
         konusma = (sh.get("seslendirme") or "").strip()
@@ -36,14 +40,27 @@ def reels_paketi(t, persona):
         prompt = uret.video_promptu(sh, persona)
         if not (sh.get("sahne_promptu") or "").strip():
             uyarilar.append(f"Sahne {i}: sahne promptu boş.")
+        # Konuşma süreye sığmıyorsa süreyi (8 sn'yi aşmadan) uzat; imza cümleleri sabit olduğu için kısaltmak yerine bu yapılır
+        if sure and kelime / sure > MAKS_KELIME_SN:
+            gereken = -(-int(kelime / HEDEF_KELIME_SN * 10) // 10)
+            gereken = max(sure + 1, int(kelime / HEDEF_KELIME_SN + 0.999))
+            if gereken <= MAKS_KLIP_SN:
+                notlar.append(f"Sahne {i}: konuşma ({kelime} kelime) {sure} sn'ye sığmıyordu, süre {gereken} sn'ye çıkarıldı.")
+                sure = gereken
+            else:
+                uyarilar.append(f"Sahne {i}: {kelime} kelime {MAKS_KLIP_SN} sn'ye bile sığmaz. Konuşmayı kısalt ya da sahneyi ikiye böl.")
         if sure > MAKS_KLIP_SN:
             uyarilar.append(f"Sahne {i}: {sure} sn. Video araçları klipleri genelde {MAKS_KLIP_SN} sn üretir; bu sahneyi ikiye böl.")
-        if sure and kelime / sure > MAKS_KELIME_SN:
-            uyarilar.append(f"Sahne {i}: {kelime} kelime {sure} sn'ye sığmaz (en fazla ~{int(sure * MAKS_KELIME_SN)} kelime). Konuşmayı kısalt.")
+        sp = sh.get("sahne_promptu") or ""
+        if PARCA.search(sp) and HAREKET.search(sp):
+            mekanik.append(i)
         sahneler.append({"no": i, "sure_sn": sure, "gorsel": sh.get("gorsel", ""), "ekran_yazisi": sh.get("ekran_yazisi", ""),
                          "seslendirme": konusma, "prompt": prompt, "karakter": bool(sh.get("karakter_gorunur"))})
+    if mekanik:
+        uyarilar.append("Sahne " + ", ".join(map(str, mekanik)) + ": mekanik hareket (menteşe, kilit, kapak). Video modelleri bunu çoğu zaman fiziksel olarak "
+                        "mümkün olmayacak biçimde çizer. Kısa, tek hareketli, yakın plan iste; sonuç gerçekçi değilse sahneyi çıkar ya da gerçek bir baskıyı çek.")
     toplam = sum(s["sure_sn"] for s in sahneler)
-    return {"tur": "reels", "toplam_sn": toplam, "sahneler": sahneler, "uyarilar": uyarilar}
+    return {"tur": "reels", "toplam_sn": toplam, "sahneler": sahneler, "uyarilar": uyarilar, "notlar": notlar}
 
 
 def carousel_paketi(t, persona):
@@ -64,6 +81,8 @@ def okunur(kayit, p):
     else:
         for sl in p["slaytlar"]:
             s += ["", f"## Slayt {sl['no']}: {sl['baslik']}", f"- Yazı: {sl['metin']}", "", "Prompt:", sl["prompt"]]
+    if p.get("notlar"):
+        s += ["", "## Notlar"] + [f"- {n}" for n in p["notlar"]]
     if p["uyarilar"]:
         s += ["", "## Uyarılar"] + [f"- {u}" for u in p["uyarilar"]]
     return "\n".join(s) + "\n"
@@ -77,6 +96,8 @@ def isle(kimlik):
     persona = uret.persona_tarifi()
     p = reels_paketi(t, persona) if t.get("format") == "reels" else carousel_paketi(t, persona)
     kayit["paket"] = p
+    if t.get("model_notu"):
+        kayit["model_notu"] = t["model_notu"]
     kayit_yolu.write_text(json.dumps(kayit, ensure_ascii=False, indent=2), encoding="utf-8")
     (dizin / f"{kimlik}_paket.md").write_text(okunur(kayit, p), encoding="utf-8")
     n = len(p.get("sahneler") or p.get("slaytlar") or [])

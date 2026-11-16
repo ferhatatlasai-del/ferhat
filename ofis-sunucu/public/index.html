@@ -918,6 +918,7 @@ function paketCiz(p,kayit){
     kap.appendChild(b);
     tum.push(baslik+'\n'+(yazi?'Yazı: '+yazi+'\n':'')+(p.tur==='reels'&&x.seslendirme?'Konuşma: '+x.seslendirme+'\n':'')+'Prompt: '+x.prompt);
   });
+  (p.notlar||[]).forEach(function(n){ kap.appendChild(dom('div','not','• '+n)); });
   (p.uyarilar||[]).forEach(function(u){ kap.appendChild(dom('div','uyari','⚠ '+u)); });
   var tb=dom('button','mini','Tüm paketi kopyala'); tb.type='button'; tb.addEventListener('click',function(){kopyala(kayit.konu+'\n\n'+tum.join('\n\n'),tb);}); kap.appendChild(tb);
   return kap;
@@ -950,6 +951,7 @@ function zincirCiz(z){
     if(k.elestiri&&k.elestiri.puan!=null) satir('Öz eleştiri',(k.elestiri.ilk_puan!=null?'ilk '+k.elestiri.ilk_puan+'/10, son taslak ':'')+k.elestiri.puan+'/10'+(k.elestiri.turlar?' ('+k.elestiri.turlar+' tur)':'')+', düzeltme '+(k.elestiri.uygulandi?'uygulandı':'uygulanmadı'));
     if(k.trend&&k.trend.tarih) satir('Trend araştırması',fmt(k.trend.tarih)+(k.trend.yenilendi?' (bu zincirde yenilendi)':''));
     if(k.not) satir('Not',k.not);
+    if(k.model_notu) satir('Hangi modeli basmalı',k.model_notu);
     if(k.taslak&&z.depo&&z.dal){ var ta=dom('div'); ta.appendChild(dom('b',null,'Taslak')); var a=dom('a',null,k.taslak); a.href='https://github.com/'+z.depo+'/blob/'+z.dal+'/'+k.taslak; a.target='_blank'; a.rel='noopener noreferrer'; ta.appendChild(a); g.appendChild(ta); }
     if(k.paket){ var pb=dom('div'); pb.appendChild(dom('b',null,'Video paketi (yapay zekâ video aracına yapıştır)')); pb.appendChild(paketCiz(k.paket,k)); g.appendChild(pb); }
     (k.yayinlar||[]).forEach(function(y){
