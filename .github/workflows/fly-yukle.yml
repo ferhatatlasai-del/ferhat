@@ -28,7 +28,8 @@ jobs:
       - name: Kontrol ya da yükleme
         run: |
           if [ "$ONAY" = "EVET" ]; then
-            flyctl deploy --remote-only --config ofis-sunucu/fly.toml --dockerfile ofis-sunucu/Dockerfile -a "$UYGULAMA" ofis-sunucu
+            cd ofis-sunucu
+            flyctl deploy --remote-only -a "$UYGULAMA"
           else
             echo "KONTROL MODU: yüklenmedi. Uygulama: $UYGULAMA"
             flyctl status -a "$UYGULAMA" || true
