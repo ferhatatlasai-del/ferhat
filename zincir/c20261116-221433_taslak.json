@@ -1,0 +1,65 @@
+{
+  "konu": "Tek parça açılan mini pense kutu",
+  "format": "carousel",
+  "seri": "Basılabilir 5 Şey",
+  "kanca": "Vida yok. Ayrı kapak yok. Bir anda açılan kutu var.",
+  "slaytlar": [
+    {
+      "baslik": "Tek parça kutu",
+      "metin": "Vida yok, kapak yok; tek baskıda açılan kutu.",
+      "karakter_gorunur": true,
+      "gorsel_promptu": "Doctor Filament: a fictional, eccentric but friendly inventor character, photorealistic, wearing a gray 3D-printed horned headpiece with visible layer lines, round gray 3D-printed glasses frames, a high-collared gray jacket with colorful wires and small circuit-board details, colorful headphones around his neck and small gold earrings, warm smile, expressive eyes, in a tidy 3D printing workshop with colorful filament spools and printers with soft purple and pink lighting blurred in the background. Doctor Filament standing in a tidy 3D printing workshop, presenting a small print-in-place box that opens in one piece, soft purple and pink lighting, blurred filament spools and printers in the background, vertical 4:5 composition, room for text in the lower third"
+    },
+    {
+      "baslik": "Menteşe sürprizi",
+      "metin": "İçindeki menteşe ayrı parça değil.",
+      "karakter_gorunur": false,
+      "gorsel_promptu": "Close-up of a print-in-place hinge mechanism on a small 3D printed box, clearly showing a simple, physically plausible hinge geometry, visible layer lines, clean workshop surface, soft purple and pink lighting, vertical 4:5 composition, lower third kept clear"
+    },
+    {
+      "baslik": "Kilit detayı",
+      "metin": "Kapanınca kilitlenir, bastırınca açılır.",
+      "karakter_gorunur": false,
+      "gorsel_promptu": "Macro close-up of a tiny snap latch on a 3D printed box, the lid slightly pressed open, the latch looks mechanically plausible and printable, visible layer lines, tidy workshop background blurred, soft purple and pink lighting, vertical 4:5 composition"
+    },
+    {
+      "baslik": "İç hacim",
+      "metin": "İçine küçük parçalar rahatça sığar.",
+      "karakter_gorunur": false,
+      "gorsel_promptu": "Open small 3D printed box showing organized tiny parts inside, clean top-down close-up, visible layer lines, soft purple and pink workshop lighting, vertical 4:5 composition"
+    },
+    {
+      "baslik": "Kenar formu",
+      "metin": "Yuvarlak köşeler, elde rahat tutuş.",
+      "karakter_gorunur": false,
+      "gorsel_promptu": "Close-up of rounded corners and ergonomic grip on a small 3D printed box, held in hand, visible layer lines, blurred workshop printers behind, soft purple and pink lighting, vertical 4:5 composition"
+    },
+    {
+      "baslik": "Kapanış hissi",
+      "metin": "Tek baskıda mekanik kutu fikri hoşuna gitti mi?",
+      "karakter_gorunur": false,
+      "gorsel_promptu": "Small print-in-place box open on a workbench, dramatic close-up, blurred filament spools and printers in the background, soft purple and pink lighting, vertical 4:5 composition, lower third clear for text"
+    },
+    {
+      "baslik": "Yorum isteği",
+      "metin": "Bunu başka neye dönüştürelim? Yaz.",
+      "karakter_gorunur": true,
+      "gorsel_promptu": "Doctor Filament: a fictional, eccentric but friendly inventor character, photorealistic, wearing a gray 3D-printed horned headpiece with visible layer lines, round gray 3D-printed glasses frames, a high-collared gray jacket with colorful wires and small circuit-board details, colorful headphones around his neck and small gold earrings, warm smile, expressive eyes, in a tidy 3D printing workshop with colorful filament spools and printers with soft purple and pink lighting blurred in the background. Doctor Filament smiling beside the small print-in-place box in a tidy 3D printing workshop, soft purple and pink lighting, blurred filament spools and printers in the background, vertical 4:5 composition, lower third kept clear"
+    }
+  ],
+  "sure_sn": 0,
+  "sahneler": [],
+  "instagram_caption": "Vida yok.\nKapak yok.\nAma kutu açılıyor.\n\nBöyle baskılar ayrı bir keyif veriyor.\nBunu başka neye çevirelim?\nYorum bırak.",
+  "youtube_baslik": "Tek Parça Açılan Mini Kutu Nasıl Çalışır?",
+  "youtube_aciklama": "Bugün tek baskıda çalışan mini pense kutu fikrine bakıyoruz. Küçük mekanik detaylar, 3D baskıda neden bu kadar tatmin edici oluyor?",
+  "facebook_caption": "Vida yok.\nAyrı kapak yok.\nTek parça açılan mini kutu var.\n\nSence bu fikir masa üstünde ne işe yarar?\nYorumlara yaz.",
+  "hashtagler": [
+    "#3dbaskı",
+    "#printinplace",
+    "#3dprinter",
+    "#doktorfilament",
+    "#gurtechs3d",
+    "#maker"
+  ],
+  "model_notu": "CC0 veya CC BY lisanslı print-in-place hinge box, snap-latch box, parametric small container ya da basit kendi çizilebilecek menteşeli kutu modeli aranmalı; tek parça çalışan, destek istemeyen mekanik kutu tasarımı tercih edilmeli."
+}

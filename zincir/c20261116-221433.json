@@ -1,0 +1,93 @@
+{
+  "kimlik": "c20261116-221433",
+  "olusturma": "2026-11-16T22:14:33Z",
+  "durum": "senaryo",
+  "kaynak": "zincir",
+  "direktif": "",
+  "konu": "Tek parça açılan mini pense kutu",
+  "format": "carousel",
+  "seri": "Basılabilir 5 Şey",
+  "kanca": "Vida yok. Ayrı kapak yok. Bir anda açılan kutu var.",
+  "taslak": "taslaklar/2026-11-16_zincir_221433.md",
+  "taslak_json": "zincir/c20261116-221433_taslak.json",
+  "fikir": {
+    "konu": "Tek parça açılan mini pense kutu",
+    "neden": "Tek baskıda çalışan mekanik parça hissi verir; izleyici ‘bu nasıl hareket ediyor?’ diye kaydırır.",
+    "trend_baglantisi": "[KAYNAKLI] print-in-place menteşeli kutu trendi",
+    "puan": 26.0,
+    "benzerlik": 0.0
+  },
+  "elestiri": {
+    "puan": 6,
+    "uygulandi": true
+  },
+  "trend": {
+    "tarih": "2026-11-16T21:45:29Z",
+    "yenilendi": true
+  },
+  "metinler": {
+    "youtube_baslik": "Tek Parça Açılan Mini Kutu Nasıl Çalışır?",
+    "aciklama": "Vida yok.\nKapak yok.\nAma kutu açılıyor.\n\nBöyle baskılar ayrı bir keyif veriyor.\nBunu başka neye çevirelim?\nYorum bırak.\n\n#3dbaskı #printinplace #3dprinter #doktorfilament #gurtechs3d #maker"
+  },
+  "video": null,
+  "yayinlar": [],
+  "olcumler": [],
+  "ogrenildi": false,
+  "paket": {
+    "tur": "carousel",
+    "slaytlar": [
+      {
+        "no": 1,
+        "baslik": "Tek parça kutu",
+        "metin": "Vida yok, kapak yok; tek baskıda açılan kutu.",
+        "prompt": "Doctor Filament: a fictional, eccentric but friendly inventor character, photorealistic, wearing a gray 3D-printed horned headpiece with visible layer lines, round gray 3D-printed glasses frames, a high-collared gray jacket with colorful wires and small circuit-board details, colorful headphones around his neck and small gold earrings, warm smile, expressive eyes, in a tidy 3D printing workshop with colorful filament spools and printers with soft purple and pink lighting blurred in the background. Doctor Filament standing in a tidy 3D printing workshop, presenting a small print-in-place box that opens in one piece, soft purple and pink lighting, blurred filament spools and printers in the background, vertical 4:5 composition, room for text in the lower third. Doctor Filament: a fictional, eccentric but friendly inventor character, photorealistic, wearing a gray 3D-printed horned headpiece with visible layer lines, round gray 3D-printed glasses frames, a high-collared gray jacket with colorful wires and small circuit-board details, colorful headphones around his neck and small gold earrings, warm smile, expressive eyes, in a tidy 3D printing workshop with colorful filament spools and printers with soft purple and pink lighting blurred in the background. Photorealistic, vertical 4:5 image, no text, no letters, no readable text on clothing or objects, no logos, no watermark.",
+        "karakter": true
+      },
+      {
+        "no": 2,
+        "baslik": "Menteşe sürprizi",
+        "metin": "İçindeki menteşe ayrı parça değil.",
+        "prompt": "Close-up of a print-in-place hinge mechanism on a small 3D printed box, clearly showing a simple, physically plausible hinge geometry, visible layer lines, clean workshop surface, soft purple and pink lighting, vertical 4:5 composition, lower third kept clear. Photorealistic, vertical 4:5 image, no text, no letters, no readable text on clothing or objects, no logos, no watermark.",
+        "karakter": false
+      },
+      {
+        "no": 3,
+        "baslik": "Kilit detayı",
+        "metin": "Kapanınca kilitlenir, bastırınca açılır.",
+        "prompt": "Macro close-up of a tiny snap latch on a 3D printed box, the lid slightly pressed open, the latch looks mechanically plausible and printable, visible layer lines, tidy workshop background blurred, soft purple and pink lighting, vertical 4:5 composition. Photorealistic, vertical 4:5 image, no text, no letters, no readable text on clothing or objects, no logos, no watermark.",
+        "karakter": false
+      },
+      {
+        "no": 4,
+        "baslik": "İç hacim",
+        "metin": "İçine küçük parçalar rahatça sığar.",
+        "prompt": "Open small 3D printed box showing organized tiny parts inside, clean top-down close-up, visible layer lines, soft purple and pink workshop lighting, vertical 4:5 composition. Photorealistic, vertical 4:5 image, no text, no letters, no readable text on clothing or objects, no logos, no watermark.",
+        "karakter": false
+      },
+      {
+        "no": 5,
+        "baslik": "Kenar formu",
+        "metin": "Yuvarlak köşeler, elde rahat tutuş.",
+        "prompt": "Close-up of rounded corners and ergonomic grip on a small 3D printed box, held in hand, visible layer lines, blurred workshop printers behind, soft purple and pink lighting, vertical 4:5 composition. Photorealistic, vertical 4:5 image, no text, no letters, no readable text on clothing or objects, no logos, no watermark.",
+        "karakter": false
+      },
+      {
+        "no": 6,
+        "baslik": "Kapanış hissi",
+        "metin": "Tek baskıda mekanik kutu fikri hoşuna gitti mi?",
+        "prompt": "Small print-in-place box open on a workbench, dramatic close-up, blurred filament spools and printers in the background, soft purple and pink lighting, vertical 4:5 composition, lower third clear for text. Photorealistic, vertical 4:5 image, no text, no letters, no readable text on clothing or objects, no logos, no watermark.",
+        "karakter": false
+      },
+      {
+        "no": 7,
+        "baslik": "Yorum isteği",
+        "metin": "Bunu başka neye dönüştürelim? Yaz.",
+        "prompt": "Doctor Filament: a fictional, eccentric but friendly inventor character, photorealistic, wearing a gray 3D-printed horned headpiece with visible layer lines, round gray 3D-printed glasses frames, a high-collared gray jacket with colorful wires and small circuit-board details, colorful headphones around his neck and small gold earrings, warm smile, expressive eyes, in a tidy 3D printing workshop with colorful filament spools and printers with soft purple and pink lighting blurred in the background. Doctor Filament smiling beside the small print-in-place box in a tidy 3D printing workshop, soft purple and pink lighting, blurred filament spools and printers in the background, vertical 4:5 composition, lower third kept clear. Doctor Filament: a fictional, eccentric but friendly inventor character, photorealistic, wearing a gray 3D-printed horned headpiece with visible layer lines, round gray 3D-printed glasses frames, a high-collared gray jacket with colorful wires and small circuit-board details, colorful headphones around his neck and small gold earrings, warm smile, expressive eyes, in a tidy 3D printing workshop with colorful filament spools and printers with soft purple and pink lighting blurred in the background. Photorealistic, vertical 4:5 image, no text, no letters, no readable text on clothing or objects, no logos, no watermark.",
+        "karakter": true
+      }
+    ],
+    "uyarilar": [
+      "Menteşe, katlama, zincir gibi karmaşık bir mekanizma var: yapay zekâ görseli yanlış çizebilir, görselin gerçekten basılabilir göründüğünü kontrol et."
+    ]
+  }
+}
