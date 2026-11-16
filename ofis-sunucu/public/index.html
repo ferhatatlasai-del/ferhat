@@ -158,6 +158,8 @@ dd{margin:1px 0 0}
       <div class="card pub" id="zKart">
         <h2>Zincir</h2>
         <p class="alt">Her içerik bir dişlide ilerler: fikir, senaryo, video, yayın, ölçüm, öğrenme. “İçerik üret” zinciri başlatır: trend kontrol edilir, içerik ajanı en gerçekçi fikri seçer, senaryo ve video paketi hazırlanır. Videoyu sen yaparsın.</p>
+        <label class="k" for="zFormat">İçerik biçimi</label>
+        <select id="zFormat"><option value="reels" selected>Video senaryosu (Reels / Shorts)</option><option value="carousel">Carousel (görsel slaytlar)</option><option value="otomatik">Ajan seçsin</option></select>
         <div class="satir"><button type="button" class="ana" id="zUret">İçerik üret</button></div>
         <input type="text" id="zDirektif" maxlength="500" placeholder="İsteğe bağlı direktif (boş bırakabilirsin)" style="width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px">
         <input type="password" id="zSifre" autocomplete="current-password" placeholder="Ofis şifresi" hidden style="margin-top:8px;width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px">
@@ -681,7 +683,7 @@ function engineUpdate(dt,t){
 var MOD='demo', SIF=''; try{SIF=localStorage.getItem('ofisSifre')||'';}catch(e){}
 function chk(r){return r.json().then(function(j){ if(!r.ok){ if(r.status===401){SIF=''; try{localStorage.removeItem('ofisSifre');}catch(e){}} throw new Error(j.hata||('Hata '+r.status)); } return j; });}
 function apiGet(u){return fetch(u,{headers:{'X-Sifre':SIF}}).then(chk);}
-function apiIcerikUret(metin){return fetch('/api/icerik-uret',{method:'POST',headers:{'X-Sifre':SIF,'Content-Type':'application/json'},body:JSON.stringify({metin:metin||''})}).then(chk);}
+function apiIcerikUret(metin){var f=$('#zFormat'); return fetch('/api/icerik-uret',{method:'POST',headers:{'X-Sifre':SIF,'Content-Type':'application/json'},body:JSON.stringify({metin:metin||'',format:f?f.value:'reels'})}).then(chk);}
 function apiPost(metin){return fetch('/api/direktif',{method:'POST',headers:{'X-Sifre':SIF,'Content-Type':'application/json'},body:JSON.stringify({metin:metin})}).then(chk);}
 fetch('/api/ping').then(function(r){return r.json();}).then(function(j){ if(j&&j.ok){ MOD=j.hazir?'sunucu':'demo'; if(selId==='icerik') renderInfo(); if(typeof pSifreHazirla==='function') pSifreHazirla(); } }).catch(function(){});
 
@@ -945,7 +947,7 @@ function zincirCiz(z){
     if(k.direktif) satir('Direktif',k.direktif);
     satir('Kanca',k.kanca);
     if(k.fikir&&k.fikir.neden) satir('Neden bu fikir',k.fikir.neden+(k.fikir.trend_baglantisi&&k.fikir.trend_baglantisi!=='yok'?' (trend: '+k.fikir.trend_baglantisi+')':''));
-    if(k.elestiri&&k.elestiri.puan!=null) satir('Öz eleştiri',k.elestiri.puan+'/10, düzeltme '+(k.elestiri.uygulandi?'uygulandı':'uygulanmadı'));
+    if(k.elestiri&&k.elestiri.puan!=null) satir('Öz eleştiri',(k.elestiri.ilk_puan!=null?'ilk '+k.elestiri.ilk_puan+'/10, son taslak ':'')+k.elestiri.puan+'/10'+(k.elestiri.turlar?' ('+k.elestiri.turlar+' tur)':'')+', düzeltme '+(k.elestiri.uygulandi?'uygulandı':'uygulanmadı'));
     if(k.trend&&k.trend.tarih) satir('Trend araştırması',fmt(k.trend.tarih)+(k.trend.yenilendi?' (bu zincirde yenilendi)':''));
     if(k.not) satir('Not',k.not);
     if(k.taslak&&z.depo&&z.dal){ var ta=dom('div'); ta.appendChild(dom('b',null,'Taslak')); var a=dom('a',null,k.taslak); a.href='https://github.com/'+z.depo+'/blob/'+z.dal+'/'+k.taslak; a.target='_blank'; a.rel='noopener noreferrer'; ta.appendChild(a); g.appendChild(ta); }

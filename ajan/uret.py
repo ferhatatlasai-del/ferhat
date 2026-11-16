@@ -196,6 +196,21 @@ def yasak_uyarilari(t):
     return uyari
 
 
+TERCIH = {"format": "otomatik"}
+SERI_KURALI = ('SERİ KURALI: "Basılabilir 5 Şey" yalnızca beş FARKLI nesneyi listeleyen içerik içindir. Tek bir nesneyi ya da tek bir hileyi '
+               'anlatıyorsan seri "Katman Katman" ya da "Doktor Notu" olmalı.')
+
+
+def format_talimati():
+    f = TERCIH["format"]
+    if f == "reels":
+        return ('Format MUTLAKA "reels" olmalı ("slaytlar" boş kalsın). Sahibi videoyu yapay zekâ video araçlarıyla kendisi üretecek; klip kredisi sorun değil. '
+                'Her sahne EN FAZLA 8 saniye olsun (video araçları klipleri 8 sn üretir) ve sahnedeki konuşma süreye sığsın (saniyede en fazla 2,5 kelime).')
+    if f == "carousel":
+        return 'Format MUTLAKA "carousel" olmalı ("sahneler" boş kalsın).'
+    return 'Format "carousel" ya da "reels" olabilir; son içeriklere bakarak formatı değiştir (aynısını art arda üretme).'
+
+
 def direktif_blogu(direktif):
     """Kanal sahibinin o güne özel isteği. Kanal kurallarını (yapay zekâ açıklaması, güvenlik, lisans) aşamaz."""
     direktif = " ".join((direktif or "").split())[:500]
@@ -238,9 +253,8 @@ def prompt_olustur(bugun, direktif="", fikir=None):
 {json.dumps(gecmis_konular(), ensure_ascii=False)}
 
 {direktif_blogu(direktif)}{trend_blogu()}{fikir_blogu(fikir)}# GÖREV
-Bugünün tarihi: {bugun}. Bugün için TEK bir içerik planı üret. Format "carousel" ya da "reels" olabilir;
-son içeriklere bakarak formatı ve seriyi değiştir (aynısını art arda üretme). Video klip kredisi sınırlı olduğu için
-emin değilsen "carousel" seç.
+Bugünün tarihi: {bugun}. Bugün için TEK bir içerik planı üret. {format_talimati()}
+Seriyi de son içeriklere bakarak değiştir (aynısını art arda üretme). {SERI_KURALI}
 
 JSON şeması (kullanılmayan alanı boş liste bırak):
 {{
@@ -360,7 +374,7 @@ def zincir_yaz(taslak, cikti, notlar, direktif):
         "taslak_json": f"zincir/{kimlik}_taslak.json",
         "fikir": {"konu": f.get("konu"), "neden": f.get("neden_ilgi_ceker"), "trend_baglantisi": f.get("trend_baglantisi"),
                   "puan": f.get("_puan"), "benzerlik": f.get("_benzerlik")} if f else None,
-        "elestiri": {"puan": e.get("puan"), "uygulandi": e.get("uygulandi")} if e else None,
+        "elestiri": {"puan": e.get("puan"), "ilk_puan": e.get("ilk_puan"), "turlar": e.get("turlar"), "uygulandi": e.get("uygulandi")} if e else None,
         "trend": {"tarih": tr["tarih"] if tr else None, "yenilendi": yenilendi},
         "metinler": {"youtube_baslik": (taslak.get("youtube_baslik") or "")[:100],
                      "aciklama": "\n".join(x for x in [caption_temizle(taslak.get("instagram_caption", "")), "", hashtagler] if x is not None).strip()},
@@ -404,6 +418,8 @@ GÖREV: Bugün için 5 FARKLI aday içerik fikri üret. Aynı nesneyi, aynı kat
 - Trend listesi varsa en az 2 aday oradan esinlensin (özgün açıyla, kimseyi kopyalamadan); en az 1 aday trend dışı, tamamen özgün olsun.
 - Nesne gerçekten ev tipi 3D yazıcıyla basılabilir olsun. Marka, lisanslı karakter, sağlık iddiası yok.
 - Sahibinin direktifi varsa tüm adaylar ona uysun.
+- """ + format_talimati() + """
+- """ + SERI_KURALI + """
 JSON: {"adaylar":[{"konu":"kısa somut başlık","format":"carousel | reels","seri":"Basılabilir 5 Şey | Doktor Notu | Katman Katman",
 "kanca":"ilk cümle","neden_ilgi_ceker":"1 cümle","trend_baglantisi":"hangi trend ya da 'yok'",
 "yenilik":1-10 (son içeriklerden ne kadar farklı),"ilgi":1-10,"uygulanabilirlik":1-10 (görselleri üretmek ne kadar kolay)}]}"""
@@ -445,28 +461,43 @@ def elestir(taslak, uyarilar, bugun):
 GÖREV: Taslağı 1-10 puanla (kanca gücü, özgünlük, kurallara uyum, doğal Türkçe, doğruluk) ve somut sorunları listele.
 Puan 8 ve üstüyse ve sorun yoksa "duzeltilmis" null olsun. Aksi halde sorunları gideren, AYNI JSON şemasına ve AYNI format/seri
 kurallarına uyan TAM bir düzeltilmiş taslak ver (yalnızca gerçekten sorunlu yerleri değiştir, kanca ve kurallar korunsun).
-Uydurma rakam, süre ya da marka ekleme.
+Uydurma rakam, süre ya da marka ekleme. gorsel_promptu / sahne_promptu içine karakterin görünüşünü (kıyafet, başlık, gözlük, kulaklık vb.) YAZMA, kod ekler.
+{format_talimati()} {SERI_KURALI}
 JSON: {{"puan": 1-10, "sorunlar": ["..."], "duzeltilmis": null veya taslağın tamamı}}"""
     return openai_cagir(sistem, kullanici)
 
 
 def elestir_uygula(taslak, notlar, bugun):
-    ilk_uyari = yasak_uyarilari(taslak)
-    try:
-        c = elestir(taslak, ilk_uyari, bugun)
-    except Exception as e:
-        print(f"UYARI: öz eleştiri çalışmadı: {e}")
-        notlar["elestiri"] = {"puan": None, "sorunlar": [], "uygulandi": False, "durum": f"çalışmadı ({type(e).__name__})"}
-        return taslak
-    yeni = c.get("duzeltilmis")
-    bilgi = {"puan": c.get("puan"), "sorunlar": c.get("sorunlar") or [], "uygulandi": False}
-    if isinstance(yeni, dict) and yeni.get("konu") and yeni.get("format") in ("carousel", "reels"):
-        yeni_uyari = yasak_uyarilari(yeni)
-        if len(yeni_uyari) <= len(ilk_uyari):
-            bilgi["uygulandi"] = True
+    """En fazla 3 eleştiri: her turda sorun varsa düzeltilmiş taslak benimsenir; son puan SON taslağa aittir."""
+    bilgi = {"ilk_puan": None, "puan": None, "sorunlar": [], "uygulandi": False, "turlar": 0}
+    for tur in range(3):
+        uyari = yasak_uyarilari(taslak)
+        try:
+            c = elestir(taslak, uyari, bugun)
+        except Exception as e:
+            print(f"UYARI: öz eleştiri çalışmadı: {e}")
+            bilgi["durum"] = f"çalışmadı ({type(e).__name__})"
+            break
+        puan = c.get("puan")
+        bilgi["turlar"] = tur + 1
+        bilgi["puan"] = puan
+        if tur == 0:
+            bilgi["ilk_puan"] = puan
+            bilgi["sorunlar"] = c.get("sorunlar") or []
+        yeni = c.get("duzeltilmis")
+        try:
+            iyi = float(puan) >= 8
+        except (TypeError, ValueError):
+            iyi = False
+        if iyi or tur == 2 or not isinstance(yeni, dict):
+            break
+        gecerli = yeni.get("konu") and yeni.get("format") in ("carousel", "reels") and (TERCIH["format"] == "otomatik" or yeni.get("format") == TERCIH["format"])
+        if gecerli and len(yasak_uyarilari(yeni)) <= len(uyari):
             taslak = yeni
+            bilgi["uygulandi"] = True
         else:
-            bilgi["durum"] = "düzeltme daha çok uyarı doğurduğu için kullanılmadı"
+            bilgi["durum"] = "düzeltme geçersiz ya da daha çok uyarı doğurduğu için kullanılmadı"
+            break
     notlar["elestiri"] = bilgi
     return taslak
 
@@ -488,6 +519,11 @@ def numara_temizle(metin):
 def _prompt_birlestir(govde, karakter, sonek, persona):
     """Sahne/slayt promptunu birleştirir; karakter tarifini yalnızca karakter gerçekten sahnedeyse ekler."""
     govde = (govde or "").strip()
+    if persona:
+        # Model (ya da öz eleştiri) karakter tarifini promptun içine yazmış olabilir; kod ekliyor, tekrar etmesin
+        for p in (persona, persona.rstrip(".")):
+            govde = govde.replace(p, "")
+        govde = re.sub(r"\s{2,}", " ", govde).strip(" ")
     if govde and govde[-1] not in ".!?":
         govde += "."
     parcalar = [govde]
@@ -576,8 +612,8 @@ def markdown_yaz(t, bugun, notlar=None):
                 satirlar.append("- **Elenen adaylar:** " + "; ".join(diger))
         e = notlar.get("elestiri")
         if e:
-            satirlar.append(f"- **Öz eleştiri puanı:** {e.get('puan')}/10. Düzeltme " + ("uygulandı." if e.get("uygulandi") else "uygulanmadı.")
-                            + (f" ({e['durum']})" if e.get("durum") else ""))
+            satirlar.append(f"- **Öz eleştiri:** ilk puan {e.get('ilk_puan')}/10, son taslak {e.get('puan')}/10 ({e.get('turlar')} tur). Düzeltme "
+                            + ("uygulandı." if e.get("uygulandi") else "uygulanmadı.") + (f" ({e['durum']})" if e.get("durum") else ""))
             satirlar += [f"  - Sorun: {x}" for x in e.get("sorunlar", [])]
         if notlar.get("trend_tarihi"):
             satirlar.append(f"- **Trend araştırması:** {notlar['trend_tarihi']}")
@@ -592,8 +628,10 @@ def main():
     ap.add_argument("--dry-run", action="store_true", help="API çağırma, sadece prompt'u yazdır")
     ap.add_argument("--direktif", default="", help="Sahibinin o güne özel isteği (isteğe bağlı)")
     ap.add_argument("--hizli", action="store_true", help="Fikir seçimi ve öz eleştiriyi atla (tek çağrı)")
+    ap.add_argument("--format", choices=["otomatik", "reels", "carousel"], default="otomatik", help="İçerik biçimi (zincirde sahibi seçer)")
     ap.add_argument("--benzersiz", action="store_true", help="Taslak dosya adına saat ekle (aynı gün üzerine yazmasın); zincir için")
     args = ap.parse_args()
+    TERCIH["format"] = args.format
 
     bugun = datetime.date.today().isoformat()
     sistem, kullanici = prompt_olustur(bugun, args.direktif)
@@ -615,6 +653,9 @@ def main():
         notlar["trend_tarihi"] = tr["tarih"]
     sistem, kullanici = prompt_olustur(bugun, args.direktif, fikir)
     taslak = openai_cagir(sistem, kullanici)
+    if args.format != "otomatik" and taslak.get("format") != args.format:
+        print(f"UYARI: model '{taslak.get('format')}' üretti, '{args.format}' isteniyordu; bir kez daha deneniyor.")
+        taslak = openai_cagir(sistem, kullanici + f"\n\nÖNCEKİ DENEMEDE FORMAT YANLIŞTI. Format MUTLAKA \"{args.format}\" olmalı.")
     if not args.hizli:
         taslak = elestir_uygula(taslak, notlar, bugun)
         e = notlar.get("elestiri", {})
