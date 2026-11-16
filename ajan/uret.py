@@ -20,6 +20,7 @@ import urllib.request
 KOK = pathlib.Path(__file__).resolve().parent.parent
 TASLAK_DIZINI = KOK / "taslaklar"
 MODEL = os.environ.get("OPENAI_MODEL") or "gpt-4o-mini"
+OPENAI_ADRES = os.environ.get("OPENAI_BASE_URL") or "https://api.openai.com/v1"
 YEDEK_MODEL = "gpt-4o-mini"
 
 YZ_SATIRI = "🤖 Doktor Filament yapay zekâ ile üretilmiş bir karakterdir."
@@ -58,6 +59,45 @@ def gecmis_konular(adet=20):
 def hesap_durumu():
     yol = KOK / "ajan" / "hesap_durumu.md"
     return yol.read_text(encoding="utf-8") if yol.exists() else "(Henüz otomatik hesap verisi yok.)"
+
+
+def trendler():
+    """Trend ajanının son araştırması (en fazla 14 gün eski). Yoksa None."""
+    yol = KOK / "ajan" / "trendler.json"
+    if not yol.exists():
+        return None
+    try:
+        v = json.loads(yol.read_text(encoding="utf-8"))
+        zaman = datetime.datetime.strptime(v["tarih"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=datetime.timezone.utc)
+    except Exception:
+        return None
+    if (datetime.datetime.now(datetime.timezone.utc) - zaman).days > 14:
+        return None
+    return v
+
+
+def trend_blogu():
+    v = trendler()
+    if not v:
+        return "# GÜNCEL TRENDLER\n(Trend araştırması yok ya da eski. Kendi araştırmana ve özgün fikre güven.)\n\n"
+    satirlar = [f"# GÜNCEL TRENDLER (trend ajanı, {v['tarih']}; kaynaklı olanlar güvenilir, kaynaksızlar yalnızca esin)"]
+    for o in v.get("oneriler", [])[:8]:
+        etiket = "KAYNAKLI" if o.get("dogrulandi") else "kaynaksız"
+        satirlar.append(f"- [{etiket}] {o.get('konu')} | neden: {o.get('neden_trend')} | açı: {o.get('kanca_acisi')} | "
+                        f"basılabilir: {o.get('basilabilir')} | risk: {o.get('risk')}")
+    if v.get("asiri_kullanilan"):
+        satirlar.append("- AŞIRI KULLANILAN (kaçın): " + "; ".join(v["asiri_kullanilan"]))
+    return "\n".join(satirlar) + "\n\n"
+
+
+def govde_kokleri(metin):
+    """Türkçe ek farklarını yutmak için kelimelerin ilk 5 harfi."""
+    return {k[:5] for k in _norm(metin) if len(k) >= 3}
+
+
+def benzerlik(a, b):
+    x, y = govde_kokleri(a), govde_kokleri(b)
+    return len(x & y) / len(x | y) if x and y else 0.0
 
 
 def persona_tarifi():
@@ -162,7 +202,14 @@ def direktif_blogu(direktif):
     )
 
 
-def prompt_olustur(bugun, direktif=""):
+def fikir_blogu(fikir):
+    if not fikir:
+        return ""
+    return ("# SEÇİLEN FİKİR (ajan bu fikri 5 adaydan seçti; bunu geliştir, başka konuya kayma)\n"
+            + json.dumps(fikir, ensure_ascii=False) + "\n\n")
+
+
+def prompt_olustur(bugun, direktif="", fikir=None):
     sistem = (
         "Sen sosyal medya içerik ajanısın. Kanal profiline ve stratejiye kesinlikle uy. "
         "Yalnızca geçerli JSON döndür."
@@ -182,7 +229,7 @@ def prompt_olustur(bugun, direktif=""):
 # SON İÇERİKLER (konuyu ve formatı tekrar etme)
 {json.dumps(gecmis_konular(), ensure_ascii=False)}
 
-{direktif_blogu(direktif)}# GÖREV
+{direktif_blogu(direktif)}{trend_blogu()}{fikir_blogu(fikir)}# GÖREV
 Bugünün tarihi: {bugun}. Bugün için TEK bir içerik planı üret. Format "carousel" ya da "reels" olabilir;
 son içeriklere bakarak formatı ve seriyi değiştir (aynısını art arda üretme). Video klip kredisi sınırlı olduğu için
 emin değilsen "carousel" seç.
@@ -243,7 +290,7 @@ def _istek(model, sistem, kullanici):
         ],
     }).encode()
     istek = urllib.request.Request(
-        "https://api.openai.com/v1/chat/completions",
+        f"{OPENAI_ADRES}/chat/completions",
         data=govde,
         headers={"Content-Type": "application/json", "Authorization": f"Bearer {anahtar}"},
     )
@@ -269,6 +316,102 @@ def openai_cagir(sistem, kullanici):
         sonuc = _istek(YEDEK_MODEL, sistem, kullanici)
         print(f"Model: {YEDEK_MODEL} (yedek)")
         return sonuc
+
+
+def baglam_metni(bugun, direktif):
+    return f"""# KANAL PROFİLİ VE KURALLAR
+{oku('ajan/kanal.md')}
+
+# STRATEJİ NOTLARI
+{oku('ajan/strateji.md')}
+
+# FİKİR HAVUZU (başlangıç tohumları)
+{oku('ajan/fikirler.md')}
+
+# GÜNCEL HESAP DURUMU (gerçek veri, sayı uydurma)
+{hesap_durumu()}
+
+# SON İÇERİKLER (bunları ve benzerlerini TEKRAR ETME)
+{json.dumps(gecmis_konular(), ensure_ascii=False)}
+
+{direktif_blogu(direktif)}{trend_blogu()}Bugünün tarihi: {bugun}."""
+
+
+def fikir_sec(bugun, direktif):
+    """5 farklı aday fikir üretir; geçmişe benzeyenleri eler, puanı en yüksek olanı seçer."""
+    sistem = ("Sen yaratıcı ve araştırmacı bir içerik stratejistisin. Kanalın geçmişine ve trendlere bakıp "
+              "özgün, tekrara düşmeyen fikirler bulursun. Yalnızca geçerli JSON döndür.")
+    kullanici = baglam_metni(bugun, direktif) + """
+
+GÖREV: Bugün için 5 FARKLI aday içerik fikri üret. Aynı nesneyi, aynı kategoriyi ya da aynı kancayı tekrar etme.
+- Trend listesi varsa en az 2 aday oradan esinlensin (özgün açıyla, kimseyi kopyalamadan); en az 1 aday trend dışı, tamamen özgün olsun.
+- Nesne gerçekten ev tipi 3D yazıcıyla basılabilir olsun. Marka, lisanslı karakter, sağlık iddiası yok.
+- Sahibinin direktifi varsa tüm adaylar ona uysun.
+JSON: {"adaylar":[{"konu":"kısa somut başlık","format":"carousel | reels","seri":"Basılabilir 5 Şey | Doktor Notu | Katman Katman",
+"kanca":"ilk cümle","neden_ilgi_ceker":"1 cümle","trend_baglantisi":"hangi trend ya da 'yok'",
+"yenilik":1-10 (son içeriklerden ne kadar farklı),"ilgi":1-10,"uygulanabilirlik":1-10 (görselleri üretmek ne kadar kolay)}]}"""
+    cevap = openai_cagir(sistem, kullanici)
+    adaylar = [a for a in cevap.get("adaylar", []) if isinstance(a, dict) and a.get("konu")]
+    if not adaylar:
+        raise ValueError("aday fikir gelmedi")
+    gecmis = gecmis_konular()
+    for a in adaylar:
+        a["_benzerlik"] = max([benzerlik(a["konu"], g) for g in gecmis] or [0.0])
+        try:
+            puan = float(a.get("yenilik", 5)) * 1.3 + float(a.get("ilgi", 5)) + float(a.get("uygulanabilirlik", 5)) * 0.7
+        except (TypeError, ValueError):
+            puan = 0.0
+        if str(a.get("trend_baglantisi", "yok")).strip().lower() not in ("yok", "", "none"):
+            puan += 1.0
+        a["_puan"] = round(puan, 1)
+    uygun = [a for a in adaylar if a["_benzerlik"] < 0.5] or adaylar
+    secilen = max(uygun, key=lambda a: a["_puan"])
+    return secilen, adaylar
+
+
+def elestir(taslak, uyarilar, bugun):
+    """Taslağı sert bir editör gibi eleştirir; gerekirse düzeltilmiş tam taslak döndürür."""
+    sistem = ("Sen sert ama adil bir editörsün. Bir sosyal medya taslağını kanal kurallarına, kanca gücüne ve özgünlüğe göre "
+              "değerlendirir, gerekirse düzeltirsin. Yalnızca geçerli JSON döndür.")
+    kullanici = f"""# KANAL PROFİLİ VE KURALLAR
+{oku('ajan/kanal.md')}
+
+# SON İÇERİKLER (benzerse taslak zayıftır)
+{json.dumps(gecmis_konular(), ensure_ascii=False)}
+
+# DENETİM UYARILARI (kod bulgusu)
+{json.dumps(uyarilar, ensure_ascii=False)}
+
+# TASLAK
+{json.dumps(taslak, ensure_ascii=False)}
+
+GÖREV: Taslağı 1-10 puanla (kanca gücü, özgünlük, kurallara uyum, doğal Türkçe, doğruluk) ve somut sorunları listele.
+Puan 8 ve üstüyse ve sorun yoksa "duzeltilmis" null olsun. Aksi halde sorunları gideren, AYNI JSON şemasına ve AYNI format/seri
+kurallarına uyan TAM bir düzeltilmiş taslak ver (yalnızca gerçekten sorunlu yerleri değiştir, kanca ve kurallar korunsun).
+Uydurma rakam, süre ya da marka ekleme.
+JSON: {{"puan": 1-10, "sorunlar": ["..."], "duzeltilmis": null veya taslağın tamamı}}"""
+    return openai_cagir(sistem, kullanici)
+
+
+def elestir_uygula(taslak, notlar, bugun):
+    ilk_uyari = yasak_uyarilari(taslak)
+    try:
+        c = elestir(taslak, ilk_uyari, bugun)
+    except Exception as e:
+        print(f"UYARI: öz eleştiri çalışmadı: {e}")
+        notlar["elestiri"] = {"puan": None, "sorunlar": [], "uygulandi": False, "durum": f"çalışmadı ({type(e).__name__})"}
+        return taslak
+    yeni = c.get("duzeltilmis")
+    bilgi = {"puan": c.get("puan"), "sorunlar": c.get("sorunlar") or [], "uygulandi": False}
+    if isinstance(yeni, dict) and yeni.get("konu") and yeni.get("format") in ("carousel", "reels"):
+        yeni_uyari = yasak_uyarilari(yeni)
+        if len(yeni_uyari) <= len(ilk_uyari):
+            bilgi["uygulandi"] = True
+            taslak = yeni
+        else:
+            bilgi["durum"] = "düzeltme daha çok uyarı doğurduğu için kullanılmadı"
+    notlar["elestiri"] = bilgi
+    return taslak
 
 
 def caption_temizle(caption):
@@ -305,7 +448,7 @@ def gorsel_promptu(sl, persona):
     return _prompt_birlestir(sl.get("gorsel_promptu"), sl.get("karakter_gorunur"), GORSEL_SONEKI, persona)
 
 
-def markdown_yaz(t, bugun):
+def markdown_yaz(t, bugun, notlar=None):
     hashtag = " ".join(dict.fromkeys(t.get("hashtagler") or VARSAYILAN_ETIKETLER))
     persona = persona_tarifi()
     bicim = t.get("format", "")
@@ -365,6 +508,22 @@ def markdown_yaz(t, bugun):
         "## Model / lisans notu",
         t.get("model_notu", ""),
     ]
+    if notlar:
+        satirlar += ["", "## Ajan notları"]
+        f = notlar.get("fikir")
+        if f:
+            satirlar.append(f"- **Seçilen fikir:** {f.get('konu')} (puan {f.get('_puan')}, geçmişe benzerlik {f.get('_benzerlik', 0):.2f}). "
+                            f"Neden: {f.get('neden_ilgi_ceker', '')}. Trend bağlantısı: {f.get('trend_baglantisi', 'yok')}.")
+            diger = [a.get("konu") for a in notlar.get("adaylar", []) if a is not f]
+            if diger:
+                satirlar.append("- **Elenen adaylar:** " + "; ".join(diger))
+        e = notlar.get("elestiri")
+        if e:
+            satirlar.append(f"- **Öz eleştiri puanı:** {e.get('puan')}/10. Düzeltme " + ("uygulandı." if e.get("uygulandi") else "uygulanmadı.")
+                            + (f" ({e['durum']})" if e.get("durum") else ""))
+            satirlar += [f"  - Sorun: {x}" for x in e.get("sorunlar", [])]
+        if notlar.get("trend_tarihi"):
+            satirlar.append(f"- **Trend araştırması:** {notlar['trend_tarihi']}")
     uyarilar = yasak_uyarilari(t)
     if uyarilar:
         satirlar += ["", "## ⚠ Kontrol et"] + [f"- {u}" for u in uyarilar]
@@ -375,6 +534,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry-run", action="store_true", help="API çağırma, sadece prompt'u yazdır")
     ap.add_argument("--direktif", default="", help="Sahibinin o güne özel isteği (isteğe bağlı)")
+    ap.add_argument("--hizli", action="store_true", help="Fikir seçimi ve öz eleştiriyi atla (tek çağrı)")
     args = ap.parse_args()
 
     bugun = datetime.date.today().isoformat()
@@ -383,13 +543,30 @@ def main():
         print(sistem, "\n---\n", kullanici)
         return
 
+    notlar = {}
+    fikir = None
+    if not args.hizli:
+        try:
+            fikir, adaylar = fikir_sec(bugun, args.direktif)
+            notlar["fikir"], notlar["adaylar"] = fikir, adaylar
+            print(f"Seçilen fikir: {fikir['konu']} (puan {fikir['_puan']}, benzerlik {fikir['_benzerlik']:.2f})")
+        except Exception as e:
+            print(f"UYARI: fikir seçimi çalışmadı, tek çağrıyla devam: {e}")
+    tr = trendler()
+    if tr:
+        notlar["trend_tarihi"] = tr["tarih"]
+    sistem, kullanici = prompt_olustur(bugun, args.direktif, fikir)
     taslak = openai_cagir(sistem, kullanici)
+    if not args.hizli:
+        taslak = elestir_uygula(taslak, notlar, bugun)
+        e = notlar.get("elestiri", {})
+        print(f"Öz eleştiri: puan {e.get('puan')}, düzeltme {'uygulandı' if e.get('uygulandi') else 'uygulanmadı'}")
     TASLAK_DIZINI.mkdir(exist_ok=True)
     if args.direktif.strip():
         cikti = TASLAK_DIZINI / f"{bugun}_direktif_{datetime.datetime.now(datetime.timezone.utc):%H%M%S}.md"
     else:
         cikti = TASLAK_DIZINI / f"{bugun}.md"
-    cikti.write_text(markdown_yaz(taslak, bugun), encoding="utf-8")
+    cikti.write_text(markdown_yaz(taslak, bugun, notlar), encoding="utf-8")
     print(f"Taslak yazıldı: {cikti.relative_to(KOK)}")
 
 

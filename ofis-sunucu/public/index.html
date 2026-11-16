@@ -6,7 +6,7 @@
 /* Layout: sahne solda, seçili ajanın kartı sağda; telefonda alt alta. Ofis 3D, 45 derece açıyla. */
 :root{
   --bg:#eef1f5; --panel:#ffffff; --ink:#18212d; --ink2:#556273; --line:#d7dee8;
-  --accent:#f07a1a; --ok:#1f9d55; --ready:#2b7de9; --plan:#8a94a3; --star:#f07a1a; --you:#7c5cff;
+  --accent:#f07a1a; --ok:#1f9d55; --err:#d6453d; --ready:#2b7de9; --plan:#8a94a3; --star:#f07a1a; --you:#7c5cff;
   --font-head:'Space Grotesk','Inter',system-ui,sans-serif; --font-body:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
 }
 .dir{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
@@ -54,10 +54,10 @@ textarea{resize:vertical;min-height:72px}
 #sonuc pre{white-space:pre-wrap;word-break:break-word;font:12.5px/1.45 var(--font-body);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;max-height:260px;overflow:auto;margin:10px 0 6px}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#12171f; --panel:#1b222c; --ink:#e8edf4; --ink2:#9aa7b8; --line:#2c3644; --accent:#ff9340;
-  --ok:#3cc47a; --ready:#5b9cf5; --plan:#7d889a; --star:#ff9340; --you:#a28cff; color-scheme:dark;}}
+  --ok:#3cc47a; --err:#ff6b61; --ready:#5b9cf5; --plan:#7d889a; --star:#ff9340; --you:#a28cff; color-scheme:dark;}}
 :root[data-theme="dark"]{
   --bg:#12171f; --panel:#1b222c; --ink:#e8edf4; --ink2:#9aa7b8; --line:#2c3644; --accent:#ff9340;
-  --ok:#3cc47a; --ready:#5b9cf5; --plan:#7d889a; --star:#ff9340; --you:#a28cff; color-scheme:dark;}
+  --ok:#3cc47a; --err:#ff6b61; --ready:#5b9cf5; --plan:#7d889a; --star:#ff9340; --you:#a28cff; color-scheme:dark;}
 *{box-sizing:border-box}
 body{margin:0}
 body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.5;
@@ -131,6 +131,7 @@ dd{margin:1px 0 0}
         <span><i style="background:var(--ok)"></i>Çalışıyor</span>
         <span><i style="background:var(--ready)"></i>Hazır</span>
         <span><i style="background:var(--plan)"></i>Planlı</span>
+        <span><i style="background:var(--err)"></i>Hata</span>
         <span><i style="background:var(--star)"></i>Karakter</span>
         <span><i style="background:var(--you)"></i>Sen</span>
       </div>
@@ -178,12 +179,13 @@ var DURUM={
   hazir:{ad:'Hazır',v:'--ready',c:'#2b7de9'},
   planli:{ad:'Planlı, henüz kurulmadı',v:'--plan',c:'#8a94a3'},
   karakter:{ad:'Kanalın yüzü',v:'--star',c:'#f07a1a'},
+  hata:{ad:'Son çalışma hata verdi, kontrol gerek',v:'--err',c:'#d6453d'},
   patron:{ad:'Patron',v:'--you',c:'#7c5cff'}
 };
 var AJ=[
  {id:'icerik',ad:'İçerik ajanı',kisa:'İçerik',durum:'calisiyor',x:-5,z:-5,yaw:0,tip:'icerik',
   gorev:'Her gün carousel ya da kısa video planı yazar, üç platform için metin hazırlar.',
-  son:'2026-11-15T21:45:14Z',sonuc:'Başarılı, günlük taslak yazıldı.',zaman:'Her gün 09:00 (TR). GitHub birkaç dakika geciktirebilir.',not:'Model gpt-5.4-mini, bulunamazsa gpt-4o-mini.'},
+  son:'2026-11-15T21:45:14Z',sonuc:'Başarılı, günlük taslak yazıldı.',zaman:'Her gün 09:00 (TR) hedeflenir. GitHub saatlerce geciktirebiliyor (son çalışmalar öğleden sonra oldu).',not:'Model gpt-5.4-mini, bulunamazsa gpt-4o-mini.'},
  {id:'istatistik',ad:'Hesap istatistik ajanı',kisa:'İstatistik',durum:'calisiyor',x:-0.6,z:-5,yaw:0,tip:'istatistik',
   gorev:'@gurtechs3d takipçi ve son gönderi verisini okur.',
   son:'2026-11-15T18:25:44Z',sonuc:'Veri yazıldı, son doğrulanan çalışma.',zaman:'İçerik ajanıyla aynı iş akışında, her gün 09:00 (TR).',not:'Salt okunur. Beğeni ve yorum gelir, izlenme sayısı gelmez.'},
@@ -196,9 +198,9 @@ var AJ=[
  {id:'gorsel',ad:'Görsel ajanı',kisa:'Görsel',durum:'hazir',x:-8,z:-1.5,yaw:Math.PI/2,tip:'gorsel',
   gorev:'OpenAI ile Doktor Filament ana görselini üretir.',
   son:null,sonuc:'Hiç çalıştırılmadı.',zaman:'Elle.',not:'Görseller şimdilik Gemini’de ücretsiz üretiliyor.'},
- {id:'trend',ad:'Trend ajanı',kisa:'Trend',durum:'planli',x:-8,z:2.8,yaw:Math.PI/2,tip:'planli',
-  gorev:'YouTube’dan etkileşimi yüksek konuları bulup fikir listesine ekler.',
-  son:null,sonuc:'Kurulmadı.',zaman:'Haftada bir olacak.',not:'Benzer hesap listesi ve YouTube API anahtarı gerekir.'},
+ {id:'trend',ad:'Trend ajanı',kisa:'Trend',durum:'hazir',x:-8,z:2.8,yaw:Math.PI/2,tip:'trend',
+  gorev:'İnternette (YouTube Shorts, Instagram, Reddit, Printables) güncel 3D baskı trendlerini araştırır, içerik ajanına fikir verir.',
+  son:null,sonuc:'Henüz çalışmadı.',zaman:'Haftada iki kez (pazartesi, perşembe) ve elle.',not:'Kaynak bağlantılarını doğrular, doğrulanamayanı zayıf işaretler. Başkasının içeriğini kopyalamaz.'},
  {id:'facebook',ad:'Facebook yayın ajanı',kisa:'Facebook',durum:'planli',x:7.6,z:0.2,yaw:0,tip:'planli',
   gorev:'Videoyu Facebook Reels olarak paylaşır.',
   son:null,sonuc:'Kurulmadı.',zaman:'Planlı.',not:'Ayrı kurulum gerekir.'},
@@ -383,6 +385,9 @@ var DRAW={
    x.fillStyle='#16303a';x.beginPath();x.moveTo(98,104);x.lineTo(128,48);x.lineTo(158,104);x.closePath();x.fill();},
  sen:function(x,w,h,t){x.fillStyle='#15202c';x.fillRect(0,0,w,h);var c=['#3cc47a','#2b7de9','#f07a1a'];for(var i=0;i<3;i++){x.fillStyle='#223247';rr(x,12+i*80,14,72,50,8);x.fill();x.fillStyle=c[i];x.fillRect(22+i*80,24,30,6);x.fillStyle='#cfd9e6';x.fillRect(22+i*80,38,50,5);x.fillRect(22+i*80,48,36,5);}
    x.fillStyle='#223247';rr(x,12,76,232,70,8);x.fill();x.strokeStyle='#f07a1a';x.lineWidth=3;x.beginPath();for(var k=0;k<12;k++){var yy=122-k*2.4-Math.sin(k*0.9+t)*6;if(k===0)x.moveTo(24,yy);else x.lineTo(24+k*18.5,yy);}x.stroke();},
+ trend:function(x,w,h,t){x.fillStyle='#15202c';x.fillRect(0,0,w,h);x.fillStyle='#f0b429';x.fillRect(12,12,70,8);
+   x.strokeStyle='#3cc47a';x.lineWidth=4;x.beginPath();for(var k=0;k<9;k++){var yy=130-k*9-Math.sin(k*1.2+t)*10;if(k===0)x.moveTo(16,yy);else x.lineTo(16+k*28,yy);}x.stroke();
+   x.fillStyle='#cfd9e6';for(var q=0;q<4;q++){x.fillRect(12,34+q*0,0,0);} x.beginPath();x.arc(16+((Math.floor(t*2)%9)*28),130-(Math.floor(t*2)%9)*9,6,0,6.3);x.fill();},
  planli:function(x,w,h){x.fillStyle='#e9edf3';x.fillRect(0,0,w,h);x.fillStyle='#8a94a3';x.font='700 70px sans-serif';x.textAlign='center';x.fillText('?',w/2,110);}
 };
 
@@ -450,7 +455,7 @@ function station(a){
   var ghost=a.durum==='planli';
   var M=function(c){return mk(c,ghost);};
   var g=new THREE.Group(); g.position.set(a.x,0,a.z); g.rotation.y=a.yaw; g.userData.id=a.id; scene.add(g);
-  var st={a:a,g:g,screens:[],ticks:[]}; var ch, accent=({icerik:0x2b7de9,istatistik:0x3cc47a,instagram:0xe1306c,youtube:0xe62117,gorsel:0xf0b429,planli:0x8a94a3,sen:0x7c5cff})[a.tip]||0x8a94a3;
+  var st={a:a,g:g,screens:[],ticks:[]}; var ch, accent=({trend:0xf0b429,icerik:0x2b7de9,istatistik:0x3cc47a,instagram:0xe1306c,youtube:0xe62117,gorsel:0xf0b429,planli:0x8a94a3,sen:0x7c5cff})[a.tip]||0x8a94a3;
   var ph=a.x*0.7+a.z;
   if(a.tip==='doktor'){
     var c=makeChar(M,{pose:'stand',shirt:0x9aa4b2,pants:0x2f3e55,extra:'doktor',skin:0xf1c9a5});
@@ -496,7 +501,7 @@ function station(a){
     c3.g.rotation.y=0.35; st.char=c3;
   } else {
     var scr=screen(DRAW[a.tip]||DRAW.planli); st.screens.push(scr);
-    var look=({icerik:{shirt:0x2b7de9,hair:0x2b2a33,extra:'gozluk'},instagram:{shirt:0xe1306c,hair:0x5a3825,extra:'kep',cap:0xe1306c},youtube:{shirt:0xe62117,hair:0x1f1f26,extra:'kulaklik'},planli:{shirt:0x8a94a3,hair:0x4a4f58,extra:''},sen:{shirt:0x7c5cff,hair:0x2a2018,extra:''}})[a.tip];
+    var look=({icerik:{shirt:0x2b7de9,hair:0x2b2a33,extra:'gozluk'},trend:{shirt:0xf0b429,hair:0x3a2a20,extra:'kulaklik'},instagram:{shirt:0xe1306c,hair:0x5a3825,extra:'kep',cap:0xe1306c},youtube:{shirt:0xe62117,hair:0x1f1f26,extra:'kulaklik'},planli:{shirt:0x8a94a3,hair:0x4a4f58,extra:''},sen:{shirt:0x7c5cff,hair:0x2a2018,extra:''}})[a.tip];
     var skinC=a.tip==='instagram'?0xf1c9a5:(a.tip==='youtube'?0xc98f66:0xe8b995); st.look={shirt:look.shirt,hair:look.hair,extra:look.extra,cap:look.cap,skin:skinC};
     var c4=makeChar(M,{pose:'sit',shirt:look.shirt,hair:look.hair,extra:look.extra,cap:look.cap,skin:skinC});
     chair(M,g,accent); c4.g.position.y=0.0; g.add(c4.g);
@@ -514,7 +519,7 @@ function station(a){
     }
     var work=a.durum==='calisiyor';
     st.ticks.push(function(t){
-      if(work){ var sp=st.busy?1.9:1; c4.aL.rotation.x=-1.15+Math.sin(t*9*sp+ph)*0.1; c4.aR.rotation.x=-1.15+Math.sin(t*8.3*sp+ph)*0.1; c4.head.rotation.x=0.1+Math.sin(t*1.7+ph)*0.05; c4.head.rotation.y=0.15+Math.sin(t*0.8+ph)*0.1; }
+      if(a.durum==='calisiyor'){ var sp=st.busy?1.9:1; c4.aL.rotation.x=-1.15+Math.sin(t*9*sp+ph)*0.1; c4.aR.rotation.x=-1.15+Math.sin(t*8.3*sp+ph)*0.1; c4.head.rotation.x=0.1+Math.sin(t*1.7+ph)*0.05; c4.head.rotation.y=0.15+Math.sin(t*0.8+ph)*0.1; }
       else if(!ghost){ c4.aL.rotation.x=-0.7; c4.aR.rotation.x=-0.7; c4.head.rotation.y=Math.sin(t*0.6+ph)*0.55; c4.head.rotation.x=Math.sin(t*0.4+ph)*0.05; }
       else { c4.aL.rotation.x=-0.5; c4.aR.rotation.x=-0.5; }
     });
@@ -811,6 +816,30 @@ function yayinSahnesiBitir(hedefler,bitti){
   hedefler.forEach(function(t){var st=ST[t]; if(st){st.busy=false; st.busyRing.visible=false;}});
 }
 pSifreHazirla();
+
+/* ---------- Canlı durum (GitHub'daki gerçek çalışmalar) ---------- */
+var ZAMANLI={icerik:36,istatistik:36,trend:96};
+function canliUygula(v){
+  var ajan=v.ajanlar||{};
+  AJ.forEach(function(a){
+    var w=ajan[a.id]; if(!w||w.yok) return;
+    var yas=(Date.now()-Date.parse(w.son))/36e5, olay=w.olay==='schedule'?'otomatik':'elle';
+    a.son=w.son; a.adres=w.adres;
+    if(w.durum!=='completed'){ a.durum='calisiyor'; a.sonuc='Şu an çalışıyor…'; return; }
+    if(w.sonuc==='success'){
+      a.sonuc='Başarılı ('+olay+').';
+      if(ZAMANLI[a.id]){ if(yas<=ZAMANLI[a.id]) a.durum='calisiyor'; else { a.durum='hazir'; a.sonuc+=' Uzun süredir çalışmadı ('+Math.round(yas)+' saat önce).'; } }
+      else a.durum='hazir';
+    } else if(w.sonuc==='failure'||w.sonuc==='timed_out'){ a.durum='hata'; a.sonuc='Son çalışma başarısız oldu. GitHub kaydına bak.'; }
+    else { a.sonuc='Son çalışma: '+(w.sonuc||'bilinmiyor')+'.'; }
+  });
+  stations.forEach(function(st){ var d=DURUM[st.a.durum]; st.pb.material.color.set(d.c); var i=st.lb.querySelector('i'); if(i) i.style.background='var('+d.v+')'; });
+  renderChips();
+  var ta=$('#dMetin'); if(!(ta&&(ta.value||document.activeElement===ta))) renderInfo();
+  $('#snap').textContent='Ajan durumları GitHub’dan canlı okundu ('+fmt(v.zaman)+'). Hareketler ajanın durumunu gösterir.';
+}
+function canliCek(){ fetch('/api/ajanlar').then(function(r){return r.ok?r.json():null;}).then(function(v){ if(v&&v.ajanlar) canliUygula(v); }).catch(function(){}); }
+canliCek(); setInterval(canliCek,300000);
 
 var SR=window.SpeechRecognition||window.webkitSpeechRecognition, rec=null;
 document.addEventListener('click',function(e){
