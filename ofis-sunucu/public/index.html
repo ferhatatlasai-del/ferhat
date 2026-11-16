@@ -41,6 +41,14 @@ textarea{resize:vertical;min-height:72px}
 .pub .sonuc i{width:10px;height:10px;border-radius:50%;background:var(--plan);flex:none}
 .pub .sonuc .ok i{background:var(--ok)}.pub .sonuc .cal i{background:var(--accent)}.pub .sonuc .kt i{background:#d6453d}
 .pub .hata{color:#d6453d;font-size:13.5px;margin-top:8px}
+.tr{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:8px;background:var(--bg)}
+.tr summary{cursor:pointer;font-weight:600;display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
+.tr .gov{margin-top:8px;display:grid;gap:6px;font-size:14px}
+.tr .gov b{font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);display:block}
+.rozet{font-size:11.5px;font-weight:600;padding:1px 8px;border-radius:999px;border:1px solid currentColor}
+.rozet.iyi{color:var(--ok)}.rozet.orta{color:var(--ready)}.rozet.zayif{color:var(--plan)}.rozet.kt{color:var(--err)}
+.tr a{color:var(--ready);word-break:break-all}
+.tr button{background:var(--accent);border:1px solid var(--accent);color:#111;border-radius:10px;padding:7px 12px;font-size:13.5px;font-weight:600;justify-self:start}
 .bub{position:absolute;left:0;top:0;transform:translate(-50%,-100%);max-width:230px;background:var(--panel);color:var(--ink);border:2px solid var(--accent);border-radius:12px;padding:6px 10px;font-size:12.5px;line-height:1.35;box-shadow:0 2px 8px rgba(10,20,40,.2);pointer-events:none;z-index:3}
 .bub[hidden]{display:none}
 #run{margin-bottom:12px}
@@ -136,6 +144,11 @@ dd{margin:1px 0 0}
         <span><i style="background:var(--you)"></i>Sen</span>
       </div>
       <div class="chips" id="chips"></div>
+      <div class="card pub" id="trKart">
+        <h2>Trend fikirleri</h2>
+        <p class="alt" id="trAlt">Yükleniyor…</p>
+        <div id="trListe"></div>
+      </div>
       <div class="card pub" id="pub">
         <h2>Video yayınla</h2>
         <p class="alt">Google Flow’da yaptığın videoyu seç, önizle, yükle. Sonra Instagram ve YouTube’da birlikte yayınla.</p>
@@ -200,7 +213,7 @@ var AJ=[
   son:null,sonuc:'Hiç çalıştırılmadı.',zaman:'Elle.',not:'Görseller şimdilik Gemini’de ücretsiz üretiliyor.'},
  {id:'trend',ad:'Trend ajanı',kisa:'Trend',durum:'hazir',x:-8,z:2.8,yaw:Math.PI/2,tip:'trend',
   gorev:'İnternette (YouTube Shorts, Instagram, Reddit, Printables) güncel 3D baskı trendlerini araştırır, içerik ajanına fikir verir.',
-  son:null,sonuc:'Henüz çalışmadı.',zaman:'Haftada iki kez (pazartesi, perşembe) ve elle.',not:'Kaynak bağlantılarını doğrular, doğrulanamayanı zayıf işaretler. Başkasının içeriğini kopyalamaz.'},
+  son:null,sonuc:'Henüz çalışmadı.',zaman:'Haftada iki kez (pazartesi, perşembe) ve elle.',not:'Bulduğu fikirler aşağıdaki “Trend fikirleri” kartında. Kaynak bağlantılarını doğrular, başkasının içeriğini kopyalamaz.'},
  {id:'facebook',ad:'Facebook yayın ajanı',kisa:'Facebook',durum:'planli',x:7.6,z:0.2,yaw:0,tip:'planli',
   gorev:'Videoyu Facebook Reels olarak paylaşır.',
   son:null,sonuc:'Kurulmadı.',zaman:'Planlı.',not:'Ayrı kurulum gerekir.'},
@@ -840,6 +853,41 @@ function canliUygula(v){
 }
 function canliCek(){ fetch('/api/ajanlar').then(function(r){return r.ok?r.json():null;}).then(function(v){ if(v&&v.ajanlar) canliUygula(v); }).catch(function(){}); }
 canliCek(); setInterval(canliCek,300000);
+
+/* ---------- Trend fikirleri kartı ---------- */
+function dom(tag,cls,txt){var e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e;}
+function temizMetin(t){return String(t||'').replace(/\s*\(\[[^\]]*\]\([^)]*\)\)/g,'').replace(/\[([^\]]*)\]\([^)]*\)/g,'$1').trim();}
+function guvenSinif(g){return g==='yuksek'?'iyi':(g==='orta'?'orta':'zayif');}
+function trendCiz(v){
+  var kap=$('#trListe'); kap.textContent='';
+  if(!v||v.yok||!v.oneriler||!v.oneriler.length){ $('#trAlt').textContent='Henüz trend araştırması yok. Trend ajanı çalışınca fikirler burada görünür.'; return; }
+  $('#trAlt').textContent='Araştırma zamanı: '+fmt(v.tarih)+'. '+v.oneriler.length+' fikir. Birine dokununca ayrıntısı açılır. “Bu fikirle direktif ver” düğmesi fikri içerik ajanına gönderir.';
+  v.oneriler.forEach(function(o){
+    var d=dom('details','tr'), sm=dom('summary',null,o.konu||'Fikir');
+    sm.appendChild(dom('span','rozet '+guvenSinif(o.guven),'güven: '+(o.guven||'?')));
+    sm.appendChild(dom('span','rozet '+(o.basilabilir?'iyi':'kt'),o.basilabilir?'basılabilir':'nesne değil'));
+    if(o.format_onerisi) sm.appendChild(dom('span','rozet orta',o.format_onerisi));
+    d.appendChild(sm);
+    var g=dom('div','gov');
+    function satir(baslik,metin){ if(!metin) return; var x=dom('div'); x.appendChild(dom('b',null,baslik)); x.appendChild(document.createTextNode(metin)); g.appendChild(x); }
+    satir('Neden trend',temizMetin(o.neden_trend)); satir('Bizim açımız',temizMetin(o.kanca_acisi)); satir('Basılabilirlik',temizMetin(o.basilabilir_notu));
+    if(o.risk&&o.risk!=='yok') satir('Risk',o.risk);
+    var kx=dom('div'); kx.appendChild(dom('b',null,'Kaynaklar'));
+    var kayn=(o.kaynaklar||[]).filter(function(u){return /^https:\/\//.test(u);});
+    if(kayn.length) kayn.forEach(function(u){ var a=dom('a',null,u); a.href=u; a.target='_blank'; a.rel='noopener noreferrer'; kx.appendChild(a); kx.appendChild(dom('br')); });
+    else kx.appendChild(document.createTextNode('Doğrulanamadı, yalnızca esin olarak kullanılır.'));
+    g.appendChild(kx);
+    var b=dom('button',null,'Bu fikirle direktif ver'); b.type='button';
+    b.addEventListener('click',function(){
+      select('icerik'); var ta=$('#dMetin');
+      if(ta){ ta.value='Şu trendden esinlenerek özgün bir içerik üret (kimseyi kopyalama, son yayınladıklarımızı tekrar etme): '+o.konu+'. Açı: '+(o.kanca_acisi||''); ta.scrollIntoView({behavior:'smooth',block:'center'}); ta.focus(); }
+    });
+    g.appendChild(b); d.appendChild(g); kap.appendChild(d);
+  });
+  if(v.asiri_kullanilan&&v.asiri_kullanilan.length){ var a=dom('p','not','Aşırı kullanılan, kaçınılacak: '+v.asiri_kullanilan.join(', ')+'.'); kap.appendChild(a); }
+}
+function trendCek(){ fetch('/api/trendler').then(function(r){return r.ok?r.json():null;}).then(function(v){ if(v) trendCiz(v); else $('#trAlt').textContent='Trendler okunamadı.'; }).catch(function(){ $('#trAlt').textContent='Trendler okunamadı.'; }); }
+trendCek(); setInterval(trendCek,600000);
 
 var SR=window.SpeechRecognition||window.webkitSpeechRecognition, rec=null;
 document.addEventListener('click',function(e){

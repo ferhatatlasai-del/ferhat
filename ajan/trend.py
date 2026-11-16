@@ -88,6 +88,12 @@ def temiz_adres(u):
     return re.sub(r"[?&]utm_[^&]*", "", u or "").rstrip("/?&")
 
 
+def temiz_metin(t):
+    """Modelin metne gömdüğü ham bağlantı işaretlerini ([site](url)) temizler; kaynaklar ayrı alanda."""
+    t = re.sub(r"\s*\(\[[^\]]*\]\([^)]*\)\)", "", t or "")
+    return re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", t).strip()
+
+
 def json_ayikla(metin):
     m = re.search(r"\{.*\}", metin, re.S)
     if not m:
@@ -121,6 +127,8 @@ def main():
         if not (o.get("konu") or "").strip():
             continue
         kaynaklar = [k for k in (o.get("kaynaklar") or []) if temiz_adres(k) in dogrulanan]
+        for alan in ("neden_trend", "basilabilir_notu", "kanca_acisi"):
+            o[alan] = temiz_metin(o.get(alan))
         o["kaynaklar"] = kaynaklar
         o["dogrulandi"] = bool(kaynaklar)
         if not kaynaklar:

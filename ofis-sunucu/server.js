@@ -16,6 +16,7 @@ const AKIS_YT = 'youtube-yukle.yml';
 // Ajan kimliği -> iş akışı dosyası (panel durumu buradan okunur)
 const AJAN_AKISLARI = { icerik: 'gunluk-taslak.yml', istatistik: 'gunluk-taslak.yml', instagram: 'yayinla.yml', youtube: 'youtube-yukle.yml', gorsel: 'gorsel.yml', trend: 'trend.yml' };
 let ajanOnbellek = { t: 0, veri: null };
+let trendOnbellek = { t: 0, veri: null };
 const GH_API = process.env.GH_API || 'https://api.github.com';
 const MAX_VIDEO = 30 * 1024 * 1024;
 const YZ_SATIRI = '🤖 Doktor Filament yapay zekâ ile üretilmiş bir karakterdir.';
@@ -111,6 +112,20 @@ async function api(req, res, url) {
     if (!TOKEN) return json(res, 503, { hata: 'Sunucuda GITHUB_TOKEN tanımlı değil.' });
     try { return json(res, 200, { zaman: new Date().toISOString(), ajanlar: await ajanDurumlari() }); }
     catch (e) { return json(res, 502, { hata: 'GitHub okunamadı.' }); }
+  }
+  if (url.pathname === '/api/trendler') {
+    if (!TOKEN) return json(res, 503, { hata: 'Sunucuda GITHUB_TOKEN tanımlı değil.' });
+    if (Date.now() - trendOnbellek.t < 60e3 && trendOnbellek.veri) return json(res, 200, trendOnbellek.veri);
+    try {
+      const dal = await varsayilanDal();
+      const r = await gh(`/repos/${REPO}/contents/ajan/trendler.json?ref=${encodeURIComponent(dal)}`);
+      if (r.status === 404) return json(res, 200, { yok: true });
+      if (!r.ok) return json(res, 502, { hata: 'Trendler okunamadı.' });
+      const d = await r.json();
+      const veri = JSON.parse(Buffer.from(d.content || '', 'base64').toString('utf8'));
+      trendOnbellek = { t: Date.now(), veri };
+      return json(res, 200, veri);
+    } catch (e) { return json(res, 502, { hata: 'Trendler okunamadı.' }); }
   }
   if (!TOKEN || !SIFRE) return json(res, 503, { hata: 'Sunucuda GITHUB_TOKEN ya da PANEL_SIFRE tanımlı değil.' });
   if (kilitliMi(req)) return json(res, 429, { hata: 'Çok fazla yanlış deneme. 15 dakika sonra tekrar dene.' });
