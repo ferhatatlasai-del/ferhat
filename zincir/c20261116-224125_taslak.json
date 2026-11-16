@@ -1,0 +1,63 @@
+{
+  "konu": "Tek Parça Snap-Latch Mikro Alet Kutusu",
+  "format": "reels",
+  "seri": "Doktor Notu",
+  "kanca": "Kapağı ayrı değil. Kilidi ayrı değil. Tek parçada çalışıyor.",
+  "slaytlar": [],
+  "sure_sn": 25,
+  "sahneler": [
+    {
+      "sure_sn": 5,
+      "gorsel": "Doctor Filament holding a tiny one-piece snap-latch tool box in a tidy 3D printing workshop, soft purple and pink blurred background, close-up on the latch area, no text on screen",
+      "ekran_yazisi": "Hepsi tek parça.",
+      "seslendirme": "Merhaba, ben Doktor Filament! Yapay zekâyım, tek hastalığım katman katman merak!",
+      "karakter_gorunur": true,
+      "sahne_promptu": "Doctor Filament in a tidy 3D printing workshop, presenting a tiny one-piece snap-latch tool box, close-up framing, soft purple and pink blurred background, no text on screen"
+    },
+    {
+      "sure_sn": 6,
+      "gorsel": "Close-up of the box lid flexing open and snapping shut in slow motion, showing integrated hinge and latch, workshop background blurred, no text on screen",
+      "ekran_yazisi": "Menteşe de içerde.",
+      "seslendirme": "Bak, kapak ayrı bir parça değil. Menteşe de kilit de modelin içinde.",
+      "karakter_gorunur": false,
+      "sahne_promptu": "Close-up of a one-piece printed box flexing open and snapping shut, integrated hinge and latch visible, workshop background blurred, no text on screen"
+    },
+    {
+      "sure_sn": 6,
+      "gorsel": "Macro view of the print-in-place gap between moving parts on the box, showing clean clearances and smooth edges, no text on screen",
+      "ekran_yazisi": "Boşluk tam ayarı.",
+      "seslendirme": "Küçük boşluklar kritik. Sıkı olursa takılır. Gevşek olursa tutmaz.",
+      "karakter_gorunur": false,
+      "sahne_promptu": "Macro view of the gap between moving parts on a print-in-place snap-latch box, clean clearances and smooth edges, no text on screen"
+    },
+    {
+      "sure_sn": 5,
+      "gorsel": "The micro tool box sitting on a desk with tiny screws and bits beside it, lid closed, subtle hand entering frame, no text on screen",
+      "ekran_yazisi": "Küçük parça, büyük iş.",
+      "seslendirme": "Amaç gösteriş değil. Masadaki ufak şeyleri bir arada tutmak.",
+      "karakter_gorunur": false,
+      "sahne_promptu": "A small printed snap-latch tool box on a desk beside tiny screws and bits, lid closed, subtle hand nearby, no text on screen"
+    },
+    {
+      "sure_sn": 3,
+      "gorsel": "Doctor Filament smiling beside the closed box, warm workshop lighting, soft purple and pink blurred background, no text on screen",
+      "ekran_yazisi": "Son kontrol.",
+      "seslendirme": "Sıradaki baskı ne olsun? Yorumlara yaz, reçeteyi ben yazayım!",
+      "karakter_gorunur": true,
+      "sahne_promptu": "Doctor Filament smiling beside the closed one-piece snap-latch box in a tidy 3D printing workshop, warm lighting, soft purple and pink blurred background, no text on screen"
+    }
+  ],
+  "instagram_caption": "Tek parça, tek mekanizma, küçük bir kutu.\nKapak ayrı değil. Kilit ayrı değil.\nBu tip print-in-place tasarımlar gerçekten akıllıca.\nYorumlara yaz: sıradaki baskı ne olsun?",
+  "youtube_baslik": "Tek Parça Snap-Latch Mikro Alet Kutusu",
+  "youtube_aciklama": "Tek parçada çalışan küçük bir kutu nasıl mantık kuruyor? Bugün bir snap-latch tasarımın katman katman mantığına bakıyoruz. Yorumlara sıradaki fikri yaz.",
+  "facebook_caption": "Kapağı ayrı değil.\nKilidi ayrı değil.\nTek parça bir kutu, ama mekanizması ayrı bir mesele.\nSıradaki baskı fikrini yorumlara bırak.",
+  "hashtagler": [
+    "#3DYazıcı",
+    "#3DBaskı",
+    "#PrintInPlace",
+    "#DoktorFilament",
+    "#DoktorNotu",
+    "#3DPrinting"
+  ],
+  "model_notu": "CC0 veya CC BY lisanslı print-in-place snap-latch box, integrated hinge, mini tool box, parametric enclosure arayın; ya da basit bir kendi tasarımınızda tek parça kapak-kilit mantığı kurun."
+}
