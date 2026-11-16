@@ -136,9 +136,9 @@ async function zincirListesi() {
   zincirOnbellek = { t: Date.now(), veri };
   return veri;
 }
-async function direktifBaslat(metin) {
+async function direktifBaslat(metin, format) {
   const dal = await varsayilanDal();
-  const r = await gh(`/repos/${REPO}/actions/workflows/${AKIS}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: { direktif: metin } }) });
+  const r = await gh(`/repos/${REPO}/actions/workflows/${AKIS}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: { direktif: metin, format } }) });
   return { r, baslangic: new Date(Date.now() - 5000).toISOString() };
 }
 
@@ -200,7 +200,8 @@ async function api(req, res, url) {
     let b; try { b = await govde(req); } catch (e) { return json(res, 400, { hata: 'Geçersiz istek.' }); }
     const metin = String(b.metin || '').replace(/\s+/g, ' ').trim().slice(0, 500);
     if (url.pathname === '/api/direktif' && metin.length < 3) return json(res, 400, { hata: 'Direktif çok kısa.' });
-    const { r } = await direktifBaslat(metin);
+    const format = ['reels', 'carousel', 'otomatik'].includes(b.format) ? b.format : 'reels';
+    const { r } = await direktifBaslat(metin, format);
     if (r.status !== 204) { const t = await r.text(); return json(res, 502, { hata: 'GitHub kabul etmedi (' + r.status + ').', ayrinti: t.slice(0, 200) }); }
     direktifler.push(simdi);
     return json(res, 200, { ok: true, baslangic: new Date(simdi - 5000).toISOString() });

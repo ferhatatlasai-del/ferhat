@@ -7,6 +7,10 @@ on:
         description: "İsteğe bağlı direktif (boş olabilir). Trend araştırılır, içerik ajanı en iyi fikri seçer, senaryo ve video paketi hazırlanır."
         required: false
         default: ""
+      format:
+        description: "İçerik biçimi: reels (video senaryosu), carousel ya da otomatik"
+        required: false
+        default: "reels"
 
 permissions:
   contents: write
@@ -33,9 +37,10 @@ jobs:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           IG_USER_ID: "17841457188392262"
           DIREKTIF: ${{ inputs.direktif }}
+          FORMAT: ${{ inputs.format }}
         run: |
           python3 ajan/istatistik.py || true
-          python3 ajan/uret.py --benzersiz --direktif "$DIREKTIF"
+          python3 ajan/uret.py --benzersiz --format "$FORMAT" --direktif "$DIREKTIF"
       - name: Video paketi
         run: python3 ajan/paket.py --son
       - name: Kaydet
