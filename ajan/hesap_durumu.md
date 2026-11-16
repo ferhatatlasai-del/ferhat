@@ -8,7 +8,7 @@
 - **Gönderi sayısı:** 14
 
 ## Son gönderiler (yeniden eskiye)
-- 2026-11-15 | VIDEO | beğeni 2 · yorum 1 | "Tanışın: Doktor Filament! 🤖"
+- 2026-11-15 | VIDEO | beğeni 3 · yorum 1 | "Tanışın: Doktor Filament! 🤖"
 - 2025-11-26 | VIDEO | beğeni 4 · yorum 0 | ""
 - 2025-11-26 | VIDEO | beğeni 0 · yorum 0 | ""
 - 2025-11-26 | VIDEO | beğeni 0 · yorum 0 | ""
