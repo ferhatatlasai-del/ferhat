@@ -104,7 +104,29 @@ def json_ayikla(metin):
         hata(f"JSON okunamadı: {e}")
 
 
+def taze_mi(gun):
+    yol = KOK / "ajan" / "trendler.json"
+    if not yol.exists():
+        return None
+    try:
+        v = json.loads(yol.read_text(encoding="utf-8"))
+        z = datetime.datetime.strptime(v["tarih"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=datetime.timezone.utc)
+    except Exception:
+        return None
+    yas = (datetime.datetime.now(datetime.timezone.utc) - z).total_seconds() / 86400
+    return yas if yas < gun else None
+
+
 def main():
+    if "--en-fazla-gun" in sys.argv:
+        try:
+            gun = float(sys.argv[sys.argv.index("--en-fazla-gun") + 1])
+        except (IndexError, ValueError):
+            hata("--en-fazla-gun bir sayı bekliyor.")
+        yas = taze_mi(gun)
+        if yas is not None:
+            print(f"Trendler taze ({yas:.1f} gün önce araştırıldı, sınır {gun:g} gün); yeniden araştırma atlandı.")
+            return
     veri, kullanilan = None, None
     for tur in ARAC_TURLERI:
         try:

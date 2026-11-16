@@ -1,0 +1,48 @@
+name: İçerik zinciri
+
+on:
+  workflow_dispatch:
+    inputs:
+      direktif:
+        description: "İsteğe bağlı direktif (boş olabilir). Trend araştırılır, içerik ajanı en iyi fikri seçer, senaryo ve video paketi hazırlanır."
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: zincir
+  cancel-in-progress: false
+
+jobs:
+  zincir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Trend kontrolü
+        continue-on-error: true
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5.4-mini' }}
+        run: python3 ajan/trend.py --en-fazla-gun 3
+      - name: İçerik ajanı
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5.4-mini' }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: "17841457188392262"
+          DIREKTIF: ${{ inputs.direktif }}
+        run: |
+          python3 ajan/istatistik.py || true
+          python3 ajan/uret.py --benzersiz --direktif "$DIREKTIF"
+      - name: Video paketi
+        run: python3 ajan/paket.py --son
+      - name: Kaydet
+        run: |
+          git config user.name "zincir"
+          git config user.email "zincir@users.noreply.github.com"
+          git add taslaklar zincir ajan/trendler.json ajan/trendler.md ajan/hesap_durumu.md 2>/dev/null || git add taslaklar zincir
+          git diff --cached --quiet || git commit -m "İçerik zinciri: yeni senaryo ve video paketi"
+          git pull --rebase -q || true
+          git push

@@ -1,0 +1,36 @@
+{
+  "kimlik": "y20261115-215647",
+  "olusturma": "2026-11-15T21:56:47Z",
+  "durum": "yayinda",
+  "kaynak": "bagimsiz",
+  "direktif": "",
+  "konu": "Doktor Filament ile Tanışın: 3D Baskıyı Katman Katman Anlatıyor",
+  "format": "reels",
+  "seri": "",
+  "kanca": "",
+  "video": {
+    "yol": "videolar/doktor_filament_acilis_v2.mp4",
+    "tarih": "2026-11-15T21:50:00Z"
+  },
+  "yayinlar": [
+    {
+      "platform": "instagram",
+      "tur": "reels",
+      "durum": "yayinda",
+      "tarih": "2026-11-15T21:56:47Z",
+      "link": "https://www.instagram.com/reel/Dfxy_-8Ekyj/",
+      "medya_kimligi": "18121842679765284"
+    },
+    {
+      "platform": "youtube",
+      "tur": "shorts",
+      "durum": "yayinda",
+      "tarih": "2026-11-16T07:00:05Z",
+      "link": "https://www.youtube.com/shorts/q3Un0K1sjbE",
+      "medya_kimligi": "q3Un0K1sjbE"
+    }
+  ],
+  "olcumler": [],
+  "ogrenildi": false,
+  "not": "Zincir öncesi yayınlanan ilk video; kayıt sonradan eklendi."
+}
