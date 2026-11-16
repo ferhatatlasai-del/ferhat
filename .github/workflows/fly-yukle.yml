@@ -27,10 +27,13 @@ jobs:
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - name: Kontrol ya da yükleme
         run: |
+          # Anahtarın başındaki/sonundaki görünmez satır sonu karakterlerini temizle (panodan kopyalamada kalabiliyor)
+          FLY_API_TOKEN="$(printf '%s' "$FLY_API_TOKEN" | tr -d '\r\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+          export FLY_API_TOKEN
           if [ "$ONAY" = "EVET" ]; then
             cd ofis-sunucu
             flyctl deploy --remote-only -a "$UYGULAMA"
           else
             echo "KONTROL MODU: yüklenmedi. Uygulama: $UYGULAMA"
-            flyctl status -a "$UYGULAMA" || true
+            flyctl status -a "$UYGULAMA"
           fi
