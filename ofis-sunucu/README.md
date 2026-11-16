@@ -25,3 +25,6 @@ Her komutta `-a gurtechs-ajan-ofisi` yaz; yanlış uygulamaya dokunma.
 - Saatte en fazla 6 yayın. Onay verilmeden hiçbir şey yayınlanmaz.
 - **GitHub anahtarında `Contents: Read and write` izni gerekir** (videoyu depoya kaydetmek için). Anahtar yalnızca bu depoya erişir.
 - Not: Depo herkese açıksa yüklenen video, yayınlanmadan önce de depoda görünür.
+
+## Canlı ajan durumu
+Panel, `/api/ajanlar` uç noktasından her ajanın iş akışının son GitHub çalışmasını okur (60 sn önbellek, şifre gerekmez, yalnızca herkese açık çalışma bilgisi). Yeşil: son 36 saatte (trend için 4 gün) başarılı çalıştı. Mavi: elle tetiklenir ya da uzun süredir çalışmadı. Kırmızı: son çalışma başarısız.

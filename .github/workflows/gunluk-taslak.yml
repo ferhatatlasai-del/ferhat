@@ -29,4 +29,5 @@ jobs:
           git config user.email "icerik-ajani@users.noreply.github.com"
           git add taslaklar ajan/hesap_durumu.md 2>/dev/null || git add taslaklar
           git diff --cached --quiet || git commit -m "Günlük taslak ekle"
+          git pull --rebase -q || true
           git push

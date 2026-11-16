@@ -13,6 +13,9 @@ const SIFRE = process.env.PANEL_SIFRE || '';
 const AKIS = 'icerik-direktif.yml';
 const AKIS_IG = 'yayinla.yml';
 const AKIS_YT = 'youtube-yukle.yml';
+// Ajan kimliği -> iş akışı dosyası (panel durumu buradan okunur)
+const AJAN_AKISLARI = { icerik: 'gunluk-taslak.yml', istatistik: 'gunluk-taslak.yml', instagram: 'yayinla.yml', youtube: 'youtube-yukle.yml', gorsel: 'gorsel.yml', trend: 'trend.yml' };
+let ajanOnbellek = { t: 0, veri: null };
 const GH_API = process.env.GH_API || 'https://api.github.com';
 const MAX_VIDEO = 30 * 1024 * 1024;
 const YZ_SATIRI = '🤖 Doktor Filament yapay zekâ ile üretilmiş bir karakterdir.';
@@ -86,8 +89,29 @@ async function calismaLinki(run) {
 
 async function varsayilanDal() { const r = await gh(`/repos/${REPO}`); const j = await r.json(); return j.default_branch; }
 
+async function ajanDurumlari() {
+  if (Date.now() - ajanOnbellek.t < 60e3 && ajanOnbellek.veri) return ajanOnbellek.veri;
+  const dosyalar = [...new Set(Object.values(AJAN_AKISLARI))];
+  const akis = {};
+  for (const d of dosyalar) {
+    const r = await gh(`/repos/${REPO}/actions/workflows/${d}/runs?per_page=5`);
+    if (!r.ok) { akis[d] = { yok: true }; continue; }
+    const run = ((await r.json()).workflow_runs || [])[0];
+    akis[d] = run ? { son: run.run_started_at || run.created_at, durum: run.status, sonuc: run.conclusion, adres: run.html_url, olay: run.event } : { yok: true };
+  }
+  const veri = {};
+  for (const [id, d] of Object.entries(AJAN_AKISLARI)) veri[id] = akis[d];
+  ajanOnbellek = { t: Date.now(), veri };
+  return veri;
+}
+
 async function api(req, res, url) {
   if (url.pathname === '/api/ping') return json(res, 200, { ok: true, hazir: !!(TOKEN && SIFRE) });
+  if (url.pathname === '/api/ajanlar') {
+    if (!TOKEN) return json(res, 503, { hata: 'Sunucuda GITHUB_TOKEN tanımlı değil.' });
+    try { return json(res, 200, { zaman: new Date().toISOString(), ajanlar: await ajanDurumlari() }); }
+    catch (e) { return json(res, 502, { hata: 'GitHub okunamadı.' }); }
+  }
   if (!TOKEN || !SIFRE) return json(res, 503, { hata: 'Sunucuda GITHUB_TOKEN ya da PANEL_SIFRE tanımlı değil.' });
   if (kilitliMi(req)) return json(res, 429, { hata: 'Çok fazla yanlış deneme. 15 dakika sonra tekrar dene.' });
   if (!sifreDogru(req.headers['x-sifre'])) { yanlisKaydet(req); return json(res, 401, { hata: 'Şifre yanlış.' }); }
