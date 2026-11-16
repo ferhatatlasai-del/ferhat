@@ -27,6 +27,7 @@ textarea{resize:vertical;min-height:72px}
 .pub label.k{display:block;font-weight:600;font-size:13.5px;margin:12px 0 4px}
 .pub input[type=text],.pub textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
 .pub textarea{min-height:110px;resize:vertical}
+.pub video[hidden]{display:none}
 .pub video{width:100%;max-width:240px;border-radius:12px;background:#000;display:block;margin-top:8px}
 .pub button{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:14px;font-weight:500}
 .pub button.ana{background:var(--accent);border-color:var(--accent);color:#111;font-weight:600}
@@ -41,6 +42,24 @@ textarea{resize:vertical;min-height:72px}
 .pub .sonuc i{width:10px;height:10px;border-radius:50%;background:var(--plan);flex:none}
 .pub .sonuc .ok i{background:var(--ok)}.pub .sonuc .cal i{background:var(--accent)}.pub .sonuc .kt i{background:#d6453d}
 .pub .hata{color:#d6453d;font-size:13.5px;margin-top:8px}
+.tr{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:8px;background:var(--bg)}
+.tr summary{cursor:pointer;font-weight:600;display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
+.tr .gov{margin-top:8px;display:grid;gap:6px;font-size:14px}
+.tr .gov b{font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);display:block}
+.rozet{font-size:11.5px;font-weight:600;padding:1px 8px;border-radius:999px;border:1px solid currentColor}
+.rozet.iyi{color:var(--ok)}.rozet.orta{color:var(--ready)}.rozet.zayif{color:var(--plan)}.rozet.kt{color:var(--err)}
+.tr a{color:var(--ready);word-break:break-all}
+.tr button{background:var(--accent);border:1px solid var(--accent);color:#111;border-radius:10px;padding:7px 12px;font-size:13.5px;font-weight:600;justify-self:start}
+.asamalar{display:flex;gap:4px;flex-wrap:wrap;margin:6px 0 2px}
+.asama{font-size:11.5px;padding:1px 8px;border-radius:999px;border:1px solid var(--line);color:var(--ink2)}
+.asama.ok{color:var(--ok);border-color:var(--ok)}.asama.yok{opacity:.45}
+.paket{display:grid;gap:8px}
+.sahne{border:1px dashed var(--line);border-radius:10px;padding:8px;font-size:13.5px}
+.sahne b{font-size:12px}
+.kod{white-space:pre-wrap;word-break:break-word;font:12px/1.4 var(--font-body);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px;max-height:130px;overflow:auto;margin:6px 0 0}
+.mini{background:var(--panel)!important;color:var(--ink)!important;border:1px solid var(--line)!important;padding:4px 10px!important;font-size:12.5px!important;font-weight:500!important}
+.uyari{color:var(--err);font-size:13px}
+#zKart select,.pub select{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
 .bub{position:absolute;left:0;top:0;transform:translate(-50%,-100%);max-width:230px;background:var(--panel);color:var(--ink);border:2px solid var(--accent);border-radius:12px;padding:6px 10px;font-size:12.5px;line-height:1.35;box-shadow:0 2px 8px rgba(10,20,40,.2);pointer-events:none;z-index:3}
 .bub[hidden]{display:none}
 #run{margin-bottom:12px}
@@ -136,9 +155,25 @@ dd{margin:1px 0 0}
         <span><i style="background:var(--you)"></i>Sen</span>
       </div>
       <div class="chips" id="chips"></div>
+      <div class="card pub" id="zKart">
+        <h2>Zincir</h2>
+        <p class="alt">Her içerik bir dişlide ilerler: fikir, senaryo, video, yayın, ölçüm, öğrenme. “İçerik üret” zinciri başlatır: trend kontrol edilir, içerik ajanı en gerçekçi fikri seçer, senaryo ve video paketi hazırlanır. Videoyu sen yaparsın.</p>
+        <div class="satir"><button type="button" class="ana" id="zUret">İçerik üret</button></div>
+        <input type="text" id="zDirektif" maxlength="500" placeholder="İsteğe bağlı direktif (boş bırakabilirsin)" style="width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px">
+        <input type="password" id="zSifre" autocomplete="current-password" placeholder="Ofis şifresi" hidden style="margin-top:8px;width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px">
+        <p class="not" id="zDurum">Zincir kayıtları yükleniyor…</p>
+        <div id="zListe"></div>
+      </div>
+      <div class="card pub" id="trKart">
+        <h2>Trend fikirleri</h2>
+        <p class="alt" id="trAlt">Yükleniyor…</p>
+        <div id="trListe"></div>
+      </div>
       <div class="card pub" id="pub">
         <h2>Video yayınla</h2>
         <p class="alt">Google Flow’da yaptığın videoyu seç, önizle, yükle. Sonra Instagram ve YouTube’da birlikte yayınla.</p>
+        <label class="k" for="pIcerik">Hangi içerik için?</label>
+        <select id="pIcerik"><option value="">Zincir dışı (bağımsız video)</option></select>
         <div class="satir"><input type="file" id="pDosya" accept="video/mp4,.mp4"><button type="button" id="pYukle" disabled>Yükle</button></div>
         <input type="password" id="pSifre" autocomplete="current-password" placeholder="Ofis şifresi" hidden style="margin-top:8px;width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px">
         <video id="pOnizle" controls playsinline hidden></video>
@@ -162,7 +197,7 @@ dd{margin:1px 0 0}
       </div>
     </div>
     <aside class="side">
-      <div class="card" id="run" hidden><h2>İçerik ajanı çalışması</h2><ol class="steps" id="steps"></ol><p id="stmsg"></p><div class="dsat"><button type="button" id="btnAtla" hidden>Anlatmayı atla</button></div><div id="sonuc"></div></div>
+      <div class="card" id="run" hidden><h2>Zincir çalışması</h2><ol class="steps" id="steps"></ol><p id="stmsg"></p><div class="dsat"><button type="button" id="btnAtla" hidden>Anlatmayı atla</button></div><div id="sonuc"></div></div>
       <div class="card" id="info" aria-live="polite"></div>
       <p class="note" id="snap"></p>
     </aside>
@@ -195,12 +230,12 @@ var AJ=[
  {id:'youtube',ad:'YouTube yayın ajanı',kisa:'YouTube',durum:'hazir',x:8,z:-5,yaw:0,tip:'youtube',
   gorev:'Videoyu YouTube Shorts olarak yükler. Onay kapılıdır.',
   son:'2026-11-16T07:00:05Z',sonuc:'İlk Shorts yüklendi ve herkese açık yayında.',zaman:'Elle tetiklenir. Onay EVET değilse yalnızca bağlantıyı kontrol eder.',not:'Kanal adındaki yazım hatası (DR. FLAMENT) Studio’dan düzeltilecek.'},
- {id:'gorsel',ad:'Görsel ajanı',kisa:'Görsel',durum:'hazir',x:-8,z:-1.5,yaw:Math.PI/2,tip:'gorsel',
-  gorev:'OpenAI ile Doktor Filament ana görselini üretir.',
-  son:null,sonuc:'Hiç çalıştırılmadı.',zaman:'Elle.',not:'Görseller şimdilik Gemini’de ücretsiz üretiliyor.'},
+ {id:'gorsel',ad:'Video paketi ajanı',kisa:'Video paketi',durum:'hazir',x:-8,z:-1.5,yaw:Math.PI/2,tip:'gorsel',
+  gorev:'Senaryoyu yapay zekâ video aracına (Flow vb.) yapıştırmaya hazır pakete çevirir: sahne sahne prompt, konuşma, süre. Klip 8 sn’yi aşıyorsa ya da konuşma sürece sığmıyorsa uyarır.',
+  son:null,sonuc:'Henüz çalışmadı.',zaman:'İçerik zincirinin son adımı. “İçerik üret” dediğinde çalışır.',not:'Videoyu sen yaparsın, bu ajan video üretmez.'},
  {id:'trend',ad:'Trend ajanı',kisa:'Trend',durum:'hazir',x:-8,z:2.8,yaw:Math.PI/2,tip:'trend',
   gorev:'İnternette (YouTube Shorts, Instagram, Reddit, Printables) güncel 3D baskı trendlerini araştırır, içerik ajanına fikir verir.',
-  son:null,sonuc:'Henüz çalışmadı.',zaman:'Haftada iki kez (pazartesi, perşembe) ve elle.',not:'Kaynak bağlantılarını doğrular, doğrulanamayanı zayıf işaretler. Başkasının içeriğini kopyalamaz.'},
+  son:null,sonuc:'Henüz çalışmadı.',zaman:'Haftada iki kez (pazartesi, perşembe) ve elle.',not:'Bulduğu fikirler aşağıdaki “Trend fikirleri” kartında. Kaynak bağlantılarını doğrular, başkasının içeriğini kopyalamaz.'},
  {id:'facebook',ad:'Facebook yayın ajanı',kisa:'Facebook',durum:'planli',x:7.6,z:0.2,yaw:0,tip:'planli',
   gorev:'Videoyu Facebook Reels olarak paylaşır.',
   son:null,sonuc:'Kurulmadı.',zaman:'Planlı.',not:'Ayrı kurulum gerekir.'},
@@ -231,7 +266,7 @@ function renderChips(){
 function renderInfo(){
   var a=BY[selId], el=$('#info');
   if(!a){
-    el.innerHTML='<h2>Ekip</h2><p style="margin:6px 0 0;color:var(--ink2)">Ofiste 7 ajan, Doktor Filament ve sen varsınız. Beş ajan çalışıyor ya da hazır, ikisi planlı (soluk, boş masalar). Birine dokununca ayrıntısı burada açılır.</p>';
+    el.innerHTML='<h2>Ekip</h2><p style="margin:6px 0 0;color:var(--ink2)">Ofiste 7 ajan, Doktor Filament ve sen varsınız. Facebook ajanı henüz kurulmadı (soluk masa), diğerleri çalışıyor ya da hazır. Birine dokununca ayrıntısı burada açılır.</p>';
     return;
   }
   var d=DURUM[a.durum];
@@ -244,12 +279,12 @@ function renderInfo(){
 }
 function direktifFormu(){
   var sunucu=(typeof MOD!=='undefined'&&MOD==='sunucu'), sifreVar=(typeof SIF!=='undefined'&&SIF);
-  return '<div class="dir"><label for="dMetin">Direktif ver</label>'+
+  return '<div class="dir"><label for="dMetin">Direktif (isteğe bağlı)</label>'+
    '<textarea id="dMetin" maxlength="500" placeholder="Örn: Bir 3D baskı fenomeni gibi hızlı tempolu, merak uyandıran bir içerik üret."></textarea>'+
    (sunucu&&!sifreVar?'<input id="dSifre" type="password" autocomplete="current-password" placeholder="Ofis şifresi" style="margin-top:8px">':'')+
-   '<div class="dsat"><button type="button" id="dMic">Sesle yaz</button><button type="button" id="dGonder" class="ana"'+(typeof busy!=='undefined'&&busy?' disabled':'')+'>'+(sunucu?'Direktifi ver':'Gösteriyi başlat')+'</button></div>'+
+   '<div class="dsat"><button type="button" id="dMic">Sesle yaz</button><button type="button" id="dGonder" class="ana"'+(typeof busy!=='undefined'&&busy?' disabled':'')+'>'+(sunucu?'İçerik üret':'Gösteriyi başlat')+'</button></div>'+
    '<div class="sab"><button type="button" data-t="Bir 3D baskı fenomeni gibi hızlı tempolu, merak uyandıran bir içerik üret.">Fenomen tarzı</button><button type="button" data-t="Evde en çok işe yarayan 5 basılabilir nesneyi anlatan bir carousel üret.">Faydalı 5 nesne</button><button type="button" data-t="Doktor Filament’in 3D baskıda sık yapılan bir hatayı esprili şekilde anlattığı kısa bir video planı üret.">Hata ve çözüm</button></div>'+
-   '<p class="dmsg" id="dMsg">'+(sunucu?'Direktif GitHub’daki içerik ajanını gerçekten çalıştırır. Hiçbir şey yayınlanmaz, yalnızca taslak yazılır.':'Sunucu bağlı değil: bu bir gösteri. Ajan gerçekten çalışmaz.')+'</p></div>';
+   '<p class="dmsg" id="dMsg">'+(sunucu?'Zinciri başlatır: trend kontrolü, içerik ajanı, video paketi. Direktif boş olabilir. Hiçbir şey yayınlanmaz.':'Sunucu bağlı değil: bu bir gösteri. Ajan gerçekten çalışmaz.')+'</p></div>';
 }
 function select(id,focus){
   selId=id; renderChips(); renderInfo();
@@ -646,10 +681,11 @@ function engineUpdate(dt,t){
 var MOD='demo', SIF=''; try{SIF=localStorage.getItem('ofisSifre')||'';}catch(e){}
 function chk(r){return r.json().then(function(j){ if(!r.ok){ if(r.status===401){SIF=''; try{localStorage.removeItem('ofisSifre');}catch(e){}} throw new Error(j.hata||('Hata '+r.status)); } return j; });}
 function apiGet(u){return fetch(u,{headers:{'X-Sifre':SIF}}).then(chk);}
+function apiIcerikUret(metin){return fetch('/api/icerik-uret',{method:'POST',headers:{'X-Sifre':SIF,'Content-Type':'application/json'},body:JSON.stringify({metin:metin||''})}).then(chk);}
 function apiPost(metin){return fetch('/api/direktif',{method:'POST',headers:{'X-Sifre':SIF,'Content-Type':'application/json'},body:JSON.stringify({metin:metin})}).then(chk);}
 fetch('/api/ping').then(function(r){return r.json();}).then(function(j){ if(j&&j.ok){ MOD=j.hazir?'sunucu':'demo'; if(selId==='icerik') renderInfo(); if(typeof pSifreHazirla==='function') pSifreHazirla(); } }).catch(function(){});
 
-var ADIMLAR=['Direktif iletildi','İçerik ajanı çalışıyor','İçerik hazır','Görsel ajanına anlatılıyor','Bitti'];
+var ADIMLAR=['İstek iletildi','Trend kontrolü','İçerik ajanı','Video paketi','Hazır'];
 function adimlar(n,msg,hata){
   $('#run').hidden=false;
   $('#steps').innerHTML=ADIMLAR.map(function(a,i){return '<li class="'+(hata&&i===n?'err':(i<n?'done':(i===n?'active':'')))+'"><i></i>'+a+'</li>';}).join('');
@@ -657,79 +693,90 @@ function adimlar(n,msg,hata){
 }
 function dMsg(t){var e=$('#dMsg'); if(e) e.textContent=t;}
 
+function adimDurum(d,ad){var a=((d&&d.adimlar)||[]).filter(function(x){return x.ad===ad;})[0]; return a?a.durum:'';}
 async function senaryo(metin){
   if(busy) return; busy=true; sahnede=true; need=true;
   var gercek=(MOD==='sunucu');
-  var sen=ST.sen, ic=ST.icerik, gs=ST.gorsel, SPOT=[3.4,3.2], VIS=[-3.4,-3.9], LIS=[-6.2,-1.1];
-  $('#sonuc').innerHTML=''; select(null); adimlar(0,'Direktif veriliyor…');
+  var sen=ST.sen, ic=ST.icerik, gs=ST.gorsel, tr=ST.trend, SPOT=[3.4,3.2], VIS=[-3.4,-3.9], LIS=[-6.2,-1.1];
+  $('#sonuc').innerHTML=''; select(null); adimlar(0,'İstek veriliyor…');
   try{
     W_sen=W_sen||mkWalker(sen.look); W_ic=W_ic||mkWalker(ic.look);
     oturSakla(sen,true); koy(W_sen,SPOT[0],SPOT[1],0);
     await walkTo(W_sen,[VIS]);
     W_sen.face=yon(VIS[0],VIS[1],ic.a.x,ic.a.z); W_sen.mode='talk';
-    konus('sen','“'+kisalt(metin,110)+'”',function(){return [W_sen.w.position.x,W_sen.w.position.z];});
+    konus('sen',metin?('“'+kisalt(metin,110)+'”'):'Bir içerik hazırla!',function(){return [W_sen.w.position.x,W_sen.w.position.z];});
     var gon=null;
-    if(gercek){ gon=await apiPost(metin); }
-    adimlar(1,'Direktif içerik ajanına ulaştı.');
-    await bekle(3800); konus('sen','');
-    ic.busy=true; ic.busyRing.visible=true;
+    if(gercek){ gon=await apiIcerikUret(metin); }
+    adimlar(1,'İstek zincire ulaştı.');
+    await bekle(3000); konus('sen','');
     await walkTo(W_sen,[SPOT]); W_sen.w.visible=false; oturSakla(sen,false);
 
-    var baslik,adres='',icerik='';
+    var kayit=null;
     if(gercek){
-      var t0=Date.now(), d;
+      var t0=Date.now(), d, brief=null, paketBitti=false, brifBasladi=0;
       for(;;){
-        await bekle(4000);
+        await bekle(3000);
         d=await apiGet('/api/durum?since='+encodeURIComponent(gon.baslangic));
         var sn=Math.round((Date.now()-t0)/1000);
-        adimlar(1,(d.durum==='bekliyor'?'GitHub sıraya aldı…':'İçerik ajanı çalışıyor…')+' ('+sn+' sn)');
-        if(d.durum==='completed') break;
-        if(sn>480) throw new Error('Süre aşıldı. GitHub’daki Actions sayfasına bak.');
+        var dt=adimDurum(d,'Trend kontrolü'), di=adimDurum(d,'İçerik ajanı'), dp=adimDurum(d,'Video paketi');
+        tr.busy=tr.busyRing.visible=(dt==='in_progress'); ic.busy=ic.busyRing.visible=(di==='in_progress');
+        konus('tr',dt==='in_progress'?'Trendleri araştırıyorum…':'',function(){return [tr.a.x,tr.a.z];});
+        konus('icx',di==='in_progress'?'Fikirleri tartıyorum…':'',function(){return [ic.a.x,ic.a.z];});
+        if(d.durum==='bekliyor') adimlar(1,'GitHub sıraya aldı… ('+sn+' sn)');
+        else if(dt==='in_progress') adimlar(1,'Trend ajanı araştırıyor (3 günden eskiyse)… ('+sn+' sn)');
+        else if(di==='in_progress'||di==='pending'&&dt==='completed') adimlar(2,'İçerik ajanı 5 fikir tartıyor, en gerçekçisini seçip senaryoyu yazıyor… ('+sn+' sn)');
+        else if(dp==='in_progress'){ adimlar(3,'Video paketi hazırlanıyor… ('+sn+' sn)');
+          if(!brief){ brifBasladi=Date.now(); brief=(async function(){
+            oturSakla(ic,true); koy(W_ic,ic.a.x,ic.a.z,0);
+            await walkTo(W_ic,[[-6.3,-5.0],[-6.3,-1.1],LIS]);
+            W_ic.face=yon(LIS[0],LIS[1],-7.8,-1.2); gs.mode='listen'; W_ic.mode='talk'; gs.busy=gs.busyRing.visible=true;
+            konus('ic','Senaryo hazır, paketle!',function(){return [W_ic.w.position.x,W_ic.w.position.z];});
+            while(!(paketBitti&&Date.now()-brifBasladi>8000)) await bekle(400);
+            konus('ic',''); konus('gs','Paket hazır!',function(){return [-7.8,-1.2,4.5];}); await bekle(2000); konus('gs','');
+            W_ic.mode='idle'; gs.mode=''; gs.busy=gs.busyRing.visible=false;
+            await walkTo(W_ic,[[-6.3,-1.1],[-6.3,-5.0],[ic.a.x,ic.a.z]]); W_ic.w.visible=false; oturSakla(ic,false);
+          })(); }
+        }
+        if(dp==='completed') paketBitti=true;
+        if(d.durum==='completed') { paketBitti=true; break; }
+        if(sn>600) throw new Error('Süre aşıldı. GitHub’daki Actions sayfasına bak.');
       }
-      if(d.sonuc!=='success') throw new Error('Çalışma başarısız oldu. Ayrıntı: '+d.adres);
-      var tk=await apiGet('/api/taslak'); baslik=tk.baslik; icerik=tk.icerik; adres=tk.adres;
-    } else { adimlar(1,'İçerik ajanı çalışıyor… (gösteri)'); await bekle(6000); baslik='Örnek içerik: Basılabilir 5 Şey'; }
-
-    ic.busy=false; ic.busyRing.visible=false;
-    adimlar(2,'Bulunan içerik: '+baslik);
-    oturSakla(ic,true); koy(W_ic,ic.a.x,ic.a.z,0);
-    await walkTo(W_ic,[[-6.3,-5.0],[-6.3,-1.1],LIS]);
-    W_ic.face=yon(LIS[0],LIS[1],-7.8,-1.2); gs.mode='listen'; W_ic.mode='talk';
-    konus('ic','Yeni içerik: '+kisalt(baslik,70)+'. Bunun için görsel hazırlayalım!',function(){return [W_ic.w.position.x,W_ic.w.position.z];});
-    await bekle(2500);
-    konus('gs','Anladım, hemen başlıyorum.',function(){return [-7.8,-1.2,4.5];});
-    var sure=gercek?300000:20000, bit=Date.now()+sure, atla=false; skipBrief=function(){atla=true;};
-    $('#btnAtla').hidden=false;
-    while(Date.now()<bit&&!atla){ var k=Math.max(0,Math.round((bit-Date.now())/1000)); adimlar(3,'Anlatma sürüyor, kalan '+Math.floor(k/60)+':'+String(k%60).padStart(2,'0')); await bekle(500); }
-    $('#btnAtla').hidden=true; skipBrief=null;
-    konus('ic',''); konus('gs','');
-    W_ic.mode='idle'; gs.mode='';
-    await walkTo(W_ic,[[-6.3,-1.1],[-6.3,-5.0],[ic.a.x,ic.a.z]]);
-    W_ic.w.visible=false; oturSakla(ic,false);
-
-    adimlar(4,gercek?'Taslak hazır. Hiçbir şey yayınlanmadı.':'Gösteri bitti.');
-    if(gercek){
-      var pre=document.createElement('pre'); pre.textContent=icerik.slice(0,1500)+(icerik.length>1500?'\n…':'');
-      var a=document.createElement('a'); a.href=adres; a.target='_blank'; a.rel='noopener'; a.textContent='Taslağın tamamı (GitHub)';
-      $('#sonuc').appendChild(pre); $('#sonuc').appendChild(a);
+      if(d.sonuc!=='success') throw new Error('Zincir başarısız oldu. Ayrıntı: '+d.adres);
+      if(!brief){ paketBitti=true; }
+      if(brief) await brief;
+      var z=await apiGet('/api/zincir?taze=1'); zincirCiz(z);
+      kayit=(z.kayitlar||[]).filter(function(k){return k.olusturma&&Date.parse(k.olusturma)>=Date.parse(gon.baslangic);})[0]||null;
+    } else {
+      adimlar(1,'Trend kontrolü… (gösteri)'); await bekle(3000);
+      adimlar(2,'İçerik ajanı çalışıyor… (gösteri)'); ic.busy=ic.busyRing.visible=true; await bekle(5000); ic.busy=ic.busyRing.visible=false;
+      adimlar(3,'Video paketi… (gösteri)'); oturSakla(ic,true); koy(W_ic,ic.a.x,ic.a.z,0);
+      await walkTo(W_ic,[[-6.3,-5.0],[-6.3,-1.1],LIS]); W_ic.face=yon(LIS[0],LIS[1],-7.8,-1.2); gs.mode='listen'; W_ic.mode='talk';
+      konus('ic','Senaryo hazır, paketle!',function(){return [W_ic.w.position.x,W_ic.w.position.z];}); await bekle(7000); konus('ic','');
+      W_ic.mode='idle'; gs.mode=''; await walkTo(W_ic,[[-6.3,-1.1],[-6.3,-5.0],[ic.a.x,ic.a.z]]); W_ic.w.visible=false; oturSakla(ic,false);
+    }
+    adimlar(4,gercek?'Senaryo ve video paketi hazır. Hiçbir şey yayınlanmadı.':'Gösteri bitti.');
+    if(gercek&&kayit){
+      var kutu=$('#sonuc'); kutu.appendChild(dom('p',null,'“'+kayit.konu+'” ('+kayit.format+')'));
+      if(kayit.kanca) kutu.appendChild(dom('p','not','Kanca: '+kayit.kanca));
+      var b=dom('button',null,'Zincirde aç'); b.type='button'; b.addEventListener('click',function(){ zincirAc(kayit.kimlik); }); kutu.appendChild(b);
     }
   }catch(e){
     adimlar(1,String(e.message||e),true);
-    var gs2=ST.gorsel; gs2.mode='';
+    ST.gorsel.mode='';
   }finally{
-    ic.busy=false; ic.busyRing.visible=false; [W_sen,W_ic].forEach(function(o){if(o)o.w.visible=false;});
-    oturSakla(sen,false); oturSakla(ic,false); konus('sen',''); konus('ic',''); konus('gs','');
-    $('#btnAtla').hidden=true; skipBrief=null; busy=false; sahnede=false; need=true;
-    var g=$('#dGonder'); if(g) g.disabled=false;
+    [ST.trend,ST.icerik,ST.gorsel].forEach(function(st){st.busy=false; st.busyRing.visible=false;});
+    [W_sen,W_ic].forEach(function(o){if(o)o.w.visible=false;});
+    oturSakla(ST.sen,false); oturSakla(ST.icerik,false); konus('sen',''); konus('ic',''); konus('gs',''); konus('tr',''); konus('icx','');
+    busy=false; sahnede=false; need=true;
+    var g=$('#dGonder'); if(g) g.disabled=false; var g2=$('#zUret'); if(g2) g2.disabled=false;
   }
 }
-
 
 /* ---------- Video yayınla ---------- */
 var pDosya=null, pYol=null, pBaslangic=null, pBekle=false;
 function pHata(t){var e=$('#pHata'); e.textContent=t||''; e.hidden=!t;}
-function pSifreHazirla(){var ps=$('#pSifre'); ps.hidden=!(MOD==='sunucu'&&!SIF);}
-function pSifreOku(){var ps=$('#pSifre'); if(ps&&ps.value){SIF=ps.value; try{localStorage.setItem('ofisSifre',SIF);}catch(x){}}}
+function pSifreHazirla(){var h=!(MOD==='sunucu'&&!SIF); $('#pSifre').hidden=h; $('#zSifre').hidden=h;}
+function pSifreOku(){var v=($('#pSifre').value||$('#zSifre').value||''); if(v){SIF=v; try{localStorage.setItem('ofisSifre',SIF);}catch(x){}}}
 $('#pDosya').addEventListener('change',function(){
   pHata(''); pYol=null; $('#pForm').hidden=true; $('#pSonuc').innerHTML='';
   var f=this.files&&this.files[0]; pDosya=null; $('#pYukle').disabled=true;
@@ -745,7 +792,7 @@ $('#pYukle').addEventListener('click',function(){
   if(MOD!=='sunucu'){pHata('Sunucu bağlı değil, yükleme yapılamaz.'); return;}
   pSifreOku(); if(!SIF){pSifreHazirla(); pHata('Önce ofis şifresini yaz.'); return;}
   var btn=this; btn.disabled=true; $('#pIlerleKap').hidden=false; $('#pIlerle').style.width='0';
-  var x=new XMLHttpRequest(); x.open('POST','/api/video-yukle'); x.setRequestHeader('X-Sifre',SIF); x.setRequestHeader('Content-Type','video/mp4');
+  var x=new XMLHttpRequest(); x.open('POST','/api/video-yukle'+($('#pIcerik').value?('?icerik='+encodeURIComponent($('#pIcerik').value)):'')); x.setRequestHeader('X-Sifre',SIF); x.setRequestHeader('Content-Type','video/mp4');
   x.upload.onprogress=function(e){ if(e.lengthComputable){$('#pIlerle').style.width=(e.loaded/e.total*100)+'%'; $('#pDurum').textContent='Yükleniyor… %'+Math.round(e.loaded/e.total*100);} };
   x.onload=function(){
     var j={}; try{j=JSON.parse(x.responseText);}catch(e){}
@@ -767,11 +814,11 @@ $('#pVazgec').addEventListener('click',function(){ $('#pOnay').hidden=true; $('#
 $('#pEvet').addEventListener('click',function(){
   var hedefler=[]; if($('#pIg').checked) hedefler.push('instagram'); if($('#pYt').checked) hedefler.push('youtube');
   $('#pOnay').hidden=true; pHata(''); $('#pDurum').textContent='Yayın başlatılıyor…';
-  fetch('/api/yayinla',{method:'POST',headers:{'X-Sifre':SIF,'Content-Type':'application/json'},body:JSON.stringify({onay:true,yol:pYol,hedefler:hedefler,baslik:$('#pBaslik').value,aciklama:$('#pAciklama').value})}).then(chk).then(function(j){
+  fetch('/api/yayinla',{method:'POST',headers:{'X-Sifre':SIF,'Content-Type':'application/json'},body:JSON.stringify({onay:true,yol:pYol,hedefler:hedefler,baslik:$('#pBaslik').value,aciklama:$('#pAciklama').value,icerik:$('#pIcerik').value})}).then(chk).then(function(j){
     pBaslangic=j.baslangic; var h='';
     hedefler.forEach(function(t){ h+='<div class="cal" id="pS_'+t+'"><i></i><span>'+(t==='instagram'?'Instagram':'YouTube')+': '+(j.sonuc[t]==='basladi'?'sırada…':j.sonuc[t])+'</span></div>'; });
     $('#pSonuc').innerHTML=h; $('#pDurum').textContent='Yayın başladı. Bir iki dakika sürer.';
-    yayinSahnesi(hedefler); yayinTakip(hedefler,Date.now());
+    yayinSahnesi(hedefler); yayinTakip(hedefler,Date.now(),j.icerik||'');
   }).catch(function(e){ pHata(String(e.message||e)); $('#pYayinla').disabled=false; $('#pDurum').textContent='Yayın başlatılamadı.'; });
 });
 function pSatir(t,sinif,metin,link){
@@ -779,11 +826,11 @@ function pSatir(t,sinif,metin,link){
   e.innerHTML='<i></i><span></span>'; e.querySelector('span').textContent=(t==='instagram'?'Instagram':'YouTube')+': '+metin;
   if(link){var a=document.createElement('a'); a.href=link; a.target='_blank'; a.rel='noopener'; a.textContent='Aç'; a.style.marginLeft='6px'; e.appendChild(a);}
 }
-async function yayinTakip(hedefler,t0){
+async function yayinTakip(hedefler,t0,icerik){
   var bitti={};
   for(;;){
     await bekle(5000);
-    var d; try{ d=await apiGet('/api/yayin-durum?since='+encodeURIComponent(pBaslangic)); }catch(e){ continue; }
+    var d; try{ d=await apiGet('/api/yayin-durum?since='+encodeURIComponent(pBaslangic)+(icerik?'&icerik='+encodeURIComponent(icerik):'')); }catch(e){ continue; }
     hedefler.forEach(function(t){
       var r=d[t]||{}; if(bitti[t]) return;
       if(r.durum==='completed'){
@@ -794,7 +841,7 @@ async function yayinTakip(hedefler,t0){
     if(hedefler.every(function(t){return bitti[t];})) break;
     if(Date.now()-t0>9*60e3){ pHata('Süre doldu. Durumu GitHub Actions sayfasından kontrol et.'); break; }
   }
-  $('#pDurum').textContent='Bitti. Yayınlar yukarıdaki listede.'; $('#pYayinla').disabled=false; yayinSahnesiBitir(hedefler,bitti);
+  $('#pDurum').textContent='Bitti. Yayınlar yukarıdaki listede.'; $('#pYayinla').disabled=false; yayinSahnesiBitir(hedefler,bitti); zincirCek(true);
 }
 
 /* yayın animasyonu: sen ajanların yanına gidip videoyu verirsin */
@@ -841,6 +888,131 @@ function canliUygula(v){
 function canliCek(){ fetch('/api/ajanlar').then(function(r){return r.ok?r.json():null;}).then(function(v){ if(v&&v.ajanlar) canliUygula(v); }).catch(function(){}); }
 canliCek(); setInterval(canliCek,300000);
 
+/* ---------- Zincir ---------- */
+var ZINCIR=null;
+var ASAMA_AD={senaryo:'Senaryo hazır',video:'Video yüklendi',yayinda:'Yayında'};
+function kopyala(metin,btn){
+  var bitir=function(){ var eski=btn.textContent; btn.textContent='Kopyalandı'; setTimeout(function(){btn.textContent=eski;},1500); };
+  try{ navigator.clipboard.writeText(metin).then(bitir,function(){ yedekKopya(metin); bitir(); }); }catch(e){ yedekKopya(metin); bitir(); }
+}
+function yedekKopya(m){ var t=document.createElement('textarea'); t.value=m; t.style.position='fixed'; t.style.opacity='0'; document.body.appendChild(t); t.select(); try{document.execCommand('copy');}catch(e){} document.body.removeChild(t); }
+function asamalar(k){
+  var bag=k.kaynak==='bagimsiz';
+  var yay=(k.yayinlar||[]).some(function(y){return y.durum==='yayinda';});
+  return [['Fikir',bag?null:!!k.fikir||!!k.kanca],['Senaryo',bag?null:!!k.taslak],['Video',!!k.video],['Yayın',yay],['Ölçüm',(k.olcumler||[]).length>0],['Öğrenme',!!k.ogrenildi]];
+}
+function paketCiz(p,kayit){
+  var kap=dom('div','paket'), tum=[];
+  var parcalar=p.tur==='reels'?p.sahneler:p.slaytlar;
+  parcalar.forEach(function(x){
+    var b=dom('div','sahne');
+    var baslik=p.tur==='reels'?('Sahne '+x.no+' ('+x.sure_sn+' sn)'):('Slayt '+x.no+(x.baslik?': '+x.baslik:''));
+    b.appendChild(dom('b',null,baslik));
+    var yazi=p.tur==='reels'?x.ekran_yazisi:x.metin;
+    if(yazi) b.appendChild(dom('div',null,'Yazı: '+yazi));
+    if(p.tur==='reels'&&x.seslendirme) b.appendChild(dom('div',null,'Konuşma: '+x.seslendirme));
+    b.appendChild(dom('pre','kod',x.prompt));
+    var kb=dom('button','mini','Promptu kopyala'); kb.type='button'; kb.addEventListener('click',function(){kopyala(x.prompt,kb);}); b.appendChild(kb);
+    kap.appendChild(b);
+    tum.push(baslik+'\n'+(yazi?'Yazı: '+yazi+'\n':'')+(p.tur==='reels'&&x.seslendirme?'Konuşma: '+x.seslendirme+'\n':'')+'Prompt: '+x.prompt);
+  });
+  (p.uyarilar||[]).forEach(function(u){ kap.appendChild(dom('div','uyari','⚠ '+u)); });
+  var tb=dom('button','mini','Tüm paketi kopyala'); tb.type='button'; tb.addEventListener('click',function(){kopyala(kayit.konu+'\n\n'+tum.join('\n\n'),tb);}); kap.appendChild(tb);
+  return kap;
+}
+function zincirCiz(z){
+  ZINCIR=z; var kap=$('#zListe'); kap.textContent='';
+  var liste=(z&&z.kayitlar)||[];
+  // Video kartındaki içerik seçici
+  var sel=$('#pIcerik'), eski=sel.value; sel.textContent='';
+  var o0=document.createElement('option'); o0.value=''; o0.textContent='Zincir dışı (bağımsız video)'; sel.appendChild(o0);
+  liste.filter(function(k){return k.durum==='senaryo'||k.durum==='video';}).forEach(function(k){ var o=document.createElement('option'); o.value=k.kimlik; o.textContent=k.konu+' ('+k.format+')'; sel.appendChild(o); });
+  sel.value=eski||''; if(sel.value!==eski) sel.value='';
+  if(!liste.length){ $('#zDurum').textContent='Henüz zincir kaydı yok. “İçerik üret” ile ilk içeriği başlat.'; return; }
+  $('#zDurum').textContent=liste.length+' içerik. Birine dokununca ayrıntı ve video paketi açılır.';
+  liste.forEach(function(k){
+    var d=dom('details','tr'); d.id='z_'+k.kimlik;
+    var sm=dom('summary',null,k.konu||'İçerik');
+    sm.appendChild(dom('span','rozet '+(k.durum==='yayinda'?'iyi':'orta'),ASAMA_AD[k.durum]||k.durum));
+    if(k.format) sm.appendChild(dom('span','rozet orta',k.format));
+    d.appendChild(sm);
+    var as=dom('div','asamalar');
+    asamalar(k).forEach(function(a){ as.appendChild(dom('span','asama '+(a[1]===null?'yok':(a[1]?'ok':'')),(a[1]?'✓ ':'')+a[0])); });
+    d.appendChild(as);
+    var g=dom('div','gov');
+    function satir(b,m){ if(!m) return; var x=dom('div'); x.appendChild(dom('b',null,b)); x.appendChild(document.createTextNode(m)); g.appendChild(x); }
+    satir('Oluşturuldu',fmt(k.olusturma));
+    if(k.direktif) satir('Direktif',k.direktif);
+    satir('Kanca',k.kanca);
+    if(k.fikir&&k.fikir.neden) satir('Neden bu fikir',k.fikir.neden+(k.fikir.trend_baglantisi&&k.fikir.trend_baglantisi!=='yok'?' (trend: '+k.fikir.trend_baglantisi+')':''));
+    if(k.elestiri&&k.elestiri.puan!=null) satir('Öz eleştiri',k.elestiri.puan+'/10, düzeltme '+(k.elestiri.uygulandi?'uygulandı':'uygulanmadı'));
+    if(k.trend&&k.trend.tarih) satir('Trend araştırması',fmt(k.trend.tarih)+(k.trend.yenilendi?' (bu zincirde yenilendi)':''));
+    if(k.not) satir('Not',k.not);
+    if(k.taslak&&z.depo&&z.dal){ var ta=dom('div'); ta.appendChild(dom('b',null,'Taslak')); var a=dom('a',null,k.taslak); a.href='https://github.com/'+z.depo+'/blob/'+z.dal+'/'+k.taslak; a.target='_blank'; a.rel='noopener noreferrer'; ta.appendChild(a); g.appendChild(ta); }
+    if(k.paket){ var pb=dom('div'); pb.appendChild(dom('b',null,'Video paketi (yapay zekâ video aracına yapıştır)')); pb.appendChild(paketCiz(k.paket,k)); g.appendChild(pb); }
+    (k.yayinlar||[]).forEach(function(y){
+      var yx=dom('div'); yx.appendChild(dom('b',null,'Yayın: '+(y.platform==='instagram'?'Instagram':'YouTube')+' '+y.tur));
+      yx.appendChild(document.createTextNode(y.durum==='yayinda'?'Yayında ':(y.durum==='hata'?'Hata verdi ':'Başladı ')));
+      if(y.link&&/^https:\/\//.test(y.link)){ var l=dom('a',null,'Aç'); l.href=y.link; l.target='_blank'; l.rel='noopener noreferrer'; yx.appendChild(l); }
+      g.appendChild(yx);
+    });
+    if(k.durum==='senaryo'||k.durum==='video'){
+      var vb=dom('button',null,'Bu içerik için video yükle'); vb.type='button'; vb.addEventListener('click',function(){ zincirSec(k.kimlik); }); g.appendChild(vb);
+    }
+    d.appendChild(g); kap.appendChild(d);
+  });
+}
+function zincirAc(id){ var d=document.getElementById('z_'+id); if(d){ d.open=true; d.scrollIntoView({behavior:'smooth',block:'center'}); } }
+function zincirSec(id){
+  var sel=$('#pIcerik'); sel.value=id;
+  var k=((ZINCIR&&ZINCIR.kayitlar)||[]).filter(function(x){return x.kimlik===id;})[0];
+  if(k&&k.metinler){ $('#pBaslik').value=k.metinler.youtube_baslik||k.konu||''; $('#pAciklama').value=k.metinler.aciklama||''; }
+  $('#pub').scrollIntoView({behavior:'smooth',block:'start'});
+}
+$('#pIcerik').addEventListener('change',function(){ if(this.value) zincirSec(this.value); });
+function zincirCek(taze){ fetch('/api/zincir'+(taze?'?taze=1':'')).then(function(r){return r.ok?r.json():null;}).then(function(v){ if(v) zincirCiz(v); else $('#zDurum').textContent='Zincir okunamadı.'; }).catch(function(){ $('#zDurum').textContent='Zincir okunamadı.'; }); }
+$('#zUret').addEventListener('click',function(){
+  if(busy) return;
+  pSifreOku(); if(MOD==='sunucu'&&!SIF){pSifreHazirla(); $('#zDurum').textContent='Ofis şifresini yaz.'; return;}
+  this.disabled=true; senaryo(($('#zDirektif').value||'').trim());
+});
+zincirCek(); setInterval(zincirCek,300000);
+
+/* ---------- Trend fikirleri kartı ---------- */
+function dom(tag,cls,txt){var e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e;}
+function temizMetin(t){return String(t||'').replace(/\s*\(\[[^\]]*\]\([^)]*\)\)/g,'').replace(/\[([^\]]*)\]\([^)]*\)/g,'$1').trim();}
+function guvenSinif(g){return g==='yuksek'?'iyi':(g==='orta'?'orta':'zayif');}
+function trendCiz(v){
+  var kap=$('#trListe'); kap.textContent='';
+  if(!v||v.yok||!v.oneriler||!v.oneriler.length){ $('#trAlt').textContent='Henüz trend araştırması yok. Trend ajanı çalışınca fikirler burada görünür.'; return; }
+  $('#trAlt').textContent='Araştırma zamanı: '+fmt(v.tarih)+'. '+v.oneriler.length+' fikir. Birine dokununca ayrıntısı açılır. “Bu fikirle direktif ver” düğmesi fikri içerik ajanına gönderir.';
+  v.oneriler.forEach(function(o){
+    var d=dom('details','tr'), sm=dom('summary',null,o.konu||'Fikir');
+    sm.appendChild(dom('span','rozet '+guvenSinif(o.guven),'güven: '+(o.guven||'?')));
+    sm.appendChild(dom('span','rozet '+(o.basilabilir?'iyi':'kt'),o.basilabilir?'basılabilir':'nesne değil'));
+    if(o.format_onerisi) sm.appendChild(dom('span','rozet orta',o.format_onerisi));
+    d.appendChild(sm);
+    var g=dom('div','gov');
+    function satir(baslik,metin){ if(!metin) return; var x=dom('div'); x.appendChild(dom('b',null,baslik)); x.appendChild(document.createTextNode(metin)); g.appendChild(x); }
+    satir('Neden trend',temizMetin(o.neden_trend)); satir('Bizim açımız',temizMetin(o.kanca_acisi)); satir('Basılabilirlik',temizMetin(o.basilabilir_notu));
+    if(o.risk&&o.risk!=='yok') satir('Risk',o.risk);
+    var kx=dom('div'); kx.appendChild(dom('b',null,'Kaynaklar'));
+    var kayn=(o.kaynaklar||[]).filter(function(u){return /^https:\/\//.test(u);});
+    if(kayn.length) kayn.forEach(function(u){ var a=dom('a',null,u); a.href=u; a.target='_blank'; a.rel='noopener noreferrer'; kx.appendChild(a); kx.appendChild(dom('br')); });
+    else kx.appendChild(document.createTextNode('Doğrulanamadı, yalnızca esin olarak kullanılır.'));
+    g.appendChild(kx);
+    var b=dom('button',null,'Bu fikirle direktif ver'); b.type='button';
+    b.addEventListener('click',function(){
+      select('icerik'); var ta=$('#dMetin');
+      if(ta){ ta.value='Şu trendden esinlenerek özgün bir içerik üret (kimseyi kopyalama, son yayınladıklarımızı tekrar etme): '+o.konu+'. Açı: '+(o.kanca_acisi||''); ta.scrollIntoView({behavior:'smooth',block:'center'}); ta.focus(); }
+    });
+    g.appendChild(b); d.appendChild(g); kap.appendChild(d);
+  });
+  if(v.asiri_kullanilan&&v.asiri_kullanilan.length){ var a=dom('p','not','Aşırı kullanılan, kaçınılacak: '+v.asiri_kullanilan.join(', ')+'.'); kap.appendChild(a); }
+}
+function trendCek(){ fetch('/api/trendler').then(function(r){return r.ok?r.json():null;}).then(function(v){ if(v) trendCiz(v); else $('#trAlt').textContent='Trendler okunamadı.'; }).catch(function(){ $('#trAlt').textContent='Trendler okunamadı.'; }); }
+trendCek(); setInterval(trendCek,600000);
+
 var SR=window.SpeechRecognition||window.webkitSpeechRecognition, rec=null;
 document.addEventListener('click',function(e){
   var b=e.target.closest&&e.target.closest('button'); if(!b) return;
@@ -855,7 +1027,6 @@ document.addEventListener('click',function(e){
   }
   if(b.id==='dGonder'){
     var ta2=$('#dMetin'), m2=(ta2&&ta2.value||'').trim();
-    if(m2.length<3){dMsg('Önce bir direktif yaz ya da bir şablon seç.');return;}
     var ps=$('#dSifre'); if(ps&&ps.value){SIF=ps.value; try{localStorage.setItem('ofisSifre',SIF);}catch(x){}}
     if(MOD==='sunucu'&&!SIF){dMsg('Ofis şifresini yaz.');return;}
     b.disabled=true; senaryo(m2);

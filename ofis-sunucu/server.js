@@ -10,12 +10,17 @@ const REPO = process.env.GH_REPO || 'ferhatatlasai-del/ferhat';
 // Anahtarın başındaki/sonundaki boşluk, satır sonu ve tırnakları temizle (komut satırından gelebiliyor)
 const TOKEN = (process.env.GITHUB_TOKEN || '').trim().replace(/^["']+|["']+$/g, '').trim();
 const SIFRE = process.env.PANEL_SIFRE || '';
-const AKIS = 'icerik-direktif.yml';
+const AKIS = 'zincir.yml';   // "İçerik üret" zinciri: trend -> içerik ajanı -> video paketi
+const ZINCIR_ADIMLARI = ['Trend kontrolü', 'İçerik ajanı', 'Video paketi', 'Kaydet'];
+const KAYIT_RE = /^[cy]\d{8}-\d{6}$/;
 const AKIS_IG = 'yayinla.yml';
 const AKIS_YT = 'youtube-yukle.yml';
 // Ajan kimliği -> iş akışı dosyası (panel durumu buradan okunur)
-const AJAN_AKISLARI = { icerik: 'gunluk-taslak.yml', istatistik: 'gunluk-taslak.yml', instagram: 'yayinla.yml', youtube: 'youtube-yukle.yml', gorsel: 'gorsel.yml', trend: 'trend.yml' };
+const AJAN_AKISLARI = { icerik: ['gunluk-taslak.yml', 'zincir.yml'], istatistik: 'gunluk-taslak.yml', instagram: 'yayinla.yml', youtube: 'youtube-yukle.yml', gorsel: 'zincir.yml', trend: 'trend.yml' };
 let ajanOnbellek = { t: 0, veri: null };
+let trendOnbellek = { t: 0, veri: null };
+let zincirOnbellek = { t: 0, veri: null };
+const guncellenenler = new Set();
 const GH_API = process.env.GH_API || 'https://api.github.com';
 const MAX_VIDEO = 30 * 1024 * 1024;
 const YZ_SATIRI = '🤖 Doktor Filament yapay zekâ ile üretilmiş bir karakterdir.';
@@ -80,18 +85,68 @@ async function calismaLinki(run) {
   if (linkler.has(run.id)) return linkler.get(run.id);
   try {
     const jr = await gh(`/repos/${REPO}/actions/runs/${run.id}/jobs`); const job = ((await jr.json()).jobs || [])[0];
-    if (!job) return '';
+    if (!job) return null;
     const lr = await gh(`/repos/${REPO}/actions/jobs/${job.id}/logs`); const t = await lr.text();
     const m = t.match(/https:\/\/www\.(?:instagram|youtube)\.com\/[^\s"'<>]+/);
-    const link = m ? m[0] : ''; if (link) linkler.set(run.id, link); return link;
-  } catch (e) { return ''; }
+    const k = t.match(/(?:Medya kimliği|Video kimliği):\s*([\w-]+)/);
+    const sonuc = m ? { link: m[0], medya: k ? k[1] : '' } : null;
+    if (sonuc) linkler.set(run.id, sonuc); return sonuc;
+  } catch (e) { return null; }
+}
+
+function bekle(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function kayitOku(id) {
+  if (!KAYIT_RE.test(id || '')) return null;
+  const dal = await varsayilanDal();
+  const r = await gh(`/repos/${REPO}/contents/zincir/${id}.json?ref=${encodeURIComponent(dal)}`);
+  if (!r.ok) return null;
+  const d = await r.json();
+  return { sha: d.sha, veri: JSON.parse(Buffer.from(d.content || '', 'base64').toString('utf8')) };
+}
+async function kayitYaz(id, veri, sha, mesaj) {
+  const dal = await varsayilanDal();
+  const govde = { message: mesaj, content: Buffer.from(JSON.stringify(veri, null, 2)).toString('base64'), branch: dal };
+  if (sha) govde.sha = sha;
+  return gh(`/repos/${REPO}/contents/zincir/${id}.json`, { method: 'PUT', body: JSON.stringify(govde) });
+}
+async function kayitGuncelle(id, degistir, mesaj) {
+  for (let i = 0; i < 3; i++) {
+    const k = await kayitOku(id);
+    if (!k) return false;
+    degistir(k.veri);
+    const r = await kayitYaz(id, k.veri, k.sha, mesaj);
+    if (r.ok) { zincirOnbellek = { t: 0, veri: null }; return true; }
+    if (r.status !== 409 && r.status !== 422) return false;
+    await bekle(800);
+  }
+  return false;
+}
+async function zincirListesi() {
+  if (Date.now() - zincirOnbellek.t < 30e3 && zincirOnbellek.veri) return zincirOnbellek.veri;
+  const dal = await varsayilanDal();
+  const r = await gh(`/repos/${REPO}/contents/zincir?ref=${encodeURIComponent(dal)}`);
+  if (r.status === 404) return { depo: REPO, dal, kayitlar: [] };
+  if (!r.ok) throw new Error('liste');
+  // Ad 'c' ya da 'y' ile başlar; sıralamada harfi değil tarih-saati kullan
+  const adlar = (await r.json()).map(f => f.name).filter(n => /^[cy]\d{8}-\d{6}\.json$/.test(n)).sort((x, y) => (y.slice(1) < x.slice(1) ? -1 : 1)).slice(0, 12);
+  const kayitlar = (await Promise.all(adlar.map(a => kayitOku(a.slice(0, -5)).then(k => k && k.veri).catch(() => null)))).filter(Boolean)
+    .sort((x, y) => Date.parse(y.olusturma || 0) - Date.parse(x.olusturma || 0));
+  const veri = { depo: REPO, dal, kayitlar };
+  zincirOnbellek = { t: Date.now(), veri };
+  return veri;
+}
+async function direktifBaslat(metin) {
+  const dal = await varsayilanDal();
+  const r = await gh(`/repos/${REPO}/actions/workflows/${AKIS}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: { direktif: metin } }) });
+  return { r, baslangic: new Date(Date.now() - 5000).toISOString() };
 }
 
 async function varsayilanDal() { const r = await gh(`/repos/${REPO}`); const j = await r.json(); return j.default_branch; }
 
 async function ajanDurumlari() {
   if (Date.now() - ajanOnbellek.t < 60e3 && ajanOnbellek.veri) return ajanOnbellek.veri;
-  const dosyalar = [...new Set(Object.values(AJAN_AKISLARI))];
+  const dosyalar = [...new Set(Object.values(AJAN_AKISLARI).flat())];
   const akis = {};
   for (const d of dosyalar) {
     const r = await gh(`/repos/${REPO}/actions/workflows/${d}/runs?per_page=5`);
@@ -100,7 +155,10 @@ async function ajanDurumlari() {
     akis[d] = run ? { son: run.run_started_at || run.created_at, durum: run.status, sonuc: run.conclusion, adres: run.html_url, olay: run.event } : { yok: true };
   }
   const veri = {};
-  for (const [id, d] of Object.entries(AJAN_AKISLARI)) veri[id] = akis[d];
+  for (const [id, d] of Object.entries(AJAN_AKISLARI)) {
+    const adaylar = [].concat(d).map(x => akis[x]).filter(x => x && !x.yok).sort((a, b) => Date.parse(b.son) - Date.parse(a.son));
+    veri[id] = adaylar[0] || { yok: true };
+  }
   ajanOnbellek = { t: Date.now(), veri };
   return veri;
 }
@@ -112,19 +170,37 @@ async function api(req, res, url) {
     try { return json(res, 200, { zaman: new Date().toISOString(), ajanlar: await ajanDurumlari() }); }
     catch (e) { return json(res, 502, { hata: 'GitHub okunamadı.' }); }
   }
+  if (url.pathname === '/api/zincir') {
+    if (!TOKEN) return json(res, 503, { hata: 'Sunucuda GITHUB_TOKEN tanımlı değil.' });
+    if (url.searchParams.get('taze')) zincirOnbellek = { t: 0, veri: null };
+    try { return json(res, 200, await zincirListesi()); } catch (e) { return json(res, 502, { hata: 'Zincir okunamadı.' }); }
+  }
+  if (url.pathname === '/api/trendler') {
+    if (!TOKEN) return json(res, 503, { hata: 'Sunucuda GITHUB_TOKEN tanımlı değil.' });
+    if (Date.now() - trendOnbellek.t < 60e3 && trendOnbellek.veri) return json(res, 200, trendOnbellek.veri);
+    try {
+      const dal = await varsayilanDal();
+      const r = await gh(`/repos/${REPO}/contents/ajan/trendler.json?ref=${encodeURIComponent(dal)}`);
+      if (r.status === 404) return json(res, 200, { yok: true });
+      if (!r.ok) return json(res, 502, { hata: 'Trendler okunamadı.' });
+      const d = await r.json();
+      const veri = JSON.parse(Buffer.from(d.content || '', 'base64').toString('utf8'));
+      trendOnbellek = { t: Date.now(), veri };
+      return json(res, 200, veri);
+    } catch (e) { return json(res, 502, { hata: 'Trendler okunamadı.' }); }
+  }
   if (!TOKEN || !SIFRE) return json(res, 503, { hata: 'Sunucuda GITHUB_TOKEN ya da PANEL_SIFRE tanımlı değil.' });
   if (kilitliMi(req)) return json(res, 429, { hata: 'Çok fazla yanlış deneme. 15 dakika sonra tekrar dene.' });
   if (!sifreDogru(req.headers['x-sifre'])) { yanlisKaydet(req); return json(res, 401, { hata: 'Şifre yanlış.' }); }
 
-  if (url.pathname === '/api/direktif' && req.method === 'POST') {
+  if ((url.pathname === '/api/direktif' || url.pathname === '/api/icerik-uret') && req.method === 'POST') {
     const simdi = Date.now();
     while (direktifler.length && simdi - direktifler[0] > 3600e3) direktifler.shift();
     if (direktifler.length >= 12) return json(res, 429, { hata: 'Saatte en fazla 12 direktif.' });
     let b; try { b = await govde(req); } catch (e) { return json(res, 400, { hata: 'Geçersiz istek.' }); }
     const metin = String(b.metin || '').replace(/\s+/g, ' ').trim().slice(0, 500);
-    if (metin.length < 3) return json(res, 400, { hata: 'Direktif çok kısa.' });
-    const dal = await varsayilanDal();
-    const r = await gh(`/repos/${REPO}/actions/workflows/${AKIS}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: { direktif: metin } }) });
+    if (url.pathname === '/api/direktif' && metin.length < 3) return json(res, 400, { hata: 'Direktif çok kısa.' });
+    const { r } = await direktifBaslat(metin);
     if (r.status !== 204) { const t = await r.text(); return json(res, 502, { hata: 'GitHub kabul etmedi (' + r.status + ').', ayrinti: t.slice(0, 200) }); }
     direktifler.push(simdi);
     return json(res, 200, { ok: true, baslangic: new Date(simdi - 5000).toISOString() });
@@ -137,7 +213,10 @@ async function api(req, res, url) {
     const dal = await varsayilanDal();
     const yol = `videolar/yukleme_${damga()}.mp4`;
     try { await dosyaYaz(yol, tampon, 'Panelden video yüklendi', dal); } catch (e) { return json(res, 502, { hata: e.kullanici ? e.message : 'Video kaydedilemedi.' }); }
-    return json(res, 200, { ok: true, yol, boyut: tampon.length });
+    const icerik = url.searchParams.get('icerik') || '';
+    let bagli = false;
+    if (icerik) bagli = await kayitGuncelle(icerik, v => { v.video = { yol, tarih: new Date().toISOString() }; if (v.durum === 'senaryo') v.durum = 'video'; }, 'Zincir: video yüklendi');
+    return json(res, 200, { ok: true, yol, boyut: tampon.length, bagli });
   }
 
   if (url.pathname === '/api/yayinla' && req.method === 'POST') {
@@ -170,7 +249,22 @@ async function api(req, res, url) {
       sonuc[h] = r.status === 204 ? 'basladi' : 'GitHub kabul etmedi (' + r.status + ')';
     }
     yayinlar.push(simdi);
-    return json(res, 200, { ok: true, baslangic, sonuc });
+    // Zincir kaydı: seçili içeriğe ya da yeni bağımsız kayda yayın girişi ekle
+    let icerik = KAYIT_RE.test(String(b.icerik || '')) ? b.icerik : '';
+    const girisler = hedefler.filter(h => sonuc[h] === 'basladi').map(h => ({ platform: h, tur: h === 'instagram' ? 'reels' : 'shorts', durum: 'basladi', baslangic, video: b.yol }));
+    try {
+      if (icerik) {
+        if (!await kayitGuncelle(icerik, v => { v.video = v.video || { yol: b.yol, tarih: baslangic }; v.yayinlar = (v.yayinlar || []).concat(girisler); }, 'Zincir: yayın başladı')) icerik = '';
+      }
+      if (!icerik) {
+        icerik = 'y' + damga().slice(0, 8) + '-' + damga().slice(8, 14);
+        const yeni = { kimlik: icerik, olusturma: new Date().toISOString(), durum: 'video', kaynak: 'bagimsiz', direktif: '', konu: baslik, format: 'reels', seri: '', kanca: '',
+          video: { yol: b.yol, tarih: baslangic }, yayinlar: girisler, olcumler: [], ogrenildi: false };
+        await kayitYaz(icerik, yeni, null, 'Zincir: bağımsız yayın kaydı');
+        zincirOnbellek = { t: 0, veri: null };
+      }
+    } catch (e) { console.error('zincir kaydı yazılamadı:', String(e.message).slice(0, 120)); }
+    return json(res, 200, { ok: true, baslangic, sonuc, icerik });
   }
 
   if (url.pathname === '/api/yayin-durum') {
@@ -182,7 +276,21 @@ async function api(req, res, url) {
       const run = ((await r.json()).workflow_runs || []).find(x => Date.parse(x.created_at) >= since);
       if (!run) { cikti[ad] = { durum: 'bekliyor' }; continue; }
       const o = { durum: run.status, sonuc: run.conclusion, adres: run.html_url };
-      if (run.status === 'completed' && run.conclusion === 'success') o.link = await calismaLinki(run);
+      const kimlik = url.searchParams.get('icerik') || '';
+      if (run.status === 'completed' && run.conclusion === 'success') {
+        const l = await calismaLinki(run); o.link = l ? l.link : '';
+        if (kimlik && !guncellenenler.has(`${kimlik}:${ad}:${run.id}`)) {
+          guncellenenler.add(`${kimlik}:${ad}:${run.id}`);
+          await kayitGuncelle(kimlik, v => {
+            const g = (v.yayinlar || []).find(x => x.platform === ad && x.durum === 'basladi');
+            if (g) { g.durum = 'yayinda'; g.tarih = run.updated_at; g.link = o.link; g.medya_kimligi = l ? l.medya : ''; g.adres = run.html_url; }
+            if ((v.yayinlar || []).some(x => x.durum === 'yayinda')) v.durum = 'yayinda';
+          }, 'Zincir: yayın tamamlandı').catch(() => {});
+        }
+      } else if (run.status === 'completed' && kimlik && !guncellenenler.has(`${kimlik}:${ad}:${run.id}`)) {
+        guncellenenler.add(`${kimlik}:${ad}:${run.id}`);
+        await kayitGuncelle(kimlik, v => { const g = (v.yayinlar || []).find(x => x.platform === ad && x.durum === 'basladi'); if (g) { g.durum = 'hata'; g.adres = run.html_url; } }, 'Zincir: yayın başarısız').catch(() => {});
+      }
       cikti[ad] = o;
     }
     return json(res, 200, cikti);
@@ -195,7 +303,13 @@ async function api(req, res, url) {
     const j = await r.json();
     const run = (j.workflow_runs || []).find(x => Date.parse(x.created_at) >= since);
     if (!run) return json(res, 200, { durum: 'bekliyor' });
-    return json(res, 200, { durum: run.status, sonuc: run.conclusion, adres: run.html_url, baslangic: run.created_at });
+    let adimlar = [];
+    try {
+      const jr = await gh(`/repos/${REPO}/actions/runs/${run.id}/jobs`);
+      const job = ((await jr.json()).jobs || [])[0];
+      adimlar = ((job && job.steps) || []).filter(a => ZINCIR_ADIMLARI.includes(a.name)).map(a => ({ ad: a.name, durum: a.status, sonuc: a.conclusion }));
+    } catch (e) { /* adım bilgisi isteğe bağlı */ }
+    return json(res, 200, { durum: run.status, sonuc: run.conclusion, adres: run.html_url, baslangic: run.created_at, adimlar });
   }
 
   if (url.pathname === '/api/taslak') {

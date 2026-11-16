@@ -88,6 +88,12 @@ def temiz_adres(u):
     return re.sub(r"[?&]utm_[^&]*", "", u or "").rstrip("/?&")
 
 
+def temiz_metin(t):
+    """Modelin metne gömdüğü ham bağlantı işaretlerini ([site](url)) temizler; kaynaklar ayrı alanda."""
+    t = re.sub(r"\s*\(\[[^\]]*\]\([^)]*\)\)", "", t or "")
+    return re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", t).strip()
+
+
 def json_ayikla(metin):
     m = re.search(r"\{.*\}", metin, re.S)
     if not m:
@@ -98,7 +104,29 @@ def json_ayikla(metin):
         hata(f"JSON okunamadı: {e}")
 
 
+def taze_mi(gun):
+    yol = KOK / "ajan" / "trendler.json"
+    if not yol.exists():
+        return None
+    try:
+        v = json.loads(yol.read_text(encoding="utf-8"))
+        z = datetime.datetime.strptime(v["tarih"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=datetime.timezone.utc)
+    except Exception:
+        return None
+    yas = (datetime.datetime.now(datetime.timezone.utc) - z).total_seconds() / 86400
+    return yas if yas < gun else None
+
+
 def main():
+    if "--en-fazla-gun" in sys.argv:
+        try:
+            gun = float(sys.argv[sys.argv.index("--en-fazla-gun") + 1])
+        except (IndexError, ValueError):
+            hata("--en-fazla-gun bir sayı bekliyor.")
+        yas = taze_mi(gun)
+        if yas is not None:
+            print(f"Trendler taze ({yas:.1f} gün önce araştırıldı, sınır {gun:g} gün); yeniden araştırma atlandı.")
+            return
     veri, kullanilan = None, None
     for tur in ARAC_TURLERI:
         try:
@@ -121,6 +149,8 @@ def main():
         if not (o.get("konu") or "").strip():
             continue
         kaynaklar = [k for k in (o.get("kaynaklar") or []) if temiz_adres(k) in dogrulanan]
+        for alan in ("neden_trend", "basilabilir_notu", "kanca_acisi"):
+            o[alan] = temiz_metin(o.get(alan))
         o["kaynaklar"] = kaynaklar
         o["dogrulandi"] = bool(kaynaklar)
         if not kaynaklar:

@@ -53,6 +53,14 @@ def gecmis_konular(adet=20):
                 bicim = m.group(1).strip()
         if baslik:
             konular.append(f"{baslik} ({bicim})" if bicim else baslik)
+    # Taslağı olmayan ama panelden yayınlanan (bağımsız) içerikler de tekrarlanmasın
+    for kayit in sorted((KOK / "zincir").glob("y*.json"))[-adet:]:
+        try:
+            k = json.loads(kayit.read_text(encoding="utf-8"))
+            if k.get("konu"):
+                konular.append(f"{k['konu']} (yayınlandı)")
+        except Exception:
+            pass
     return konular
 
 
@@ -318,6 +326,55 @@ def openai_cagir(sistem, kullanici):
         return sonuc
 
 
+def simdi_utc():
+    return datetime.datetime.now(datetime.timezone.utc)
+
+
+def zincir_yaz(taslak, cikti, notlar, direktif):
+    """Her içeriğe bir kimlik verir ve zincir kaydını yazar (fikir -> senaryo -> video -> yayın -> ölçüm)."""
+    zaman = simdi_utc()
+    kimlik = "c" + zaman.strftime("%Y%m%d-%H%M%S")
+    dizin = KOK / "zincir"
+    dizin.mkdir(exist_ok=True)
+    f = notlar.get("fikir") or {}
+    e = notlar.get("elestiri") or {}
+    tr = trendler()
+    yenilendi = False
+    if tr:
+        try:
+            yenilendi = (zaman - datetime.datetime.strptime(tr["tarih"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=datetime.timezone.utc)).total_seconds() < 1800
+        except Exception:
+            pass
+    hashtagler = " ".join(dict.fromkeys(taslak.get("hashtagler") or VARSAYILAN_ETIKETLER))
+    kayit = {
+        "kimlik": kimlik,
+        "olusturma": zaman.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "durum": "senaryo",
+        "kaynak": "direktif" if direktif.strip() else "zincir",
+        "direktif": " ".join(direktif.split())[:500],
+        "konu": taslak.get("konu", ""),
+        "format": taslak.get("format", ""),
+        "seri": taslak.get("seri", ""),
+        "kanca": taslak.get("kanca", ""),
+        "taslak": str(cikti.relative_to(KOK)),
+        "taslak_json": f"zincir/{kimlik}_taslak.json",
+        "fikir": {"konu": f.get("konu"), "neden": f.get("neden_ilgi_ceker"), "trend_baglantisi": f.get("trend_baglantisi"),
+                  "puan": f.get("_puan"), "benzerlik": f.get("_benzerlik")} if f else None,
+        "elestiri": {"puan": e.get("puan"), "uygulandi": e.get("uygulandi")} if e else None,
+        "trend": {"tarih": tr["tarih"] if tr else None, "yenilendi": yenilendi},
+        "metinler": {"youtube_baslik": (taslak.get("youtube_baslik") or "")[:100],
+                     "aciklama": "\n".join(x for x in [caption_temizle(taslak.get("instagram_caption", "")), "", hashtagler] if x is not None).strip()},
+        "video": None,
+        "yayinlar": [],
+        "olcumler": [],
+        "ogrenildi": False,
+    }
+    temiz = {k: v for k, v in taslak.items() if not k.startswith("_")}
+    (dizin / f"{kimlik}_taslak.json").write_text(json.dumps(temiz, ensure_ascii=False, indent=2), encoding="utf-8")
+    (dizin / f"{kimlik}.json").write_text(json.dumps(kayit, ensure_ascii=False, indent=2), encoding="utf-8")
+    return kimlik
+
+
 def baglam_metni(bugun, direktif):
     return f"""# KANAL PROFİLİ VE KURALLAR
 {oku('ajan/kanal.md')}
@@ -535,6 +592,7 @@ def main():
     ap.add_argument("--dry-run", action="store_true", help="API çağırma, sadece prompt'u yazdır")
     ap.add_argument("--direktif", default="", help="Sahibinin o güne özel isteği (isteğe bağlı)")
     ap.add_argument("--hizli", action="store_true", help="Fikir seçimi ve öz eleştiriyi atla (tek çağrı)")
+    ap.add_argument("--benzersiz", action="store_true", help="Taslak dosya adına saat ekle (aynı gün üzerine yazmasın); zincir için")
     args = ap.parse_args()
 
     bugun = datetime.date.today().isoformat()
@@ -562,12 +620,16 @@ def main():
         e = notlar.get("elestiri", {})
         print(f"Öz eleştiri: puan {e.get('puan')}, düzeltme {'uygulandı' if e.get('uygulandi') else 'uygulanmadı'}")
     TASLAK_DIZINI.mkdir(exist_ok=True)
-    if args.direktif.strip():
+    if args.benzersiz:
+        cikti = TASLAK_DIZINI / f"{bugun}_zincir_{simdi_utc():%H%M%S}.md"
+    elif args.direktif.strip():
         cikti = TASLAK_DIZINI / f"{bugun}_direktif_{datetime.datetime.now(datetime.timezone.utc):%H%M%S}.md"
     else:
         cikti = TASLAK_DIZINI / f"{bugun}.md"
     cikti.write_text(markdown_yaz(taslak, bugun, notlar), encoding="utf-8")
     print(f"Taslak yazıldı: {cikti.relative_to(KOK)}")
+    kimlik = zincir_yaz(taslak, cikti, notlar, args.direktif)
+    print(f"Zincir kimliği: {kimlik}")
 
 
 if __name__ == "__main__":

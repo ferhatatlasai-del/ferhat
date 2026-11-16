@@ -1,0 +1,36 @@
+{
+  "kimlik": "y20261116-210909",
+  "olusturma": "2026-11-16T21:09:09Z",
+  "durum": "yayinda",
+  "kaynak": "bagimsiz",
+  "direktif": "",
+  "konu": "Kablolar neden karışıyor. Dr Filament çözüm bulsun",
+  "format": "reels",
+  "seri": "",
+  "kanca": "Kablolar neden hep masadan kayıp gidiyor?",
+  "video": {
+    "yol": "videolar/yukleme_20261116210630.mp4",
+    "tarih": "2026-11-16T21:06:30Z"
+  },
+  "yayinlar": [
+    {
+      "platform": "instagram",
+      "tur": "reels",
+      "durum": "yayinda",
+      "tarih": "2026-11-16T21:09:44Z",
+      "link": "https://www.instagram.com/reel/Df0SY8TGKVZ/",
+      "medya_kimligi": "17925649080445339"
+    },
+    {
+      "platform": "youtube",
+      "tur": "shorts",
+      "durum": "yayinda",
+      "tarih": "2026-11-16T21:09:09Z",
+      "link": "https://www.youtube.com/shorts/aM1LRQ48pSQ",
+      "medya_kimligi": "aM1LRQ48pSQ"
+    }
+  ],
+  "olcumler": [],
+  "ogrenildi": false,
+  "not": "Panelden yayınlanan ilk video; kayıt sonradan eklendi."
+}
