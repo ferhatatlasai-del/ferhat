@@ -1,0 +1,36 @@
+name: Hikaye ajanı (yapay zekâ görseli üret)
+
+on:
+  schedule:
+    - cron: "20 5 * * *"   # Türkiye saatiyle 08:20 civarı, günde bir kez (GitHub geciktirebilir)
+  workflow_dispatch:
+    inputs:
+      hemen:
+        description: "EVET yazarsan üretim kapalı olsa bile bir kez üretir (harcama sınırları yine geçerli)"
+        default: "HAYIR"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hikaye
+  cancel-in-progress: false
+
+jobs:
+  uret:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Trend tasarımlardan temsili hikaye görselleri üret (yalnızca CC0 / CC BY)
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OFIS_ADRES: "https://gurtechs-ajan-ofisi.fly.dev"
+          BILDIRIM_SIRRI: ${{ secrets.BILDIRIM_SIRRI }}
+          HEMEN: ${{ inputs.hemen }}
+        run: |
+          if [ "$HEMEN" = "EVET" ]; then
+            python3 ajan/hikaye_uret.py --git --hemen
+          else
+            python3 ajan/hikaye_uret.py --git
+          fi

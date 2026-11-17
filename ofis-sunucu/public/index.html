@@ -199,6 +199,18 @@ dd{margin:1px 0 0}
             <p class="not">GitHub’ın saatlik kontrolü bazen saatlerce gecikebilir; hikayeler belirlediğin aralığa yayılır ama tam saatinde çıkmayabilir.</p>
           </div>
         </details>
+        <details class="tr" id="uDetay"><summary>Yapay zekâ görsel üretimi (Kademe 2)</summary>
+          <div class="gov">
+            <p class="not">Ajan Printables ve MakerWorld’de revaçtaki tasarımları arar, <b>yalnızca CC0 ve CC BY lisanslı</b> olanlardan, kendi sahnesinde <b>benzer (kopya olmayan) temsili görseller</b> üretir. Görsele “Yapay zekâ görseli (temsili)” etiketi ve tasarımın adı, tasarımcısı, lisansı işlenir. Yapay zekâ kendi kalite kontrolünü yapar, geçemeyeni atar. Yayınlanınca bildirim gelir, beğenmediğini sen silersin. <b>Başlangıçta kapalıdır.</b></p>
+            <p class="not" id="uDurum">Yükleniyor…</p>
+            <div class="satir"><button type="button" class="ana" id="uAktif">Üretimi aç</button><button type="button" id="uHemen">Şimdi üret</button></div>
+            <div class="ayarsat"><label>Mod <select id="uMod"><option value="otomatik">Otomatik (kuyruğa girer, yayınlanır)</option><option value="onay">Onaylı (ben onaylarım)</option></select></label></div>
+            <div class="ayarsat"><label>Günde en çok <input type="number" id="uGun" min="1" max="12"> hikaye üret</label><label>Günlük görsel sınırı <input type="number" id="uGSin" min="1" max="40"></label><label>Aylık görsel sınırı <input type="number" id="uASin" min="1" max="600"></label></div>
+            <div class="ayarsat"><label>Kuyruk hedefi <input type="number" id="uHed" min="1" max="30"></label><label>Kalite <select id="uKal"><option value="low">Düşük (ucuz)</option><option value="medium">Orta</option><option value="high">Yüksek (pahalı)</option></select></label></div>
+            <div class="satir"><button type="button" id="uKaydet">Üretim ayarını kaydet</button></div>
+            <p class="not">Görsel başına maliyet seçtiğin kaliteye göre değişir; günlük ve aylık görsel sınırları harcamayı üstten kapatır. İlk günlerde sınırları düşük tut, OpenAI panelinden harcamayı da izle.</p>
+          </div>
+        </details>
         <label class="k" for="hDosya">Fotoğraf ya da video ekle (birden fazla seçebilirsin)</label>
         <div class="satir"><input type="file" id="hDosya" accept="image/*,video/mp4" multiple><button type="button" id="hYukle" disabled>Kuyruğa ekle</button></div>
         <input type="text" id="hBaslik" maxlength="80" placeholder="İsteğe bağlı not (yalnızca senin için, hikayede görünmez)" style="width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px">
@@ -1060,6 +1072,7 @@ function hikayeCiz(v){
   $('#hBas').value=a.baslangic_saat!=null?a.baslangic_saat:10; $('#hBit').value=a.bitis_saat!=null?a.bitis_saat:22;
   var g=$('#hGunler'); if(!g.children.length){ GUN_AD.forEach(function(ad,i){ var l=dom('label'); var c=document.createElement('input'); c.type='checkbox'; c.value=i+1; l.appendChild(c); l.appendChild(document.createTextNode(ad)); g.appendChild(l); }); }
   Array.prototype.forEach.call(g.querySelectorAll('input'),function(c){ c.checked=(a.gunler||[1,2,3,4,5,6,7]).indexOf(+c.value)>=0; });
+  uretimCiz(v);
   // kuyruk
   var kap=$('#hListe'); kap.textContent='';
   k.forEach(function(o){
@@ -1069,7 +1082,11 @@ function hikayeCiz(v){
     var ad={planli:['Sırada','orta'],onay_bekliyor:['Onay bekliyor','orta'],yayinlaniyor:['Yayınlanıyor','orta'],yayinda:['Yayında','iyi'],hata:['Hata','kt'],reddedildi:['Reddedildi','zayif']}[o.durum]||[o.durum,'zayif'];
     b.appendChild(dom('span','rozet '+ad[1],ad[0]+(o.tur==='video'?' · video':'')));
     if(o.baslik) b.appendChild(dom('div',null,o.baslik));
-    if(o.atif&&o.atif.ad) b.appendChild(dom('div','not','Tasarım: '+o.atif.ad));
+    if(o.atif&&o.atif.ad){
+      b.appendChild(dom('div','not','Tasarım: '+o.atif.ad+(o.atif.tasarimci?' · '+o.atif.tasarimci:'')+(o.atif.lisans?' · '+o.atif.lisans:'')));
+      if(o.atif.url&&/^https:\/\/([\w-]+\.)*(printables|makerworld)\.com\//.test(o.atif.url)){ var al=dom('a',null,'Tasarım sayfası'); al.href=o.atif.url; al.target='_blank'; al.rel='noopener noreferrer'; b.appendChild(al); }
+      if(o.kaynak==='uretim') b.appendChild(dom('div','not','Yapay zekâ görseli'+(o.kontrol&&o.kontrol.puan?' · kontrol puanı '+o.kontrol.puan:'')));
+    }
     if(o.yayin&&o.yayin.tarih) b.appendChild(dom('div','not',fmt(o.yayin.tarih)));
     if(o.hata) b.appendChild(dom('div','hata',o.hata.slice(0,120)));
     if(o.yayin&&o.yayin.link&&/^https:\/\//.test(o.yayin.link)){ var l=dom('a',null,'Instagram’da aç'); l.href=o.yayin.link; l.target='_blank'; l.rel='noopener noreferrer'; b.appendChild(l); }
@@ -1078,7 +1095,7 @@ function hikayeCiz(v){
     if(['planli','onay_bekliyor','reddedildi','hata'].indexOf(o.durum)>=0) dugme('Sil','sil');
     kap.appendChild(b);
   });
-  if(!k.length) kap.appendChild(dom('p','not','Kuyruk boş. Yukarıdan fotoğraf ekle.'));
+  if(!k.length) kap.appendChild(dom('p','not','Kuyruk boş. Yukarıdan fotoğraf ekle ya da yapay zekâ üretimini aç.'));
   // sağlık
   var s=$('#hSaglik'); s.textContent='';
   if(v.saglik&&v.saglik.kontroller){ s.appendChild(dom('div','not','Son denetim: '+fmt(v.saglik.tarih))); v.saglik.kontroller.forEach(function(c){ var d=dom('div',c.durum); d.appendChild(document.createElement('i')); d.appendChild(document.createTextNode(c.ad+': '+c.not)); s.appendChild(d); }); }
@@ -1094,6 +1111,31 @@ function hikayeCiz(v){
     if(hGorulen===null) hGorulen=enSon; else if(enSon>hGorulen){ hGorulen=enSon; hikayeBalon(); }
   }
 }
+
+// Kademe 2: yapay zekâ görsel üretimi
+function uretimCiz(v){
+  var u=v.uretim||{}, h=v.harcama||{bugun:0,ay:0};
+  $('#uDurum').textContent=(u.aktif?'Üretim açık':'Üretim kapalı')+' ('+(u.mod==='onay'?'onaylı':'otomatik')+'). Bugün '+h.bugun+'/'+(u.gunluk_gorsel_siniri||'?')+' görsel, bu ay '+h.ay+'/'+(u.aylik_gorsel_siniri||'?')+' görsel üretildi.';
+  $('#uAktif').textContent=u.aktif?'Üretimi kapat':'Üretimi aç';
+  var ak=document.activeElement&&document.activeElement.closest?document.activeElement.closest('#uDetay'):null;
+  if(!ak){ $('#uMod').value=u.mod||'otomatik'; $('#uGun').value=u.gunluk_uretim||4; $('#uGSin').value=u.gunluk_gorsel_siniri||12; $('#uASin').value=u.aylik_gorsel_siniri||150; $('#uHed').value=u.kuyruk_hedefi||8; $('#uKal').value=u.kalite||'medium'; }
+}
+$('#uAktif').addEventListener('click',function(){
+  if(!hSifreKontrol()||!HK) return; var yeni=!(HK.uretim&&HK.uretim.aktif), btn=this; btn.disabled=true;
+  hPost('/api/uretim-ayar',{aktif:yeni}).then(function(){ btn.disabled=false; hikayeCek(true); }).catch(function(e){ $('#uDurum').textContent=String(e.message||e); btn.disabled=false; });
+});
+$('#uKaydet').addEventListener('click',function(){
+  if(!hSifreKontrol()) return; var btn=this; btn.disabled=true;
+  hPost('/api/uretim-ayar',{mod:$('#uMod').value,gunluk_uretim:+$('#uGun').value,gunluk_gorsel_siniri:+$('#uGSin').value,aylik_gorsel_siniri:+$('#uASin').value,kuyruk_hedefi:+$('#uHed').value,kalite:$('#uKal').value})
+    .then(function(){ btn.disabled=false; $('#uDurum').textContent='Üretim ayarı kaydedildi.'; hikayeCek(true); }).catch(function(e){ $('#uDurum').textContent=String(e.message||e); btn.disabled=false; });
+});
+var uOnay=false;
+$('#uHemen').addEventListener('click',function(){
+  if(!hSifreKontrol()) return; var btn=this;
+  if(!uOnay){ uOnay=true; btn.textContent='Emin misin? Evet, şimdi üret (maliyetli)'; setTimeout(function(){ uOnay=false; btn.textContent='Şimdi üret'; },6000); return; }
+  uOnay=false; btn.textContent='Şimdi üret'; btn.disabled=true;
+  hPost('/api/uretim-calistir',{}).then(function(){ $('#uDurum').textContent='Üretim başlatıldı. Birkaç dakika sürer; bitince yeni hikayeler kuyrukta görünür.'; btn.disabled=false; var n=0; var t=setInterval(function(){ hikayeCek(true); if(++n>30) clearInterval(t); },15000); }).catch(function(e){ $('#uDurum').textContent=String(e.message||e); btn.disabled=false; });
+});
 function hikayeBalon(){
   var st=ST.hikaye; if(!st) return; st.busy=st.busyRing.visible=true; need=true;
   konus('hk','Hikaye yayında!',function(){return [st.a.x,st.a.z];});
