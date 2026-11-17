@@ -29,6 +29,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import unicodedata
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -45,9 +46,11 @@ GORSEL_MODELI = os.environ.get("OPENAI_IMAGE_MODEL") or "gpt-image-1"
 URETIM = KOK / "hikaye" / "uretim.json"
 HARCAMA = KOK / "hikaye" / "harcama.json"
 KULLANILAN = KOK / "hikaye" / "kullanilan.json"
+ADAYLAR = KOK / "hikaye" / "adaylar.json"
+ADAY_OMRU_GUN = 4   # aynı arama sonucu bu kadar gün yeniden kullanılır (her çalışmada pahalı arama yapılmaz)
 IZINLI_SITELER = ("printables.com", "makerworld.com")
-VARSAYILAN = {"aktif": False, "mod": "otomatik", "gunluk_uretim": 4, "gunluk_gorsel_siniri": 12,
-              "aylik_gorsel_siniri": 150, "kalite": "medium", "kuyruk_hedefi": 8}
+VARSAYILAN = {"aktif": False, "mod": "otomatik", "gunluk_uretim": 3, "gunluk_gorsel_siniri": 6,
+              "aylik_gorsel_siniri": 90, "kalite": "low", "kuyruk_hedefi": 6}
 ARAC_TURLERI = ["web_search", "web_search_preview"]
 YAPAY_ZEKA_ETIKETI = "Yapay zekâ görseli (temsili)"
 
@@ -131,7 +134,7 @@ def http_hata_ozeti(e):
 def sohbet_json(sistem, kullanici, resim_b64=None):
     icerik = [{"type": "text", "text": kullanici}]
     if resim_b64:
-        icerik.append({"type": "image_url", "image_url": {"url": "data:image/png;base64," + resim_b64}})
+        icerik.append({"type": "image_url", "image_url": {"url": "data:image/png;base64," + resim_b64, "detail": "low"}})
     govde = {"model": MODEL, "response_format": {"type": "json_object"},
              "messages": [{"role": "system", "content": sistem}, {"role": "user", "content": icerik if resim_b64 else kullanici}]}
     try:
@@ -146,7 +149,10 @@ def sohbet_json(sistem, kullanici, resim_b64=None):
 
 
 ARAMA_ISTEMI = """Sen 3D baskı tasarımlarını araştıran bir ajansın. İnternette ARA ve Printables (printables.com) ile MakerWorld (makerworld.com)
-sitelerinde şu sıralar (son 1-4 hafta) popüler olan, ev tipi bir 3D yazıcıyla basılabilen, günlük hayatta kullanışlı ya da ilginç 8-12 tasarım bul.
+sitelerinde şu sıralar (son 1-4 hafta) popüler olan, ev tipi bir 3D yazıcıyla basılabilen 5-6 tasarım bul.
+
+SEÇİM ÖLÇÜTÜ: Görsel olarak net ayırt edilen, basılı hâli fotoğrafta çekici duran, günlük hayatta kullanışlı ya da ilginç somut bir NESNE olsun
+(organizer, tutucu, aksesuar, küçük alet, dekor). Eğitim/öğretici dosyası, yalnızca metin ya da kod, jeton/madalya/logo, basit geometrik parça, dosya koleksiyonu ve karakter/figür koleksiyonu DEĞİL.
 
 KESİN KURALLAR:
 - Yalnızca tasarımın kendi sayfasında lisansı AÇIKÇA "CC0" ya da "Creative Commons Attribution (CC BY)" olarak yazan tasarımları listele.
@@ -160,7 +166,7 @@ Her biri için JSON alanları:
 - lisans: sayfada yazan lisansın TAM adı (örn. "CC BY 4.0", "CC BY-NC 4.0", "CC0", "Standard Digital File License"). Yalnızca "Creative Commons 4.0 International" gibi eksik yazma; BY/NC/ND/SA ekini sayfada göremediysen "belirsiz" yaz
 - lisans_kaniti: sayfadan lisansı gösteren kısa alıntı
 - url: tasarım sayfasının adresi
-- aciklama: İngilizce, nesnenin ne olduğu ve fiziksel görünümü (şekil, parçalar, kullanım), 1-2 cümle, YALNIZCA sayfada yazanlara dayan
+- aciklama: İngilizce, 2-3 cümle: nesnenin ne olduğu ve BASILI HÂLİNİN görünüşü (genel şekil ve oran, parça sayısı, belirgin ayrıntılar, renk varsa, boyut), YALNIZCA sayfadaki açıklama ve fotoğraflara dayan, tahmin etme
 - hareketli_parca: true/false (menteşe, kilit, katlanma, dönen parça var mı)
 - kategori: kısa etiket (masa düzeni, mutfak, oyuncak, araç, bahçe vb.)
 - neden_populer: Türkçe 1 cümle
@@ -169,20 +175,19 @@ Yalnızca geçerli JSON döndür: {"tasarimlar":[{...}]}"""
 
 
 def arama_istegi(istem, sure):
-    """Web aramasını ZORUNLU kılarak çağırır (model aramadan, tahminle yanıt vermesin). (yanıt, arama_sayısı)"""
-    son = None
+    """Web aramasını ZORUNLU kılarak ama kısıtlı (az arama, küçük bağlam) çağırır. Parametre kabul edilmezse sade biçimlere düşer.
+    (yanıt, arama_sayısı)"""
     for tur in ARAC_TURLERI:
-        for zorunlu in (True, False):
-            govde = {"model": MODEL, "tools": [{"type": tur}], "input": istem}
-            if zorunlu:
-                govde["tool_choice"] = "required"
+        for ad, arac_ek, ek in (("kısıtlı", {"search_context_size": "low"}, {"tool_choice": "required", "max_tool_calls": 2}),
+                                ("zorunlu", {}, {"tool_choice": "required"}), ("sade", {}, {})):
+            govde = {"model": MODEL, "tools": [dict({"type": tur}, **arac_ek)], "input": istem}
+            govde.update(ek)
             try:
                 v = openai("responses", govde, sure)
                 aramalar = [o for o in v.get("output", []) if str(o.get("type", "")).startswith("web_search")]
                 return v, len(aramalar)
             except urllib.error.HTTPError as e:
-                son = http_hata_ozeti(e)
-                print(f"UYARI: '{tur}'{' (zorunlu)' if zorunlu else ''} olmadı ({son})")
+                print(f"UYARI: '{tur}' ({ad}) olmadı ({http_hata_ozeti(e)})")
     return None, 0
 
 
@@ -252,7 +257,7 @@ Hareketli parça var mı: {hareketli}
 
 KURALLAR:
 - Nesne ev tipi FDM yazıcıyla basılmış gibi görünsün (görünür katman çizgileri, mat plastik), temiz bir atölye tezgâhında, yumuşak mor ve pembe ışıkta, arka plan bulanık, DİKEY kompozisyon, alt üçte bir boş (yazı için).
-- Tasarımı birebir kopyalamaya çalışma; nesnenin genel türünü ve ana özelliğini göster.
+- Açıklamadaki nesneyi SADAKATLE göster: genel şekil, oran, parça sayısı ve belirgin ayrıntılar açıklamadakiyle aynı olsun. Yaratıcı yorum, ekstra parça ya da başka bir nesne ekleme. Tek bir nesne, sade arka plan.
 - Hareket eden mekanizma gösterme: parçalar kapalı ve hareketsiz dursun. İşlev iddiası yok, sadece nesnenin kendisi.
 - Görselde yazı, harf, logo, marka, filigran OLMASIN. Gerçek insan yüzü olmasın.
 {karakter_kurali}
@@ -302,9 +307,11 @@ def gorsel_modelleri():
         aday.append(os.environ["OPENAI_IMAGE_MODEL"])
     try:
         liste = [m["id"] for m in openai_get("models").get("data", [])]
-        gorsel = sorted([m for m in liste if m.startswith("gpt-image") and "mini" not in m], key=surum_anahtari, reverse=True)
-        print(f"Hesabın görsel modelleri: {', '.join(gorsel) or 'yok'}")
-        aday += gorsel
+        tum = [m for m in liste if m.startswith("gpt-image") and "mini" not in m]
+        sabit = sorted([m for m in tum if re.fullmatch(r"gpt-image-\d+(\.\d+)?", m) and m != "gpt-image-1"], key=surum_anahtari)
+        diger = sorted([m for m in tum if m not in sabit], key=surum_anahtari, reverse=True)
+        print(f"Hesabın görsel modelleri: {', '.join(tum) or 'yok'}. Deneme sırası: sabit adlı düşük sürümden (ucuz), sonra diğerleri")
+        aday += sabit + diger
     except Exception as e:
         print(f"Model listesi alınamadı ({type(e).__name__}); varsayılan denenecek.")
     aday.append("gpt-image-1")
@@ -343,7 +350,7 @@ Görseli titizlikle incele ve şu JSON'u döndür:
 "logo_var": tanınabilir logo, marka ya da filigran var mı,
 "bozuk_anatomi": bozuk el, yüz ya da gerçekçi olmayan insan/kopuk uzuv var mı (insan yoksa false),
 "nesne_makul": gösterilen nesne fiziksel olarak mümkün, makul ve ev tipi 3D yazıcıyla basılmış gibi mi,
-"tarife_uygun": görsel tarif edilen nesne türünü gösteriyor mu,
+"tarife_uygun": görsel açıklamadaki nesnenin genel şeklini ve belirgin özelliklerini sadakatle gösteriyor mu (başka bir nesne, ekstra ya da eksik ana parça varsa false),
 "puan": 1-10 genel kalite ve güvenilirlik,
 "sorunlar": ["kısa sorun cümleleri"]}}"""
 
@@ -359,19 +366,40 @@ def denetle(b64, t):
     return gecti, {"puan": puan, "sorunlar": [str(s)[:100] for s in (c.get("sorunlar") or [])][:5]}
 
 
+IZINLI_HARFLER = set("çğıöşüÇĞİÖŞÜâÂîÎûÛ·")
+
+
+def yazi_temizle(metin):
+    """Yazı tipinde olmayan karakterleri (tam genişlik tırnak, emoji vb.) çıkarır; böylece görselde kutucuk çıkmaz."""
+    t = unicodedata.normalize("NFKC", metin or "")
+    t = t.replace("“", '"').replace("”", '"').replace("’", "'").replace("‘", "'").replace("–", "-").replace("—", "-")
+    return "".join(c for c in t if 32 <= ord(c) < 127 or c in IZINLI_HARFLER).strip()
+
+
+def etiket_satirlari(t):
+    ad = SU.sar(yazi_temizle(f"Tasarım: {t['ad']}"), 40).split("\n")[:2]
+    tasarimci = yazi_temizle(f"Tasarımcı: {t.get('tasarimci') or '?'} · {t['_lisans']}")[:46]
+    return [YAPAY_ZEKA_ETIKETI] + ad + [tasarimci, yazi_temizle(f"Kaynak: {t['_site']}")]
+
+
 def etiketli_jpeg(png_b64, t, cikti):
-    """Görseli 1080x1920'ye yerleştir, YZ etiketini ve atfı işle, JPEG yaz."""
+    """Görseli 1080x1920'ye yerleştir, YZ etiketini ve atfı işle (her satır ayrı yazı katmanı), JPEG yaz."""
     font = SU.font_bul()
-    satirlar = [YAPAY_ZEKA_ETIKETI, ""] + SU.sar(f"Tasarım: {t['ad']}", 44).split("\n")[:2] + \
-        SU.sar(f"Tasarımcı: {t.get('tasarimci') or '?'} · {t['_lisans']}", 44).split("\n")[:1] + [f"Kaynak: {t['_site']}"]
+    satirlar = [x for x in etiket_satirlari(t) if x]
     with tempfile.TemporaryDirectory() as g:
         g = pathlib.Path(g)
         (g / "a.png").write_bytes(base64.b64decode(png_b64))
-        (g / "yazi.txt").write_text("\n".join(satirlar), encoding="utf-8")
+        yukseklik = 28 + 46 * len(satirlar)
+        ust = 1920 - 330 - yukseklik
         filtre = ("[0:v]split[a][b];[a]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=30:6,eq=brightness=-0.18[bg];"
                   "[b]scale=1080:-2[fg];[bg][fg]overlay=(W-w)/2:(H-h)/2-70[v0];"
-                  f"[v0]drawtext=fontfile={font}:textfile={g / 'yazi.txt'}:fontsize=34:fontcolor=white:line_spacing=10:box=1:boxcolor=black@0.62:"
-                  "boxborderw=22:expansion=none:x=(w-text_w)/2:y=h-text_h-340,format=yuvj420p[v]")
+                  f"[v0]drawbox=x=0:y={ust}:w=iw:h={yukseklik}:color=black@0.6:t=fill")
+        for i, satir in enumerate(satirlar):
+            dosya = g / f"y{i}.txt"
+            dosya.write_text(satir, encoding="utf-8")   # sonunda satır sonu yok
+            filtre += (f",drawtext=fontfile={font}:textfile={dosya}:expansion=none:fontsize=34:fontcolor=white:"
+                       f"x=(w-text_w)/2:y={ust + 20 + i * 46}")
+        filtre += ",format=yuvj420p[v]"
         r = subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(g / "a.png"), "-filter_complex", filtre, "-map", "[v]",
                             "-frames:v", "1", "-q:v", "3", str(cikti)], capture_output=True, text=True)
         if r.returncode != 0 or not cikti.exists():
@@ -434,16 +462,28 @@ def calis(a):
         return 0
     H.ffmpeg_hazir()
 
-    print("Tasarımlar aranıyor (Printables, MakerWorld)…")
-    tasarimlar, dogrulanan = tasarim_ara()
     kullanilan = json_oku(KULLANILAN, [])
-    print(f"Aramanın döndürdüğü kaynak sayısı: {len(dogrulanan)}")
-    for kaynak in sorted(dogrulanan)[:15]:
-        print(f"  kaynak: {kaynak}")
-    uygunlar, elenen = uygun_tasarimlar(tasarimlar, dogrulanan, {temiz_adres(k.get("url")) for k in kullanilan})
-    print(f"Bulunan {len(tasarimlar)}, uygun {len(uygunlar)} (modele göre CC0 / CC BY; bunlardan {sum(1 for t in uygunlar if t.get("_teyit"))} tanesinin sayfası aramada da göründü). Elenenler:")
-    for ad, neden in elenen:
-        print(f"  - {ad}: {neden}")
+    kul_anahtar = {adres_anahtari(k.get("url")) for k in kullanilan}
+    onbellek = json_oku(ADAYLAR, {})
+    kalan = []
+    try:
+        yas = (an - datetime.datetime.fromisoformat(onbellek["tarih"])).total_seconds() / 86400
+        if yas < ADAY_OMRU_GUN:
+            kalan = [t for t in onbellek.get("tasarimlar", []) if adres_anahtari(t.get("_adres")) not in kul_anahtar]
+    except Exception:
+        pass
+    if kalan:
+        uygunlar = kalan
+        print(f"Aday listesi önbellekten kullanıldı ({len(uygunlar)} kullanılmamış tasarım); yeni arama yapılmadı (maliyet tasarrufu).")
+    else:
+        print("Tasarımlar aranıyor (Printables, MakerWorld)…")
+        tasarimlar, dogrulanan = tasarim_ara()
+        print(f"Aramanın döndürdüğü kaynak sayısı: {len(dogrulanan)}")
+        uygunlar, elenen = uygun_tasarimlar(tasarimlar, dogrulanan, {temiz_adres(k.get("url")) for k in kullanilan})
+        print(f"Bulunan {len(tasarimlar)}, uygun {len(uygunlar)} (modele göre CC0 / CC BY; bunlardan {sum(1 for t in uygunlar if t.get('_teyit'))} tanesinin sayfası aramada da göründü). Elenenler:")
+        for ad, neden in elenen:
+            print(f"  - {ad}: {neden}")
+        yaz(ADAYLAR, {"tarih": an.strftime("%Y-%m-%dT%H:%M:%S+00:00"), "tasarimlar": uygunlar})
     if not uygunlar:
         print("Uygun tasarım yok; hiçbir şey üretilmedi.")
         return 0
@@ -459,7 +499,7 @@ def calis(a):
         if t.get("kategori") in kategoriler and len(uygunlar) - len(uretilen) > hedef - len(uretilen):
             continue   # çeşitlilik: aynı kategoriden art arda seçme (yeterince aday varken)
         kabul = None
-        for deneme in range(3):
+        for deneme in range(2):
             if gun_say >= ayar["gunluk_gorsel_siniri"] or ay_say >= ayar["aylik_gorsel_siniri"]:
                 print("Harcama sınırına ulaşıldı; durduruluyor.")
                 break
@@ -493,6 +533,8 @@ def calis(a):
             break
         if not kabul:
             atlanan.append((t["ad"], "denetimden geçemedi ya da üretilemedi"))
+            kullanilan.append({"url": t["_adres"], "ad": t["ad"], "tarih": H.simdi().strftime("%Y-%m-%d"), "durum": "atlandi"})
+            yaz(KULLANILAN, kullanilan[-200:])
             continue
         kimlik = yeni_kimlik(sira)
         while (H.KUYRUK / f"{kimlik}.json").exists():
