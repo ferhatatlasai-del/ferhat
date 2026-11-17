@@ -57,3 +57,10 @@ Abonelikler `bildirim/abonelikler.enc` dosyasında, `BILDIRIM_SIRRI`'ndan türet
 - 60 sn'den uzun ya da 3 sn'den kısa video "hata" olur (ajan duraklamaz; yalnızca anahtar/servis hataları duraklatma sayacına girer).
 - Instagram videoyu işlerken bekler (en fazla ~6 dk). Dosya raw adresinde görünene kadar bekler.
 - **Depo büyümesi:** her video depoya girer (ve dönüştürülmüşse bir kopya daha). Sık video hikayesi için depo hızla büyür; ileride medyayı ayrı bir depolamaya taşımak gerekebilir.
+
+### Aynı videoyu birden fazla yere aynı anda yayınlama
+"Video yayınla" kartında üç hedef işaretlenebilir: **Instagram Reels**, **YouTube Shorts**, **Instagram Hikaye**. Onaylayınca üçü birlikte başlar.
+- Hikaye için kuyruğa aynı video dosyasını işaret eden bir kayıt açılır (dosya kopyalanmaz) ve `hikaye-yayinla.yml` o kimlikle (`kimlik` girdisi) hemen çalıştırılır; sıradaki başka bir hikayeyi yayınlamaz.
+- Hikaye en fazla 60 sn olabilir; daha uzun videoda panel hikaye seçeneğini kapatır. Dikey 9:16 H.264 değilse hikaye için otomatik uyarlanır.
+- Hikaye yazı almaz; yalnızca Reels ya da Shorts seçiliyse başlık ve açıklama istenir.
+- Zincir defterinde her hedef ayrı girdi (`hedef`: instagram, youtube, hikaye) olarak bağlantı ve medya kimliğiyle kaydedilir.

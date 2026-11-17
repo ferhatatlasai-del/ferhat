@@ -22,6 +22,7 @@ import datetime
 import json
 import os
 import pathlib
+import re
 import shutil
 import subprocess
 import sys
@@ -86,9 +87,12 @@ def bugun_yayinlananlar(ogeler, an):
             and tr_zaman(o["yayin"]["tarih"]).date() == bugun]
 
 
-def karar(ayar, ogeler, an, hemen=False):
+def karar(ayar, ogeler, an, hemen=False, kimlik=None):
     """(yayinlanacak_mi, neden, secilen_oge). Saat dilimi: Türkiye."""
     sirada = sorted([o for o in ogeler if o.get("durum") == "planli"], key=lambda o: o.get("olusturma", ""))
+    if kimlik:   # belirli bir hikayeyi hemen yayınla (ör. panelden "aynı anda yayınla")
+        secilen = [o for o in sirada if o.get("id") == kimlik]
+        return (True, f"{kimlik} elle istendi", secilen[0]) if secilen else (False, f"{kimlik} bulunamadı ya da planlı değil", None)
     if hemen:
         return (True, "elle istendi", sirada[0]) if sirada else (False, "kuyrukta planlı hikaye yok", None)
     if not ayar["aktif"]:
@@ -314,7 +318,7 @@ def yayinla_komutu(a):
     ayar = ayar_oku()
     ogeler = kuyruk_oku()
     an = simdi()
-    yay, neden, oge = karar(ayar, ogeler, an, a.hemen)
+    yay, neden, oge = karar(ayar, ogeler, an, a.hemen, a.kimlik)
     print(f"Karar: {'YAYINLA' if yay else 'bekle'} ({neden})")
     if not yay or a.kuru:
         return 0
@@ -388,7 +392,10 @@ def main():
     y.add_argument("--kuru", action="store_true", help="Yalnızca karar ver, yayınlama")
     y.add_argument("--hemen", action="store_true", help="Aktif/saat/slot denetimini atla (elle)")
     y.add_argument("--git", action="store_true", help="Durumu depoya yaz ve it")
+    y.add_argument("--kimlik", help="Yalnızca bu hikayeyi hemen yayınla (sıradaki yerine)")
     a = ap.parse_args()
+    if a.kimlik and not re.fullmatch(r"h\d{8}-\d{6}-[a-z0-9]{3}", a.kimlik):
+        sys.exit("Geçersiz hikaye kimliği.")
     sys.exit(yayinla_komutu(a))
 
 

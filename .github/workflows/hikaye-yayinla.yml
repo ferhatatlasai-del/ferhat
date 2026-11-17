@@ -8,6 +8,9 @@ on:
       hemen:
         description: "EVET yazarsan ajan duraklatılmış olsa bile kuyruktaki ilk hikayeyi şimdi yayınlar"
         default: "HAYIR"
+      kimlik:
+        description: "İsteğe bağlı: yalnızca bu hikaye kimliğini hemen yayınla (panel kullanır)"
+        default: ""
 
 permissions:
   contents: write
@@ -29,7 +32,12 @@ jobs:
           OFIS_ADRES: "https://gurtechs-ajan-ofisi.fly.dev"
           BILDIRIM_SIRRI: ${{ secrets.BILDIRIM_SIRRI }}
           HEMEN: ${{ inputs.hemen }}
+          KIMLIK: ${{ inputs.kimlik }}
         run: |
-          EK=""
-          if [ "$HEMEN" = "EVET" ]; then EK="--hemen"; fi
-          python3 ajan/hikaye.py yayinla --git $EK
+          if [ -n "$KIMLIK" ]; then
+            python3 ajan/hikaye.py yayinla --git --kimlik "$KIMLIK"
+          elif [ "$HEMEN" = "EVET" ]; then
+            python3 ajan/hikaye.py yayinla --git --hemen
+          else
+            python3 ajan/hikaye.py yayinla --git
+          fi

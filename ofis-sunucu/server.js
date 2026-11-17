@@ -475,39 +475,51 @@ async function api(req, res, url) {
     let b; try { b = await govde(req); } catch (e) { return json(res, 400, { hata: 'Geçersiz istek.' }); }
     if (b.onay !== true) return json(res, 400, { hata: 'Onay verilmedi.' });
     if (!/^videolar\/yukleme_\d{14}\.mp4$/.test(String(b.yol || ''))) return json(res, 400, { hata: 'Geçersiz video yolu.' });
-    const hedefler = Array.isArray(b.hedefler) ? b.hedefler.filter(h => h === 'instagram' || h === 'youtube') : [];
+    const hedefler = Array.isArray(b.hedefler) ? [...new Set(b.hedefler.filter(h => h === 'instagram' || h === 'youtube' || h === 'hikaye'))] : [];
     if (!hedefler.length) return json(res, 400, { hata: 'En az bir platform seç.' });
+    const metinGerek = hedefler.includes('instagram') || hedefler.includes('youtube');   // hikaye yazı almaz
     const baslik = temiz(b.baslik, 100), aciklama = temiz(b.aciklama, 2000);
-    if (baslik.length < 3) return json(res, 400, { hata: 'Başlık çok kısa.' });
-    if (aciklama.length < 3) return json(res, 400, { hata: 'Açıklama çok kısa.' });
+    if (metinGerek && baslik.length < 3) return json(res, 400, { hata: 'Başlık çok kısa.' });
+    if (metinGerek && aciklama.length < 3) return json(res, 400, { hata: 'Açıklama çok kısa.' });
     const dal = await varsayilanDal();
     const ad = b.yol.slice('videolar/'.length, -4);
-    const metin = yzEkle(aciklama);
+    const metin = metinGerek ? yzEkle(aciklama) : '';
     const igDosya = `yayin/${ad}_instagram.txt`, ytDosya = `yayin/${ad}_youtube.txt`;
     try {
       if (hedefler.includes('instagram')) await dosyaYaz(igDosya, metin + '\n', 'Panelden Instagram metni', dal);
       if (hedefler.includes('youtube')) await dosyaYaz(ytDosya, baslik + '\n' + (/#shorts/i.test(metin) ? metin : metin + '\n\n#Shorts') + '\n', 'Panelden YouTube metni', dal);
     } catch (e) { return json(res, 502, { hata: e.kullanici ? e.message : 'Metin kaydedilemedi.' }); }
+    // Aynı video Instagram hikayesi olarak da gidecekse kuyruğa o videoyu işaret eden bir kayıt aç (dosya kopyalanmaz)
+    let hikayeKimligi = '';
+    if (hedefler.includes('hikaye')) {
+      const dam = damga();
+      hikayeKimligi = 'h' + dam.slice(0, 8) + '-' + dam.slice(8, 14) + '-' + crypto.randomBytes(2).toString('hex').slice(0, 3);
+      const oge = { id: hikayeKimligi, kaynak: 'yayin', tur: 'video', durum: 'planli', olusturma: new Date().toISOString(), gorsel: b.yol, baslik: baslik || 'Video hikayesi', atif: null, yayin: null, hata: '', deneme: 0 };
+      const rk = await depoYaz(`hikaye/kuyruk/${hikayeKimligi}.json`, JSON.stringify(oge, null, 2), null, 'Panel: video hikaye (aynı anda yayın)');
+      if (!rk.ok) return json(res, 502, { hata: 'Hikaye kaydı yazılamadı (' + rk.status + ').' });
+      hikayeIptal();
+    }
     await new Promise(r => setTimeout(r, 2500));
     const baslangic = new Date(Date.now() - 5000).toISOString();
     const sonuc = {};
     for (const h of hedefler) {
-      const ak = h === 'instagram' ? AKIS_IG : AKIS_YT;
-      const inputs = h === 'instagram' ? { video: b.yol, aciklama: igDosya, onay: 'EVET' } : { video: b.yol, metin: ytDosya, gizlilik: 'public', onay: 'EVET' };
+      const ak = h === 'instagram' ? AKIS_IG : (h === 'youtube' ? AKIS_YT : AKIS_HIKAYE);
+      const inputs = h === 'instagram' ? { video: b.yol, aciklama: igDosya, onay: 'EVET' }
+        : (h === 'youtube' ? { video: b.yol, metin: ytDosya, gizlilik: 'public', onay: 'EVET' } : { hemen: 'EVET', kimlik: hikayeKimligi });
       const r = await gh(`/repos/${REPO}/actions/workflows/${ak}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs }) });
       sonuc[h] = r.status === 204 ? 'basladi' : 'GitHub kabul etmedi (' + r.status + ')';
     }
     yayinlar.push(simdi);
     // Zincir kaydı: seçili içeriğe ya da yeni bağımsız kayda yayın girişi ekle
     let icerik = KAYIT_RE.test(String(b.icerik || '')) ? b.icerik : '';
-    const girisler = hedefler.filter(h => sonuc[h] === 'basladi').map(h => ({ platform: h, tur: h === 'instagram' ? 'reels' : 'shorts', durum: 'basladi', baslangic, video: b.yol }));
+    const girisler = hedefler.filter(h => sonuc[h] === 'basladi').map(h => ({ hedef: h, platform: h === 'youtube' ? 'youtube' : 'instagram', tur: h === 'instagram' ? 'reels' : (h === 'youtube' ? 'shorts' : 'hikaye'), durum: 'basladi', baslangic, video: b.yol }));
     try {
       if (icerik) {
         if (!await kayitGuncelle(icerik, v => { v.video = v.video || { yol: b.yol, tarih: baslangic }; v.yayinlar = (v.yayinlar || []).concat(girisler); }, 'Zincir: yayın başladı')) icerik = '';
       }
       if (!icerik) {
         icerik = 'y' + damga().slice(0, 8) + '-' + damga().slice(8, 14);
-        const yeni = { kimlik: icerik, olusturma: new Date().toISOString(), durum: 'video', kaynak: 'bagimsiz', direktif: '', konu: baslik, format: 'reels', seri: '', kanca: '',
+        const yeni = { kimlik: icerik, olusturma: new Date().toISOString(), durum: 'video', kaynak: 'bagimsiz', direktif: '', konu: baslik || 'Video hikayesi', format: 'reels', seri: '', kanca: '',
           video: { yol: b.yol, tarih: baslangic }, yayinlar: girisler, olcumler: [], ogrenildi: false };
         await kayitYaz(icerik, yeni, null, 'Zincir: bağımsız yayın kaydı');
         zincirOnbellek = { t: 0, veri: null };
@@ -519,7 +531,7 @@ async function api(req, res, url) {
   if (url.pathname === '/api/yayin-durum') {
     const since = Date.parse(url.searchParams.get('since') || '') || 0;
     const cikti = {};
-    for (const [ad, ak] of [['instagram', AKIS_IG], ['youtube', AKIS_YT]]) {
+    for (const [ad, ak] of [['instagram', AKIS_IG], ['youtube', AKIS_YT], ['hikaye', AKIS_HIKAYE]]) {
       const r = await gh(`/repos/${REPO}/actions/workflows/${ak}/runs?per_page=5&event=workflow_dispatch`);
       if (!r.ok) { cikti[ad] = { durum: 'okunamadi' }; continue; }
       const run = ((await r.json()).workflow_runs || []).find(x => Date.parse(x.created_at) >= since);
@@ -531,14 +543,14 @@ async function api(req, res, url) {
         if (kimlik && !guncellenenler.has(`${kimlik}:${ad}:${run.id}`)) {
           guncellenenler.add(`${kimlik}:${ad}:${run.id}`);
           await kayitGuncelle(kimlik, v => {
-            const g = (v.yayinlar || []).find(x => x.platform === ad && x.durum === 'basladi');
+            const g = (v.yayinlar || []).find(x => (x.hedef === ad || (!x.hedef && x.platform === ad)) && x.durum === 'basladi');
             if (g) { g.durum = 'yayinda'; g.tarih = run.updated_at; g.link = o.link; g.medya_kimligi = l ? l.medya : ''; g.adres = run.html_url; }
             if ((v.yayinlar || []).some(x => x.durum === 'yayinda')) v.durum = 'yayinda';
           }, 'Zincir: yayın tamamlandı').catch(() => {});
         }
       } else if (run.status === 'completed' && kimlik && !guncellenenler.has(`${kimlik}:${ad}:${run.id}`)) {
         guncellenenler.add(`${kimlik}:${ad}:${run.id}`);
-        await kayitGuncelle(kimlik, v => { const g = (v.yayinlar || []).find(x => x.platform === ad && x.durum === 'basladi'); if (g) { g.durum = 'hata'; g.adres = run.html_url; } }, 'Zincir: yayın başarısız').catch(() => {});
+        await kayitGuncelle(kimlik, v => { const g = (v.yayinlar || []).find(x => (x.hedef === ad || (!x.hedef && x.platform === ad)) && x.durum === 'basladi'); if (g) { g.durum = 'hata'; g.adres = run.html_url; } }, 'Zincir: yayın başarısız').catch(() => {});
       }
       cikti[ad] = o;
     }
