@@ -150,13 +150,17 @@ def temiz_metin(t):
 
 
 def json_ayikla(metin):
-    m = re.search(r"\{.*\}", metin, re.S)
-    if not m:
-        hata("Yanıtta JSON bulunamadı.")
-    try:
-        return json.loads(m.group(0))
-    except json.JSONDecodeError as e:
-        hata(f"JSON okunamadı: {e}")
+    """Metindeki ilk geçerli JSON nesnesini bulur (fazladan yazı ya da kod çiti olsa da)."""
+    dec = json.JSONDecoder()
+    son = None
+    for m in re.finditer(r"\{", metin or ""):
+        try:
+            nesne, _ = dec.raw_decode(metin[m.start():])
+            if isinstance(nesne, dict) and ("oneriler" in nesne or "asiri_kullanilan" in nesne):
+                return nesne
+        except json.JSONDecodeError as e:
+            son = e
+    hata(f"Yanıtta geçerli JSON bulunamadı ({son}).")
 
 
 def taze_mi(gun):

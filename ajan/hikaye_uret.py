@@ -251,13 +251,43 @@ def tasarim_ara():
                 for a in c.get("annotations", []) or []:
                     if a.get("type") == "url_citation" and a.get("url"):
                         adresler.add(temiz_adres(a["url"]))
-    m = re.search(r"\{.*\}", metin, re.S)
-    if not m:
-        hata("Arama yanıtında JSON bulunamadı.")
-    try:
-        return json.loads(m.group(0)).get("tasarimlar", []), adresler
-    except json.JSONDecodeError as e:
-        hata(f"Arama yanıtı okunamadı: {e}")
+    return tasarim_listesi_oku(metin), adresler
+
+
+def json_nesnesi_bul(metin):
+    """Metindeki ilk geçerli JSON nesnesini bulur (öncesinde/sonrasında fazladan yazı ya da kod çiti olsa da). Bulamazsa None."""
+    dec = json.JSONDecoder()
+    for m in re.finditer(r"\{", metin or ""):
+        try:
+            nesne, _ = dec.raw_decode(metin[m.start():])
+            if isinstance(nesne, dict):
+                return nesne
+        except json.JSONDecodeError:
+            continue
+    return None
+
+
+ONARIM_ISTEMI = """Aşağıdaki metin, 3D baskı tasarımlarının listesini içeriyor ama JSON biçimi bozuk. İçindeki tasarımları bozmadan,
+UYDURMA EKLEMEDEN geçerli JSON'a çevir: {"tasarimlar":[{"ad":"","tasarimci":"","lisans":"","lisans_kaniti":"","url":"","aciklama":"","hareketli_parca":false,"kategori":"","neden_populer":"","trend_konusu":""}]}
+Eksik alanları boş bırak. Okunamayan kayıtları atla.
+
+METİN:
+"""
+
+
+def tasarim_listesi_oku(metin):
+    """Arama yanıtından tasarım listesi. Biçim bozuksa önce toparlar, olmazsa ucuz bir metin çağrısıyla onarır (yeniden arama yapmaz)."""
+    nesne = json_nesnesi_bul(metin)
+    if nesne is None or not isinstance(nesne.get("tasarimlar"), list):
+        print("UYARI: arama yanıtı geçerli JSON değil; ucuz bir onarım çağrısı deneniyor.")
+        try:
+            nesne = sohbet_json("Sen JSON onarıcısın. Yalnızca geçerli JSON döndür.", ONARIM_ISTEMI + (metin or "")[:12000])
+        except Exception as e:
+            hata(f"Arama yanıtı okunamadı ve onarılamadı ({type(e).__name__}).")
+    liste = nesne.get("tasarimlar") if isinstance(nesne, dict) else None
+    if not isinstance(liste, list):
+        hata("Arama yanıtında tasarım listesi bulunamadı.")
+    return [t for t in liste if isinstance(t, dict)]
 
 
 def uygun_tasarimlar(tasarimlar, dogrulanan, kullanilan_adresler):
