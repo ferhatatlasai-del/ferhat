@@ -1,7 +1,7 @@
 {
   "id": "h20261117-193241-b0i",
   "kaynak": "uretim",
-  "durum": "planli",
+  "durum": "yayinlaniyor",
   "olusturma": "2026-11-17T19:32:41.000Z",
   "gorsel": "hikaye/gorseller/h20261117-193241-b0i.jpg",
   "baslik": "Mini Clamp Print-in-place",
@@ -19,7 +19,9 @@
     "deneme": 1,
     "sorunlar": []
   },
-  "yayin": null,
+  "yayin": {
+    "tarih": "2026-11-17T19:36:01Z"
+  },
   "hata": "",
   "deneme": 0
 }
