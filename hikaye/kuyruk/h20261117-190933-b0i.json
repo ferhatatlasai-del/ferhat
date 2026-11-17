@@ -1,0 +1,28 @@
+{
+  "id": "h20261117-190933-b0i",
+  "kaynak": "uretim",
+  "durum": "onay_bekliyor",
+  "olusturma": "2026-11-17T19:09:33.000Z",
+  "gorsel": "hikaye/gorseller/h20261117-190933-b0i.jpg",
+  "baslik": "Fish Phone Holder",
+  "atif": {
+    "ad": "Fish Phone Holder",
+    "tasarimci": "Fernando Jerez",
+    "lisans": "CC0",
+    "url": "https://www.printables.com/model/1373117-fish-phone-holder?lang=es",
+    "site": "printables.com",
+    "lisans_teyit": false
+  },
+  "kontrol": {
+    "puan": 9.0,
+    "deneme": 1,
+    "sorunlar": [
+      "Yazı/logo görünmüyor",
+      "Telefon tutucu balık formunda ve 3D baskı nesnesi gibi duruyor",
+      "Görsel temsilî olsa da ürün türüyle uyumlu"
+    ]
+  },
+  "yayin": null,
+  "hata": "",
+  "deneme": 0
+}
