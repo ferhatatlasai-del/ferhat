@@ -1,9 +1,10 @@
 {
   "aktif": true,
-  "mod": "onay",
+  "mod": "otomatik",
   "gunluk_uretim": 6,
   "gunluk_gorsel_siniri": 12,
   "aylik_gorsel_siniri": 240,
-  "kalite": "low",
-  "kuyruk_hedefi": 8
+  "kalite": "medium",
+  "kuyruk_hedefi": 8,
+  "referans": "zorunlu"
 }
