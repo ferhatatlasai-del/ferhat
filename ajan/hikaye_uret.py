@@ -687,6 +687,20 @@ Görseli titizlikle incele ve şu JSON'u döndür:
 "sorunlar": ["kısa sorun cümleleri"]}}"""
 
 
+REFERANS_KONTROL_ISTEMI = """Bu, bir 3D baskı tasarım sayfasının ana fotoğrafı. Hikaye görseli üretmek için referans olarak kullanılacak. Yalnızca JSON döndür:
+{"kullanilabilir": tek bir nesneyi net gösteren, gerçek baskı fotoğrafına benzeyen, baskın yazı/logo/etiket/başlık/filigran içermeyen fotoğraf mı (true/false),
+"neden": "kısa Türkçe neden"}"""
+
+
+def referans_kullanilabilir(referans_jpeg):
+    """Pahalı görsel üretiminden önce referans fotoğrafı ucuzca denetle (yazı, kolaj, çizim vb. varsa üretme)."""
+    try:
+        c = sohbet_json(DENETIM_SISTEM, REFERANS_KONTROL_ISTEMI, None, base64.b64encode(referans_jpeg).decode())
+    except Exception as e:
+        return True, f"referans denetimi çalışmadı ({type(e).__name__}); devam"
+    return c.get("kullanilabilir") is True, str(c.get("neden") or "")[:140]
+
+
 REFERANS_DENETIM_EKI = """
 
 İKİNCİ görsel, tasarımın gerçek REFERANS fotoğrafıdır. JSON'a ek olarak şu alanı da ekle:
@@ -716,30 +730,34 @@ def yazi_temizle(metin):
     return "".join(c for c in t if 32 <= ord(c) < 127 or c in IZINLI_HARFLER).strip()
 
 
+def kisalt(metin, en_cok):
+    return metin if len(metin) <= en_cok else metin[:max(1, en_cok - 2)].rstrip() + ".."
+
+
 def etiket_satirlari(t):
-    ad = SU.sar(yazi_temizle(f"Tasarım: {t['ad']}"), 40).split("\n")[:2]
-    tasarimci = yazi_temizle(f"Tasarımcı: {t.get('tasarimci') or '?'} · {t['_lisans']}")[:46]
-    ek = ["Tasarımcının fotoğrafından uyarlandı"] if t.get("_referansli") else []
-    return [YAPAY_ZEKA_ETIKETI] + ad + [tasarimci] + ek + [yazi_temizle(f"Kaynak: {t['_site']}")]
+    """Hikaye üstündeki küçük yazı: 2 kısa satır (yapay zekâ etiketi + tek satır atıf)."""
+    ad = kisalt(yazi_temizle(t["ad"]), 28)
+    tasarimci = kisalt(yazi_temizle(t.get("tasarimci") or "?"), 18)
+    atif = f"{ad} · {tasarimci} · {t['_lisans']} · {yazi_temizle(t['_site']).replace('.com', '')}"
+    return [YAPAY_ZEKA_ETIKETI, atif]
 
 
 def etiketli_jpeg(png_b64, t, cikti):
-    """Görseli 1080x1920'ye yerleştir, YZ etiketini ve atfı işle (her satır ayrı yazı katmanı), JPEG yaz."""
+    """Görseli 1080x1920'ye yerleştir, küçük ve sade yapay zekâ etiketi + atıf işle (hikaye arayüzünün kapatmayacağı alanda), JPEG yaz."""
     font = SU.font_bul()
     satirlar = [x for x in etiket_satirlari(t) if x]
+    boyutlar = [24, 20]
     with tempfile.TemporaryDirectory() as g:
         g = pathlib.Path(g)
         (g / "a.png").write_bytes(base64.b64decode(png_b64))
-        yukseklik = 28 + 46 * len(satirlar)
-        ust = 1920 - 330 - yukseklik
         filtre = ("[0:v]split[a][b];[a]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=30:6,eq=brightness=-0.18[bg];"
-                  "[b]scale=1080:-2[fg];[bg][fg]overlay=(W-w)/2:(H-h)/2-70[v0];"
-                  f"[v0]drawbox=x=0:y={ust}:w=iw:h={yukseklik}:color=black@0.6:t=fill")
+                  "[b]scale=1080:-2[fg];[bg][fg]overlay=(W-w)/2:(H-h)/2-70[v0];[v0]null")
+        taban = 1590   # alttaki ~250 px Instagram yanıt çubuğuna ayrılır; yazı bunun üstünde, görselin içinde kalır
         for i, satir in enumerate(satirlar):
             dosya = g / f"y{i}.txt"
             dosya.write_text(satir, encoding="utf-8")   # sonunda satır sonu yok
-            filtre += (f",drawtext=fontfile={font}:textfile={dosya}:expansion=none:fontsize=34:fontcolor=white:"
-                       f"x=(w-text_w)/2:y={ust + 20 + i * 46}")
+            filtre += (f",drawtext=fontfile={font}:textfile={dosya}:expansion=none:fontsize={boyutlar[min(i, 1)]}:fontcolor=white@0.95:"
+                       f"box=1:boxcolor=black@0.45:boxborderw=7:x=(w-text_w)/2:y={taban + i * 38}")
         filtre += ",format=yuvj420p[v]"
         r = subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(g / "a.png"), "-filter_complex", filtre, "-map", "[v]",
                             "-frames:v", "1", "-q:v", "3", str(cikti)], capture_output=True, text=True)
@@ -876,6 +894,13 @@ def calis(a):
             try:
                 referans = referans_fotografi(t["_adres"], t.get("_gorsel_adresi"))
                 print(f"  {t['ad']}: referans fotoğraf alındı ({len(referans) // 1024} KB)")
+                uygun, neden = referans_kullanilabilir(referans)
+                if not uygun:
+                    print(f"  {t['ad']}: referans fotoğraf uygun değil ({neden}); görsel üretilmedi")
+                    atlanan.append((t["ad"], f"referans uygun değil: {neden}"))
+                    kullanilan.append({"url": t["_adres"], "ad": t["ad"], "tarih": H.simdi().strftime("%Y-%m-%d"), "durum": "referans_uygun_degil"})
+                    yaz(KULLANILAN, kullanilan[-200:])
+                    continue
             except ReferansYok as e:
                 print(f"  {t['ad']}: referans fotoğraf alınamadı ({e})")
                 if ayar.get("referans", "zorunlu") == "zorunlu":
