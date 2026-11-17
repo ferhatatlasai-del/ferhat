@@ -763,12 +763,26 @@ def yazi_temizle(metin):
 
 
 def kisalt(metin, en_cok):
-    return metin if len(metin) <= en_cok else metin[:max(1, en_cok - 2)].rstrip() + ".."
+    """Uzun adı kelime sınırından kısaltır (sondaki tırnak/noktalama kalıntısını da temizler)."""
+    if len(metin) <= en_cok:
+        return metin
+    kes = metin[:en_cok - 2]
+    if " " in kes and metin[en_cok - 2] != " ":
+        kes = kes[:kes.rfind(" ")]
+    return kes.rstrip(' ,;:-"\'(') + ".."
+
+
+def ad_temizle(ad):
+    """'REMIX of "X" - alt başlık' gibi adlardan gürültüyü ayıklar; etikette kısa ve okunur ad kalır."""
+    a = re.sub(r'^\s*remix of\s*', "", ad or "", flags=re.I)
+    a = a.replace('"', "").replace("'", "'")
+    a = re.split(r"\s+[-–—]\s+|\s*\(|\s*,\s", a)[0].strip() or (ad or "")
+    return a
 
 
 def etiket_satirlari(t):
     """Hikaye üstündeki küçük yazı: 2 kısa satır (yapay zekâ etiketi + tek satır atıf)."""
-    ad = kisalt(yazi_temizle(t["ad"]), 28)
+    ad = kisalt(yazi_temizle(ad_temizle(t["ad"])), 28)
     tasarimci = kisalt(yazi_temizle(t.get("tasarimci") or "?"), 18)
     atif = f"{ad} · {tasarimci} · {t['_lisans']} · {yazi_temizle(t['_site']).replace('.com', '')}"
     return [YAPAY_ZEKA_ETIKETI, atif]
