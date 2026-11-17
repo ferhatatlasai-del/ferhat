@@ -21,20 +21,31 @@ import sys
 import urllib.error
 import urllib.request
 
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import thingiverse as TV  # noqa: E402
+
 KOK = pathlib.Path(__file__).resolve().parent.parent
 MODEL = os.environ.get("OPENAI_TREND_MODEL") or os.environ.get("OPENAI_MODEL") or "gpt-4o-mini"
 ARAC_TURLERI = ["web_search", "web_search_preview"]
 OPENAI_ADRES = os.environ.get("OPENAI_BASE_URL") or "https://api.openai.com/v1"
 
-PROMPT = """Sen 3D baskı ve maker alanında kısa video / carousel trendlerini araştıran bir araştırma ajanısın.
-İnternette ARA ve son 2-4 haftanın en çok ilgi gören konularını bul. Bakılacak yerler: YouTube Shorts, Instagram Reels,
-TikTok, Pinterest, Reddit (r/3Dprinting, r/functionalprint, r/3Dprintmything), Printables, MakerWorld ve 3D baskı haber/blog siteleri.
+PROMPT = """Sen 3D baskı ve maker alanında kısa video / carousel / hikaye trendlerini araştıran bir araştırma ajanısın.
+Bugünün tarihi: {bugun}. İnternette ARA ve son 2-4 haftanın en çok ilgi gören konularını bul. Bakılacak yerler: MakerWorld ve Printables'ın
+"trending / popular / most downloaded this week" sayfaları ve haberleri, Thingiverse popüler listeleri, YouTube Shorts, Instagram Reels,
+TikTok, Pinterest, Reddit (r/3Dprinting, r/functionalprint, r/3Dprintmything) ve 3D baskı haber/blog siteleri.
 
 Hedef kanal: Türkçe, 3D yazıcıyla basılabilen pratik ve ilginç nesneleri anlatan bir kanal. Karakter: yapay zekâ ile üretilmiş,
 kurgusal bir mucit (Doktor Filament). İzleyici: Türkiye'deki yeni başlayanlar ve meraklılar.
+{gercek_veri}{onceki}
+KONU ÇEŞİTLİLİĞİ (çok önemli): Öneriler dar bir ürün grubuna sıkışmasın. En az 7 FARKLI kategoriden öner: ev/mutfak, bahçe/balkon, araç/bisiklet,
+evcil hayvan, oyuncak/oyun/bulmaca, teknoloji aksesuarı (telefon/bilgisayar/kablo), atölye/el aleti, hediye/mevsimsel (yaklaşan bayram, yılbaşı,
+okul dönemi vb.), ofis/okul, kamp/seyahat, tamir/yedek parça, dekor/aydınlatma. Aynı ürün türünden (ör. kutu, klips, organizer) en çok 2 öneri ver.
+Bilinen klişelerin dışına çık; ilginç, şaşırtıcı, gerçekten talep gören ve görsel olarak çekici nesneleri bul.
 
-İSTENEN: 6-8 somut öneri. Her biri için:
+İSTENEN: 10-12 somut öneri. Her biri için:
 - konu: Türkçe, kısa ve somut (örn. bir nesne ya da bir baskı hatası, genel kategori değil)
+- kategori: yukarıdaki kategorilerden biri
+- arama_terimi_en: Printables/Thingiverse'te bu konuyu bulmak için 2-3 kelimelik İngilizce arama terimi (örn. "cable clip", "hinge box")
 - neden_trend: Türkçe, 1-2 cümle, aramada GÖRDÜĞÜN kanıtla (ne yükseliyor, nerede)
 - kaynaklar: yalnızca aramada gerçekten açtığın sayfaların adresleri
 - basilabilir: gerçekten ev tipi bir 3D yazıcıyla basılabiliyor mu (true/false) ve nedeni
@@ -49,7 +60,51 @@ KURALLAR: Uydurma. Bulamadığın şeyi yazma, öneri sayısı az kalırsa az ya
 Markalı ya da lisanslı karakter/ürün (film, oyun, spor kulübü logosu vb.) önerme. Sağlık iddiası içeren konu önerme.
 
 Yalnızca geçerli JSON döndür, başka metin yazma:
-{"oneriler":[{"konu":"","neden_trend":"","kaynaklar":["https://..."],"basilabilir":true,"basilabilir_notu":"","kanca_acisi":"","format_onerisi":"carousel","risk":"yok","guven":"orta"}],"asiri_kullanilan":["",""]}"""
+{{"oneriler":[{{"konu":"","kategori":"","arama_terimi_en":"","neden_trend":"","kaynaklar":["https://..."],"basilabilir":true,"basilabilir_notu":"","kanca_acisi":"","format_onerisi":"carousel","risk":"yok","guven":"orta"}}],"asiri_kullanilan":["",""]}}"""
+
+
+def thingiverse_gercek_veri():
+    """Thingiverse'in resmi popüler listesinden gerçek veri (anahtar yoksa boş). (istem_metni, ozet_listesi)"""
+    if not TV.hazir():
+        return "", []
+    try:
+        liste = [TV.ozet_bilgisi(o) for o in TV.populer(25)]
+    except TV.ThingiverseHata as e:
+        print(f"UYARI: Thingiverse popüler listesi alınamadı ({e})")
+        return "", []
+    liste = [o for o in liste if o["ad"]]
+    if not liste:
+        return "", []
+    metin = ("GERÇEK VERİ (Thingiverse resmi servisi, şu an en popüler tasarımlar; beğeni sayısıyla). Bunlardan trend sinyali çıkar, ama körü körüne kopyalama:\n"
+             + "\n".join(f"- {o['ad']} ({o['begeni']} beğeni)" for o in liste[:25]) + "\n")
+    return metin, liste
+
+
+def onceki_konular():
+    try:
+        v = json.loads((KOK / "ajan" / "trendler.json").read_text(encoding="utf-8"))
+        return [o.get("konu", "") for o in v.get("oneriler", []) if o.get("konu")][:12]
+    except Exception:
+        return []
+
+
+def prompt_olustur():
+    bugun = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
+    gercek, _ = thingiverse_gercek_veri()
+    onceki = onceki_konular()
+    onceki_metin = ("\nGEÇEN ARAŞTIRMADA ÖNERİLENLER (aynı konuları TEKRARLAMA, yeni alanlar keşfet): " + "; ".join(onceki) + "\n") if onceki else ""
+    return PROMPT.format(bugun=bugun, gercek_veri=("\n" + gercek) if gercek else "", onceki=onceki_metin)
+
+
+def ornekler_bul(arama_terimi, adet=3):
+    """Konuya yakın, popüler gerçek tasarım örnekleri (Thingiverse). Lisans ayrıca kontrol edilmeli. Anahtar yoksa boş."""
+    if not TV.hazir() or not arama_terimi:
+        return []
+    try:
+        return [{"ad": o["ad"], "url": o["url"], "begeni": o["begeni"], "site": "thingiverse.com"}
+                for o in (TV.ozet_bilgisi(x) for x in TV.ara(arama_terimi, adet + 2)[:adet + 2]) if o["ad"] and o["url"]][:adet]
+    except TV.ThingiverseHata:
+        return []
 
 
 def hata(m):
@@ -61,7 +116,7 @@ def istek(arac_turu):
     anahtar = os.environ.get("OPENAI_API_KEY")
     if not anahtar:
         hata("OPENAI_API_KEY tanımlı değil.")
-    govde = json.dumps({"model": MODEL, "tools": [{"type": arac_turu}], "input": PROMPT}).encode()
+    govde = json.dumps({"model": MODEL, "tools": [{"type": arac_turu}], "input": prompt_olustur()}).encode()
     r = urllib.request.Request(
         f"{OPENAI_ADRES}/responses", data=govde, method="POST",
         headers={"Content-Type": "application/json", "Authorization": f"Bearer {anahtar}"})
@@ -153,6 +208,7 @@ def main():
             o[alan] = temiz_metin(o.get(alan))
         o["kaynaklar"] = kaynaklar
         o["dogrulandi"] = bool(kaynaklar)
+        o["ornekler"] = ornekler_bul((o.get("arama_terimi_en") or "").strip())
         if not kaynaklar:
             o["guven"] = "dusuk"
         oneriler.append(o)
@@ -171,8 +227,9 @@ def main():
                      f"- **Neden trend:** {o.get('neden_trend', '')}",
                      f"- **Basılabilir:** {'evet' if o.get('basilabilir') else 'hayır'}. {o.get('basilabilir_notu', '')}",
                      f"- **Bizim açımız:** {o.get('kanca_acisi', '')}",
-                     f"- **Format:** {o.get('format_onerisi', '')} · **Güven:** {o.get('guven', '')} · **Risk:** {o.get('risk', '')}"]
+                     f"- **Kategori:** {o.get('kategori', '')} · **Format:** {o.get('format_onerisi', '')} · **Güven:** {o.get('guven', '')} · **Risk:** {o.get('risk', '')}"]
         satirlar += [f"- Kaynak: {k}" for k in o["kaynaklar"]] or ["- Kaynak: doğrulanamadı (zayıf öneri)"]
+        satirlar += [f"- Örnek tasarım: {e['ad']} ({e['begeni']} beğeni) {e['url']}" for e in o.get("ornekler", [])]
         satirlar.append("")
     if cikti["asiri_kullanilan"]:
         satirlar += ["## Aşırı kullanılan (kaçın)"] + [f"- {k}" for k in cikti["asiri_kullanilan"]] + [""]

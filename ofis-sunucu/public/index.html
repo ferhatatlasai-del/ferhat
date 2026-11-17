@@ -1085,7 +1085,7 @@ function hikayeCiz(v){
     if(o.trend) b.appendChild(dom('div','not','Trend: '+o.trend));
     if(o.atif&&o.atif.ad){
       b.appendChild(dom('div','not','Tasarım: '+o.atif.ad+(o.atif.tasarimci?' · '+o.atif.tasarimci:'')+(o.atif.lisans?' · '+o.atif.lisans:'')));
-      if(o.atif.url&&/^https:\/\/([\w-]+\.)*(printables|makerworld)\.com\//.test(o.atif.url)){ var al=dom('a',null,'Tasarım sayfası'); al.href=o.atif.url; al.target='_blank'; al.rel='noopener noreferrer'; b.appendChild(al); }
+      if(o.atif.url&&/^https:\/\/([\w-]+\.)*(printables|makerworld|thingiverse)\.com\//.test(o.atif.url)){ var al=dom('a',null,'Tasarım sayfası'); al.href=o.atif.url; al.target='_blank'; al.rel='noopener noreferrer'; b.appendChild(al); }
       if(o.kaynak==='uretim') b.appendChild(dom('div','not','Yapay zekâ görseli'+(o.atif.referansli?' · tasarımcının fotoğrafından uyarlandı':'')+(o.kontrol&&o.kontrol.puan?' · kontrol puanı '+o.kontrol.puan:'')));
       if(o.kaynak==='uretim'&&o.atif.lisans_teyit===false) b.appendChild(dom('div','hata','Lisans modelin beyanıdır, sayfadan teyit edilmedi. Onaylamadan önce “Tasarım sayfası”nda lisansı kontrol et; CC0 ya da CC BY değilse Reddet/Sil.'));
     }

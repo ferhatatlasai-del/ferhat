@@ -26,6 +26,7 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5.4-mini' }}
+          THINGIVERSE_TOKEN: ${{ secrets.THINGIVERSE_TOKEN }}
           OFIS_ADRES: "https://gurtechs-ajan-ofisi.fly.dev"
           BILDIRIM_SIRRI: ${{ secrets.BILDIRIM_SIRRI }}
           HEMEN: ${{ inputs.hemen }}

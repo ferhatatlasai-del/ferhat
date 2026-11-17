@@ -80,3 +80,9 @@ Abonelikler `bildirim/abonelikler.enc` dosyasında, `BILDIRIM_SIRRI`'ndan türet
 (tek sayfa, tek görsel, açık bir bot adıyla; depoya yazılmaz, yalnızca bellekte tutulur) ve OpenAI görsel düzenleme servisiyle aynı nesne yeni sahnede
 yeniden çizilir. Yapay zekâ üretilen görseli referansla karşılaştırıp sadakati denetler. Görselde "Tasarımcının fotoğrafından uyarlandı" ve atıf yazar.
 Fotoğraf alınamazsa (site engellerse) "zorunlu" modda o tasarım atlanır; "tercih" modda metinden çizilir (daha az benzer).
+
+### Thingiverse kaynağı ve geliştirilmiş Trend ajanı
+- **Thingiverse (resmi servis):** `THINGIVERSE_TOKEN` gizli anahtarı tanımlıysa hikaye üreticisi Thingiverse'in popüler listesinden ve trend terimlerinden CC0/CC BY lisanslı tasarımları da aday yapar (lisans ve fotoğraf adresi sitenin kendi verisinden). Anahtar yoksa kaynak sessizce atlanır.
+  Anahtar: thingiverse.com → Apps → Create an App → App Token; GitHub → Settings → Secrets and variables → Actions → New repository secret (`THINGIVERSE_TOKEN`).
+- **Trend ajanı:** 10-12 öneri, en az 7 farklı kategori, mevsimsel konular, önceki araştırmayı tekrarlamama, Thingiverse popüler listesinden gerçek veri (anahtar varsa) ve her öneriye Thingiverse'ten 3 gerçek örnek tasarım. İçerik ajanı bu örnekleri esin olarak görür (kopyalamaz).
+- Hikaye üreticisi Trend ajanının konularını ve İngilizce arama terimlerini kullanır; adayların yarısı trend konularına uyar.
