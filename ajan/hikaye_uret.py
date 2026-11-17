@@ -22,10 +22,13 @@ Kullanım:
 import argparse
 import base64
 import datetime
+import html
+import ipaddress
 import json
 import os
 import pathlib
 import re
+import socket
 import subprocess
 import sys
 import tempfile
@@ -50,8 +53,16 @@ ADAYLAR = KOK / "hikaye" / "adaylar.json"
 ADAY_OMRU_GUN = 4   # aynı arama sonucu bu kadar gün yeniden kullanılır (her çalışmada pahalı arama yapılmaz)
 IZINLI_SITELER = ("printables.com", "makerworld.com")
 VARSAYILAN = {"aktif": False, "mod": "otomatik", "gunluk_uretim": 3, "gunluk_gorsel_siniri": 6,
-              "aylik_gorsel_siniri": 90, "kalite": "low", "kuyruk_hedefi": 6}
+              "aylik_gorsel_siniri": 90, "kalite": "low", "kuyruk_hedefi": 6, "referans": "zorunlu"}
 ARAC_TURLERI = ["web_search", "web_search_preview"]
+BOT_ADI = "Mozilla/5.0 (compatible; DoktorFilamentBot/1.0; tasarim atfi icin tek sayfa onizleme)"
+REFERANS_EN_BUYUK = 8 * 1024 * 1024
+SAHNELER = [
+    "a clean hobbyist workshop bench with a blurred pegboard and filament spools in the background",
+    "a tidy desk with a blurred computer monitor and a small plant in the background",
+    "a wooden shelf in a cozy maker room with blurred tools in the background",
+    "a light concrete workbench with a blurred row of storage drawers in the background",
+]
 YAPAY_ZEKA_ETIKETI = "Yapay zekâ görseli (temsili)"
 
 
@@ -131,10 +142,11 @@ def http_hata_ozeti(e):
         return f"HTTP {e.code}"
 
 
-def sohbet_json(sistem, kullanici, resim_b64=None):
+def sohbet_json(sistem, kullanici, resim_b64=None, ek_resim_b64=None):
     icerik = [{"type": "text", "text": kullanici}]
-    if resim_b64:
-        icerik.append({"type": "image_url", "image_url": {"url": "data:image/png;base64," + resim_b64, "detail": "low"}})
+    for resim, mime in ((resim_b64, "image/png"), (ek_resim_b64, "image/jpeg")):
+        if resim:
+            icerik.append({"type": "image_url", "image_url": {"url": f"data:{mime};base64," + resim, "detail": "low"}})
     govde = {"model": MODEL, "response_format": {"type": "json_object"},
              "messages": [{"role": "system", "content": sistem}, {"role": "user", "content": icerik if resim_b64 else kullanici}]}
     try:
@@ -282,6 +294,147 @@ def sahne_promptu(t, karakterli):
     return " ".join(parcalar)
 
 
+# ---------- Referans fotoğraf ----------
+
+class ReferansYok(Exception):
+    """Tasarım sayfasından referans fotoğraf alınamadı (neden mesajda)."""
+
+
+def genel_adres_mi(adres):
+    """Yalnızca https ve herkese açık adresler (yerel/özel ağ adreslerine istek atılmaz)."""
+    if os.environ.get("HIKAYE_TEST_SAYFA_TABANI"):
+        return True   # yalnızca testte
+    p = urllib.parse.urlparse(adres)
+    if p.scheme != "https" or not p.hostname:
+        return False
+    try:
+        for bilgi in socket.getaddrinfo(p.hostname, 443, proto=socket.IPPROTO_TCP):
+            ip = ipaddress.ip_address(bilgi[4][0])
+            if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_multicast:
+                return False
+    except Exception:
+        return False
+    return True
+
+
+def sayfa_adresi_cevir(adres):
+    taban = os.environ.get("HIKAYE_TEST_SAYFA_TABANI")   # yalnızca test: sahte sunucuya yönlendir
+    if not taban:
+        return adres
+    p = urllib.parse.urlparse(adres)
+    return taban.rstrip("/") + p.path
+
+
+def http_al(adres, sure=25, en_buyuk=2 * 1024 * 1024):
+    r = urllib.request.Request(adres, headers={"User-Agent": BOT_ADI, "Accept": "text/html,image/*;q=0.8"})
+    with urllib.request.urlopen(r, timeout=sure) as y:
+        tur = (y.headers.get("Content-Type") or "").lower()
+        veri = y.read(en_buyuk + 1)
+    if len(veri) > en_buyuk:
+        raise ReferansYok("dosya çok büyük")
+    return veri, tur
+
+
+def og_gorsel_adresi(html_metni, sayfa_adresi):
+    """Sayfanın paylaşım önizleme (og:image) fotoğrafının adresi."""
+    for etiket in re.findall(r"<meta\b[^>]*>", html_metni, re.I):
+        if re.search(r'(?:property|name)\s*=\s*["\'](?:og:image|og:image:url|twitter:image)["\']', etiket, re.I):
+            m = re.search(r'content\s*=\s*["\']([^"\']+)["\']', etiket, re.I)
+            if m:
+                return urllib.parse.urljoin(sayfa_adresi, html.unescape(m.group(1)).strip())
+    return None
+
+
+def referans_fotografi(sayfa):
+    """Tasarım sayfasının ana fotoğrafını (yalnızca tek sayfa + tek görsel) indirir; en çok 1024 px JPEG bayt olarak döndürür.
+    Depoya yazılmaz, yalnızca bellekte kullanılır."""
+    try:
+        veri, _ = http_al(sayfa_adresi_cevir(sayfa), 25, 3 * 1024 * 1024)
+    except urllib.error.HTTPError as e:
+        raise ReferansYok(f"sayfa açılamadı (HTTP {e.code})")
+    except Exception as e:
+        raise ReferansYok(f"sayfa açılamadı ({type(e).__name__})")
+    gorsel = og_gorsel_adresi(veri.decode("utf-8", "ignore"), sayfa)
+    if not gorsel:
+        raise ReferansYok("sayfada önizleme fotoğrafı bulunamadı")
+    if not genel_adres_mi(gorsel):
+        raise ReferansYok("fotoğraf adresi güvenli değil")
+    try:
+        ham, tur = http_al(sayfa_adresi_cevir(gorsel), 30, REFERANS_EN_BUYUK)
+    except urllib.error.HTTPError as e:
+        raise ReferansYok(f"fotoğraf indirilemedi (HTTP {e.code})")
+    except ReferansYok:
+        raise
+    except Exception as e:
+        raise ReferansYok(f"fotoğraf indirilemedi ({type(e).__name__})")
+    if tur and not tur.startswith("image/"):
+        raise ReferansYok("fotoğraf adresi görsel döndürmedi")
+    with tempfile.TemporaryDirectory() as g:
+        g = pathlib.Path(g)
+        (g / "ham").write_bytes(ham)
+        r = subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(g / "ham"), "-vf", "scale='min(1024,iw)':-2",
+                            "-frames:v", "1", "-q:v", "3", str(g / "r.jpg")], capture_output=True, text=True)
+        if r.returncode != 0 or not (g / "r.jpg").exists():
+            raise ReferansYok("fotoğraf okunamadı")
+        cikti = (g / "r.jpg").read_bytes()
+    boy = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height", "-of", "csv=p=0:s=x", "-"],
+                         input=cikti, capture_output=True).stdout.decode().strip()
+    try:
+        w, h = [int(x) for x in boy.split("x")]
+    except ValueError:
+        w = h = 0
+    if min(w, h) < 300:
+        raise ReferansYok(f"fotoğraf çok küçük ({boy or '?'})")
+    return cikti
+
+
+def coklu_parca(alanlar, dosyalar):
+    """multipart/form-data gövdesi. (govde, icerik_turu)"""
+    sinir = "----hikaye" + os.urandom(8).hex()
+    parcalar = []
+    for ad, deger in alanlar.items():
+        parcalar.append(f'--{sinir}\r\nContent-Disposition: form-data; name="{ad}"\r\n\r\n{deger}\r\n'.encode())
+    for ad, dosya_adi, tur, veri in dosyalar:
+        parcalar.append(f'--{sinir}\r\nContent-Disposition: form-data; name="{ad}"; filename="{dosya_adi}"\r\nContent-Type: {tur}\r\n\r\n'.encode() + veri + b"\r\n")
+    parcalar.append(f"--{sinir}--\r\n".encode())
+    return b"".join(parcalar), f"multipart/form-data; boundary={sinir}"
+
+
+REFERANSLI_ISTEM = ("Recreate the 3D-printed object shown in the reference photo faithfully: keep exactly the same shape, proportions, number of parts, "
+                    "visible details and colors. Place it as a single hero object in a new scene: {sahne}, soft purple and pink ambient light, "
+                    "photorealistic product photo, vertical composition, object centered in the upper two thirds with empty space in the bottom third. "
+                    "Remove the original background and any hands, text, logos, watermarks and brand marks that appear in the reference. "
+                    "No text, no letters, no logos anywhere.")
+
+
+def gorsel_duzenle(prompt, referans_jpeg, kalite):
+    """Referans fotoğrafı temel alıp yeni sahnede yeniden çizer (images/edits). Model sırası gorsel_uret ile aynı."""
+    global _gorsel_modelleri
+    anahtar = os.environ.get("OPENAI_API_KEY")
+    son_hata = None
+    for model in list(gorsel_modelleri()):
+        govde, tur = coklu_parca({"model": model, "prompt": prompt, "size": "1024x1536", "quality": kalite, "n": "1"},
+                                 [("image[]", "referans.jpg", "image/jpeg", referans_jpeg)])
+        r = urllib.request.Request(f"{OPENAI}/images/edits", data=govde, method="POST",
+                                   headers={"Content-Type": tur, "Authorization": f"Bearer {anahtar}"})
+        try:
+            with urllib.request.urlopen(r, timeout=300) as y:
+                v = json.load(y)
+        except urllib.error.HTTPError as e:
+            son_hata = e
+            if e.code in (400, 403, 404):
+                print(f"  görsel modeli '{model}' düzenlemede kullanılamadı ({http_hata_ozeti(e)})")
+                continue
+            raise
+        b64 = (v.get("data") or [{}])[0].get("b64_json")
+        if not b64:
+            raise ValueError("görsel yanıtında veri yok")
+        if _gorsel_modelleri[0] != model:
+            _gorsel_modelleri = [model] + [m for m in _gorsel_modelleri if m != model]
+        return b64
+    raise son_hata or ValueError("kullanılabilir görsel modeli yok")
+
+
 def openai_get(yol, sure=60):
     anahtar = os.environ.get("OPENAI_API_KEY")
     r = urllib.request.Request(f"{OPENAI}/{yol}", headers={"Authorization": f"Bearer {anahtar}"})
@@ -355,14 +508,22 @@ Görseli titizlikle incele ve şu JSON'u döndür:
 "sorunlar": ["kısa sorun cümleleri"]}}"""
 
 
-def denetle(b64, t):
-    c = sohbet_json(DENETIM_SISTEM, DENETIM_ISTEMI.format(ad=t["ad"], aciklama=t.get("aciklama", "")), b64)
+REFERANS_DENETIM_EKI = """
+
+İKİNCİ görsel, tasarımın gerçek REFERANS fotoğrafıdır. JSON'a ek olarak şu alanı da ekle:
+"referansa_sadik": birinci (üretilen) görseldeki nesne, referanstaki nesneyle aynı genel şekil, oran, parça sayısı ve belirgin ayrıntılara sahip mi (aynı nesne mi; farklı bir nesne, ekstra ya da eksik ana parça varsa false)."""
+
+
+def denetle(b64, t, referans_jpeg=None):
+    istem = DENETIM_ISTEMI.format(ad=t["ad"], aciklama=t.get("aciklama", "")) + (REFERANS_DENETIM_EKI if referans_jpeg else "")
+    c = sohbet_json(DENETIM_SISTEM, istem, b64, base64.b64encode(referans_jpeg).decode() if referans_jpeg else None)
     try:
         puan = float(c.get("puan", 0))
     except (TypeError, ValueError):
         puan = 0.0
     gecti = (not c.get("yazi_var") and not c.get("logo_var") and not c.get("bozuk_anatomi")
-             and c.get("nesne_makul") is True and c.get("tarife_uygun") is True and puan >= 7)
+             and c.get("nesne_makul") is True and c.get("tarife_uygun") is True and puan >= 7
+             and (not referans_jpeg or c.get("referansa_sadik") is True))
     return gecti, {"puan": puan, "sorunlar": [str(s)[:100] for s in (c.get("sorunlar") or [])][:5]}
 
 
@@ -379,7 +540,8 @@ def yazi_temizle(metin):
 def etiket_satirlari(t):
     ad = SU.sar(yazi_temizle(f"Tasarım: {t['ad']}"), 40).split("\n")[:2]
     tasarimci = yazi_temizle(f"Tasarımcı: {t.get('tasarimci') or '?'} · {t['_lisans']}")[:46]
-    return [YAPAY_ZEKA_ETIKETI] + ad + [tasarimci, yazi_temizle(f"Kaynak: {t['_site']}")]
+    ek = ["Tasarımcının fotoğrafından uyarlandı"] if t.get("_referansli") else []
+    return [YAPAY_ZEKA_ETIKETI] + ad + [tasarimci] + ek + [yazi_temizle(f"Kaynak: {t['_site']}")]
 
 
 def etiketli_jpeg(png_b64, t, cikti):
@@ -483,7 +645,7 @@ def calis(a):
         print(f"Bulunan {len(tasarimlar)}, uygun {len(uygunlar)} (modele göre CC0 / CC BY; bunlardan {sum(1 for t in uygunlar if t.get('_teyit'))} tanesinin sayfası aramada da göründü). Elenenler:")
         for ad, neden in elenen:
             print(f"  - {ad}: {neden}")
-        yaz(ADAYLAR, {"tarih": an.strftime("%Y-%m-%dT%H:%M:%S+00:00"), "tasarimlar": uygunlar})
+        yaz(ADAYLAR, {"tarih": an.strftime("%Y-%m-%dT%H:%M:%S+00:00"), "tasarimlar": [{k: v for k, v in t.items() if k != "_referansli"} for t in uygunlar]})
     if not uygunlar:
         print("Uygun tasarım yok; hiçbir şey üretilmedi.")
         return 0
@@ -498,14 +660,29 @@ def calis(a):
             break
         if t.get("kategori") in kategoriler and len(uygunlar) - len(uretilen) > hedef - len(uretilen):
             continue   # çeşitlilik: aynı kategoriden art arda seçme (yeterince aday varken)
+        # referans fotoğraf (yalnızca bellekte)
+        referans = None
+        if ayar.get("referans", "zorunlu") != "yok":
+            try:
+                referans = referans_fotografi(t["_adres"])
+                print(f"  {t['ad']}: referans fotoğraf alındı ({len(referans) // 1024} KB)")
+            except ReferansYok as e:
+                print(f"  {t['ad']}: referans fotoğraf alınamadı ({e})")
+                if ayar.get("referans", "zorunlu") == "zorunlu":
+                    atlanan.append((t["ad"], f"referans alınamadı: {e}"))
+                    continue   # kullanılmış sayılmaz; sonraki çalışmada yeniden denenir
+        t["_referansli"] = bool(referans)
         kabul = None
         for deneme in range(2):
             if gun_say >= ayar["gunluk_gorsel_siniri"] or ay_say >= ayar["aylik_gorsel_siniri"]:
                 print("Harcama sınırına ulaşıldı; durduruluyor.")
                 break
             try:
-                prompt = sahne_promptu(t, karakterli=(sira % 3 == 2))
-                b64 = gorsel_uret(prompt, ayar["kalite"])
+                if referans:
+                    b64 = gorsel_duzenle(REFERANSLI_ISTEM.format(sahne=SAHNELER[(sira + deneme) % len(SAHNELER)]), referans, ayar["kalite"])
+                else:
+                    prompt = sahne_promptu(t, karakterli=(sira % 3 == 2))
+                    b64 = gorsel_uret(prompt, ayar["kalite"])
             except urllib.error.HTTPError as e:
                 print(f"  görsel üretilemedi ({http_hata_ozeti(e)})")
                 atlanan.append((t["ad"], http_hata_ozeti(e)))
@@ -518,7 +695,7 @@ def calis(a):
             gun_say += 1
             ay_say += 1
             try:
-                gecti, kontrol = denetle(b64, t)
+                gecti, kontrol = denetle(b64, t, referans)
             except Exception as e:
                 print(f"  denetim çalışmadı ({type(e).__name__}); şüphede yayınlanmaz, atlanıyor")
                 gecti, kontrol = False, {"puan": 0, "sorunlar": ["denetim çalışmadı"]}
@@ -546,7 +723,7 @@ def calis(a):
         kategoriler.add(t.get("kategori"))
         oge = {"id": kimlik, "kaynak": "uretim", "durum": "planli" if ayar["mod"] == "otomatik" else "onay_bekliyor",
                "olusturma": H.simdi().strftime("%Y-%m-%dT%H:%M:%S.000Z"), "gorsel": gorsel_yolu, "baslik": t["ad"][:80],
-               "atif": {"ad": t["ad"], "tasarimci": t.get("tasarimci"), "lisans": t["_lisans"], "url": t["_adres"], "site": t["_site"], "lisans_teyit": bool(t.get("_teyit"))},
+               "atif": {"ad": t["ad"], "tasarimci": t.get("tasarimci"), "lisans": t["_lisans"], "url": t["_adres"], "site": t["_site"], "lisans_teyit": bool(t.get("_teyit")), "referansli": bool(t.get("_referansli"))},
                "kontrol": {"puan": kabul[1]["puan"], "deneme": kabul[2], "sorunlar": kabul[1]["sorunlar"]},
                "yayin": None, "hata": "", "deneme": 0}
         yaz(H.KUYRUK / f"{kimlik}.json", oge)

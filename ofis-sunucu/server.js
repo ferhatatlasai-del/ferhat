@@ -201,7 +201,7 @@ function jpegBoyut(b) {
   }
   return null;
 }
-const URETIM_VARSAYILAN = { aktif: false, mod: 'otomatik', gunluk_uretim: 3, gunluk_gorsel_siniri: 6, aylik_gorsel_siniri: 90, kalite: 'low', kuyruk_hedefi: 6 };
+const URETIM_VARSAYILAN = { aktif: false, mod: 'otomatik', gunluk_uretim: 3, gunluk_gorsel_siniri: 6, aylik_gorsel_siniri: 90, kalite: 'low', kuyruk_hedefi: 6, referans: 'zorunlu' };
 async function hikayeListesi() {
   if (Date.now() - hikayeOnbellek.t < 20e3 && hikayeOnbellek.veri) return hikayeOnbellek.veri;
   const dal = await varsayilanDal();
@@ -388,6 +388,7 @@ async function api(req, res, url) {
     if ('gunluk_gorsel_siniri' in b) { if (!tam(b.gunluk_gorsel_siniri, 1, 40)) return json(res, 400, { hata: 'Günlük görsel sınırı 1-40 olmalı.' }); guncel.gunluk_gorsel_siniri = b.gunluk_gorsel_siniri; }
     if ('aylik_gorsel_siniri' in b) { if (!tam(b.aylik_gorsel_siniri, 1, 600)) return json(res, 400, { hata: 'Aylık görsel sınırı 1-600 olmalı.' }); guncel.aylik_gorsel_siniri = b.aylik_gorsel_siniri; }
     if ('kuyruk_hedefi' in b) { if (!tam(b.kuyruk_hedefi, 1, 30)) return json(res, 400, { hata: 'Kuyruk hedefi 1-30 olmalı.' }); guncel.kuyruk_hedefi = b.kuyruk_hedefi; }
+    if ('referans' in b) { if (!['zorunlu', 'tercih'].includes(b.referans)) return json(res, 400, { hata: 'Geçersiz referans ayarı.' }); guncel.referans = b.referans; }
     if ('kalite' in b) { if (!['low', 'medium', 'high'].includes(b.kalite)) return json(res, 400, { hata: 'Geçersiz kalite.' }); guncel.kalite = b.kalite; }
     const ok = await jsonGuncelle('hikaye/uretim.json', v => { Object.assign(v, guncel); }, 'Panel: hikaye üretim ayarı', URETIM_VARSAYILAN);
     hikayeIptal();
