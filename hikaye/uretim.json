@@ -1,9 +1,9 @@
 {
   "aktif": true,
   "mod": "onay",
-  "gunluk_uretim": 10,
-  "gunluk_gorsel_siniri": 10,
-  "aylik_gorsel_siniri": 150,
-  "kalite": "medium",
-  "kuyruk_hedefi": 8
+  "gunluk_uretim": 3,
+  "gunluk_gorsel_siniri": 6,
+  "aylik_gorsel_siniri": 90,
+  "kalite": "low",
+  "kuyruk_hedefi": 6
 }

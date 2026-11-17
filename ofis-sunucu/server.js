@@ -201,7 +201,7 @@ function jpegBoyut(b) {
   }
   return null;
 }
-const URETIM_VARSAYILAN = { aktif: false, mod: 'otomatik', gunluk_uretim: 4, gunluk_gorsel_siniri: 12, aylik_gorsel_siniri: 150, kalite: 'medium', kuyruk_hedefi: 8 };
+const URETIM_VARSAYILAN = { aktif: false, mod: 'otomatik', gunluk_uretim: 3, gunluk_gorsel_siniri: 6, aylik_gorsel_siniri: 90, kalite: 'low', kuyruk_hedefi: 6 };
 async function hikayeListesi() {
   if (Date.now() - hikayeOnbellek.t < 20e3 && hikayeOnbellek.veri) return hikayeOnbellek.veri;
   const dal = await varsayilanDal();
