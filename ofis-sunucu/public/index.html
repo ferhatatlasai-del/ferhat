@@ -1082,6 +1082,7 @@ function hikayeCiz(v){
     var ad={planli:['Sırada','orta'],onay_bekliyor:['Onay bekliyor','orta'],yayinlaniyor:['Yayınlanıyor','orta'],yayinda:['Yayında','iyi'],hata:['Hata','kt'],reddedildi:['Reddedildi','zayif']}[o.durum]||[o.durum,'zayif'];
     b.appendChild(dom('span','rozet '+ad[1],ad[0]+(o.tur==='video'?' · video':'')));
     if(o.baslik) b.appendChild(dom('div',null,o.baslik));
+    if(o.trend) b.appendChild(dom('div','not','Trend: '+o.trend));
     if(o.atif&&o.atif.ad){
       b.appendChild(dom('div','not','Tasarım: '+o.atif.ad+(o.atif.tasarimci?' · '+o.atif.tasarimci:'')+(o.atif.lisans?' · '+o.atif.lisans:'')));
       if(o.atif.url&&/^https:\/\/([\w-]+\.)*(printables|makerworld)\.com\//.test(o.atif.url)){ var al=dom('a',null,'Tasarım sayfası'); al.href=o.atif.url; al.target='_blank'; al.rel='noopener noreferrer'; b.appendChild(al); }
