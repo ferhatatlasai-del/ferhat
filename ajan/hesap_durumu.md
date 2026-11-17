@@ -3,7 +3,7 @@
 (Otomatik çekildi: 2026-11-17. Elle düzenleme, üzerine yazılır.)
 
 - **Hesap:** @gurtechs3d
-- **Takipçi:** 418
+- **Takipçi:** 417
 - **Takip edilen:** 167
 - **Gönderi sayısı:** 15
 

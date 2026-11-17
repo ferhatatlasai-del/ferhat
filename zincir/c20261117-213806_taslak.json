@@ -1,0 +1,63 @@
+{
+  "konu": "Desteksiz overhang test kulesiyle köşe kurtarma",
+  "format": "reels",
+  "seri": "Doktor Notu",
+  "kanca": "Köşe bozuluyorsa, suç her zaman modelde değil.",
+  "slaytlar": [],
+  "sure_sn": 24,
+  "sahneler": [
+    {
+      "sure_sn": 4,
+      "gorsel": "Doctor Filament in a tidy 3D printing workshop, holding a small overhang test tower near the printer, curious expression, soft purple and pink lighting blurred in background",
+      "ekran_yazisi": "Köşe neden dağılıyor?",
+      "seslendirme": "Merhaba, ben Doktor Filament! Yapay zekâyım, tek hastalığım katman katman merak!",
+      "karakter_gorunur": true,
+      "sahne_promptu": "Doctor Filament stands in a tidy 3D printing workshop, showing a small overhang test tower near a printer, curious and friendly, soft purple and pink lighting blurred in the background"
+    },
+    {
+      "sure_sn": 5,
+      "gorsel": "Close-up of a 3D printed overhang test tower with one side sagging and one side clean, workshop background blurred",
+      "ekran_yazisi": "Suçlu çoğu zaman açı",
+      "seslendirme": "Sorun bazen modelde değil. Açı fazla kalmış olabilir.",
+      "karakter_gorunur": false,
+      "sahne_promptu": "Close-up of a 3D printed overhang test tower with one side sagging and one side clean, workshop background blurred, dramatic side lighting"
+    },
+    {
+      "sure_sn": 5,
+      "gorsel": "Close-up of the same test tower with different overhang sections highlighted by camera movement, no text on screen",
+      "ekran_yazisi": "Açı büyüdükçe destek gerekebilir",
+      "seslendirme": "Küçük açılar daha rahat durur. Açı büyüdükçe destek ihtiyacı artar.",
+      "karakter_gorunur": false,
+      "sahne_promptu": "Close-up of a 3D printed overhang test tower with different overhang sections visible, camera slowly panning across the edges, workshop background blurred"
+    },
+    {
+      "sure_sn": 5,
+      "gorsel": "Hands removing a failed overhang test piece and placing a cleaner one beside it, printer and filament spools blurred in the background",
+      "ekran_yazisi": "Test et, sonra ayarını düzelt",
+      "seslendirme": "Kuleyi test et. Sonra açıyı, fanı ve hızı birlikte düşün.",
+      "karakter_gorunur": false,
+      "sahne_promptu": "Hands remove a failed overhang test piece and place a cleaner one beside it, 3D printer and colorful filament spools blurred in the background"
+    },
+    {
+      "sure_sn": 5,
+      "gorsel": "Doctor Filament pointing to a cleaner overhang test tower, warm smile, same workshop, soft purple and pink lighting",
+      "ekran_yazisi": "Sende hangisi önce değişiyor?",
+      "seslendirme": "Sıradaki baskı ne olsun? Yorumlara yaz, reçeteyi ben yazayım!",
+      "karakter_gorunur": true,
+      "sahne_promptu": "Doctor Filament points to a cleaner overhang test tower in a tidy 3D printing workshop, warm smile, soft purple and pink lighting blurred in the background"
+    }
+  ],
+  "instagram_caption": "Bu köşe bozuluyorsa, tek suçlu model olmayabilir.\nKüçük bir test parçası, ayarın nereye dokunduğunu gösterir.\nAçı, fan ve hız birlikte sonucu değiştirir.\nSende önce hangisini kurcalıyorsun?",
+  "youtube_baslik": "Overhang Testiyle Bozuk Köşeyi Nasıl Okursun?",
+  "youtube_aciklama": "Bu kısa videoda, desteksiz overhang test kulesiyle köşe neden kötü görünüyor onu bakışta ayırıyoruz. Küçük bir test parçası, ayarların nereye dokunduğunu daha net gösterir.",
+  "facebook_caption": "Bu köşe bozulduysa, tek suçlu model olmayabilir.\nOverhang testi bazen ayarları ele verir.\nSenin baskında önce hangisini kurcalıyorsun?",
+  "hashtagler": [
+    "#3Dbaskı",
+    "#3Dprinter",
+    "#overhangtesti",
+    "#printeripucu",
+    "#doktorfilament",
+    "#gurtechs3d"
+  ],
+  "model_notu": "CC0 veya CC BY lisanslı basit bir overhang test tower arayın; alternatif olarak kendi çizilebilecek, farklı açıları olan sade bir test kulesi tasarlayın. Desteksiz kavisler ve katman davranışını gösteren, basılabilir geometriler tercih edin."
+}
