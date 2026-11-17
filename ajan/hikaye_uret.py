@@ -151,7 +151,7 @@ KESİN KURALLAR:
 Her biri için JSON alanları:
 - ad: tasarımın adı (sayfadaki gibi)
 - tasarimci: tasarımcının kullanıcı adı
-- lisans: sayfada yazan lisans (aynen)
+- lisans: sayfada yazan lisansın TAM adı (örn. "CC BY 4.0", "CC BY-NC 4.0", "CC0", "Standard Digital File License"). Yalnızca "Creative Commons 4.0 International" gibi eksik yazma; BY/NC/ND/SA ekini sayfada göremediysen "belirsiz" yaz
 - lisans_kaniti: sayfadan lisansı gösteren kısa alıntı
 - url: tasarım sayfasının adresi
 - aciklama: İngilizce, nesnenin ne olduğu ve fiziksel görünümü (şekil, parçalar, kullanım), 1-2 cümle, YALNIZCA sayfada yazanlara dayan
@@ -194,7 +194,7 @@ def tasarim_ara():
 
 DOGRULA_ISTEMI = """Şu 3D baskı tasarım sayfasını internette ARA ve aç: {url}
 Sayfa gerçekten var mı ve sayfada yazan lisans nedir? Uydurma; sayfayı açamadıysan gecerli_sayfa false yaz.
-Yalnızca geçerli JSON döndür: {{"gecerli_sayfa": true/false, "ad": "sayfadaki tasarım adı", "lisans": "sayfada yazan lisans aynen"}}"""
+Yalnızca geçerli JSON döndür: {{"gecerli_sayfa": true/false, "ad": "sayfadaki tasarım adı", "lisans": "sayfada yazan lisansın tam adı (BY/NC/ND/SA ekleriyle, örn. CC BY 4.0); göremediysen belirsiz"}}"""
 
 
 def sayfa_dogrula(t):
