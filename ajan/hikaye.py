@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Hikaye ajanı: kuyruktaki görselleri, sahibinin belirlediği aralıkta Instagram hikayesi olarak yayınlar.
+"""Hikaye ajanı: kuyruktaki fotoğraf ve videoları, sahibinin belirlediği aralıkta Instagram hikayesi olarak yayınlar.
 
 Veri (depoda):
   hikaye/ayar.json            aktif, günlük sayı, saat aralığı, günler, hata sınırı
   hikaye/kuyruk/<kimlik>.json her hikaye için kayıt (durum: onay_bekliyor, planli, yayinlaniyor, yayinda, hata, reddedildi)
-  hikaye/gorseller/<kimlik>.jpg  hazır 9:16 JPEG
+  hikaye/gorseller/<kimlik>.jpg ya da .mp4  hazır 9:16 fotoğraf / video (video uygun değilse <kimlik>_hazir.mp4 üretilir)
 
 Güvenlik:
   - Çift yayın olmasın diye önce "yayinlaniyor" işareti depoya yazılır (yazılamazsa yayınlanmaz), sonra yayınlanır.
@@ -33,6 +33,8 @@ KOK = pathlib.Path(os.environ.get("HIKAYE_KOK") or pathlib.Path(__file__).resolv
 API = os.environ.get("IG_API_ADRESI") or "https://graph.facebook.com/v21.0"
 AYAR = KOK / "hikaye" / "ayar.json"
 KUYRUK = KOK / "hikaye" / "kuyruk"
+GORSELLER = KOK / "hikaye" / "gorseller"
+MAKS_VIDEO_SN, MIN_VIDEO_SN = 60, 3
 VARSAYILAN = {"aktif": False, "mod": "otomatik", "gunluk_sayi": 4, "baslangic_saat": 10, "bitis_saat": 22,
               "gunler": [1, 2, 3, 4, 5, 6, 7], "min_aralik_dk": 60, "ardisik_hata": 0, "hata_siniri": 3, "son_not": ""}
 TR = datetime.timezone(datetime.timedelta(hours=3))   # Türkiye sabit UTC+3
@@ -158,10 +160,74 @@ def hata_ozeti(e):
         return f"HTTP {e.code}"
 
 
+class IcerikHatasi(Exception):
+    """Videonun kendisinden kaynaklanan sorun (anahtar/servis sorunu değil); ardışık hata sayılmaz."""
+
+
+def video_bilgi(yol):
+    r = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "stream=codec_type,codec_name,width,height:format=duration",
+                        "-of", "json", str(yol)], capture_output=True, text=True)
+    if r.returncode != 0:
+        raise IcerikHatasi("video dosyası okunamadı (bozuk ya da desteklenmeyen biçim)")
+    j = json.loads(r.stdout or "{}")
+    v = next((x for x in j.get("streams", []) if x.get("codec_type") == "video"), None)
+    a = next((x for x in j.get("streams", []) if x.get("codec_type") == "audio"), None)
+    if not v:
+        raise IcerikHatasi("dosyada görüntü yok")
+    return {"g": int(v.get("width", 0)), "y": int(v.get("height", 0)), "kodek": v.get("codec_name"),
+            "ses": a.get("codec_name") if a else None, "sure": float(j.get("format", {}).get("duration") or 0)}
+
+
+def video_uygun_mu(b):
+    """Instagram hikayesi için olduğu gibi kullanılabilir mi? (dikey 9:16, H.264, ses yoksa ya da AAC, 3-60 sn)"""
+    return (b["y"] > 0 and abs(b["g"] / b["y"] - 9 / 16) < 0.015 and b["g"] >= 540 and b["kodek"] == "h264"
+            and b["ses"] in (None, "aac"))
+
+
+def video_hazirla(o):
+    """Videoyu denetler. Uygunsa dokunmaz (None döner); değilse 1080x1920 H.264/AAC'ye çevirir ve yeni yolu döndürür."""
+    kaynak = KOK / o["gorsel"]
+    b = video_bilgi(kaynak)
+    if b["sure"] > MAKS_VIDEO_SN + 0.5:
+        raise IcerikHatasi(f"video {b['sure']:.0f} sn; hikaye videosu en fazla {MAKS_VIDEO_SN} sn olabilir")
+    if b["sure"] < MIN_VIDEO_SN:
+        raise IcerikHatasi(f"video {b['sure']:.1f} sn; hikaye videosu en az {MIN_VIDEO_SN} sn olmalı")
+    if video_uygun_mu(b):
+        print(f"Video hikayeye uygun ({b['g']}x{b['y']}, {b['sure']:.0f} sn); olduğu gibi kullanılacak.")
+        return None
+    cikti = GORSELLER / f"{o['id']}_hazir.mp4"
+    filtre = ("[0:v]split[a][b];[a]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=30:6,eq=brightness=-0.18[bg];"
+              "[b]scale=1080:1920:force_original_aspect_ratio=decrease[fg];[bg][fg]overlay=(W-w)/2:(H-h)/2,format=yuv420p[v]")
+    komut = ["ffmpeg", "-y", "-loglevel", "error", "-i", str(kaynak), "-filter_complex", filtre, "-map", "[v]"]
+    komut += ["-map", "0:a:0", "-c:a", "aac", "-b:a", "128k", "-ar", "44100", "-ac", "2"] if b["ses"] else ["-an"]
+    komut += ["-c:v", "libx264", "-preset", "veryfast", "-crf", "26", "-r", "30", "-movflags", "+faststart", "-t", str(MAKS_VIDEO_SN), str(cikti)]
+    r = subprocess.run(komut, capture_output=True, text=True)
+    if r.returncode != 0 or not cikti.exists():
+        raise IcerikHatasi("video dönüştürülemedi: " + (r.stderr or "")[-160:])
+    print(f"Video hikaye biçimine çevrildi: {b['g']}x{b['y']} -> 1080x1920 ({cikti.stat().st_size // 1024} KB).")
+    return str(cikti.relative_to(KOK))
+
+
+def adres_hazir_mi(adres, sn=90):
+    """Yeni itilen dosya raw adresinde görünene kadar bekle (Instagram'ın indirebilmesi için)."""
+    bitis = time.time() + sn
+    while True:
+        try:
+            istek = urllib.request.Request(adres, headers={"Range": "bytes=0-0"})
+            with urllib.request.urlopen(istek, timeout=20) as y:
+                if y.status in (200, 206):
+                    return True
+        except Exception:
+            pass
+        if time.time() > bitis:
+            return False
+        time.sleep(5)
+
+
 def gorsel_adresi(o):
     """Instagram'ın indirebileceği, görseli içeren commit'e sabitlenmiş adres."""
     depo = os.environ.get("GITHUB_REPOSITORY", "")
-    yol = o["gorsel"]
+    yol = o.get("hazir") or o["gorsel"]
     sha = git("log", "-n1", "--format=%H", "--", yol, kontrol=False).stdout.strip() or os.environ.get("GITHUB_SHA", "main")
     return os.environ.get("HIKAYE_GORSEL_ADRESI") or f"https://raw.githubusercontent.com/{depo}/{sha}/{yol}"
 
@@ -169,14 +235,23 @@ def gorsel_adresi(o):
 def hikaye_yayinla(o):
     """Görseli hikaye olarak yayınlar. (medya_kimligi, link) döndürür."""
     kimlik = os.environ["IG_USER_ID"]
-    kap = api("POST", f"{kimlik}/media", media_type="STORIES", image_url=gorsel_adresi(o))["id"]
-    for _ in range(12):
-        durum = api("GET", kap, fields="status_code").get("status_code", "FINISHED")
+    video = o.get("tur") == "video"
+    adres = gorsel_adresi(o)
+    if not os.environ.get("HIKAYE_GORSEL_ADRESI") and not adres_hazir_mi(adres):
+        raise RuntimeError("Dosya adresi 90 sn içinde erişilebilir olmadı")
+    anahtar = "video_url" if video else "image_url"
+    kap = api("POST", f"{kimlik}/media", media_type="STORIES", **{anahtar: adres})["id"]
+    deneme, aralik = (36, 10) if video else (12, 5)   # video işleme birkaç dakika sürebilir
+    for _ in range(deneme):
+        veri = api("GET", kap, fields="status_code,status")
+        durum = veri.get("status_code", "FINISHED")
         if durum == "FINISHED":
             break
         if durum in ("ERROR", "EXPIRED"):
-            raise RuntimeError(f"Instagram görseli işleyemedi ({durum})")
-        time.sleep(5)
+            raise RuntimeError(f"Instagram {'videoyu' if video else 'görseli'} işleyemedi ({durum}: {str(veri.get('status', ''))[:120]})")
+        time.sleep(aralik)
+    else:
+        raise RuntimeError("Instagram medyayı zamanında işleyemedi")
     medya = api("POST", f"{kimlik}/media_publish", creation_id=kap)["id"]
     link = ""
     try:
@@ -225,11 +300,26 @@ def yayinla_komutu(a):
             git_kaydet(f"Hikaye: {oge['id']} görseli yok", [KUYRUK])
         return 1
 
+    # 0) Video ise denetle/gerekirse dönüştür (içerik sorunu ajanı duraklatmaz, yalnızca o hikaye "hata" olur)
+    if oge.get("tur") == "video":
+        try:
+            hazir = video_hazirla(oge)
+            if hazir:
+                oge["hazir"] = hazir
+        except IcerikHatasi as e:
+            print(f"Video hikaye reddedildi: {e}")
+            oge["durum"], oge["hata"] = "hata", str(e)[:200]
+            oge_yaz(oge)
+            if a.git:
+                git_kaydet(f"Hikaye: {oge['id']} video uygun değil", [KUYRUK])
+            bildir("Video hikayesi yayınlanamadı", str(e)[:160], adres="/")
+            return 1
+
     # 1) Önce "yayınlanıyor" işaretini depoya yaz; yazılamazsa çift yayın riski olduğu için yayınlama
     oge["durum"] = "yayinlaniyor"
     oge["yayin"] = {"tarih": an.strftime("%Y-%m-%dT%H:%M:%SZ")}
     oge_yaz(oge)
-    if a.git and not git_kaydet(f"Hikaye: {oge['id']} yayınlanıyor", [KUYRUK]):
+    if a.git and not git_kaydet(f"Hikaye: {oge['id']} yayınlanıyor", [KUYRUK, GORSELLER]):
         print("Durum işareti depoya yazılamadı; çift yayını önlemek için yayınlanmadı.")
         return 1
 
@@ -262,7 +352,10 @@ def yayinla_komutu(a):
     if a.git and not git_kaydet(f"Hikaye: {oge['id']} yayında", [KUYRUK, AYAR]):
         print("UYARI: yayın sonrası durum depoya yazılamadı; yayınlaniyor işareti kalır (çift yayını önler).")
     print(f"YAYINLANDI. Medya kimliği: {medya}  Bağlantı: {link}")
-    bildir("Hikaye yayınlandı", oge.get("baslik") or "Yeni hikaye", gorsel=gorsel_adresi(oge), adres=link or "https://www.instagram.com/")
+    if oge.get("tur") == "video":
+        bildir("Video hikayesi yayınlandı", oge.get("baslik") or "Yeni video hikayesi", adres=link or "https://www.instagram.com/")
+    else:
+        bildir("Hikaye yayınlandı", oge.get("baslik") or "Yeni hikaye", gorsel=gorsel_adresi(oge), adres=link or "https://www.instagram.com/")
     return 0
 
 

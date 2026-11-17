@@ -51,3 +51,9 @@ Panel, çalışma adımlarını `/api/durum` ile GitHub'dan okur ve animasyonu g
 4. GitHub > Settings > Secrets > Actions: aynı `BILDIRIM_SIRRI` değerini ekle.
 5. Sunucuyu yeniden yükle (fly-yukle.yml). Panelde Hikaye ajanı > Bildirimler > "Bildirimleri aç" (Android Chrome).
 Abonelikler `bildirim/abonelikler.enc` dosyasında, `BILDIRIM_SIRRI`'ndan türetilen anahtarla şifrelenmiş saklanır.
+
+### Video hikayeleri
+- Panelden MP4 (3-60 sn, en fazla 30 MB) kuyruğa eklenir. Yayından önce `ajan/hikaye.py` videoyu denetler: dikey 9:16, H.264, AAC (ya da sessiz) ise olduğu gibi yayınlanır; değilse 1080x1920 H.264/AAC'ye çevrilir (`<kimlik>_hazir.mp4`).
+- 60 sn'den uzun ya da 3 sn'den kısa video "hata" olur (ajan duraklamaz; yalnızca anahtar/servis hataları duraklatma sayacına girer).
+- Instagram videoyu işlerken bekler (en fazla ~6 dk). Dosya raw adresinde görünene kadar bekler.
+- **Depo büyümesi:** her video depoya girer (ve dönüştürülmüşse bir kopya daha). Sık video hikayesi için depo hızla büyür; ileride medyayı ayrı bir depolamaya taşımak gerekebilir.

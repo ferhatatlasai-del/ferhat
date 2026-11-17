@@ -388,6 +388,22 @@ async function api(req, res, url) {
     hikayeIptal();
     return r2.ok ? json(res, 200, { ok: true, id: kimlik, boyut }) : json(res, 502, { hata: 'Kuyruk kaydı yazılamadı.' });
   }
+  if (url.pathname === '/api/hikaye-video' && req.method === 'POST') {
+    if (+req.headers['content-length'] > MAX_VIDEO) return json(res, 413, { hata: 'Video 30 MB’tan büyük olamaz.' });
+    let tampon; try { tampon = await govdeIkili(req, MAX_VIDEO); } catch (e) { return json(res, 413, { hata: 'Video 30 MB’tan büyük olamaz.' }); }
+    if (tampon.length < 1024 || tampon.slice(4, 8).toString('latin1') !== 'ftyp') return json(res, 400, { hata: 'Bu bir MP4 video dosyası gibi görünmüyor.' });
+    const liste = await hikayeListesi();
+    if (liste.kuyruk.filter(o => o.durum === 'planli').length >= 60) return json(res, 429, { hata: 'Kuyruk dolu (60 planlı hikaye).' });
+    const dam = damga();
+    const kimlik = 'h' + dam.slice(0, 8) + '-' + dam.slice(8, 14) + '-' + crypto.randomBytes(2).toString('hex').slice(0, 3);
+    const gorsel = `hikaye/gorseller/${kimlik}.mp4`;
+    const r1 = await depoYaz(gorsel, tampon, null, 'Panel: hikaye videosu');
+    if (!r1.ok) return json(res, 502, { hata: 'Video kaydedilemedi (' + r1.status + ').' });
+    const oge = { id: kimlik, kaynak: 'video', tur: 'video', durum: 'planli', olusturma: new Date().toISOString(), gorsel, baslik: temiz(url.searchParams.get('baslik') || '', 80), atif: null, yayin: null, hata: '', deneme: 0 };
+    const r2 = await depoYaz(`hikaye/kuyruk/${kimlik}.json`, JSON.stringify(oge, null, 2), null, 'Panel: video hikaye kuyruğa eklendi');
+    hikayeIptal();
+    return r2.ok ? json(res, 200, { ok: true, id: kimlik, boyut: tampon.length }) : json(res, 502, { hata: 'Kuyruk kaydı yazılamadı.' });
+  }
   if (url.pathname === '/api/hikaye-karar' && req.method === 'POST') {
     let b; try { b = await govde(req); } catch (e) { return json(res, 400, { hata: 'Geçersiz istek.' }); }
     if (!HIKAYE_RE.test(String(b.id || ''))) return json(res, 400, { hata: 'Geçersiz kimlik.' });
@@ -397,8 +413,11 @@ async function api(req, res, url) {
     const oge = JSON.parse(k.metin);
     if (b.karar === 'sil') {
       if (!['planli', 'onay_bekliyor', 'reddedildi', 'hata'].includes(oge.durum)) return json(res, 409, { hata: 'Yayınlanmış ya da yayınlanıyor olan hikaye silinemez.' });
-      const gk = oge.gorsel && /^hikaye\/gorseller\/h[\w-]+\.jpg$/.test(oge.gorsel) ? await depoOku(oge.gorsel) : null;
-      if (gk) await depoSil(oge.gorsel, gk.sha, 'Panel: hikaye görseli silindi');
+      for (const yolu of [oge.gorsel, oge.hazir]) {
+        if (!(yolu && /^hikaye\/gorseller\/h[\w.-]+\.(jpg|mp4)$/.test(yolu))) continue;
+        const gk = await depoOku(yolu);
+        if (gk) await depoSil(yolu, gk.sha, 'Panel: hikaye medyası silindi');
+      }
       const r = await depoSil(yol, k.sha, 'Panel: hikaye silindi');
       hikayeIptal();
       return r.ok ? json(res, 200, { ok: true }) : json(res, 502, { hata: 'Silinemedi.' });
