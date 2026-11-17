@@ -149,7 +149,7 @@ def sohbet_json(sistem, kullanici, resim_b64=None, ek_resim_b64=None):
         if resim:
             icerik.append({"type": "image_url", "image_url": {"url": f"data:{mime};base64," + resim, "detail": "low"}})
     govde = {"model": MODEL, "response_format": {"type": "json_object"},
-             "messages": [{"role": "system", "content": sistem}, {"role": "user", "content": icerik if resim_b64 else kullanici}]}
+             "messages": [{"role": "system", "content": sistem}, {"role": "user", "content": icerik if (resim_b64 or ek_resim_b64) else kullanici}]}
     try:
         v = openai("chat/completions", govde)
     except urllib.error.HTTPError as e:
