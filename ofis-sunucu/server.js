@@ -27,13 +27,14 @@ const AKIS_IG = 'yayinla.yml';
 const AKIS_YT = 'youtube-yukle.yml';
 // Ajan kimliği -> iş akışı dosyası (panel durumu buradan okunur)
 const AKIS_HIKAYE = 'hikaye-yayinla.yml';
+const AKIS_URETIM = 'hikaye-uret.yml';
 const HIKAYE_RE = /^h\d{8}-\d{6}-[a-z0-9]{3}$/;
 const AJAN_AKISLARI = { hikaye: 'hikaye-yayinla.yml', icerik: ['gunluk-taslak.yml', 'zincir.yml'], istatistik: 'gunluk-taslak.yml', instagram: 'yayinla.yml', youtube: 'youtube-yukle.yml', gorsel: 'zincir.yml', trend: 'trend.yml' };
 let ajanOnbellek = { t: 0, veri: null };
 let trendOnbellek = { t: 0, veri: null };
 let zincirOnbellek = { t: 0, veri: null };
 let hikayeOnbellek = { t: 0, veri: null };
-const hikayeTetikler = [], bildirimler = [];
+const hikayeTetikler = [], uretimTetikler = [], bildirimler = [];
 const guncellenenler = new Set();
 const GH_API = process.env.GH_API || 'https://api.github.com';
 const MAX_VIDEO = 30 * 1024 * 1024;
@@ -200,6 +201,7 @@ function jpegBoyut(b) {
   }
   return null;
 }
+const URETIM_VARSAYILAN = { aktif: false, mod: 'otomatik', gunluk_uretim: 4, gunluk_gorsel_siniri: 12, aylik_gorsel_siniri: 150, kalite: 'medium', kuyruk_hedefi: 8 };
 async function hikayeListesi() {
   if (Date.now() - hikayeOnbellek.t < 20e3 && hikayeOnbellek.veri) return hikayeOnbellek.veri;
   const dal = await varsayilanDal();
@@ -208,7 +210,13 @@ async function hikayeListesi() {
   const r = await gh(`/repos/${REPO}/contents/hikaye/kuyruk?ref=${encodeURIComponent(dal)}`);
   const adlar = r.ok ? (await r.json()).map(f => f.name).filter(n => /^h\d{8}-\d{6}-[a-z0-9]{3}\.json$/.test(n)).sort().reverse().slice(0, 40) : [];
   const kuyruk = (await Promise.all(adlar.map(a => depoOku('hikaye/kuyruk/' + a).then(k => k && JSON.parse(k.metin)).catch(() => null)))).filter(Boolean);
-  const veri = { depo: REPO, dal, ayar: ayarK ? JSON.parse(ayarK.metin) : null, kuyruk, saglik: saglikK ? JSON.parse(saglikK.metin) : null, bildirim: BILDIRIM_ACIK };
+  const uretimK = await depoOku('hikaye/uretim.json').catch(() => null);
+  const harcamaK = await depoOku('hikaye/harcama.json').catch(() => null);
+  const uretim = Object.assign({}, URETIM_VARSAYILAN, uretimK ? JSON.parse(uretimK.metin) : {});
+  const harcama = harcamaK ? JSON.parse(harcamaK.metin) : {};
+  const trGun = new Date(Date.now() + 3 * 3600e3).toISOString();
+  const harcamaOzet = { bugun: ((harcama.gunler || {})[trGun.slice(0, 10)] || {}).gorsel || 0, ay: ((harcama.aylar || {})[trGun.slice(0, 7)] || {}).gorsel || 0 };
+  const veri = { depo: REPO, dal, ayar: ayarK ? JSON.parse(ayarK.metin) : null, kuyruk, saglik: saglikK ? JSON.parse(saglikK.metin) : null, bildirim: BILDIRIM_ACIK, uretim, harcama: harcamaOzet };
   hikayeOnbellek = { t: Date.now(), veri };
   return veri;
 }
@@ -369,6 +377,31 @@ async function api(req, res, url) {
     }, 'Panel: hikaye ayarı', { aktif: false, mod: 'otomatik', gunluk_sayi: 4, baslangic_saat: 10, bitis_saat: 22, gunler: [1, 2, 3, 4, 5, 6, 7], min_aralik_dk: 60, ardisik_hata: 0, hata_siniri: 3, son_not: '' });
     hikayeIptal();
     return ok ? json(res, 200, { ok: true }) : json(res, 400, { hata: 'Ayar kaydedilemedi (bitiş saati başlangıçtan büyük olmalı).' });
+  }
+  if (url.pathname === '/api/uretim-ayar' && req.method === 'POST') {
+    let b; try { b = await govde(req); } catch (e) { return json(res, 400, { hata: 'Geçersiz istek.' }); }
+    const tam = (v, lo, hi) => Number.isInteger(v) && v >= lo && v <= hi;
+    const guncel = {};
+    if ('aktif' in b) guncel.aktif = b.aktif === true;
+    if ('mod' in b) { if (!['otomatik', 'onay'].includes(b.mod)) return json(res, 400, { hata: 'Geçersiz mod.' }); guncel.mod = b.mod; }
+    if ('gunluk_uretim' in b) { if (!tam(b.gunluk_uretim, 1, 12)) return json(res, 400, { hata: 'Günlük üretim 1-12 olmalı.' }); guncel.gunluk_uretim = b.gunluk_uretim; }
+    if ('gunluk_gorsel_siniri' in b) { if (!tam(b.gunluk_gorsel_siniri, 1, 40)) return json(res, 400, { hata: 'Günlük görsel sınırı 1-40 olmalı.' }); guncel.gunluk_gorsel_siniri = b.gunluk_gorsel_siniri; }
+    if ('aylik_gorsel_siniri' in b) { if (!tam(b.aylik_gorsel_siniri, 1, 600)) return json(res, 400, { hata: 'Aylık görsel sınırı 1-600 olmalı.' }); guncel.aylik_gorsel_siniri = b.aylik_gorsel_siniri; }
+    if ('kuyruk_hedefi' in b) { if (!tam(b.kuyruk_hedefi, 1, 30)) return json(res, 400, { hata: 'Kuyruk hedefi 1-30 olmalı.' }); guncel.kuyruk_hedefi = b.kuyruk_hedefi; }
+    if ('kalite' in b) { if (!['low', 'medium', 'high'].includes(b.kalite)) return json(res, 400, { hata: 'Geçersiz kalite.' }); guncel.kalite = b.kalite; }
+    const ok = await jsonGuncelle('hikaye/uretim.json', v => { Object.assign(v, guncel); }, 'Panel: hikaye üretim ayarı', URETIM_VARSAYILAN);
+    hikayeIptal();
+    return ok ? json(res, 200, { ok: true }) : json(res, 502, { hata: 'Ayar kaydedilemedi.' });
+  }
+  if (url.pathname === '/api/uretim-calistir' && req.method === 'POST') {
+    const simdi = Date.now();
+    while (uretimTetikler.length && simdi - uretimTetikler[0] > 3600e3) uretimTetikler.shift();
+    if (uretimTetikler.length >= 3) return json(res, 429, { hata: 'Saatte en fazla 3 elle üretim.' });
+    const dal = await varsayilanDal();
+    const r = await gh(`/repos/${REPO}/actions/workflows/${AKIS_URETIM}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: { hemen: 'EVET' } }) });
+    if (r.status !== 204) return json(res, 502, { hata: 'GitHub kabul etmedi (' + r.status + '). Önce iş akışının birleştirildiğinden emin ol.' });
+    uretimTetikler.push(simdi);
+    return json(res, 200, { ok: true });
   }
   if (url.pathname === '/api/hikaye-foto' && req.method === 'POST') {
     if (+req.headers['content-length'] > 3 * 1024 * 1024) return json(res, 413, { hata: 'Fotoğraf 3 MB’tan büyük olamaz (panel otomatik küçültür).' });

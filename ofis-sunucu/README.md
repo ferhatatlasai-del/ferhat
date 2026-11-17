@@ -64,3 +64,14 @@ Abonelikler `bildirim/abonelikler.enc` dosyasında, `BILDIRIM_SIRRI`'ndan türet
 - Hikaye en fazla 60 sn olabilir; daha uzun videoda panel hikaye seçeneğini kapatır. Dikey 9:16 H.264 değilse hikaye için otomatik uyarlanır.
 - Hikaye yazı almaz; yalnızca Reels ya da Shorts seçiliyse başlık ve açıklama istenir.
 - Zincir defterinde her hedef ayrı girdi (`hedef`: instagram, youtube, hikaye) olarak bağlantı ve medya kimliğiyle kaydedilir.
+
+### Yapay zekâ görsel üretimi (Kademe 2)
+`ajan/hikaye_uret.py` (iş akışı: `hikaye-uret.yml`, günde bir kez ya da panelden "Şimdi üret"):
+- OpenAI web aramasıyla Printables ve MakerWorld'de revaçtaki tasarımları bulur. Bağlantılar aramanın gerçekten döndürdüğü adreslerle doğrulanır.
+- **Yalnızca lisansı açıkça CC0 ya da CC BY olanlar** kullanılır; NC, ND, SA, "Standard Digital File License" ve belirsiz lisanslar elenir. Başkasının fotoğrafı indirilmez; yalnızca ad, tasarımcı, lisans ve bağlantı alınır.
+- Her tasarım için kendi sahnemizde (atölye tezgâhı) benzer, kopya olmayan temsili görsel üretir (hareketli mekanizma, yazı, logo yok).
+- Yapay zekâ kendi çıktısını denetler (yazı, logo, bozuk anatomi, fiziksel olarak makul mü); 3 denemede geçemezse o tasarım atlanır.
+- Görsele "Yapay zekâ görseli (temsili)" etiketi ve atıf (tasarım adı, tasarımcı, lisans, kaynak) işlenir.
+- Kuyruğa `planli` (otomatik mod) ya da `onay_bekliyor` (onaylı mod) girer; yayını Hikaye ajanı yapar. Bildirim gelir; beğenmediğini panelden silersin.
+- **Başlangıçta kapalıdır** (`hikaye/uretim.json`, `aktif: false`). Günlük ve aylık görsel sınırı (`hikaye/harcama.json` sayar) maliyeti üstten kapatır.
+- Gerekli sır: `OPENAI_API_KEY` (diğer ajanlarla aynı). Sunucuyu yeniden yüklemek gerekir (panelde yeni bölüm için).
