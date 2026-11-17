@@ -1,7 +1,7 @@
 {
   "id": "h20261117-213934-b0i",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-17T21:39:34.000Z",
   "gorsel": "hikaye/gorseller/h20261117-213934-b0i.jpg",
   "baslik": "modular organizer",
@@ -21,7 +21,9 @@
     "sorunlar": []
   },
   "yayin": {
-    "tarih": "2026-11-17T21:42:47Z"
+    "tarih": "2026-11-17T21:43:04Z",
+    "medya_kimligi": "18084222266348034",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4032670198796299287"
   },
   "hata": "",
   "deneme": 0
