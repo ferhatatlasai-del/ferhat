@@ -73,6 +73,12 @@ def lisans_uygun(metin):
     return None
 
 
+def lisans_acik_red(metin):
+    """Lisans metni açıkça kısıtlayıcı mı (NC/ND/SA, standart dijital dosya vb.)? Belirsiz/eksik metin için False."""
+    t = " ".join((metin or "").lower().replace("-", " ").replace("_", " ").split())
+    return bool(re.search(r"\b(nc|nd|sa)\b|noncommercial|non commercial|noderiv|no deriv|sharealike|share alike|standard digital file|all rights reserved", t))
+
+
 def site_uygun(adres):
     try:
         h = urllib.parse.urlparse(adres).hostname or ""
@@ -162,17 +168,30 @@ Her biri için JSON alanları:
 Yalnızca geçerli JSON döndür: {"tasarimlar":[{...}]}"""
 
 
+def arama_istegi(istem, sure):
+    """Web aramasını ZORUNLU kılarak çağırır (model aramadan, tahminle yanıt vermesin). (yanıt, arama_sayısı)"""
+    son = None
+    for tur in ARAC_TURLERI:
+        for zorunlu in (True, False):
+            govde = {"model": MODEL, "tools": [{"type": tur}], "input": istem}
+            if zorunlu:
+                govde["tool_choice"] = "required"
+            try:
+                v = openai("responses", govde, sure)
+                aramalar = [o for o in v.get("output", []) if str(o.get("type", "")).startswith("web_search")]
+                return v, len(aramalar)
+            except urllib.error.HTTPError as e:
+                son = http_hata_ozeti(e)
+                print(f"UYARI: '{tur}'{' (zorunlu)' if zorunlu else ''} olmadı ({son})")
+    return None, 0
+
+
 def tasarim_ara():
     """(tasarimlar, dogrulanan_adresler). Web arama aracı bulunamazsa hata."""
-    veri = None
-    for tur in ARAC_TURLERI:
-        try:
-            veri = openai("responses", {"model": MODEL, "tools": [{"type": tur}], "input": ARAMA_ISTEMI}, 300)
-            break
-        except urllib.error.HTTPError as e:
-            print(f"UYARI: '{tur}' aracı olmadı ({http_hata_ozeti(e)})")
+    veri, arama_sayisi = arama_istegi(ARAMA_ISTEMI, 300)
     if veri is None:
         hata("Web arama aracı kullanılamadı; tasarım araştırması yapılamadı.")
+    print(f"Modelin yaptığı web araması: {arama_sayisi} kez")
     metin, adresler = "", set()
     for oge in veri.get("output", []):
         if oge.get("type") != "message":
@@ -200,12 +219,7 @@ Yalnızca geçerli JSON döndür: {{"gecerli_sayfa": true/false, "ad": "sayfadak
 def sayfa_dogrula(t):
     """Aramada doğrulanamayan adayı, sayfaya özel ikinci bir aramayla sına. Aynı sayfa kaynak gösterilmeli ve lisans uygun olmalı."""
     adres = t["_adres"]
-    for tur in ARAC_TURLERI:
-        try:
-            v = openai("responses", {"model": MODEL, "tools": [{"type": tur}], "input": DOGRULA_ISTEMI.format(url=adres)}, 240)
-            break
-        except urllib.error.HTTPError:
-            v = None
+    v, _ = arama_istegi(DOGRULA_ISTEMI.format(url=adres), 240)
     if v is None:
         return False, "doğrulama araması yapılamadı"
     metin, kaynaklar = "", set()
@@ -235,8 +249,12 @@ def sayfa_dogrula(t):
 
 
 def uygun_tasarimlar(tasarimlar, dogrulanan, kullanilan_adresler):
-    """Lisans, site, doğrulanmış bağlantı ve tekrar süzgeci. (uygunlar, elenenler_nedenleriyle)"""
+    """Lisans, site, bağlantı ve tekrar süzgeci. (uygunlar, elenenler_nedenleriyle)
+
+    Açıkça kısıtlayıcı lisanslar (NC/ND/SA, standart dijital dosya) hemen elenir. Bağlantısı aramada doğrulanamayan ya da lisansı
+    belirsiz/eksik yazılan adaylar, sayfaya özel ikinci bir aramayla sayfadan teyit edilmek üzere işaretlenir (sayfa_dogrula)."""
     dogrulanan = {adres_anahtari(a) for a in dogrulanan}
+    kullanilan_anahtarlar = {adres_anahtari(k) for k in kullanilan_adresler}
     uygunlar, elenen = [], []
     for t in tasarimlar:
         ad = (t.get("ad") or "").strip()
@@ -246,23 +264,15 @@ def uygun_tasarimlar(tasarimlar, dogrulanan, kullanilan_adresler):
             elenen.append((ad or "?", "ad ya da bağlantı yok"))
         elif not site_uygun(adres):
             elenen.append((ad, "kaynak Printables ya da MakerWorld değil"))
-        elif adres_anahtari(adres) not in dogrulanan:
-            if not lis:
-                elenen.append((ad, f"lisans uygun değil ({t.get('lisans')})"))
-            elif (t.get("lisans_kaniti") or "").strip():
-                t["_lisans"], t["_site"], t["_adres"] = lis, site_uygun(adres), adres
-                t["_ikinci_dogrulama"] = True
-                uygunlar.append(t)
-            else:
-                elenen.append((ad, f"bağlantı aramada doğrulanamadı ({adres})"))
-        elif not lis:
-            elenen.append((ad, f"lisans uygun değil ({t.get('lisans')})"))
-        elif not (t.get("lisans_kaniti") or "").strip():
-            elenen.append((ad, "lisans kanıtı yok"))
-        elif adres in kullanilan_adresler or any(adres_anahtari(k) == adres_anahtari(adres) for k in kullanilan_adresler):
+        elif adres_anahtari(adres) in kullanilan_anahtarlar:
             elenen.append((ad, "daha önce kullanıldı"))
+        elif not lis and lisans_acik_red(t.get("lisans")):
+            elenen.append((ad, f"lisans uygun değil ({t.get('lisans')})"))
         else:
             t["_lisans"], t["_site"], t["_adres"] = lis, site_uygun(adres), adres
+            kanitli = bool(lis) and bool((t.get("lisans_kaniti") or "").strip()) and adres_anahtari(adres) in dogrulanan
+            if not kanitli:
+                t["_ikinci_dogrulama"] = True
             uygunlar.append(t)
     return uygunlar, elenen
 
@@ -421,12 +431,15 @@ def calis(a):
     print(f"Bulunan {len(tasarimlar)}, uygun {len(uygunlar)} (CC0 / CC BY, doğrulanmış). Elenenler:")
     for ad, neden in elenen:
         print(f"  - {ad}: {neden}")
-    kesin = []
+    kesin, denenen = [], 0
     hedef_sayi = max(1, min(int(ayar["gunluk_uretim"]), 12))
     for t in uygunlar:
         if len(kesin) >= hedef_sayi:
             break
         if t.get("_ikinci_dogrulama"):
+            denenen += 1
+            if denenen > 8:
+                break
             ok, neden = sayfa_dogrula(t)
             print(f"  ikinci doğrulama: {t['ad']}: {neden}")
             if not ok:
