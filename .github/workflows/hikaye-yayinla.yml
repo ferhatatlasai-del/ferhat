@@ -19,6 +19,7 @@ concurrency:
 jobs:
   yayinla:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - name: Zamanı geldiyse bir hikaye yayınla

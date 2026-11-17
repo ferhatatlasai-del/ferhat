@@ -66,6 +66,7 @@ textarea{resize:vertical;min-height:72px}
 #zKart select,.pub select{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
 .hgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:10px}
 .hoge{border:1px solid var(--line);border-radius:12px;padding:6px;background:var(--bg);font-size:12.5px;display:grid;gap:4px;align-content:start}
+.hoge video{width:100%;aspect-ratio:9/16;object-fit:cover;border-radius:8px;background:#000}
 .hoge img{width:100%;aspect-ratio:9/16;object-fit:cover;border-radius:8px;background:#0003}
 .hoge .rozet{justify-self:start}
 .hoge button{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:3px 8px;font-size:12px}
@@ -186,7 +187,7 @@ dd{margin:1px 0 0}
       </div>
       <div class="card pub" id="hKart">
         <h2>Hikaye ajanı</h2>
-        <p class="alt">Kuyruktaki fotoğrafları senin ayarladığın aralıkta Instagram hikayesi olarak yayınlar. <b>Fotoğrafı kuyruğa koymak, yayın onayı sayılır.</b> Hikaye API’si yazı eklemez, yalnızca görsel gider. Yayınlanan hikaye API ile silinemez, Instagram uygulamasından silersin.</p>
+        <p class="alt">Kuyruktaki fotoğraf ve videoları senin ayarladığın aralıkta Instagram hikayesi olarak yayınlar. <b>Fotoğrafı kuyruğa koymak, yayın onayı sayılır.</b> Hikaye API’si yazı eklemez, yalnızca görsel gider. Yayınlanan hikaye API ile silinemez, Instagram uygulamasından silersin.</p>
         <p class="not" id="hDurum">Yükleniyor…</p>
         <input type="password" id="hSifre" autocomplete="current-password" placeholder="Ofis şifresi" hidden style="margin-top:8px;width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px">
         <div class="satir"><button type="button" class="ana" id="hAktif">Etkinleştir</button><button type="button" id="hHemen">Şimdi bir hikaye yayınla</button></div>
@@ -198,10 +199,10 @@ dd{margin:1px 0 0}
             <p class="not">GitHub’ın saatlik kontrolü bazen saatlerce gecikebilir; hikayeler belirlediğin aralığa yayılır ama tam saatinde çıkmayabilir.</p>
           </div>
         </details>
-        <label class="k" for="hDosya">Fotoğraf ekle (birden fazla seçebilirsin)</label>
-        <div class="satir"><input type="file" id="hDosya" accept="image/*" multiple><button type="button" id="hYukle" disabled>Kuyruğa ekle</button></div>
+        <label class="k" for="hDosya">Fotoğraf ya da video ekle (birden fazla seçebilirsin)</label>
+        <div class="satir"><input type="file" id="hDosya" accept="image/*,video/mp4" multiple><button type="button" id="hYukle" disabled>Kuyruğa ekle</button></div>
         <input type="text" id="hBaslik" maxlength="80" placeholder="İsteğe bağlı not (yalnızca senin için, hikayede görünmez)" style="width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px">
-        <p class="not" id="hYukleDurum">Fotoğraflar telefonunda otomatik dikey (9:16) hikaye boyutuna getirilir.</p>
+        <p class="not" id="hYukleDurum">Fotoğraflar telefonunda otomatik dikey (9:16) hikaye boyutuna getirilir. Video: MP4, 3-60 sn, en fazla 30 MB. Dikey 9:16 H.264 ise olduğu gibi yayınlanır, değilse otomatik uyarlanır.</p>
         <div class="hgrid" id="hListe"></div>
         <details class="tr"><summary>Bildirimler (Android web push)</summary>
           <div class="gov">
@@ -1057,9 +1058,10 @@ function hikayeCiz(v){
   var kap=$('#hListe'); kap.textContent='';
   k.forEach(function(o){
     var b=dom('div','hoge');
-    if(o.gorsel){ var im=document.createElement('img'); im.loading='lazy'; im.alt='Hikaye önizleme'; im.src='https://raw.githubusercontent.com/'+v.depo+'/'+v.dal+'/'+o.gorsel; b.appendChild(im); }
+    if(o.gorsel&&o.tur==='video'){ var vd=document.createElement('video'); vd.muted=true; vd.playsInline=true; vd.controls=true; vd.preload='metadata'; vd.src='https://raw.githubusercontent.com/'+v.depo+'/'+v.dal+'/'+(o.hazir||o.gorsel)+'#t=0.5'; b.appendChild(vd); }
+    else if(o.gorsel){ var im=document.createElement('img'); im.loading='lazy'; im.alt='Hikaye önizleme'; im.src='https://raw.githubusercontent.com/'+v.depo+'/'+v.dal+'/'+o.gorsel; b.appendChild(im); }
     var ad={planli:['Sırada','orta'],onay_bekliyor:['Onay bekliyor','orta'],yayinlaniyor:['Yayınlanıyor','orta'],yayinda:['Yayında','iyi'],hata:['Hata','kt'],reddedildi:['Reddedildi','zayif']}[o.durum]||[o.durum,'zayif'];
-    b.appendChild(dom('span','rozet '+ad[1],ad[0]));
+    b.appendChild(dom('span','rozet '+ad[1],ad[0]+(o.tur==='video'?' · video':'')));
     if(o.baslik) b.appendChild(dom('div',null,o.baslik));
     if(o.atif&&o.atif.ad) b.appendChild(dom('div','not','Tasarım: '+o.atif.ad));
     if(o.yayin&&o.yayin.tarih) b.appendChild(dom('div','not',fmt(o.yayin.tarih)));
@@ -1109,7 +1111,15 @@ $('#hHemen').addEventListener('click',function(){
   hPost('/api/hikaye-yayinla',{}).then(function(){ $('#hDurum').textContent='Yayın başlatıldı. Bir iki dakika içinde hikaye çıkar ve burada görünür.'; btn.disabled=false; var n=0; var t=setInterval(function(){ hikayeCek(true); if(++n>18) clearInterval(t); },10000); }).catch(function(e){ $('#hDurum').textContent=String(e.message||e); btn.disabled=false; });
 });
 // fotoğraf seçme, küçültme, yükleme
-$('#hDosya').addEventListener('change',function(){ $('#hYukle').disabled=!(this.files&&this.files.length); $('#hYukleDurum').textContent=this.files&&this.files.length?(this.files.length+' fotoğraf seçildi.'):''; });
+$('#hDosya').addEventListener('change',function(){ $('#hYukle').disabled=!(this.files&&this.files.length); $('#hYukleDurum').textContent=this.files&&this.files.length?(this.files.length+' dosya seçildi.'):''; });
+function videoSure(dosya){
+  return new Promise(function(coz,red){
+    var v=document.createElement('video'), u=URL.createObjectURL(dosya); v.preload='metadata';
+    v.onloadedmetadata=function(){ var d=v.duration; URL.revokeObjectURL(u); coz(isFinite(d)?d:0); };
+    v.onerror=function(){ URL.revokeObjectURL(u); red(new Error('Video dosyası okunamadı')); };
+    v.src=u;
+  });
+}
 async function hikayeGorseli(dosya){
   var bmp=await createImageBitmap(dosya,{imageOrientation:'from-image'}).catch(function(){return createImageBitmap(dosya);});
   var W=1080,H=1920, c=document.createElement('canvas'); c.width=W; c.height=H; var x=c.getContext('2d');
@@ -1128,14 +1138,23 @@ $('#hYukle').addEventListener('click',async function(){
   for(var i=0;i<dosyalar.length;i++){
     durum.textContent='Yükleniyor: '+(i+1)+' / '+dosyalar.length+'…';
     try{
-      var blob=await hikayeGorseli(dosyalar[i]);
-      var r=await fetch('/api/hikaye-foto?baslik='+encodeURIComponent($('#hBaslik').value||''),{method:'POST',headers:{'X-Sifre':SIF,'Content-Type':'image/jpeg'},body:blob});
+      var d0=dosyalar[i], videoMu=/^video\//.test(d0.type)||/\.mp4$/i.test(d0.name), r;
+      if(videoMu){
+        if(d0.size>30*1024*1024) throw new Error('Video 30 MB’tan büyük ('+(d0.size/1048576).toFixed(0)+' MB)');
+        var sure=await videoSure(d0);
+        if(sure>60.5) throw new Error('Video '+Math.round(sure)+' sn; hikaye videosu en fazla 60 sn');
+        if(sure<3) throw new Error('Video çok kısa; en az 3 sn olmalı');
+        r=await fetch('/api/hikaye-video?baslik='+encodeURIComponent($('#hBaslik').value||''),{method:'POST',headers:{'X-Sifre':SIF,'Content-Type':'video/mp4'},body:d0});
+      } else {
+        var blob=await hikayeGorseli(d0);
+        r=await fetch('/api/hikaye-foto?baslik='+encodeURIComponent($('#hBaslik').value||''),{method:'POST',headers:{'X-Sifre':SIF,'Content-Type':'image/jpeg'},body:blob});
+      }
       var j=await r.json().catch(function(){return {};});
       if(!r.ok) throw new Error(j.hata||('Hata '+r.status));
       ok++;
-    }catch(e){ durum.textContent='Fotoğraf '+(i+1)+' yüklenemedi: '+String(e.message||e); if(String(e.message||'').indexOf('Şifre')>=0){SIF=''; try{localStorage.removeItem('ofisSifre');}catch(x){} pSifreHazirla();} break; }
+    }catch(e){ durum.textContent='Dosya '+(i+1)+' yüklenemedi: '+String(e.message||e); if(String(e.message||'').indexOf('Şifre')>=0){SIF=''; try{localStorage.removeItem('ofisSifre');}catch(x){} pSifreHazirla();} break; }
   }
-  if(ok===dosyalar.length) durum.textContent=ok+' fotoğraf kuyruğa eklendi.';
+  if(ok===dosyalar.length) durum.textContent=ok+' dosya kuyruğa eklendi.';
   $('#hDosya').value=''; btn.disabled=true; hikayeCek(true);
 });
 // bildirimler (web push)
