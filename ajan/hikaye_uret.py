@@ -277,12 +277,61 @@ def sahne_promptu(t, karakterli):
     return " ".join(parcalar)
 
 
+def openai_get(yol, sure=60):
+    anahtar = os.environ.get("OPENAI_API_KEY")
+    r = urllib.request.Request(f"{OPENAI}/{yol}", headers={"Authorization": f"Bearer {anahtar}"})
+    with urllib.request.urlopen(r, timeout=sure) as y:
+        return json.load(y)
+
+
+def surum_anahtari(model_adi):
+    """gpt-image-1 < gpt-image-1.5 < gpt-image-2 gibi adları sürüme göre sıralamak için."""
+    return [int(x) for x in re.findall(r"\d+", model_adi)] or [0]
+
+
+_gorsel_modelleri = None
+
+
+def gorsel_modelleri():
+    """Denenecek görsel modelleri: önce açıkça ayarlanan, sonra hesabın erişebildiği gpt-image* (yeniden eskiye), sonra varsayılan."""
+    global _gorsel_modelleri
+    if _gorsel_modelleri is not None:
+        return _gorsel_modelleri
+    aday = []
+    if os.environ.get("OPENAI_IMAGE_MODEL"):
+        aday.append(os.environ["OPENAI_IMAGE_MODEL"])
+    try:
+        liste = [m["id"] for m in openai_get("models").get("data", [])]
+        gorsel = sorted([m for m in liste if m.startswith("gpt-image") and "mini" not in m], key=surum_anahtari, reverse=True)
+        print(f"Hesabın görsel modelleri: {', '.join(gorsel) or 'yok'}")
+        aday += gorsel
+    except Exception as e:
+        print(f"Model listesi alınamadı ({type(e).__name__}); varsayılan denenecek.")
+    aday.append("gpt-image-1")
+    _gorsel_modelleri = list(dict.fromkeys(aday))
+    return _gorsel_modelleri
+
+
 def gorsel_uret(prompt, kalite):
-    v = openai("images/generations", {"model": GORSEL_MODELI, "prompt": prompt, "size": "1024x1536", "quality": kalite, "n": 1}, 300)
-    b64 = (v.get("data") or [{}])[0].get("b64_json")
-    if not b64:
-        raise ValueError("görsel yanıtında veri yok")
-    return b64
+    """Görseli ilk çalışan modelle üretir (b64). Model yok/erişim yok hatalarında sıradaki modeli dener ve çalışanı hatırlar."""
+    global _gorsel_modelleri
+    son_hata = None
+    for model in list(gorsel_modelleri()):
+        try:
+            v = openai("images/generations", {"model": model, "prompt": prompt, "size": "1024x1536", "quality": kalite, "n": 1}, 300)
+        except urllib.error.HTTPError as e:
+            son_hata = e
+            if e.code in (400, 403, 404):
+                print(f"  görsel modeli '{model}' kullanılamadı ({http_hata_ozeti(e)})")
+                continue
+            raise
+        b64 = (v.get("data") or [{}])[0].get("b64_json")
+        if not b64:
+            raise ValueError("görsel yanıtında veri yok")
+        if _gorsel_modelleri[0] != model:
+            _gorsel_modelleri = [model] + [m for m in _gorsel_modelleri if m != model]
+        return b64
+    raise son_hata or ValueError("kullanılabilir görsel modeli yok")
 
 
 DENETIM_SISTEM = "Sen sosyal medya görsellerini denetleyen titiz bir editörsün. Yalnızca geçerli JSON döndür."
@@ -401,6 +450,7 @@ def calis(a):
 
     hedef = max(1, min(int(ayar["gunluk_uretim"]), 12))
     uretilen, atlanan = [], []
+    gorsel_hatasi = False
     kategoriler = set()
     sira = 0
     for t in uygunlar:
@@ -419,6 +469,7 @@ def calis(a):
             except urllib.error.HTTPError as e:
                 print(f"  görsel üretilemedi ({http_hata_ozeti(e)})")
                 atlanan.append((t["ad"], http_hata_ozeti(e)))
+                gorsel_hatasi = True
                 break
             except Exception as e:
                 print(f"  görsel üretilemedi ({type(e).__name__}: {str(e)[:100]})")
@@ -437,6 +488,9 @@ def calis(a):
                 break
         yaz(HARCAMA, harcama)
         sira += 1
+        if gorsel_hatasi:
+            print("Görsel servisi hata verdi; kalan tasarımlar için denenmeyecek (anahtar/model erişimini kontrol et).")
+            break
         if not kabul:
             atlanan.append((t["ad"], "denetimden geçemedi ya da üretilemedi"))
             continue
