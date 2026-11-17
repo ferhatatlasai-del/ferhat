@@ -13,3 +13,5 @@ self.addEventListener('notificationclick', e => {
   const adres = (e.notification.data && e.notification.data.adres) || '/';
   e.waitUntil(self.clients.openWindow(adres));
 });
+// Yüklenebilir uygulama için gerekli: yalnızca sayfa açılışlarını olduğu gibi geçirir (API ve yüklemelere dokunmaz)
+self.addEventListener('fetch', e => { if (e.request.mode === 'navigate') e.respondWith(fetch(e.request)); });
