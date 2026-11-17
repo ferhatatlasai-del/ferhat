@@ -185,6 +185,7 @@ Her biri için JSON alanları:
 - hareketli_parca: true/false (menteşe, kilit, katlanma, dönen parça var mı)
 - kategori: kısa etiket (masa düzeni, mutfak, oyuncak, araç, bahçe vb.)
 - neden_populer: Türkçe 1 cümle
+- trend_konusu: aşağıdaki TREND listesinden hangisine uyuyorsa o konunun adı (aynen), uymuyorsa boş string
 
 Yalnızca geçerli JSON döndür: {"tasarimlar":[{...}]}"""
 
@@ -206,9 +207,36 @@ def arama_istegi(istem, sure):
     return None, 0
 
 
+TREND_DOSYASI = KOK / "ajan" / "trendler.json"
+TREND_EN_ESKI_GUN = 7
+
+
+def trend_yonlendirmesi():
+    """Trend ajanının son bulguları (en çok 7 günlük) arama istemine eklenir. (metin, konu_listesi)"""
+    try:
+        v = json.loads(TREND_DOSYASI.read_text(encoding="utf-8"))
+        z = datetime.datetime.strptime(v["tarih"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=datetime.timezone.utc)
+        if (H.simdi() - z).total_seconds() > TREND_EN_ESKI_GUN * 86400:
+            return "", []
+    except Exception:
+        return "", []
+    konular = [o["konu"].strip() for o in v.get("oneriler", [])
+               if o.get("konu") and o.get("basilabilir", True) and str(o.get("risk", "yok")).lower().startswith("yok")][:8]
+    kacin = [k for k in v.get("asiri_kullanilan", []) if k][:5]
+    if not konular:
+        return "", []
+    metin = ("TREND YÖNLENDİRMESİ (Trend ajanının son bulguları): Listeleyeceğin tasarımların YARISI şu güncel trend konularından birine uysun,\n"
+             "diğer yarısı serbest (çeşitlilik için):\n" + "\n".join(f"- {k}" for k in konular) + "\n"
+             + (("Şu klişe konulardan kaçın: " + "; ".join(kacin) + "\n") if kacin else "") + "\n")
+    return metin, konular
+
+
 def tasarim_ara():
     """(tasarimlar, dogrulanan_adresler). Web arama aracı bulunamazsa hata."""
-    veri, arama_sayisi = arama_istegi(ARAMA_ISTEMI, 300)
+    trend_metni, konular = trend_yonlendirmesi()
+    print(f"Trend ajanı yönlendirmesi: {len(konular)} konu" + (f" ({'; '.join(k[:30] for k in konular[:4])}…)" if konular else " (trend verisi yok ya da 7 günden eski)"))
+    istem = ARAMA_ISTEMI.replace("KESİN KURALLAR:", trend_metni + "KESİN KURALLAR:", 1) if trend_metni else ARAMA_ISTEMI
+    veri, arama_sayisi = arama_istegi(istem, 300)
     if veri is None:
         hata("Web arama aracı kullanılamadı; tasarım araştırması yapılamadı.")
     print(f"Modelin yaptığı web araması: {arama_sayisi} kez")
@@ -831,6 +859,7 @@ def calis(a):
         oge = {"id": kimlik, "kaynak": "uretim", "durum": "planli" if ayar["mod"] == "otomatik" else "onay_bekliyor",
                "olusturma": H.simdi().strftime("%Y-%m-%dT%H:%M:%S.000Z"), "gorsel": gorsel_yolu, "baslik": t["ad"][:80],
                "atif": {"ad": t["ad"], "tasarimci": t.get("tasarimci"), "lisans": t["_lisans"], "url": t["_adres"], "site": t["_site"], "lisans_teyit": bool(t.get("_teyit")), "referansli": bool(t.get("_referansli"))},
+               "trend": (t.get("trend_konusu") or "")[:80],
                "kontrol": {"puan": kabul[1]["puan"], "deneme": kabul[2], "sorunlar": kabul[1]["sorunlar"]},
                "yayin": None, "hata": "", "deneme": 0}
         yaz(H.KUYRUK / f"{kimlik}.json", oge)
