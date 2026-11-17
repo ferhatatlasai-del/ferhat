@@ -219,7 +219,7 @@ dd{margin:1px 0 0}
       </div>
       <div class="card pub" id="pub">
         <h2>Video yayınla</h2>
-        <p class="alt">Google Flow’da yaptığın videoyu seç, önizle, yükle. Sonra Instagram ve YouTube’da birlikte yayınla.</p>
+        <p class="alt">Google Flow’da yaptığın videoyu seç, önizle, yükle. Sonra Instagram Reels, YouTube Shorts ve Instagram Hikaye’ye <b>aynı anda</b> yayınla (istediklerini işaretle).</p>
         <label class="k" for="pIcerik">Hangi içerik için?</label>
         <select id="pIcerik"><option value="">Zincir dışı (bağımsız video)</option></select>
         <div class="satir"><input type="file" id="pDosya" accept="video/mp4,.mp4"><button type="button" id="pYukle" disabled>Yükle</button></div>
@@ -233,7 +233,8 @@ dd{margin:1px 0 0}
           <label class="k" for="pAciklama">Açıklama ve etiketler (Instagram ve YouTube)</label>
           <textarea id="pAciklama" maxlength="2000" placeholder="Kısa bir açıklama yaz, en altta #etiketlerini ekle."></textarea>
           <p class="not">“🤖 Doktor Filament yapay zekâ ile üretilmiş bir karakterdir.” satırı yayında otomatik eklenir. YouTube için #Shorts da eklenir.</p>
-          <div class="satir"><label><input type="checkbox" id="pIg" checked> Instagram</label><label><input type="checkbox" id="pYt" checked> YouTube</label></div>
+          <div class="satir"><label><input type="checkbox" id="pIg" checked> Instagram Reels</label><label><input type="checkbox" id="pYt" checked> YouTube Shorts</label><label><input type="checkbox" id="pHk" checked> Instagram Hikaye</label></div>
+          <p class="not" id="pHkNot" hidden></p>
           <div class="satir"><button type="button" class="ana" id="pYayinla" disabled>Yayınla…</button></div>
           <div class="onay" id="pOnay" hidden>
             <p id="pOnayMetin"></p>
@@ -836,9 +837,13 @@ $('#pDosya').addEventListener('change',function(){
   if(!f){$('#pOnizle').hidden=true; return;}
   if(!/\.mp4$/i.test(f.name)&&f.type!=='video/mp4'){pHata('Yalnızca MP4 video seçebilirsin.'); return;}
   if(f.size>30*1024*1024){pHata('Video 30 MB’tan büyük ('+(f.size/1048576).toFixed(1)+' MB). Daha küçük bir sürüm seç.'); return;}
-  pDosya=f; var v=$('#pOnizle'); v.src=URL.createObjectURL(f); v.hidden=false;
+  pDosya=f; var v=$('#pOnizle'); v.src=URL.createObjectURL(f); v.hidden=false; $('#pHkNot').hidden=true; $('#pHk').disabled=false; $('#pHk').checked=true;
   $('#pDurum').textContent=f.name+' · '+(f.size/1048576).toFixed(1)+' MB. İzle, doğruysa Yükle’ye bas.';
   $('#pYukle').disabled=false;
+});
+$('#pOnizle').addEventListener('loadedmetadata',function(){
+  var d=this.duration, n=$('#pHkNot');
+  if(isFinite(d)&&d>60.5){ $('#pHk').checked=false; $('#pHk').disabled=true; n.textContent='Bu video '+Math.round(d)+' sn. Instagram hikayesi en fazla 60 sn olabilir, hikaye seçeneği kapatıldı (Reels ve Shorts için uygun).'; n.hidden=false; }
 });
 $('#pYukle').addEventListener('click',function(){
   if(!pDosya) return; pHata('');
@@ -856,27 +861,28 @@ $('#pYukle').addEventListener('click',function(){
   x.send(pDosya);
 });
 $('#pYayinla').addEventListener('click',function(){
-  pHata(''); var b=$('#pBaslik').value.trim(), a=$('#pAciklama').value.trim(), ig=$('#pIg').checked, yt=$('#pYt').checked;
-  if(b.length<3){pHata('Bir başlık yaz.'); return;} if(a.length<3){pHata('Bir açıklama yaz.'); return;} if(!ig&&!yt){pHata('En az bir platform seç.'); return;}
+  pHata(''); var b=$('#pBaslik').value.trim(), a=$('#pAciklama').value.trim(), ig=$('#pIg').checked, yt=$('#pYt').checked, hk=$('#pHk').checked;
+  if(!ig&&!yt&&!hk){pHata('En az bir platform seç.'); return;}
+  if((ig||yt)&&b.length<3){pHata('Bir başlık yaz.'); return;} if((ig||yt)&&a.length<3){pHata('Bir açıklama yaz.'); return;}
   pSifreOku(); if(!SIF){pSifreHazirla(); pHata('Ofis şifresini yaz.'); return;}
-  var hed=(ig&&yt)?'Instagram’da ve YouTube’da':(ig?'Instagram’da':'YouTube’da');
-  $('#pOnayMetin').textContent='Bu video '+hed+' herkese açık olarak yayınlanacak. Başlık: “'+b+'”. Yayınlansın mı?';
+  var hedAd=[]; if(ig) hedAd.push('Instagram Reels'); if(yt) hedAd.push('YouTube Shorts'); if(hk) hedAd.push('Instagram Hikaye');
+  $('#pOnayMetin').textContent='Bu video şuralarda aynı anda herkese açık yayınlanacak: '+hedAd.join(', ')+'.'+((ig||yt)?' Başlık: “'+b+'”.':'')+' Yayınlansın mı?';
   $('#pOnay').hidden=false; this.disabled=true;
 });
 $('#pVazgec').addEventListener('click',function(){ $('#pOnay').hidden=true; $('#pYayinla').disabled=false; });
 $('#pEvet').addEventListener('click',function(){
-  var hedefler=[]; if($('#pIg').checked) hedefler.push('instagram'); if($('#pYt').checked) hedefler.push('youtube');
+  var hedefler=[]; if($('#pIg').checked) hedefler.push('instagram'); if($('#pYt').checked) hedefler.push('youtube'); if($('#pHk').checked) hedefler.push('hikaye');
   $('#pOnay').hidden=true; pHata(''); $('#pDurum').textContent='Yayın başlatılıyor…';
   fetch('/api/yayinla',{method:'POST',headers:{'X-Sifre':SIF,'Content-Type':'application/json'},body:JSON.stringify({onay:true,yol:pYol,hedefler:hedefler,baslik:$('#pBaslik').value,aciklama:$('#pAciklama').value,icerik:$('#pIcerik').value})}).then(chk).then(function(j){
     pBaslangic=j.baslangic; var h='';
-    hedefler.forEach(function(t){ h+='<div class="cal" id="pS_'+t+'"><i></i><span>'+(t==='instagram'?'Instagram':'YouTube')+': '+(j.sonuc[t]==='basladi'?'sırada…':j.sonuc[t])+'</span></div>'; });
+    hedefler.forEach(function(t){ h+='<div class="cal" id="pS_'+t+'"><i></i><span>'+({instagram:'Instagram Reels',youtube:'YouTube Shorts',hikaye:'Instagram Hikaye'}[t]||t)+': '+(j.sonuc[t]==='basladi'?'sırada…':j.sonuc[t])+'</span></div>'; });
     $('#pSonuc').innerHTML=h; $('#pDurum').textContent='Yayın başladı. Bir iki dakika sürer.';
     yayinSahnesi(hedefler); yayinTakip(hedefler,Date.now(),j.icerik||'');
   }).catch(function(e){ pHata(String(e.message||e)); $('#pYayinla').disabled=false; $('#pDurum').textContent='Yayın başlatılamadı.'; });
 });
 function pSatir(t,sinif,metin,link){
   var e=$('#pS_'+t); if(!e) return; e.className=sinif;
-  e.innerHTML='<i></i><span></span>'; e.querySelector('span').textContent=(t==='instagram'?'Instagram':'YouTube')+': '+metin;
+  e.innerHTML='<i></i><span></span>'; e.querySelector('span').textContent=({instagram:'Instagram Reels',youtube:'YouTube Shorts',hikaye:'Instagram Hikaye'}[t]||t)+': '+metin;
   if(link){var a=document.createElement('a'); a.href=link; a.target='_blank'; a.rel='noopener'; a.textContent='Aç'; a.style.marginLeft='6px'; e.appendChild(a);}
 }
 async function yayinTakip(hedefler,t0,icerik){
