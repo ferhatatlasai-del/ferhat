@@ -1,12 +1,20 @@
 {
-  "aktif": false,
+  "aktif": true,
   "mod": "otomatik",
   "gunluk_sayi": 4,
   "baslangic_saat": 10,
   "bitis_saat": 22,
-  "gunler": [1, 2, 3, 4, 5, 6, 7],
+  "gunler": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
   "min_aralik_dk": 60,
   "ardisik_hata": 0,
   "hata_siniri": 3,
-  "son_not": "Ajan başlangıçta duraklatılmış. Önce 'Şimdi bir hikaye yayınla' ile bir deneme yap, sonra panelden etkinleştir."
+  "son_not": ""
 }
