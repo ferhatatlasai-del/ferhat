@@ -89,10 +89,11 @@ def trend_blogu():
     if not v:
         return "# GÜNCEL TRENDLER\n(Trend araştırması yok ya da eski. Kendi araştırmana ve özgün fikre güven.)\n\n"
     satirlar = [f"# GÜNCEL TRENDLER (trend ajanı, {v['tarih']}; kaynaklı olanlar güvenilir, kaynaksızlar yalnızca esin)"]
-    for o in v.get("oneriler", [])[:8]:
+    for o in v.get("oneriler", [])[:12]:
         etiket = "KAYNAKLI" if o.get("dogrulandi") else "kaynaksız"
-        satirlar.append(f"- [{etiket}] {o.get('konu')} | neden: {o.get('neden_trend')} | açı: {o.get('kanca_acisi')} | "
-                        f"basılabilir: {o.get('basilabilir')} | risk: {o.get('risk')}")
+        ornek = "; ".join(f"{e.get('ad')} ({e.get('url')})" for e in (o.get("ornekler") or [])[:2])
+        satirlar.append(f"- [{etiket}] {o.get('konu')} ({o.get('kategori', '')}) | neden: {o.get('neden_trend')} | açı: {o.get('kanca_acisi')} | "
+                        f"basılabilir: {o.get('basilabilir')} | risk: {o.get('risk')}" + (f" | gerçek örnekler (esin, kopyalama): {ornek}" if ornek else ""))
     if v.get("asiri_kullanilan"):
         satirlar.append("- AŞIRI KULLANILAN (kaçın): " + "; ".join(v["asiri_kullanilan"]))
     return "\n".join(satirlar) + "\n\n"

@@ -39,6 +39,7 @@ import urllib.request
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import hikaye as H  # noqa: E402
+import thingiverse as TV  # noqa: E402
 import shorts_uret as SU  # noqa: E402
 import uret  # noqa: E402
 
@@ -51,7 +52,7 @@ HARCAMA = KOK / "hikaye" / "harcama.json"
 KULLANILAN = KOK / "hikaye" / "kullanilan.json"
 ADAYLAR = KOK / "hikaye" / "adaylar.json"
 ADAY_OMRU_GUN = 4   # aynı arama sonucu bu kadar gün yeniden kullanılır (her çalışmada pahalı arama yapılmaz)
-IZINLI_SITELER = ("printables.com", "makerworld.com")
+IZINLI_SITELER = ("printables.com", "makerworld.com", "thingiverse.com")
 VARSAYILAN = {"aktif": False, "mod": "otomatik", "gunluk_uretim": 3, "gunluk_gorsel_siniri": 6,
               "aylik_gorsel_siniri": 90, "kalite": "low", "kuyruk_hedefi": 6, "referans": "zorunlu"}
 ARAC_TURLERI = ["web_search", "web_search_preview"]
@@ -80,7 +81,7 @@ def lisans_uygun(metin):
         return None
     if re.search(r"\b(nc|nd|sa)\b|noncommercial|non commercial|noderiv|no deriv|sharealike|share alike|standard digital file|all rights reserved", t):
         return None
-    if re.search(r"\bcc0\b|public domain dedication|\bcc zero\b", t):
+    if re.search(r"\bcc0\b|public domain dedication|\bcc zero\b|^public domain$", t):
         return "CC0"
     if re.search(r"\bcc by\b(?!\s*(nc|nd|sa))", t) or re.fullmatch(r"(creative commons )?attribution( 4 0| 3 0| 2 0)?( international)?( \(?cc by\)?)?", t):
         return "CC BY"
@@ -549,6 +550,69 @@ def printables_dogrula(t):
     return True, f"lisans sitenin verisinde doğrulandı ({bilgi['lisans_metni']})"
 
 
+# ---------- Thingiverse kaynağı ----------
+
+def trend_terimleri():
+    """Trend ajanının İngilizce arama terimleri: [(terim, konu)]. Trend verisi yoksa boş."""
+    try:
+        v = json.loads(TREND_DOSYASI.read_text(encoding="utf-8"))
+        z = datetime.datetime.strptime(v["tarih"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=datetime.timezone.utc)
+        if (H.simdi() - z).total_seconds() > TREND_EN_ESKI_GUN * 86400:
+            return []
+        return [((o.get("arama_terimi_en") or "").strip(), o.get("konu", "").strip()) for o in v.get("oneriler", [])
+                if (o.get("arama_terimi_en") or "").strip() and str(o.get("risk", "yok")).lower().startswith("yok")][:6]
+    except Exception:
+        return []
+
+
+def thingiverse_adaylari(kullanilan_anahtarlar, sayi):
+    """Thingiverse'in resmi servisinden CC0/CC BY lisanslı, popüler tasarımlar (lisans ve fotoğraf sitenin kendi verisinden).
+    Önce trend terimleriyle aranır (trend uyumlu), sonra genel popüler listeden tamamlanır. Anahtar yoksa boş döner."""
+    if not TV.hazir():
+        print("Thingiverse kaynağı kapalı (THINGIVERSE_TOKEN tanımlı değil).")
+        return []
+    ozetler, konu_haritasi = [], {}
+    try:
+        for terim, konu in trend_terimleri()[:4]:
+            for o in TV.ara(terim, 8)[:8]:
+                if o.get("id") and o["id"] not in konu_haritasi:
+                    ozetler.append(o)
+                    konu_haritasi[o["id"]] = konu
+        for o in TV.populer(30):
+            if o.get("id") and o["id"] not in konu_haritasi:
+                ozetler.append(o)
+                konu_haritasi[o["id"]] = ""
+    except TV.ThingiverseHata as e:
+        print(f"Thingiverse listesi alınamadı ({e})")
+        return []
+    adaylar, bakilan, elenen_say = [], 0, {}
+    for o in ozetler:
+        if len(adaylar) >= sayi or bakilan >= 25:
+            break
+        adres = o.get("public_url") or f"https://www.thingiverse.com/thing:{o['id']}"
+        if adres_anahtari(adres) in kullanilan_anahtarlar:
+            continue
+        bakilan += 1
+        try:
+            b = TV.kayit_bilgisi(TV.detay(o["id"]))
+        except TV.ThingiverseHata as e:
+            print(f"  Thingiverse {o.get('id')}: ayrıntı alınamadı ({e})")
+            continue
+        lis = lisans_uygun(b["lisans"])
+        if not lis:
+            elenen_say[b["lisans"] or "lisans yok"] = elenen_say.get(b["lisans"] or "lisans yok", 0) + 1
+            continue
+        if not b["gorsel"] or not b["ad"]:
+            continue
+        adaylar.append({"ad": b["ad"], "tasarimci": b["tasarimci"], "lisans": b["lisans"], "lisans_kaniti": f"Thingiverse servisi: {b['lisans']}",
+                        "url": b["url"], "aciklama": b["aciklama"] or b["ad"], "hareketli_parca": False, "kategori": "",
+                        "trend_konusu": konu_haritasi.get(o["id"], ""), "_lisans": lis, "_site": "thingiverse.com", "_adres": temiz_adres(b["url"]),
+                        "_teyit": True, "_gorsel_adresi": b["gorsel"]})
+    ozet = ", ".join(f"{k} x{v}" for k, v in sorted(elenen_say.items(), key=lambda x: -x[1])[:5])
+    print(f"Thingiverse: {len(ozetler)} popüler tasarım listelendi, {bakilan} tanesine bakıldı, {len(adaylar)} uygun (CC0/CC BY)." + (f" Elenen lisanslar: {ozet}" if ozet else ""))
+    return adaylar
+
+
 def openai_get(yol, sure=60):
     anahtar = os.environ.get("OPENAI_API_KEY")
     r = urllib.request.Request(f"{OPENAI}/{yol}", headers={"Authorization": f"Bearer {anahtar}"})
@@ -615,6 +679,7 @@ Nesne: {ad}. Açıklama: {aciklama}
 Görseli titizlikle incele ve şu JSON'u döndür:
 {{"yazi_var": okunabilir ya da anlamsız herhangi bir yazı/harf/rakam var mı (true/false),
 "logo_var": tanınabilir logo, marka ya da filigran var mı,
+"taninmis_karakter": film/oyun/çizgi film/anime gibi telifli, tanınmış bir karakter ya da marka ürünü var mı,
 "bozuk_anatomi": bozuk el, yüz ya da gerçekçi olmayan insan/kopuk uzuv var mı (insan yoksa false),
 "nesne_makul": gösterilen nesne fiziksel olarak mümkün, makul ve ev tipi 3D yazıcıyla basılmış gibi mi,
 "tarife_uygun": görsel açıklamadaki nesnenin genel şeklini ve belirgin özelliklerini sadakatle gösteriyor mu (başka bir nesne, ekstra ya da eksik ana parça varsa false),
@@ -635,7 +700,7 @@ def denetle(b64, t, referans_jpeg=None):
         puan = float(c.get("puan", 0))
     except (TypeError, ValueError):
         puan = 0.0
-    gecti = (not c.get("yazi_var") and not c.get("logo_var") and not c.get("bozuk_anatomi")
+    gecti = (not c.get("yazi_var") and not c.get("logo_var") and not c.get("taninmis_karakter") and not c.get("bozuk_anatomi")
              and c.get("nesne_makul") is True and c.get("tarife_uygun") is True and puan >= 7
              and (not referans_jpeg or c.get("referansa_sadik") is True))
     return gecti, {"puan": puan, "sorunlar": [str(s)[:100] for s in (c.get("sorunlar") or [])][:5]}
@@ -749,7 +814,8 @@ def calis(a):
     except Exception:
         pass
     hedef_aday = max(1, min(int(ayar["gunluk_uretim"]), 12)) + 2   # reddedilen/atlanan adaylar için pay
-    if len(kalan) >= hedef_aday:
+    printables_hedef = max(1, hedef_aday // 2) if TV.hazir() else hedef_aday   # Thingiverse varsa adayların yarısını o tamamlar
+    if len(kalan) >= printables_hedef:
         uygunlar = kalan
         print(f"Aday listesi önbellekten kullanıldı ({len(uygunlar)} kullanılmamış tasarım); yeni arama yapılmadı (maliyet tasarrufu).")
     else:
@@ -769,6 +835,15 @@ def calis(a):
         uygunlar = [t for t in uygunlar if site_uygun(t.get("_adres")) == "printables.com"]
         if onceki != len(uygunlar):
             print(f"  MakerWorld adayları ({onceki - len(uygunlar)}) referans fotoğraf alınamadığı için bu çalışmada atlandı.")
+    tv_adaylar = thingiverse_adaylari(kul_anahtar | {adres_anahtari(t.get("_adres")) for t in uygunlar}, max(1, hedef_aday - len(uygunlar)))
+    if tv_adaylar:   # iki kaynağı sırayla serpiştir (çeşitlilik)
+        karisik = []
+        for i in range(max(len(uygunlar), len(tv_adaylar))):
+            if i < len(uygunlar):
+                karisik.append(uygunlar[i])
+            if i < len(tv_adaylar):
+                karisik.append(tv_adaylar[i])
+        uygunlar = karisik
     if not uygunlar:
         print("Uygun tasarım yok; hiçbir şey üretilmedi.")
         return 0
@@ -781,7 +856,7 @@ def calis(a):
     for t in uygunlar:
         if len(uretilen) >= hedef:
             break
-        if t.get("kategori") in kategoriler and len(uygunlar) - len(uretilen) > hedef - len(uretilen):
+        if t.get("kategori") and t.get("kategori") in kategoriler and len(uygunlar) - len(uretilen) > hedef - len(uretilen):
             continue   # çeşitlilik: aynı kategoriden art arda seçme (yeterince aday varken)
         # Printables adayları: lisans ve fotoğraf sitenin kendi veri servisinden (kanıtlı)
         if site_uygun(t["_adres"]) == "printables.com":
