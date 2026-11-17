@@ -161,7 +161,7 @@ def sohbet_json(sistem, kullanici, resim_b64=None, ek_resim_b64=None):
 
 
 ARAMA_ISTEMI = """Sen 3D baskı tasarımlarını araştıran bir ajansın. İnternette ARA ve Printables (printables.com) ile MakerWorld (makerworld.com)
-sitelerinde şu sıralar (son 1-4 hafta) popüler olan, ev tipi bir 3D yazıcıyla basılabilen 5-6 tasarım bul.
+sitelerinde (sonuçların çoğu printables.com'dan olsun) şu sıralar (son 1-4 hafta) popüler olan, ev tipi bir 3D yazıcıyla basılabilen 8-10 tasarım bul.
 
 SEÇİM ÖLÇÜTÜ: Görsel olarak net ayırt edilen, basılı hâli fotoğrafta çekici duran, günlük hayatta kullanışlı ya da ilginç somut bir NESNE olsun
 (organizer, tutucu, aksesuar, küçük alet, dekor). Eğitim/öğretici dosyası, yalnızca metin ya da kod, jeton/madalya/logo, basit geometrik parça, dosya koleksiyonu ve karakter/figür koleksiyonu DEĞİL.
@@ -720,7 +720,8 @@ def calis(a):
             kalan = [t for t in onbellek.get("tasarimlar", []) if adres_anahtari(t.get("_adres")) not in kul_anahtar]
     except Exception:
         pass
-    if kalan:
+    hedef_aday = max(1, min(int(ayar["gunluk_uretim"]), 12)) + 2   # reddedilen/atlanan adaylar için pay
+    if len(kalan) >= hedef_aday:
         uygunlar = kalan
         print(f"Aday listesi önbellekten kullanıldı ({len(uygunlar)} kullanılmamış tasarım); yeni arama yapılmadı (maliyet tasarrufu).")
     else:
@@ -731,7 +732,15 @@ def calis(a):
         print(f"Bulunan {len(tasarimlar)}, uygun {len(uygunlar)} (modele göre CC0 / CC BY; bunlardan {sum(1 for t in uygunlar if t.get('_teyit'))} tanesinin sayfası aramada da göründü). Elenenler:")
         for ad, neden in elenen:
             print(f"  - {ad}: {neden}")
+        mevcut = {adres_anahtari(t.get("_adres")) for t in uygunlar}
+        uygunlar = uygunlar + [t for t in kalan if adres_anahtari(t.get("_adres")) not in mevcut]   # önceki kullanılmamış adaylar da kalsın
         yaz(ADAYLAR, {"tarih": an.strftime("%Y-%m-%dT%H:%M:%S+00:00"), "tasarimlar": [{k: v for k, v in t.items() if k not in ("_referansli", "_gorsel_adresi")} for t in uygunlar]})
+    if ayar.get("referans", "zorunlu") == "zorunlu":
+        # MakerWorld siteleri robotları engelliyor ve veri servisi yok: referans zorunluyken yalnızca Printables adayları kullanılır
+        onceki = len(uygunlar)
+        uygunlar = [t for t in uygunlar if site_uygun(t.get("_adres")) == "printables.com"]
+        if onceki != len(uygunlar):
+            print(f"  MakerWorld adayları ({onceki - len(uygunlar)}) referans fotoğraf alınamadığı için bu çalışmada atlandı.")
     if not uygunlar:
         print("Uygun tasarım yok; hiçbir şey üretilmedi.")
         return 0
