@@ -166,6 +166,9 @@ sitelerinde şu sıralar (son 1-4 hafta) popüler olan, ev tipi bir 3D yazıcıy
 SEÇİM ÖLÇÜTÜ: Görsel olarak net ayırt edilen, basılı hâli fotoğrafta çekici duran, günlük hayatta kullanışlı ya da ilginç somut bir NESNE olsun
 (organizer, tutucu, aksesuar, küçük alet, dekor). Eğitim/öğretici dosyası, yalnızca metin ya da kod, jeton/madalya/logo, basit geometrik parça, dosya koleksiyonu ve karakter/figür koleksiyonu DEĞİL.
 
+ARAMA İPUCU: Arama sorgularına lisans terimlerini de ekle (örn. "printables CC0 popular", "printables public domain CC0 model", "makerworld CC0",
+"Creative Commons Attribution CC BY printables"); lisansı sayfada açıkça CC0 ya da CC BY yazan tasarımları öncelikle ara.
+
 KESİN KURALLAR:
 - Yalnızca tasarımın kendi sayfasında lisansı AÇIKÇA "CC0" ya da "Creative Commons Attribution (CC BY)" olarak yazan tasarımları listele.
   Lisansı sayfada göremiyorsan, NC (ticari değil), ND (türev yok), SA (benzer paylaşım), "Standard Digital File License" ya da belirsizse LİSTELEME.
