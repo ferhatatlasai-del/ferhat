@@ -549,7 +549,8 @@ def printables_bilgi(adres):
             lis = pr.get("license") or {}
             resimler = [i.get("filePath") for i in (pr.get("images") or []) if i.get("filePath")]
             gorsel = urllib.parse.urljoin(PRINTABLES_MEDYA, resimler[0]) if resimler else None
-            return {"lisans_metni": " ".join(x for x in (lis.get("name"), lis.get("abbreviation")) if x),
+            gorseller = [urllib.parse.urljoin(PRINTABLES_MEDYA, r) for r in resimler[:4]]
+            return {"gorseller": gorseller, "lisans_metni": " ".join(x for x in (lis.get("name"), lis.get("abbreviation")) if x),
                     "tasarimci": (pr.get("user") or {}).get("publicUsername"), "ad": pr.get("name"), "gorsel": gorsel}, ""
         son = "; ".join(str(h.get("message"))[:120] for h in (hatalar or [])[:2]) or "tasarım bulunamadı"
     if not _introspeksiyon_yazildi:   # teşhis: gerçek alan adlarını günlüğe yaz
@@ -573,6 +574,7 @@ def printables_dogrula(t):
     if not lis:
         return False, f"sitenin kendi verisinde lisans uygun değil ({bilgi['lisans_metni'] or 'yok'})"
     t["_lisans"], t["_teyit"], t["_gorsel_adresi"] = lis, True, bilgi.get("gorsel")
+    t["_gorsel_adresleri"] = bilgi.get("gorseller") or ([bilgi["gorsel"]] if bilgi.get("gorsel") else [])
     if bilgi.get("tasarimci"):
         t["tasarimci"] = bilgi["tasarimci"]
     if bilgi.get("ad"):
@@ -718,7 +720,7 @@ Görseli titizlikle incele ve şu JSON'u döndür:
 
 
 REFERANS_KONTROL_ISTEMI = """Bu, bir 3D baskı tasarım sayfasının ana fotoğrafı. Hikaye görseli üretmek için referans olarak kullanılacak. Yalnızca JSON döndür:
-{"kullanilabilir": tek bir nesneyi net gösteren, gerçek baskı fotoğrafına benzeyen, baskın yazı/logo/etiket/başlık/filigran içermeyen fotoğraf mı (true/false),
+{"kullanilabilir": fotoğrafta ana nesne net ve bütün görünüyor mu VE kareyi kaplayan baskın yazı, logo, başlık, filigran ya da sayfa arayüzü (butonlar, menüler) yok mu (true/false). Bilgisayar çizimi/render olması ya da küçük bir etiket olması SORUN DEĞİL; ana nesne seçilebiliyorsa true de,
 "neden": "kısa Türkçe neden"}"""
 
 
@@ -876,13 +878,20 @@ def calis(a):
             print(f"  - {ad}: {neden}")
         mevcut = {adres_anahtari(t.get("_adres")) for t in uygunlar}
         uygunlar = uygunlar + [t for t in kalan if adres_anahtari(t.get("_adres")) not in mevcut]   # önceki kullanılmamış adaylar da kalsın
-        yaz(ADAYLAR, {"tarih": an.strftime("%Y-%m-%dT%H:%M:%S+00:00"), "tasarimlar": [{k: v for k, v in t.items() if k not in ("_referansli", "_gorsel_adresi")} for t in uygunlar]})
+        yaz(ADAYLAR, {"tarih": an.strftime("%Y-%m-%dT%H:%M:%S+00:00"), "tasarimlar": [{k: v for k, v in t.items() if k not in ("_referansli", "_gorsel_adresi", "_gorsel_adresleri")} for t in uygunlar]})
     if ayar.get("referans", "zorunlu") == "zorunlu":
         # MakerWorld siteleri robotları engelliyor ve veri servisi yok: referans zorunluyken yalnızca Printables adayları kullanılır
         onceki = len(uygunlar)
         uygunlar = [t for t in uygunlar if site_uygun(t.get("_adres")) == "printables.com"]
         if onceki != len(uygunlar):
             print(f"  MakerWorld adayları ({onceki - len(uygunlar)}) referans fotoğraf alınamadığı için bu çalışmada atlandı.")
+    gorulen, tekil = set(), []
+    for t in uygunlar:   # aynı tasarım listede birden fazla gelmiş olabilir
+        anahtar = adres_anahtari(t.get("_adres"))
+        if anahtar not in gorulen:
+            gorulen.add(anahtar)
+            tekil.append(t)
+    uygunlar = tekil
     tv_adaylar = thingiverse_adaylari(kul_anahtar | {adres_anahtari(t.get("_adres")) for t in uygunlar}, max(1, hedef_aday - len(uygunlar)))
     if tv_adaylar:   # iki kaynağı sırayla serpiştir (çeşitlilik)
         karisik = []
@@ -918,24 +927,33 @@ def calis(a):
             if durum is None and not t.get("_lisans"):
                 atlanan.append((t["ad"], "lisans doğrulanamadı (modelin beyanı da belirsiz)"))
                 continue
-        # referans fotoğraf (yalnızca bellekte)
+        # referans fotoğraf (yalnızca bellekte): tasarımın fotoğraflarından ilk uygun olanı (en çok 3 deneme)
         referans = None
         if ayar.get("referans", "zorunlu") != "yok":
-            try:
-                referans = referans_fotografi(t["_adres"], t.get("_gorsel_adresi"))
-                print(f"  {t['ad']}: referans fotoğraf alındı ({len(referans) // 1024} KB)")
-                uygun, neden = referans_kullanilabilir(referans)
-                if not uygun:
-                    print(f"  {t['ad']}: referans fotoğraf uygun değil ({neden}); görsel üretilmedi")
-                    atlanan.append((t["ad"], f"referans uygun değil: {neden}"))
-                    kullanilan.append({"url": t["_adres"], "ad": t["ad"], "tarih": H.simdi().strftime("%Y-%m-%d"), "durum": "referans_uygun_degil"})
-                    yaz(KULLANILAN, kullanilan[-200:])
+            adaylar_foto = t.get("_gorsel_adresleri") or ([t["_gorsel_adresi"]] if t.get("_gorsel_adresi") else [None])
+            son_neden, uygunsuz = "", 0
+            for foto in adaylar_foto[:3]:
+                try:
+                    aday_referans = referans_fotografi(t["_adres"], foto)
+                except ReferansYok as e:
+                    son_neden = f"alınamadı ({e})"
                     continue
-            except ReferansYok as e:
-                print(f"  {t['ad']}: referans fotoğraf alınamadı ({e})")
+                uygun, neden = referans_kullanilabilir(aday_referans)
+                if uygun:
+                    referans = aday_referans
+                    print(f"  {t['ad']}: referans fotoğraf alındı ve uygun ({len(referans) // 1024} KB)")
+                    break
+                uygunsuz += 1
+                son_neden = f"uygun değil ({neden})"
+                print(f"  {t['ad']}: bir fotoğraf uygun değil ({neden[:90]})")
+            if not referans:
+                print(f"  {t['ad']}: referans fotoğraf bulunamadı: {son_neden}")
                 if ayar.get("referans", "zorunlu") == "zorunlu":
-                    atlanan.append((t["ad"], f"referans alınamadı: {e}"))
-                    continue   # kullanılmış sayılmaz; sonraki çalışmada yeniden denenir
+                    atlanan.append((t["ad"], f"referans yok: {son_neden}"))
+                    if uygunsuz:   # fotoğrafları gerçekten uygunsuz: bir daha denenmesin
+                        kullanilan.append({"url": t["_adres"], "ad": t["ad"], "tarih": H.simdi().strftime("%Y-%m-%d"), "durum": "referans_uygun_degil"})
+                        yaz(KULLANILAN, kullanilan[-200:])
+                    continue   # alınamadıysa kullanılmış sayılmaz; sonraki çalışmada yeniden denenir
         t["_referansli"] = bool(referans)
         kabul = None
         for deneme in range(2):
