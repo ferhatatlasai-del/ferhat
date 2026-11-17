@@ -22,6 +22,7 @@ import datetime
 import json
 import os
 import pathlib
+import shutil
 import subprocess
 import sys
 import time
@@ -160,11 +161,23 @@ def hata_ozeti(e):
         return f"HTTP {e.code}"
 
 
+def ffmpeg_hazir():
+    """ffprobe/ffmpeg yoksa (GitHub çalıştırıcısında hazır gelmeyebilir) yalnızca gerektiğinde kur."""
+    if shutil.which("ffprobe") and shutil.which("ffmpeg"):
+        return
+    if os.environ.get("GITHUB_ACTIONS"):
+        print("ffmpeg kuruluyor…")
+        subprocess.run("sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg", shell=True, capture_output=True, text=True)
+    if not (shutil.which("ffprobe") and shutil.which("ffmpeg")):
+        raise RuntimeError("ffmpeg/ffprobe yüklü değil, video denetlenemedi")
+
+
 class IcerikHatasi(Exception):
     """Videonun kendisinden kaynaklanan sorun (anahtar/servis sorunu değil); ardışık hata sayılmaz."""
 
 
 def video_bilgi(yol):
+    ffmpeg_hazir()
     r = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "stream=codec_type,codec_name,width,height:format=duration",
                         "-of", "json", str(yol)], capture_output=True, text=True)
     if r.returncode != 0:
@@ -281,6 +294,22 @@ def bildir(baslik, govde, gorsel="", adres="", etiket="hikaye"):
 
 # ---------- Ana akış ----------
 
+def sistem_hatasi(ayar, oge, ozet, a):
+    """Anahtar/servis/altyapı sorunu: hikaye sıraya geri döner (5 denemeye kadar), ardışık hata sayılır, sınırda ajan duraklar."""
+    oge["deneme"] = oge.get("deneme", 0) + 1
+    oge["durum"], oge["hata"], oge["yayin"] = ("planli" if oge["deneme"] < 5 else "hata"), ozet, None
+    oge_yaz(oge)
+    ayar["ardisik_hata"] = ayar.get("ardisik_hata", 0) + 1
+    durdu = ayar["ardisik_hata"] >= ayar["hata_siniri"]
+    if durdu:
+        ayar["aktif"], ayar["son_not"] = False, f"{ayar['ardisik_hata']} ardışık hata nedeniyle otomatik duraklatıldı"
+    ayar_yaz(ayar)
+    if a.git:
+        git_kaydet(f"Hikaye: {oge['id']} hata", [KUYRUK, AYAR])
+    bildir("Hikaye yayınlanamadı" + (" ve ajan duraklatıldı" if durdu else ""), ozet[:160], adres="/")
+    return 1
+
+
 def yayinla_komutu(a):
     ayar = ayar_oku()
     ogeler = kuyruk_oku()
@@ -314,6 +343,11 @@ def yayinla_komutu(a):
                 git_kaydet(f"Hikaye: {oge['id']} video uygun değil", [KUYRUK])
             bildir("Video hikayesi yayınlanamadı", str(e)[:160], adres="/")
             return 1
+        except Exception as e:   # ffmpeg yok, dosya okunamadı vb.: altyapı sorunu, ardışık hata sayılır
+            ozet = f"{type(e).__name__}: {str(e)[:200]}"
+            print(f"Video hazırlanamadı: {ozet}")
+            oge.pop("hazir", None)
+            return sistem_hatasi(ayar, oge, ozet, a)
 
     # 1) Önce "yayınlanıyor" işaretini depoya yaz; yazılamazsa çift yayın riski olduğu için yayınlama
     oge["durum"] = "yayinlaniyor"
@@ -329,19 +363,7 @@ def yayinla_komutu(a):
     except Exception as e:
         ozet = hata_ozeti(e) if isinstance(e, urllib.error.HTTPError) else f"{type(e).__name__}: {str(e)[:200]}"
         print(f"Instagram hikaye hatası: {ozet}")
-        oge["deneme"] = oge.get("deneme", 0) + 1
-        # Geçici sorunlarda (ör. anahtar süresi) fotoğraf boşa harcanmasın: 5 denemeye kadar sıraya geri dön (duraklatma sınırı 3, anahtar sorununda fotoğraf harcanmaz)
-        oge["durum"], oge["hata"], oge["yayin"] = ("planli" if oge["deneme"] < 5 else "hata"), ozet, None
-        oge_yaz(oge)
-        ayar["ardisik_hata"] = ayar.get("ardisik_hata", 0) + 1
-        durdu = ayar["ardisik_hata"] >= ayar["hata_siniri"]
-        if durdu:
-            ayar["aktif"], ayar["son_not"] = False, f"{ayar['ardisik_hata']} ardışık hata nedeniyle otomatik duraklatıldı"
-        ayar_yaz(ayar)
-        if a.git:
-            git_kaydet(f"Hikaye: {oge['id']} hata", [KUYRUK, AYAR])
-        bildir("Hikaye yayınlanamadı" + (" ve ajan duraklatıldı" if durdu else ""), ozet[:160], adres="/")
-        return 1
+        return sistem_hatasi(ayar, oge, ozet, a)
 
     # 3) Sonucu yaz
     oge["durum"], oge["hata"] = "yayinda", ""
