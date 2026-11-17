@@ -1,0 +1,43 @@
+name: Nöbetçi (anahtar ve servis sağlığı)
+
+on:
+  schedule:
+    - cron: "15 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nobetci
+  cancel-in-progress: false
+
+jobs:
+  nobetci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Denetle
+        id: denetim
+        continue-on-error: true
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: "17841457188392262"
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OFIS_ADRES: "https://gurtechs-ajan-ofisi.fly.dev"
+          BILDIRIM_SIRRI: ${{ secrets.BILDIRIM_SIRRI }}
+        run: python3 ajan/nobetci.py
+      - name: Sonucu kaydet
+        run: |
+          git config user.name "nobetci"
+          git config user.email "nobetci@users.noreply.github.com"
+          git add hikaye/saglik.json
+          git diff --cached --quiet || git commit -m "Nöbetçi: sağlık durumu"
+          git pull --rebase -q || true
+          git push
+      - name: Sorun varsa kırmızı bitir
+        if: steps.denetim.outcome == 'failure'
+        run: exit 1
