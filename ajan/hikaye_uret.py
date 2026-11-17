@@ -645,6 +645,81 @@ def thingiverse_adaylari(kullanilan_anahtarlar, sayi):
     return adaylar
 
 
+# ---------- Printables doğrudan arama (lisans filtreli) ----------
+
+PRINTABLES_LISANSLAR = [1, 7]   # 1 = CC BY, 7 = CC0 (servisin licenses listesinden)
+YASAKLI_ADLAR = ("benchy", "dummy", "calibration", "kalibr", "test cube", "temp tower", "pokemon", "pokémon", "mario", "zelda", "star wars", "disney", "marvel",
+                 "harry potter", "naruto", "anime", "lego", "minecraft", "fortnite", "baby yoda", "mandalorian", "gundam", "warhammer", "tutorial")
+SAYFA_BOYU = 40
+
+
+def kacin_kelimeleri():
+    """Trend ajanının 'aşırı kullanılan' konularından ad süzgeci için anahtar kelimeler."""
+    try:
+        v = json.loads(TREND_DOSYASI.read_text(encoding="utf-8"))
+        return [k.lower() for x in v.get("asiri_kullanilan", []) for k in re.findall(r"[A-Za-zÇĞİÖŞÜçğıöşü0-9]{5,}", x)][:20]
+    except Exception:
+        return []
+
+
+def printables_ara(terim, sayfa=0):
+    """searchPrints2: lisans filtreli (CC0/CC BY), popülerliğe göre. Öğeler: id, ad, slug, beğeni, lisans, tasarımcı, fotoğraflar."""
+    q = ('{ searchPrints2(query: %s, limit: %d, offset: %d, licenses: %s, ordering: popular) { items { id name slug likesCount '
+         'license { name abbreviation } user { publicUsername } images { filePath } } } }'
+         % (json.dumps(terim or ""), SAYFA_BOYU, sayfa * SAYFA_BOYU, json.dumps(PRINTABLES_LISANSLAR)))
+    v = graphql(q)
+    if v.get("errors"):
+        raise RuntimeError("; ".join(str(h.get("message"))[:100] for h in v["errors"][:2]))
+    return ((v.get("data") or {}).get("searchPrints2") or {}).get("items") or []
+
+
+def printables_adaylari(kullanilan_anahtarlar, sayi):
+    """Printables'ın kendi aramasından (lisans filtreli) popüler tasarım adayları: trend terimleriyle ve genel popüler listeyle.
+    Lisans ve fotoğraflar sitenin verisinden gelir (kanıtlı). Servis kullanılamazsa boş döner."""
+    kacin = kacin_kelimeleri()
+    sorgular = [t for t, _ in trend_terimleri()[:5]] + [""]
+    konu_de = {t: k for t, k in trend_terimleri()}
+    adaylar, gorulen = [], set()
+    ham = 0
+    try:
+        for terim in sorgular:
+            for sayfa in range(3 if terim == "" else 1):
+                if len(adaylar) >= sayi:
+                    break
+                for o in printables_ara(terim, sayfa):
+                    ham += 1
+                    kimlik, ad = o.get("id"), (o.get("name") or "").strip()
+                    if not kimlik or not ad:
+                        continue
+                    adres = f"https://www.printables.com/model/{kimlik}-{o.get('slug') or ''}".rstrip("-")
+                    anahtar = adres_anahtari(adres)
+                    if anahtar in kullanilan_anahtarlar or anahtar in gorulen:
+                        continue
+                    gorulen.add(anahtar)
+                    kucuk = ad.lower()
+                    if any(y in kucuk for y in YASAKLI_ADLAR) or any(k in kucuk for k in kacin):
+                        continue
+                    lis_metni = " ".join(x for x in ((o.get("license") or {}).get("name"), (o.get("license") or {}).get("abbreviation")) if x)
+                    lis = lisans_uygun(lis_metni)
+                    if not lis:
+                        continue
+                    resimler = [urllib.parse.urljoin(PRINTABLES_MEDYA, i["filePath"]) for i in (o.get("images") or []) if i.get("filePath")][:4]
+                    if not resimler:
+                        continue
+                    adaylar.append({"ad": ad, "tasarimci": (o.get("user") or {}).get("publicUsername") or "", "lisans": lis_metni,
+                                    "lisans_kaniti": f"Printables servisi: {lis_metni}", "url": adres,
+                                    "aciklama": ad, "hareketli_parca": False, "kategori": "", "trend_konusu": konu_de.get(terim, ""),
+                                    "_lisans": lis, "_site": "printables.com", "_adres": temiz_adres(adres), "_teyit": True, "_kesin": True,
+                                    "_gorsel_adresi": resimler[0], "_gorsel_adresleri": resimler})
+                    if len(adaylar) >= sayi:
+                        break
+    except Exception as e:
+        print(f"Printables doğrudan arama kullanılamadı ({type(e).__name__}: {str(e)[:120]})")
+        return adaylar
+    print(f"Printables doğrudan arama (CC0/CC BY filtreli, popüler): {ham} kayıt tarandı, {len(adaylar)} uygun aday.")
+    return adaylar
+
+
 def openai_get(yol, sure=60):
     anahtar = os.environ.get("OPENAI_API_KEY")
     r = urllib.request.Request(f"{OPENAI}/{yol}", headers={"Authorization": f"Bearer {anahtar}"})
@@ -747,7 +822,7 @@ def denetle(b64, t, referans_jpeg=None):
     except (TypeError, ValueError):
         puan = 0.0
     gecti = (not c.get("yazi_var") and not c.get("logo_var") and not c.get("taninmis_karakter") and not c.get("bozuk_anatomi")
-             and c.get("nesne_makul") is True and c.get("tarife_uygun") is True and puan >= 7
+             and c.get("nesne_makul") is True and (c.get("tarife_uygun") is True or bool(referans_jpeg)) and puan >= 7
              and (not referans_jpeg or c.get("referansa_sadik") is True))
     return gecti, {"puan": puan, "sorunlar": [str(s)[:100] for s in (c.get("sorunlar") or [])][:5]}
 
@@ -878,10 +953,15 @@ def calis(a):
     except Exception:
         pass
     hedef_aday = max(1, min(int(ayar["gunluk_uretim"]), 12)) + 2   # reddedilen/atlanan adaylar için pay
+    pr_adaylar = printables_adaylari(kul_anahtar, hedef_aday)      # ana kaynak: Printables'ın kendi aramasında lisans filtreli popüler tasarımlar
     printables_hedef = max(1, hedef_aday // 2) if TV.hazir() else hedef_aday   # Thingiverse varsa adayların yarısını o tamamlar
-    if len(kalan) >= printables_hedef:
+    if len(pr_adaylar) >= hedef_aday:
+        uygunlar = []
+        print("Printables doğrudan arama yeterli aday verdi; pahalı yapay zekâ araması yapılmadı.")
+    elif len(kalan) + len(pr_adaylar) >= printables_hedef:
         uygunlar = kalan
-        print(f"Aday listesi önbellekten kullanıldı ({len(uygunlar)} kullanılmamış tasarım); yeni arama yapılmadı (maliyet tasarrufu).")
+        if uygunlar:
+            print(f"Aday listesi önbellekten kullanıldı ({len(uygunlar)} kullanılmamış tasarım); yeni arama yapılmadı (maliyet tasarrufu).")
     else:
         print("Tasarımlar aranıyor (Printables, MakerWorld)…")
         tasarimlar, dogrulanan = tasarim_ara()
@@ -893,6 +973,7 @@ def calis(a):
         mevcut = {adres_anahtari(t.get("_adres")) for t in uygunlar}
         uygunlar = uygunlar + [t for t in kalan if adres_anahtari(t.get("_adres")) not in mevcut]   # önceki kullanılmamış adaylar da kalsın
         yaz(ADAYLAR, {"tarih": an.strftime("%Y-%m-%dT%H:%M:%S+00:00"), "tasarimlar": [{k: v for k, v in t.items() if k not in ("_referansli", "_gorsel_adresi", "_gorsel_adresleri")} for t in uygunlar]})
+    uygunlar = pr_adaylar + [t for t in uygunlar if adres_anahtari(t.get("_adres")) not in {adres_anahtari(x["_adres"]) for x in pr_adaylar}]
     if ayar.get("referans", "zorunlu") == "zorunlu":
         # MakerWorld siteleri robotları engelliyor ve veri servisi yok: referans zorunluyken yalnızca Printables adayları kullanılır
         onceki = len(uygunlar)
@@ -930,7 +1011,7 @@ def calis(a):
         if t.get("kategori") and t.get("kategori") in kategoriler and len(uygunlar) - len(uretilen) > hedef - len(uretilen):
             continue   # çeşitlilik: aynı kategoriden art arda seçme (yeterince aday varken)
         # Printables adayları: lisans ve fotoğraf sitenin kendi veri servisinden (kanıtlı)
-        if site_uygun(t["_adres"]) == "printables.com":
+        if site_uygun(t["_adres"]) == "printables.com" and not t.get("_kesin"):
             durum, neden = printables_dogrula(t)
             print(f"  {t['ad']}: Printables servisi: {neden}")
             if durum is False:
