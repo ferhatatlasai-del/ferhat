@@ -250,6 +250,10 @@ def uygun_tasarimlar(tasarimlar, dogrulanan, kullanilan_adresler):
             elenen.append((ad, "bağlantı Printables/MakerWorld tasarım sayfası biçiminde değil"))
         elif adres_anahtari(adres) in kullanilan_anahtarlar:
             elenen.append((ad, "daha önce kullanıldı"))
+        elif not lis and not lisans_acik_red(t.get("lisans")) and site_uygun(adres) == "printables.com":
+            # model lisansı net yazamadı: Printables'ın kendi veri servisinden sorgulanacak
+            t["_lisans"], t["_site"], t["_adres"], t["_teyit"] = None, "printables.com", adres, False
+            uygunlar.append(t)
         elif not lis:
             elenen.append((ad, f"lisans uygun değil ({t.get('lisans')})"))
         elif not (t.get("lisans_kaniti") or "").strip():
@@ -348,16 +352,19 @@ def og_gorsel_adresi(html_metni, sayfa_adresi):
     return None
 
 
-def referans_fotografi(sayfa):
-    """Tasarım sayfasının ana fotoğrafını (yalnızca tek sayfa + tek görsel) indirir; en çok 1024 px JPEG bayt olarak döndürür.
+def referans_fotografi(sayfa, gorsel_adresi=None):
+    """Tasarımın ana fotoğrafını (yalnızca tek görsel) indirir; en çok 1024 px JPEG bayt olarak döndürür.
+    Fotoğraf adresi verilmişse (ör. Printables servisinden) sayfa açılmaz; yoksa sayfanın og:image adresi kullanılır.
     Depoya yazılmaz, yalnızca bellekte kullanılır."""
-    try:
-        veri, _ = http_al(sayfa_adresi_cevir(sayfa), 25, 3 * 1024 * 1024)
-    except urllib.error.HTTPError as e:
-        raise ReferansYok(f"sayfa açılamadı (HTTP {e.code})")
-    except Exception as e:
-        raise ReferansYok(f"sayfa açılamadı ({type(e).__name__})")
-    gorsel = og_gorsel_adresi(veri.decode("utf-8", "ignore"), sayfa)
+    gorsel = gorsel_adresi
+    if not gorsel:
+        try:
+            veri, _ = http_al(sayfa_adresi_cevir(sayfa), 25, 3 * 1024 * 1024)
+        except urllib.error.HTTPError as e:
+            raise ReferansYok(f"sayfa açılamadı (HTTP {e.code})")
+        except Exception as e:
+            raise ReferansYok(f"sayfa açılamadı ({type(e).__name__})")
+        gorsel = og_gorsel_adresi(veri.decode("utf-8", "ignore"), sayfa)
     if not gorsel:
         raise ReferansYok("sayfada önizleme fotoğrafı bulunamadı")
     if not genel_adres_mi(gorsel):
@@ -436,6 +443,82 @@ def gorsel_duzenle(prompt, referans_jpeg, kalite):
             _gorsel_modelleri = [model] + [m for m in _gorsel_modelleri if m != model]
         return b64
     raise son_hata or ValueError("kullanılabilir görsel modeli yok")
+
+
+# ---------- Printables veri servisi ----------
+
+PRINTABLES_API = os.environ.get("PRINTABLES_API") or "https://api.printables.com/graphql/"
+PRINTABLES_MEDYA = os.environ.get("PRINTABLES_MEDYA") or "https://media.printables.com/"
+PRINTABLES_SORGULAR = [
+    "query P($id: ID!) { print(id: $id) { id name license { id name abbreviation } user { publicUsername } images { filePath } } }",
+    "query P($id: ID!) { print(id: $id) { id name license { id name } user { publicUsername } images { filePath } } }",
+]
+_introspeksiyon_yazildi = False
+
+
+def graphql(sorgu, degiskenler=None):
+    govde = json.dumps({"query": sorgu, "variables": degiskenler or {}}).encode()
+    r = urllib.request.Request(PRINTABLES_API, data=govde, method="POST",
+                               headers={"Content-Type": "application/json", "User-Agent": BOT_ADI, "Accept": "application/json"})
+    with urllib.request.urlopen(r, timeout=30) as y:
+        return json.load(y)
+
+
+def printables_numara(adres):
+    m = re.search(r"printables\.com/(?:[a-z]{2}(?:-[a-z]{2,4})?/)?model/(\d+)", adres or "", re.I)
+    return m.group(1) if m else None
+
+
+def printables_bilgi(adres):
+    """Printables'ın kendi veri servisinden lisans, tasarımcı ve fotoğraf adresi. (bilgi_sozlugu, hata_metni)
+    Sözlük: lisans_metni, tasarimci, ad, gorsel (tam adres ya da None)."""
+    global _introspeksiyon_yazildi
+    numara = printables_numara(adres)
+    if not numara:
+        return None, "Printables tasarım numarası bulunamadı"
+    son = "bilinmeyen hata"
+    for sorgu in PRINTABLES_SORGULAR:
+        try:
+            v = graphql(sorgu, {"id": numara})
+        except urllib.error.HTTPError as e:
+            return None, f"servis HTTP {e.code}"
+        except Exception as e:
+            return None, f"servis ulaşılamadı ({type(e).__name__})"
+        hatalar = v.get("errors")
+        pr = (v.get("data") or {}).get("print") if not hatalar else None
+        if pr:
+            lis = pr.get("license") or {}
+            resimler = [i.get("filePath") for i in (pr.get("images") or []) if i.get("filePath")]
+            gorsel = urllib.parse.urljoin(PRINTABLES_MEDYA, resimler[0]) if resimler else None
+            return {"lisans_metni": " ".join(x for x in (lis.get("name"), lis.get("abbreviation")) if x),
+                    "tasarimci": (pr.get("user") or {}).get("publicUsername"), "ad": pr.get("name"), "gorsel": gorsel}, ""
+        son = "; ".join(str(h.get("message"))[:120] for h in (hatalar or [])[:2]) or "tasarım bulunamadı"
+    if not _introspeksiyon_yazildi:   # teşhis: gerçek alan adlarını günlüğe yaz
+        _introspeksiyon_yazildi = True
+        try:
+            t = graphql('{ __type(name: "PrintType") { fields { name } } }')
+            alanlar = [f["name"] for f in (((t.get("data") or {}).get("__type") or {}).get("fields") or [])]
+            print(f"  [teşhis] PrintType alanları: {', '.join(alanlar[:60]) or 'okunamadı'}")
+        except Exception as e:
+            print(f"  [teşhis] alan listesi alınamadı ({type(e).__name__})")
+    return None, f"servis yanıtı kullanılamadı ({son})"
+
+
+def printables_dogrula(t):
+    """Printables adayı için lisansı sitenin kendi verisiyle kanıtla. (durum, neden)
+    durum: True=doğrulandı (lisans uygun), False=lisans uygun değil (elen), None=servis kullanılamadı (eski davranış)."""
+    bilgi, hata_metni = printables_bilgi(t["_adres"])
+    if not bilgi:
+        return None, hata_metni
+    lis = lisans_uygun(bilgi["lisans_metni"])
+    if not lis:
+        return False, f"sitenin kendi verisinde lisans uygun değil ({bilgi['lisans_metni'] or 'yok'})"
+    t["_lisans"], t["_teyit"], t["_gorsel_adresi"] = lis, True, bilgi.get("gorsel")
+    if bilgi.get("tasarimci"):
+        t["tasarimci"] = bilgi["tasarimci"]
+    if bilgi.get("ad"):
+        t["ad"] = bilgi["ad"]
+    return True, f"lisans sitenin verisinde doğrulandı ({bilgi['lisans_metni']})"
 
 
 def openai_get(yol, sure=60):
@@ -648,7 +731,7 @@ def calis(a):
         print(f"Bulunan {len(tasarimlar)}, uygun {len(uygunlar)} (modele göre CC0 / CC BY; bunlardan {sum(1 for t in uygunlar if t.get('_teyit'))} tanesinin sayfası aramada da göründü). Elenenler:")
         for ad, neden in elenen:
             print(f"  - {ad}: {neden}")
-        yaz(ADAYLAR, {"tarih": an.strftime("%Y-%m-%dT%H:%M:%S+00:00"), "tasarimlar": [{k: v for k, v in t.items() if k != "_referansli"} for t in uygunlar]})
+        yaz(ADAYLAR, {"tarih": an.strftime("%Y-%m-%dT%H:%M:%S+00:00"), "tasarimlar": [{k: v for k, v in t.items() if k not in ("_referansli", "_gorsel_adresi")} for t in uygunlar]})
     if not uygunlar:
         print("Uygun tasarım yok; hiçbir şey üretilmedi.")
         return 0
@@ -663,11 +746,23 @@ def calis(a):
             break
         if t.get("kategori") in kategoriler and len(uygunlar) - len(uretilen) > hedef - len(uretilen):
             continue   # çeşitlilik: aynı kategoriden art arda seçme (yeterince aday varken)
+        # Printables adayları: lisans ve fotoğraf sitenin kendi veri servisinden (kanıtlı)
+        if site_uygun(t["_adres"]) == "printables.com":
+            durum, neden = printables_dogrula(t)
+            print(f"  {t['ad']}: Printables servisi: {neden}")
+            if durum is False:
+                atlanan.append((t["ad"], neden))
+                kullanilan.append({"url": t["_adres"], "ad": t["ad"], "tarih": H.simdi().strftime("%Y-%m-%d"), "durum": "lisans_uygun_degil"})
+                yaz(KULLANILAN, kullanilan[-200:])
+                continue
+            if durum is None and not t.get("_lisans"):
+                atlanan.append((t["ad"], "lisans doğrulanamadı (modelin beyanı da belirsiz)"))
+                continue
         # referans fotoğraf (yalnızca bellekte)
         referans = None
         if ayar.get("referans", "zorunlu") != "yok":
             try:
-                referans = referans_fotografi(t["_adres"])
+                referans = referans_fotografi(t["_adres"], t.get("_gorsel_adresi"))
                 print(f"  {t['ad']}: referans fotoğraf alındı ({len(referans) // 1024} KB)")
             except ReferansYok as e:
                 print(f"  {t['ad']}: referans fotoğraf alınamadı ({e})")
