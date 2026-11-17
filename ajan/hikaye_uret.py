@@ -211,48 +211,12 @@ def tasarim_ara():
         hata(f"Arama yanıtı okunamadı: {e}")
 
 
-DOGRULA_ISTEMI = """Şu 3D baskı tasarım sayfasını internette ARA ve aç: {url}
-Sayfa gerçekten var mı ve sayfada yazan lisans nedir? Uydurma; sayfayı açamadıysan gecerli_sayfa false yaz.
-Yalnızca geçerli JSON döndür: {{"gecerli_sayfa": true/false, "ad": "sayfadaki tasarım adı", "lisans": "sayfada yazan lisansın tam adı (BY/NC/ND/SA ekleriyle, örn. CC BY 4.0); göremediysen belirsiz"}}"""
-
-
-def sayfa_dogrula(t):
-    """Aramada doğrulanamayan adayı, sayfaya özel ikinci bir aramayla sına. Aynı sayfa kaynak gösterilmeli ve lisans uygun olmalı."""
-    adres = t["_adres"]
-    v, _ = arama_istegi(DOGRULA_ISTEMI.format(url=adres), 240)
-    if v is None:
-        return False, "doğrulama araması yapılamadı"
-    metin, kaynaklar = "", set()
-    for oge in v.get("output", []):
-        if oge.get("type") != "message":
-            continue
-        for c in oge.get("content", []):
-            if c.get("type") == "output_text":
-                metin += c.get("text", "")
-                for a in c.get("annotations", []) or []:
-                    if a.get("type") == "url_citation" and a.get("url"):
-                        kaynaklar.add(adres_anahtari(a["url"]))
-    if adres_anahtari(adres) not in kaynaklar:
-        return False, "sayfa ikinci aramada da kaynak olarak görünmedi"
-    m = re.search(r"\{.*\}", metin, re.S)
-    try:
-        j = json.loads(m.group(0)) if m else {}
-    except json.JSONDecodeError:
-        return False, "doğrulama yanıtı okunamadı"
-    if j.get("gecerli_sayfa") is not True:
-        return False, "sayfa açılamadı"
-    lis = lisans_uygun(j.get("lisans"))
-    if not lis:
-        return False, f"sayfadaki lisans uygun değil ({j.get('lisans')})"
-    t["_lisans"] = lis
-    return True, f"sayfa doğrulandı, lisans {lis}"
-
-
 def uygun_tasarimlar(tasarimlar, dogrulanan, kullanilan_adresler):
-    """Lisans, site, bağlantı ve tekrar süzgeci. (uygunlar, elenenler_nedenleriyle)
+    """Lisans, site, bağlantı biçimi ve tekrar süzgeci. (uygunlar, elenenler_nedenleriyle)
 
-    Açıkça kısıtlayıcı lisanslar (NC/ND/SA, standart dijital dosya) hemen elenir. Bağlantısı aramada doğrulanamayan ya da lisansı
-    belirsiz/eksik yazılan adaylar, sayfaya özel ikinci bir aramayla sayfadan teyit edilmek üzere işaretlenir (sayfa_dogrula)."""
+    Modelin açıkça CC0 ya da CC BY dediği ve lisans alıntısı verdiği tasarımlar kabul edilir (NC/ND/SA, standart dijital dosya ve
+    belirsiz lisanslar elenir). Lisans sayfadan bağımsız teyit edilemiyorsa kayıtta lisans_teyit=False olarak işaretlenir;
+    panel bunu gösterir ve kullanıcı tasarım sayfasından kontrol edebilir."""
     dogrulanan = {adres_anahtari(a) for a in dogrulanan}
     kullanilan_anahtarlar = {adres_anahtari(k) for k in kullanilan_adresler}
     uygunlar, elenen = [], []
@@ -262,17 +226,17 @@ def uygun_tasarimlar(tasarimlar, dogrulanan, kullanilan_adresler):
         lis = lisans_uygun(t.get("lisans"))
         if not ad or not adres:
             elenen.append((ad or "?", "ad ya da bağlantı yok"))
-        elif not site_uygun(adres):
-            elenen.append((ad, "kaynak Printables ya da MakerWorld değil"))
+        elif not site_uygun(adres) or not re.search(r"/models?/\d+", adres):
+            elenen.append((ad, "bağlantı Printables/MakerWorld tasarım sayfası biçiminde değil"))
         elif adres_anahtari(adres) in kullanilan_anahtarlar:
             elenen.append((ad, "daha önce kullanıldı"))
-        elif not lis and lisans_acik_red(t.get("lisans")):
+        elif not lis:
             elenen.append((ad, f"lisans uygun değil ({t.get('lisans')})"))
+        elif not (t.get("lisans_kaniti") or "").strip():
+            elenen.append((ad, "lisans kanıtı yok"))
         else:
             t["_lisans"], t["_site"], t["_adres"] = lis, site_uygun(adres), adres
-            kanitli = bool(lis) and bool((t.get("lisans_kaniti") or "").strip()) and adres_anahtari(adres) in dogrulanan
-            if not kanitli:
-                t["_ikinci_dogrulama"] = True
+            t["_teyit"] = adres_anahtari(adres) in dogrulanan
             uygunlar.append(t)
     return uygunlar, elenen
 
@@ -428,24 +392,9 @@ def calis(a):
     for kaynak in sorted(dogrulanan)[:15]:
         print(f"  kaynak: {kaynak}")
     uygunlar, elenen = uygun_tasarimlar(tasarimlar, dogrulanan, {temiz_adres(k.get("url")) for k in kullanilan})
-    print(f"Bulunan {len(tasarimlar)}, uygun {len(uygunlar)} (CC0 / CC BY, doğrulanmış). Elenenler:")
+    print(f"Bulunan {len(tasarimlar)}, uygun {len(uygunlar)} (modele göre CC0 / CC BY; bunlardan {sum(1 for t in uygunlar if t.get("_teyit"))} tanesinin sayfası aramada da göründü). Elenenler:")
     for ad, neden in elenen:
         print(f"  - {ad}: {neden}")
-    kesin, denenen = [], 0
-    hedef_sayi = max(1, min(int(ayar["gunluk_uretim"]), 12))
-    for t in uygunlar:
-        if len(kesin) >= hedef_sayi:
-            break
-        if t.get("_ikinci_dogrulama"):
-            denenen += 1
-            if denenen > 8:
-                break
-            ok, neden = sayfa_dogrula(t)
-            print(f"  ikinci doğrulama: {t['ad']}: {neden}")
-            if not ok:
-                continue
-        kesin.append(t)
-    uygunlar = kesin
     if not uygunlar:
         print("Uygun tasarım yok; hiçbir şey üretilmedi.")
         return 0
@@ -501,7 +450,7 @@ def calis(a):
         kategoriler.add(t.get("kategori"))
         oge = {"id": kimlik, "kaynak": "uretim", "durum": "planli" if ayar["mod"] == "otomatik" else "onay_bekliyor",
                "olusturma": H.simdi().strftime("%Y-%m-%dT%H:%M:%S.000Z"), "gorsel": gorsel_yolu, "baslik": t["ad"][:80],
-               "atif": {"ad": t["ad"], "tasarimci": t.get("tasarimci"), "lisans": t["_lisans"], "url": t["_adres"], "site": t["_site"]},
+               "atif": {"ad": t["ad"], "tasarimci": t.get("tasarimci"), "lisans": t["_lisans"], "url": t["_adres"], "site": t["_site"], "lisans_teyit": bool(t.get("_teyit"))},
                "kontrol": {"puan": kabul[1]["puan"], "deneme": kabul[2], "sorunlar": kabul[1]["sorunlar"]},
                "yayin": None, "hata": "", "deneme": 0}
         yaz(H.KUYRUK / f"{kimlik}.json", oge)
