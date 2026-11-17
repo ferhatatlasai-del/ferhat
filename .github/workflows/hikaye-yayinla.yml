@@ -1,0 +1,34 @@
+name: Hikaye ajanı (yayınla)
+
+on:
+  schedule:
+    - cron: "5 7-19 * * *"   # Türkiye saatiyle 10:05-22:05, her saat başı (GitHub geciktirebilir)
+  workflow_dispatch:
+    inputs:
+      hemen:
+        description: "EVET yazarsan ajan duraklatılmış olsa bile kuyruktaki ilk hikayeyi şimdi yayınlar"
+        default: "HAYIR"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hikaye
+  cancel-in-progress: false
+
+jobs:
+  yayinla:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Zamanı geldiyse bir hikaye yayınla
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: "17841457188392262"
+          OFIS_ADRES: "https://gurtechs-ajan-ofisi.fly.dev"
+          BILDIRIM_SIRRI: ${{ secrets.BILDIRIM_SIRRI }}
+          HEMEN: ${{ inputs.hemen }}
+        run: |
+          EK=""
+          if [ "$HEMEN" = "EVET" ]; then EK="--hemen"; fi
+          python3 ajan/hikaye.py yayinla --git $EK

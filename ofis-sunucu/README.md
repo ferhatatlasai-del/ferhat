@@ -37,3 +37,17 @@ Panel, `/api/ajanlar` uç noktasından her ajanın iş akışının son GitHub �
 4. **Kaydet:** her içerik için `zincir/<kimlik>.json` kaydı (kimlik `c...`; panelden bağımsız yüklenen videolar `y...`).
 
 Panel, çalışma adımlarını `/api/durum` ile GitHub'dan okur ve animasyonu gerçek adımlara göre oynatır. Video yüklerken içerik seçilirse video o kayda bağlanır; yayınlar bağlantı ve medya kimliğiyle deftere (`yayinlar`) yazılır. Aşama sırası: fikir, senaryo, video, yayın, ölçüm, öğrenme (ölçüm ve öğrenme sonraki adım).
+
+## Hikaye ajanı ve bildirimler
+- `hikaye/ayar.json` (zamanlama, başlangıçta **duraklatılmış**), `hikaye/kuyruk/*.json`, `hikaye/gorseller/*.jpg`.
+- `hikaye-yayinla.yml` her saat başı çalışır (GitHub geciktirebilir); `ajan/hikaye.py` slot hesabını yapar. Çift yayını önlemek için önce "yayınlanıyor" işaretini depoya yazar, yazamazsa yayınlamaz. Ardışık 3 hatada kendini duraklatır.
+- Fotoğrafı panelde kuyruğa koymak yayın onayı sayılır. Panel fotoğrafı telefonda 1080x1920 JPEG'e küçültür.
+- `nobetci.yml` günlük Instagram, YouTube, OpenAI anahtarlarını ve ofis sunucusunu denetler, sonucu `hikaye/saglik.json`'a yazar, yeni sorunda bildirim gönderir.
+
+### Web push kurulumu (bir kez)
+1. VAPID anahtarı üret (kendi bilgisayarında, `C:\AjanOfisi` gibi ayrı bir klasörde): `npx web-push generate-vapid-keys`
+2. Bir de uzun rastgele bir `BILDIRIM_SIRRI` düşün (en az 24 karakter).
+3. `fly secrets set -a gurtechs-ajan-ofisi VAPID_PUBLIC_KEY=... VAPID_PRIVATE_KEY=... BILDIRIM_SIRRI=...`
+4. GitHub > Settings > Secrets > Actions: aynı `BILDIRIM_SIRRI` değerini ekle.
+5. Sunucuyu yeniden yükle (fly-yukle.yml). Panelde Hikaye ajanı > Bildirimler > "Bildirimleri aç" (Android Chrome).
+Abonelikler `bildirim/abonelikler.enc` dosyasında, `BILDIRIM_SIRRI`'ndan türetilen anahtarla şifrelenmiş saklanır.

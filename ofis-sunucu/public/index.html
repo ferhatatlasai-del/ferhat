@@ -60,6 +60,20 @@ textarea{resize:vertical;min-height:72px}
 .mini{background:var(--panel)!important;color:var(--ink)!important;border:1px solid var(--line)!important;padding:4px 10px!important;font-size:12.5px!important;font-weight:500!important}
 .uyari{color:var(--err);font-size:13px}
 #zKart select,.pub select{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.hgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:10px}
+.hoge{border:1px solid var(--line);border-radius:12px;padding:6px;background:var(--bg);font-size:12.5px;display:grid;gap:4px;align-content:start}
+.hoge img{width:100%;aspect-ratio:9/16;object-fit:cover;border-radius:8px;background:#0003}
+.hoge .rozet{justify-self:start}
+.hoge button{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:3px 8px;font-size:12px}
+.hoge .hata{font-size:11.5px}
+.gunler{display:flex;flex-wrap:wrap;gap:8px}
+.gunler label{display:inline-flex;gap:4px;align-items:center;font-size:13px}
+.ayarsat{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0}
+.ayarsat input[type=number]{width:70px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:5px 8px}
+.saglik{display:grid;gap:4px;margin-top:8px;font-size:13px}
+.saglik div{display:flex;gap:8px;align-items:center}
+.saglik i{width:9px;height:9px;border-radius:50%;background:var(--plan);flex:none}
+.saglik .iyi i{background:var(--ok)}.saglik .sorun i{background:var(--err)}
 .bub{position:absolute;left:0;top:0;transform:translate(-50%,-100%);max-width:230px;background:var(--panel);color:var(--ink);border:2px solid var(--accent);border-radius:12px;padding:6px 10px;font-size:12.5px;line-height:1.35;box-shadow:0 2px 8px rgba(10,20,40,.2);pointer-events:none;z-index:3}
 .bub[hidden]{display:none}
 #run{margin-bottom:12px}
@@ -166,6 +180,33 @@ dd{margin:1px 0 0}
         <p class="not" id="zDurum">Zincir kayıtları yükleniyor…</p>
         <div id="zListe"></div>
       </div>
+      <div class="card pub" id="hKart">
+        <h2>Hikaye ajanı</h2>
+        <p class="alt">Kuyruktaki fotoğrafları senin ayarladığın aralıkta Instagram hikayesi olarak yayınlar. <b>Fotoğrafı kuyruğa koymak, yayın onayı sayılır.</b> Hikaye API’si yazı eklemez, yalnızca görsel gider. Yayınlanan hikaye API ile silinemez, Instagram uygulamasından silersin.</p>
+        <p class="not" id="hDurum">Yükleniyor…</p>
+        <input type="password" id="hSifre" autocomplete="current-password" placeholder="Ofis şifresi" hidden style="margin-top:8px;width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px">
+        <div class="satir"><button type="button" class="ana" id="hAktif">Etkinleştir</button><button type="button" id="hHemen">Şimdi bir hikaye yayınla</button></div>
+        <details class="tr"><summary>Zamanlama ayarı</summary>
+          <div class="gov">
+            <div class="ayarsat"><label>Günde <input type="number" id="hSayi" min="1" max="12"> hikaye</label><label>Saat <input type="number" id="hBas" min="0" max="23">:00 ile <input type="number" id="hBit" min="1" max="24">:00 arası (Türkiye saati)</label></div>
+            <div class="gunler" id="hGunler"></div>
+            <div class="satir"><button type="button" id="hKaydet">Ayarı kaydet</button></div>
+            <p class="not">GitHub’ın saatlik kontrolü bazen saatlerce gecikebilir; hikayeler belirlediğin aralığa yayılır ama tam saatinde çıkmayabilir.</p>
+          </div>
+        </details>
+        <label class="k" for="hDosya">Fotoğraf ekle (birden fazla seçebilirsin)</label>
+        <div class="satir"><input type="file" id="hDosya" accept="image/*" multiple><button type="button" id="hYukle" disabled>Kuyruğa ekle</button></div>
+        <input type="text" id="hBaslik" maxlength="80" placeholder="İsteğe bağlı not (yalnızca senin için, hikayede görünmez)" style="width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px">
+        <p class="not" id="hYukleDurum">Fotoğraflar telefonunda otomatik dikey (9:16) hikaye boyutuna getirilir.</p>
+        <div class="hgrid" id="hListe"></div>
+        <details class="tr"><summary>Bildirimler (Android web push)</summary>
+          <div class="gov">
+            <p class="not" id="bDurum">Bildirim durumu kontrol ediliyor…</p>
+            <div class="satir"><button type="button" class="ana" id="bAc">Bildirimleri aç</button><button type="button" id="bDene">Deneme bildirimi gönder</button></div>
+          </div>
+        </details>
+        <details class="tr"><summary>Nöbetçi (anahtar ve servis sağlığı)</summary><div class="saglik" id="hSaglik">Henüz denetim yok.</div></details>
+      </div>
       <div class="card pub" id="trKart">
         <h2>Trend fikirleri</h2>
         <p class="alt" id="trAlt">Yükleniyor…</p>
@@ -244,6 +285,9 @@ var AJ=[
  {id:'doktor',ad:'Doktor Filament',kisa:'Dr. Filament',durum:'karakter',x:-1.6,z:0.4,yaw:0,tip:'doktor',
   gorev:'Kanalın yapay zekâ karakteri. Videolarda ve görsellerde yüz olur, 3D baskıyı katman katman anlatır.',
   son:'2026-11-16T07:00:05Z',sonuc:'Tanıtım videosu Instagram ve YouTube’da yayında.',zaman:'Her içerikte sahnede.',not:'Kurgusal, yapay zekâ ile üretilmiş bir karakterdir. Açıklamalarda bu açıkça yazılır.'},
+ {id:'hikaye',ad:'Hikaye ajanı',kisa:'Hikaye',durum:'hazir',x:6.2,z:3.6,yaw:0,tip:'hikaye',
+  gorev:'Kuyruktaki fotoğrafları senin ayarladığın aralıkta Instagram hikayesi olarak yayınlar. Yayınlanınca telefonuna bildirim gönderir.',
+  son:null,sonuc:'Henüz yayınlamadı.',zaman:'Her saat başı kontrol eder; senin ayarladığın aralıkta ve günlük sayıda yayınlar. GitHub saatlerce geciktirebilir.',not:'Başlangıçta duraklatılmış. Fotoğrafı kuyruğa koymak yayın onayıdır. Hikaye API’si yazı eklemez, yalnızca görsel gider.'},
  {id:'sen',ad:'Sen (patron)',kisa:'Sen',durum:'patron',x:3.4,z:3.2,yaw:0,tip:'sen',
   gorev:'Birleştir, yayınla ve yükle kararlarını sen verirsin.',
   son:'2026-11-16T07:00:00Z',sonuc:'Videoyu YouTube’a yüklemeye onay verdin.',zaman:'İstediğin zaman.',not:'Sen onaylamadan hiçbir şey yayınlanmaz.'}
@@ -425,6 +469,8 @@ var DRAW={
  trend:function(x,w,h,t){x.fillStyle='#15202c';x.fillRect(0,0,w,h);x.fillStyle='#f0b429';x.fillRect(12,12,70,8);
    x.strokeStyle='#3cc47a';x.lineWidth=4;x.beginPath();for(var k=0;k<9;k++){var yy=130-k*9-Math.sin(k*1.2+t)*10;if(k===0)x.moveTo(16,yy);else x.lineTo(16+k*28,yy);}x.stroke();
    x.fillStyle='#cfd9e6';for(var q=0;q<4;q++){x.fillRect(12,34+q*0,0,0);} x.beginPath();x.arc(16+((Math.floor(t*2)%9)*28),130-(Math.floor(t*2)%9)*9,6,0,6.3);x.fill();},
+ hikaye:function(x,w,h,t){x.fillStyle='#1d1d2b';x.fillRect(0,0,w,h);var g=x.createLinearGradient(0,0,w,0);g.addColorStop(0,'#f9a03f');g.addColorStop(1,'#c13584');for(var i=0;i<3;i++){x.fillStyle=i<(Math.floor(t)%4)?g:'#3a3a52';rr(x,14+i*76,12,66,6,3);x.fill();}
+   x.fillStyle='#2b3550';rr(x,70,32,116,118,10);x.fill();x.fillStyle=g;x.beginPath();x.arc(128,78,26,0,6.3);x.fill();x.fillStyle='#cfd9e6';x.fillRect(96,122,64,6);x.fillRect(108,134,40,5);},
  planli:function(x,w,h){x.fillStyle='#e9edf3';x.fillRect(0,0,w,h);x.fillStyle='#8a94a3';x.font='700 70px sans-serif';x.textAlign='center';x.fillText('?',w/2,110);}
 };
 
@@ -492,7 +538,7 @@ function station(a){
   var ghost=a.durum==='planli';
   var M=function(c){return mk(c,ghost);};
   var g=new THREE.Group(); g.position.set(a.x,0,a.z); g.rotation.y=a.yaw; g.userData.id=a.id; scene.add(g);
-  var st={a:a,g:g,screens:[],ticks:[]}; var ch, accent=({trend:0xf0b429,icerik:0x2b7de9,istatistik:0x3cc47a,instagram:0xe1306c,youtube:0xe62117,gorsel:0xf0b429,planli:0x8a94a3,sen:0x7c5cff})[a.tip]||0x8a94a3;
+  var st={a:a,g:g,screens:[],ticks:[]}; var ch, accent=({hikaye:0xc13584,trend:0xf0b429,icerik:0x2b7de9,istatistik:0x3cc47a,instagram:0xe1306c,youtube:0xe62117,gorsel:0xf0b429,planli:0x8a94a3,sen:0x7c5cff})[a.tip]||0x8a94a3;
   var ph=a.x*0.7+a.z;
   if(a.tip==='doktor'){
     var c=makeChar(M,{pose:'stand',shirt:0x9aa4b2,pants:0x2f3e55,extra:'doktor',skin:0xf1c9a5});
@@ -538,7 +584,7 @@ function station(a){
     c3.g.rotation.y=0.35; st.char=c3;
   } else {
     var scr=screen(DRAW[a.tip]||DRAW.planli); st.screens.push(scr);
-    var look=({icerik:{shirt:0x2b7de9,hair:0x2b2a33,extra:'gozluk'},trend:{shirt:0xf0b429,hair:0x3a2a20,extra:'kulaklik'},instagram:{shirt:0xe1306c,hair:0x5a3825,extra:'kep',cap:0xe1306c},youtube:{shirt:0xe62117,hair:0x1f1f26,extra:'kulaklik'},planli:{shirt:0x8a94a3,hair:0x4a4f58,extra:''},sen:{shirt:0x7c5cff,hair:0x2a2018,extra:''}})[a.tip];
+    var look=({icerik:{shirt:0x2b7de9,hair:0x2b2a33,extra:'gozluk'},trend:{shirt:0xf0b429,hair:0x3a2a20,extra:'kulaklik'},hikaye:{shirt:0xc13584,hair:0x2a2018,extra:'gozluk'},instagram:{shirt:0xe1306c,hair:0x5a3825,extra:'kep',cap:0xe1306c},youtube:{shirt:0xe62117,hair:0x1f1f26,extra:'kulaklik'},planli:{shirt:0x8a94a3,hair:0x4a4f58,extra:''},sen:{shirt:0x7c5cff,hair:0x2a2018,extra:''}})[a.tip];
     var skinC=a.tip==='instagram'?0xf1c9a5:(a.tip==='youtube'?0xc98f66:0xe8b995); st.look={shirt:look.shirt,hair:look.hair,extra:look.extra,cap:look.cap,skin:skinC};
     var c4=makeChar(M,{pose:'sit',shirt:look.shirt,hair:look.hair,extra:look.extra,cap:look.cap,skin:skinC});
     chair(M,g,accent); c4.g.position.y=0.0; g.add(c4.g);
@@ -777,8 +823,8 @@ async function senaryo(metin){
 /* ---------- Video yayınla ---------- */
 var pDosya=null, pYol=null, pBaslangic=null, pBekle=false;
 function pHata(t){var e=$('#pHata'); e.textContent=t||''; e.hidden=!t;}
-function pSifreHazirla(){var h=!(MOD==='sunucu'&&!SIF); $('#pSifre').hidden=h; $('#zSifre').hidden=h;}
-function pSifreOku(){var v=($('#pSifre').value||$('#zSifre').value||''); if(v){SIF=v; try{localStorage.setItem('ofisSifre',SIF);}catch(x){}}}
+function pSifreHazirla(){var h=!(MOD==='sunucu'&&!SIF); $('#pSifre').hidden=h; $('#zSifre').hidden=h; var hs=$('#hSifre'); if(hs) hs.hidden=h;}
+function pSifreOku(){var hs=$('#hSifre'); var v=($('#pSifre').value||$('#zSifre').value||(hs&&hs.value)||''); if(v){SIF=v; try{localStorage.setItem('ofisSifre',SIF);}catch(x){}}}
 $('#pDosya').addEventListener('change',function(){
   pHata(''); pYol=null; $('#pForm').hidden=true; $('#pSonuc').innerHTML='';
   var f=this.files&&this.files[0]; pDosya=null; $('#pYukle').disabled=true;
@@ -868,10 +914,16 @@ pSifreHazirla();
 
 /* ---------- Canlı durum (GitHub'daki gerçek çalışmalar) ---------- */
 var ZAMANLI={icerik:36,istatistik:36,trend:96};
+function durumGorselYenile(){
+  stations.forEach(function(st){ var d=DURUM[st.a.durum]; st.pb.material.color.set(d.c); var i=st.lb.querySelector('i'); if(i) i.style.background='var('+d.v+')'; });
+  renderChips();
+  var ta=$('#dMetin'); if(!(ta&&(ta.value||document.activeElement===ta))) renderInfo();
+}
 function canliUygula(v){
   var ajan=v.ajanlar||{};
   AJ.forEach(function(a){
     var w=ajan[a.id]; if(!w||w.yok) return;
+    if(a.id==='hikaye'){ a.sonSonuc=w.sonuc; return; }   // hikaye ajanının durumunu hikayeCiz belirler (ayar + kuyruk)
     var yas=(Date.now()-Date.parse(w.son))/36e5, olay=w.olay==='schedule'?'otomatik':'elle';
     a.son=w.son; a.adres=w.adres;
     if(w.durum!=='completed'){ a.durum='calisiyor'; a.sonuc='Şu an çalışıyor…'; return; }
@@ -882,9 +934,7 @@ function canliUygula(v){
     } else if(w.sonuc==='failure'||w.sonuc==='timed_out'){ a.durum='hata'; a.sonuc='Son çalışma başarısız oldu. GitHub kaydına bak.'; }
     else { a.sonuc='Son çalışma: '+(w.sonuc||'bilinmiyor')+'.'; }
   });
-  stations.forEach(function(st){ var d=DURUM[st.a.durum]; st.pb.material.color.set(d.c); var i=st.lb.querySelector('i'); if(i) i.style.background='var('+d.v+')'; });
-  renderChips();
-  var ta=$('#dMetin'); if(!(ta&&(ta.value||document.activeElement===ta))) renderInfo();
+  durumGorselYenile();
   $('#snap').textContent='Ajan durumları GitHub’dan canlı okundu ('+fmt(v.zaman)+'). Hareketler ajanın durumunu gösterir.';
 }
 function canliCek(){ fetch('/api/ajanlar').then(function(r){return r.ok?r.json():null;}).then(function(v){ if(v&&v.ajanlar) canliUygula(v); }).catch(function(){}); }
@@ -981,6 +1031,141 @@ $('#zUret').addEventListener('click',function(){
   this.disabled=true; senaryo(($('#zDirektif').value||'').trim());
 });
 zincirCek(); setInterval(zincirCek,300000);
+
+/* ---------- Hikaye ajanı ---------- */
+var HK=null, hGorulen=null, hOnay=false;
+function trGun(iso){ try{return new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Istanbul'}).format(new Date(iso));}catch(e){return '';} }
+var GUN_AD=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
+function hSifreKontrol(){ pSifreOku(); if(MOD==='sunucu'&&!SIF){ pSifreHazirla(); $('#hDurum').textContent='Önce ofis şifresini yaz.'; return false; } if(MOD!=='sunucu'){ $('#hDurum').textContent='Sunucu bağlı değil.'; return false; } return true; }
+function hPost(yol,govde){ return fetch(yol,{method:'POST',headers:{'X-Sifre':SIF,'Content-Type':'application/json'},body:JSON.stringify(govde||{})}).then(chk); }
+function hikayeCiz(v){
+  HK=v; var a=v.ayar||{}, k=v.kuyruk||[];
+  var bugun=trGun(new Date().toISOString());
+  var bugunSay=k.filter(function(o){return (o.durum==='yayinda'||o.durum==='yayinlaniyor')&&o.yayin&&o.yayin.tarih&&trGun(o.yayin.tarih)===bugun;}).length;
+  var planli=k.filter(function(o){return o.durum==='planli';}).length, onayda=k.filter(function(o){return o.durum==='onay_bekliyor';}).length;
+  $('#hDurum').textContent=(a.aktif?'Çalışıyor':'Duraklatılmış')+'. Bugün '+bugunSay+' hikaye yayınlandı (hedef '+(a.gunluk_sayi||'?')+'), kuyrukta '+planli+' planlı'+(onayda?', '+onayda+' onay bekliyor':'')+'.'+(a.son_not?' '+a.son_not:'');
+  $('#hAktif').textContent=a.aktif?'Duraklat':'Etkinleştir';
+  if(document.activeElement!==$('#hSayi')) $('#hSayi').value=a.gunluk_sayi||4;
+  $('#hBas').value=a.baslangic_saat!=null?a.baslangic_saat:10; $('#hBit').value=a.bitis_saat!=null?a.bitis_saat:22;
+  var g=$('#hGunler'); if(!g.children.length){ GUN_AD.forEach(function(ad,i){ var l=dom('label'); var c=document.createElement('input'); c.type='checkbox'; c.value=i+1; l.appendChild(c); l.appendChild(document.createTextNode(ad)); g.appendChild(l); }); }
+  Array.prototype.forEach.call(g.querySelectorAll('input'),function(c){ c.checked=(a.gunler||[1,2,3,4,5,6,7]).indexOf(+c.value)>=0; });
+  // kuyruk
+  var kap=$('#hListe'); kap.textContent='';
+  k.forEach(function(o){
+    var b=dom('div','hoge');
+    if(o.gorsel){ var im=document.createElement('img'); im.loading='lazy'; im.alt='Hikaye önizleme'; im.src='https://raw.githubusercontent.com/'+v.depo+'/'+v.dal+'/'+o.gorsel; b.appendChild(im); }
+    var ad={planli:['Sırada','orta'],onay_bekliyor:['Onay bekliyor','orta'],yayinlaniyor:['Yayınlanıyor','orta'],yayinda:['Yayında','iyi'],hata:['Hata','kt'],reddedildi:['Reddedildi','zayif']}[o.durum]||[o.durum,'zayif'];
+    b.appendChild(dom('span','rozet '+ad[1],ad[0]));
+    if(o.baslik) b.appendChild(dom('div',null,o.baslik));
+    if(o.atif&&o.atif.ad) b.appendChild(dom('div','not','Tasarım: '+o.atif.ad));
+    if(o.yayin&&o.yayin.tarih) b.appendChild(dom('div','not',fmt(o.yayin.tarih)));
+    if(o.hata) b.appendChild(dom('div','hata',o.hata.slice(0,120)));
+    if(o.yayin&&o.yayin.link&&/^https:\/\//.test(o.yayin.link)){ var l=dom('a',null,'Instagram’da aç'); l.href=o.yayin.link; l.target='_blank'; l.rel='noopener noreferrer'; b.appendChild(l); }
+    function dugme(ad2,karar){ var d=dom('button',null,ad2); d.type='button'; d.addEventListener('click',function(){ if(!hSifreKontrol()) return; d.disabled=true; hPost('/api/hikaye-karar',{id:o.id,karar:karar}).then(function(){ hikayeCek(true); }).catch(function(e){ $('#hDurum').textContent=String(e.message||e); d.disabled=false; }); }); b.appendChild(d); }
+    if(o.durum==='onay_bekliyor'){ dugme('Onayla','onayla'); dugme('Reddet','reddet'); }
+    if(['planli','onay_bekliyor','reddedildi','hata'].indexOf(o.durum)>=0) dugme('Sil','sil');
+    kap.appendChild(b);
+  });
+  if(!k.length) kap.appendChild(dom('p','not','Kuyruk boş. Yukarıdan fotoğraf ekle.'));
+  // sağlık
+  var s=$('#hSaglik'); s.textContent='';
+  if(v.saglik&&v.saglik.kontroller){ s.appendChild(dom('div','not','Son denetim: '+fmt(v.saglik.tarih))); v.saglik.kontroller.forEach(function(c){ var d=dom('div',c.durum); d.appendChild(document.createElement('i')); d.appendChild(document.createTextNode(c.ad+': '+c.not)); s.appendChild(d); }); }
+  // ofisteki Hikaye ajanı masası
+  var aj=BY.hikaye; if(aj){
+    aj.durum=a.aktif?(aj.sonSonuc==='failure'?'hata':'calisiyor'):'hazir';
+    var son=k.filter(function(o){return o.yayin&&o.yayin.tarih;}).sort(function(x,y){return Date.parse(y.yayin.tarih)-Date.parse(x.yayin.tarih);})[0];
+    if(son){ aj.son=son.yayin.tarih; aj.sonuc=son.durum==='yayinda'?'Son hikaye yayınlandı.':(son.durum==='hata'?'Son hikaye hata verdi.':'Son hikaye: '+son.durum); }
+    aj.sonuc=(a.aktif?'':'Duraklatılmış. ')+(aj.sonuc||'Henüz yayınlamadı.')+(a.son_not?' '+a.son_not:'');
+    durumGorselYenile();
+    // yeni yayınlanan hikaye: ajan canlansın
+    var enSon=son&&son.yayin?Date.parse(son.yayin.tarih):0;
+    if(hGorulen===null) hGorulen=enSon; else if(enSon>hGorulen){ hGorulen=enSon; hikayeBalon(); }
+  }
+}
+function hikayeBalon(){
+  var st=ST.hikaye; if(!st) return; st.busy=st.busyRing.visible=true; need=true;
+  konus('hk','Hikaye yayında!',function(){return [st.a.x,st.a.z];});
+  setTimeout(function(){ st.busy=st.busyRing.visible=false; konus('hk',''); },6000);
+}
+function hikayeCek(taze){ fetch('/api/hikaye'+(taze?'?taze=1':'')).then(function(r){return r.ok?r.json():null;}).then(function(v){ if(v) hikayeCiz(v); else $('#hDurum').textContent='Hikaye verisi okunamadı.'; }).catch(function(){ $('#hDurum').textContent='Hikaye verisi okunamadı.'; }); }
+$('#hAktif').addEventListener('click',function(){
+  if(!hSifreKontrol()||!HK) return; var yeni=!(HK.ayar&&HK.ayar.aktif), btn=this; btn.disabled=true;
+  hPost('/api/hikaye-ayar',{aktif:yeni}).then(function(){ btn.disabled=false; hikayeCek(true); }).catch(function(e){ $('#hDurum').textContent=String(e.message||e); btn.disabled=false; });
+});
+$('#hKaydet').addEventListener('click',function(){
+  if(!hSifreKontrol()) return;
+  var gunler=Array.prototype.filter.call($('#hGunler').querySelectorAll('input'),function(c){return c.checked;}).map(function(c){return +c.value;});
+  var btn=this; btn.disabled=true;
+  hPost('/api/hikaye-ayar',{gunluk_sayi:+$('#hSayi').value,baslangic_saat:+$('#hBas').value,bitis_saat:+$('#hBit').value,gunler:gunler}).then(function(){ btn.disabled=false; $('#hDurum').textContent='Ayar kaydedildi.'; hikayeCek(true); }).catch(function(e){ $('#hDurum').textContent=String(e.message||e); btn.disabled=false; });
+});
+$('#hHemen').addEventListener('click',function(){
+  if(!hSifreKontrol()) return; var btn=this;
+  if(!hOnay){ hOnay=true; btn.textContent='Emin misin? Evet, şimdi yayınla'; setTimeout(function(){ hOnay=false; btn.textContent='Şimdi bir hikaye yayınla'; },6000); return; }
+  hOnay=false; btn.textContent='Şimdi bir hikaye yayınla'; btn.disabled=true;
+  hPost('/api/hikaye-yayinla',{}).then(function(){ $('#hDurum').textContent='Yayın başlatıldı. Bir iki dakika içinde hikaye çıkar ve burada görünür.'; btn.disabled=false; var n=0; var t=setInterval(function(){ hikayeCek(true); if(++n>18) clearInterval(t); },10000); }).catch(function(e){ $('#hDurum').textContent=String(e.message||e); btn.disabled=false; });
+});
+// fotoğraf seçme, küçültme, yükleme
+$('#hDosya').addEventListener('change',function(){ $('#hYukle').disabled=!(this.files&&this.files.length); $('#hYukleDurum').textContent=this.files&&this.files.length?(this.files.length+' fotoğraf seçildi.'):''; });
+async function hikayeGorseli(dosya){
+  var bmp=await createImageBitmap(dosya,{imageOrientation:'from-image'}).catch(function(){return createImageBitmap(dosya);});
+  var W=1080,H=1920, c=document.createElement('canvas'); c.width=W; c.height=H; var x=c.getContext('2d');
+  x.fillStyle='#111'; x.fillRect(0,0,W,H);
+  var kapla=Math.max(W/bmp.width,H/bmp.height);
+  try{ x.filter='blur(40px) brightness(0.7)'; }catch(e){}
+  x.drawImage(bmp,(W-bmp.width*kapla)/2,(H-bmp.height*kapla)/2,bmp.width*kapla,bmp.height*kapla);
+  try{ x.filter='none'; }catch(e){}
+  var sig=Math.min(W/bmp.width,H/bmp.height), w=bmp.width*sig, h=bmp.height*sig;
+  x.drawImage(bmp,(W-w)/2,(H-h)/2,w,h);
+  return await new Promise(function(r){ c.toBlob(r,'image/jpeg',0.86); });
+}
+$('#hYukle').addEventListener('click',async function(){
+  if(!hSifreKontrol()) return; var dosyalar=Array.prototype.slice.call($('#hDosya').files||[]); if(!dosyalar.length) return;
+  var btn=this; btn.disabled=true; var ok=0, durum=$('#hYukleDurum');
+  for(var i=0;i<dosyalar.length;i++){
+    durum.textContent='Yükleniyor: '+(i+1)+' / '+dosyalar.length+'…';
+    try{
+      var blob=await hikayeGorseli(dosyalar[i]);
+      var r=await fetch('/api/hikaye-foto?baslik='+encodeURIComponent($('#hBaslik').value||''),{method:'POST',headers:{'X-Sifre':SIF,'Content-Type':'image/jpeg'},body:blob});
+      var j=await r.json().catch(function(){return {};});
+      if(!r.ok) throw new Error(j.hata||('Hata '+r.status));
+      ok++;
+    }catch(e){ durum.textContent='Fotoğraf '+(i+1)+' yüklenemedi: '+String(e.message||e); if(String(e.message||'').indexOf('Şifre')>=0){SIF=''; try{localStorage.removeItem('ofisSifre');}catch(x){} pSifreHazirla();} break; }
+  }
+  if(ok===dosyalar.length) durum.textContent=ok+' fotoğraf kuyruğa eklendi.';
+  $('#hDosya').value=''; btn.disabled=true; hikayeCek(true);
+});
+// bildirimler (web push)
+function b64U8(b){ var p='='.repeat((4-b.length%4)%4), s=(b+p).replace(/-/g,'+').replace(/_/g,'/'), r=atob(s), a=new Uint8Array(r.length); for(var i=0;i<r.length;i++) a[i]=r.charCodeAt(i); return a; }
+async function bildirimDurumu(){
+  var e=$('#bDurum');
+  if(!('serviceWorker' in navigator)||!('PushManager' in window)||!('Notification' in window)){ e.textContent='Bu tarayıcı web push desteklemiyor.'; return; }
+  var v=await fetch('/api/vapid').then(function(r){return r.json();}).catch(function(){return {};});
+  if(!v.acik){ e.textContent='Sunucuda bildirim anahtarları henüz tanımlı değil.'; return; }
+  if(Notification.permission==='denied'){ e.textContent='Bildirim izni engellenmiş. Tarayıcı ayarlarından (site ayarları) izin ver.'; return; }
+  var reg=await navigator.serviceWorker.getRegistration('/'); var sub=reg?await reg.pushManager.getSubscription():null;
+  e.textContent=(Notification.permission==='granted'&&sub)?'Bildirimler bu cihazda açık.':'Bildirimler bu cihazda kapalı. “Bildirimleri aç”a bas.';
+}
+$('#bAc').addEventListener('click',async function(){
+  var e=$('#bDurum');
+  try{
+    if(!('serviceWorker' in navigator)||!('PushManager' in window)){ e.textContent='Bu tarayıcı web push desteklemiyor.'; return; }
+    if(!hSifreKontrol()) return;
+    var v=await fetch('/api/vapid').then(function(r){return r.json();});
+    if(!v.acik){ e.textContent='Sunucuda bildirim anahtarları henüz tanımlı değil.'; return; }
+    var izin=await Notification.requestPermission(); if(izin!=='granted'){ e.textContent='Bildirim izni verilmedi.'; return; }
+    var reg=await navigator.serviceWorker.register('/sw.js'); await navigator.serviceWorker.ready;
+    var sub=await reg.pushManager.getSubscription()||await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64U8(v.anahtar)});
+    await hPost('/api/abone',{abonelik:sub.toJSON()});
+    e.textContent='Bildirimler açıldı. “Deneme bildirimi gönder” ile dene.';
+  }catch(x){ e.textContent='Bildirim açılamadı: '+String(x.message||x); }
+});
+$('#bDene').addEventListener('click',function(){
+  if(!hSifreKontrol()) return; var e=$('#bDurum');
+  hPost('/api/bildirim-dene',{}).then(function(j){ e.textContent=j.abone?('Deneme bildirimi gönderildi ('+j.abone+' cihaz).'):'Henüz bu cihaz abone değil. Önce “Bildirimleri aç”a bas.'; }).catch(function(x){ e.textContent=String(x.message||x); });
+});
+if('serviceWorker' in navigator&&window.Notification&&Notification.permission==='granted'){ navigator.serviceWorker.register('/sw.js').catch(function(){}); }
+bildirimDurumu();
+hikayeCek(); setInterval(hikayeCek,120000);
 
 /* ---------- Trend fikirleri kartı ---------- */
 function dom(tag,cls,txt){var e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e;}

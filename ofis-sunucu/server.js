@@ -5,6 +5,16 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
+let webpush = null;
+try { webpush = require('web-push'); } catch (e) { console.error('web-push yüklü değil, bildirim kapalı'); }
+const VAPID_PUB = (process.env.VAPID_PUBLIC_KEY || '').trim();
+const VAPID_PRIV = (process.env.VAPID_PRIVATE_KEY || '').trim();
+const BILDIRIM_SIRRI = (process.env.BILDIRIM_SIRRI || '').trim();
+const VAPID_KONU = process.env.VAPID_KONU || 'https://gurtechs-ajan-ofisi.fly.dev';
+const BILDIRIM_ACIK = !!(webpush && VAPID_PUB && VAPID_PRIV && BILDIRIM_SIRRI);
+if (BILDIRIM_ACIK) webpush.setVapidDetails(VAPID_KONU, VAPID_PUB, VAPID_PRIV);
+const BILDIRIM_KURU = !!process.env.BILDIRIM_KURU;   // yalnızca test: gerçek gönderim yerine kaydeder
+const kuruKayit = [];
 const PORT = +process.env.PORT || 3000;
 const REPO = process.env.GH_REPO || 'ferhatatlasai-del/ferhat';
 // Anahtarın başındaki/sonundaki boşluk, satır sonu ve tırnakları temizle (komut satırından gelebiliyor)
@@ -16,10 +26,14 @@ const KAYIT_RE = /^[cy]\d{8}-\d{6}$/;
 const AKIS_IG = 'yayinla.yml';
 const AKIS_YT = 'youtube-yukle.yml';
 // Ajan kimliği -> iş akışı dosyası (panel durumu buradan okunur)
-const AJAN_AKISLARI = { icerik: ['gunluk-taslak.yml', 'zincir.yml'], istatistik: 'gunluk-taslak.yml', instagram: 'yayinla.yml', youtube: 'youtube-yukle.yml', gorsel: 'zincir.yml', trend: 'trend.yml' };
+const AKIS_HIKAYE = 'hikaye-yayinla.yml';
+const HIKAYE_RE = /^h\d{8}-\d{6}-[a-z0-9]{3}$/;
+const AJAN_AKISLARI = { hikaye: 'hikaye-yayinla.yml', icerik: ['gunluk-taslak.yml', 'zincir.yml'], istatistik: 'gunluk-taslak.yml', instagram: 'yayinla.yml', youtube: 'youtube-yukle.yml', gorsel: 'zincir.yml', trend: 'trend.yml' };
 let ajanOnbellek = { t: 0, veri: null };
 let trendOnbellek = { t: 0, veri: null };
 let zincirOnbellek = { t: 0, veri: null };
+let hikayeOnbellek = { t: 0, veri: null };
+const hikayeTetikler = [], bildirimler = [];
 const guncellenenler = new Set();
 const GH_API = process.env.GH_API || 'https://api.github.com';
 const MAX_VIDEO = 30 * 1024 * 1024;
@@ -96,6 +110,110 @@ async function calismaLinki(run) {
 
 function bekle(ms) { return new Promise(r => setTimeout(r, ms)); }
 
+// ---- Genel depo okuma/yazma/silme (contents API) ----
+async function depoOku(yol) {
+  const dal = await varsayilanDal();
+  const r = await gh(`/repos/${REPO}/contents/${yol}?ref=${encodeURIComponent(dal)}`);
+  if (r.status === 404) return null;
+  if (!r.ok) throw new Error('okunamadı: ' + yol);
+  const d = await r.json();
+  return { sha: d.sha, metin: Buffer.from(d.content || '', 'base64').toString('utf8') };
+}
+async function depoYaz(yol, icerik, sha, mesaj) {
+  const dal = await varsayilanDal();
+  const govde = { message: mesaj, content: Buffer.from(icerik).toString('base64'), branch: dal };
+  if (sha) govde.sha = sha;
+  return gh(`/repos/${REPO}/contents/${yol}`, { method: 'PUT', body: JSON.stringify(govde) });
+}
+async function depoSil(yol, sha, mesaj) {
+  const dal = await varsayilanDal();
+  return gh(`/repos/${REPO}/contents/${yol}`, { method: 'DELETE', body: JSON.stringify({ message: mesaj, sha, branch: dal }) });
+}
+// Çakışmada (409/422) yeniden dene; degistir(veri) false dönerse vazgeç
+async function jsonGuncelle(yol, degistir, mesaj, varsayilan) {
+  for (let i = 0; i < 3; i++) {
+    const k = await depoOku(yol);
+    const veri = k ? JSON.parse(k.metin) : JSON.parse(JSON.stringify(varsayilan || {}));
+    if (degistir(veri) === false) return false;
+    const r = await depoYaz(yol, JSON.stringify(veri, null, 2), k && k.sha, mesaj);
+    if (r.ok) return true;
+    if (r.status !== 409 && r.status !== 422) return false;
+    await bekle(700);
+  }
+  return false;
+}
+
+// ---- Web push: abonelikler şifrelenerek depoda saklanır (makine kapanınca kaybolmasın) ----
+function aboneAnahtari() { return Buffer.from(crypto.hkdfSync('sha256', Buffer.from(BILDIRIM_SIRRI), Buffer.from('ofis-bildirim-tuz'), Buffer.from('abonelikler'), 32)); }
+function sifrele(nesne) {
+  const iv = crypto.randomBytes(12), c = crypto.createCipheriv('aes-256-gcm', aboneAnahtari(), iv);
+  const enc = Buffer.concat([c.update(JSON.stringify(nesne), 'utf8'), c.final()]);
+  return Buffer.concat([iv, c.getAuthTag(), enc]).toString('base64');
+}
+function coz(b64) {
+  const b = Buffer.from(b64.trim(), 'base64'), d = crypto.createDecipheriv('aes-256-gcm', aboneAnahtari(), b.subarray(0, 12));
+  d.setAuthTag(b.subarray(12, 28));
+  return JSON.parse(Buffer.concat([d.update(b.subarray(28)), d.final()]).toString('utf8'));
+}
+const ABONE_YOL = 'bildirim/abonelikler.enc';
+async function aboneleriOku() {
+  const k = await depoOku(ABONE_YOL);
+  if (!k) return { sha: null, liste: [] };
+  try { return { sha: k.sha, liste: coz(k.metin) }; } catch (e) { return { sha: k.sha, liste: [] }; }
+}
+async function aboneleriGuncelle(degistir, mesaj) {
+  for (let i = 0; i < 3; i++) {
+    const { sha, liste } = await aboneleriOku();
+    const yeni = degistir(liste);
+    const r = await depoYaz(ABONE_YOL, sifrele(yeni), sha, mesaj);
+    if (r.ok) return yeni;
+    if (r.status !== 409 && r.status !== 422) throw new Error('abonelik yazılamadı');
+    await bekle(700);
+  }
+  throw new Error('abonelik yazılamadı');
+}
+function adresGuvenli(u) { return typeof u === 'string' && u.length <= 400 && (/^https:\/\//.test(u) || /^\/(?!\/)/.test(u)); }
+async function bildirimGonder(yuk) {
+  const { liste } = await aboneleriOku();
+  const olu = []; let tamam = 0;
+  const govde = JSON.stringify(yuk);
+  for (const a of liste) {
+    try {
+      if (BILDIRIM_KURU) kuruKayit.push({ endpoint: a.endpoint.slice(0, 40), yuk });
+      else await webpush.sendNotification(a, govde, { TTL: 3600, urgency: 'normal' });
+      tamam++;
+    } catch (e) { if (e.statusCode === 404 || e.statusCode === 410) olu.push(a.endpoint); else console.error('push hatası:', e.statusCode || e.message); }
+  }
+  if (olu.length) { try { await aboneleriGuncelle(l => l.filter(x => !olu.includes(x.endpoint)), 'Bildirim: geçersiz abonelikler silindi'); } catch (e) { /* sonraki sefer */ } }
+  return { gonderilen: tamam, abone: liste.length };
+}
+
+// ---- Hikaye ----
+function jpegBoyut(b) {
+  if (b.length < 4 || b[0] !== 0xFF || b[1] !== 0xD8 || b[2] !== 0xFF) return null;
+  let i = 2;
+  while (i + 9 < b.length) {
+    if (b[i] !== 0xFF) { i++; continue; }
+    const m = b[i + 1];
+    if (m >= 0xC0 && m <= 0xCF && m !== 0xC4 && m !== 0xC8 && m !== 0xCC) return { y: b.readUInt16BE(i + 5), g: b.readUInt16BE(i + 7) };
+    i += 2 + b.readUInt16BE(i + 2);
+  }
+  return null;
+}
+async function hikayeListesi() {
+  if (Date.now() - hikayeOnbellek.t < 20e3 && hikayeOnbellek.veri) return hikayeOnbellek.veri;
+  const dal = await varsayilanDal();
+  const ayarK = await depoOku('hikaye/ayar.json');
+  const saglikK = await depoOku('hikaye/saglik.json').catch(() => null);
+  const r = await gh(`/repos/${REPO}/contents/hikaye/kuyruk?ref=${encodeURIComponent(dal)}`);
+  const adlar = r.ok ? (await r.json()).map(f => f.name).filter(n => /^h\d{8}-\d{6}-[a-z0-9]{3}\.json$/.test(n)).sort().reverse().slice(0, 40) : [];
+  const kuyruk = (await Promise.all(adlar.map(a => depoOku('hikaye/kuyruk/' + a).then(k => k && JSON.parse(k.metin)).catch(() => null)))).filter(Boolean);
+  const veri = { depo: REPO, dal, ayar: ayarK ? JSON.parse(ayarK.metin) : null, kuyruk, saglik: saglikK ? JSON.parse(saglikK.metin) : null, bildirim: BILDIRIM_ACIK };
+  hikayeOnbellek = { t: Date.now(), veri };
+  return veri;
+}
+function hikayeIptal() { hikayeOnbellek = { t: 0, veri: null }; }
+
 async function kayitOku(id) {
   if (!KAYIT_RE.test(id || '')) return null;
   const dal = await varsayilanDal();
@@ -164,7 +282,31 @@ async function ajanDurumlari() {
 }
 
 async function api(req, res, url) {
-  if (url.pathname === '/api/ping') return json(res, 200, { ok: true, hazir: !!(TOKEN && SIFRE) });
+  if (url.pathname === '/api/ping') return json(res, 200, { ok: true, hazir: !!(TOKEN && SIFRE), bildirim: BILDIRIM_ACIK });
+  if (url.pathname === '/api/kuru-kayit' && BILDIRIM_KURU) return json(res, 200, kuruKayit);
+  if (url.pathname === '/api/vapid') return json(res, 200, { acik: BILDIRIM_ACIK, anahtar: BILDIRIM_ACIK ? VAPID_PUB : null });
+  if (url.pathname === '/api/hikaye') {
+    if (!TOKEN) return json(res, 503, { hata: 'Sunucuda GITHUB_TOKEN tanımlı değil.' });
+    if (url.searchParams.get('taze')) hikayeIptal();
+    try { return json(res, 200, await hikayeListesi()); } catch (e) { return json(res, 502, { hata: 'Hikaye verisi okunamadı.' }); }
+  }
+  if (url.pathname === '/api/bildir' && req.method === 'POST') {
+    // Sunucudan sunucuya: ajanlar (GitHub iş akışları) kendi sırlarıyla bildirim ister
+    if (!BILDIRIM_ACIK) return json(res, 503, { hata: 'Bildirim kapalı (VAPID anahtarları ya da BILDIRIM_SIRRI eksik).' });
+    if (kilitliMi(req)) return json(res, 429, { hata: 'Çok fazla yanlış deneme.' });
+    const gelen = String(req.headers['x-bildirim'] || '');
+    const a = crypto.createHash('sha256').update(gelen).digest(), b2 = crypto.createHash('sha256').update(BILDIRIM_SIRRI).digest();
+    if (!crypto.timingSafeEqual(a, b2)) { yanlisKaydet(req); return json(res, 401, { hata: 'Yetkisiz.' }); }
+    const simdi = Date.now();
+    while (bildirimler.length && simdi - bildirimler[0] > 3600e3) bildirimler.shift();
+    if (bildirimler.length >= 60) return json(res, 429, { hata: 'Saatte en fazla 60 bildirim.' });
+    let b; try { b = await govde(req); } catch (e) { return json(res, 400, { hata: 'Geçersiz istek.' }); }
+    const yuk = { baslik: temiz(b.baslik, 80) || 'Ajan ofisi', govde: temiz(b.govde, 200), etiket: temiz(b.etiket, 30) || 'ajan' };
+    if (b.gorsel && adresGuvenli(b.gorsel)) yuk.gorsel = b.gorsel;
+    yuk.adres = adresGuvenli(b.adres) ? b.adres : '/';
+    bildirimler.push(simdi);
+    try { return json(res, 200, await bildirimGonder(yuk)); } catch (e) { return json(res, 502, { hata: 'Bildirim gönderilemedi.' }); }
+  }
   if (url.pathname === '/api/ajanlar') {
     if (!TOKEN) return json(res, 503, { hata: 'Sunucuda GITHUB_TOKEN tanımlı değil.' });
     try { return json(res, 200, { zaman: new Date().toISOString(), ajanlar: await ajanDurumlari() }); }
@@ -193,6 +335,93 @@ async function api(req, res, url) {
   if (kilitliMi(req)) return json(res, 429, { hata: 'Çok fazla yanlış deneme. 15 dakika sonra tekrar dene.' });
   if (!sifreDogru(req.headers['x-sifre'])) { yanlisKaydet(req); return json(res, 401, { hata: 'Şifre yanlış.' }); }
 
+  if (url.pathname === '/api/abone' && req.method === 'POST') {
+    if (!BILDIRIM_ACIK) return json(res, 503, { hata: 'Bildirim kapalı (VAPID anahtarları ya da BILDIRIM_SIRRI eksik).' });
+    let b; try { b = await govde(req); } catch (e) { return json(res, 400, { hata: 'Geçersiz istek.' }); }
+    const ab = b.abonelik || {};
+    if (!(typeof ab.endpoint === 'string' && /^https:\/\//.test(ab.endpoint) && ab.endpoint.length < 600 && ab.keys && typeof ab.keys.p256dh === 'string' && typeof ab.keys.auth === 'string')) return json(res, 400, { hata: 'Geçersiz abonelik.' });
+    const temizAb = { endpoint: ab.endpoint, keys: { p256dh: ab.keys.p256dh.slice(0, 200), auth: ab.keys.auth.slice(0, 100) }, tarih: new Date().toISOString() };
+    try {
+      const yeni = await aboneleriGuncelle(l => l.filter(x => x.endpoint !== temizAb.endpoint).concat([temizAb]).slice(-5), 'Bildirim: abonelik eklendi');
+      return json(res, 200, { ok: true, abone: yeni.length });
+    } catch (e) { return json(res, 502, { hata: 'Abonelik kaydedilemedi.' }); }
+  }
+  if (url.pathname === '/api/bildirim-dene' && req.method === 'POST') {
+    if (!BILDIRIM_ACIK) return json(res, 503, { hata: 'Bildirim kapalı.' });
+    try { return json(res, 200, await bildirimGonder({ baslik: 'Deneme bildirimi', govde: 'Ajan ofisinden bildirim alıyorsun. Hikaye yayınlanınca böyle haber gelecek.', adres: '/', etiket: 'deneme' })); }
+    catch (e) { return json(res, 502, { hata: 'Bildirim gönderilemedi.' }); }
+  }
+  if (url.pathname === '/api/hikaye-ayar' && req.method === 'POST') {
+    let b; try { b = await govde(req); } catch (e) { return json(res, 400, { hata: 'Geçersiz istek.' }); }
+    const tam = (v, lo, hi) => Number.isInteger(v) && v >= lo && v <= hi;
+    const guncel = {};
+    if ('aktif' in b) guncel.aktif = b.aktif === true;
+    if ('gunluk_sayi' in b) { if (!tam(b.gunluk_sayi, 1, 12)) return json(res, 400, { hata: 'Günlük sayı 1 ile 12 arasında olmalı.' }); guncel.gunluk_sayi = b.gunluk_sayi; }
+    if ('baslangic_saat' in b) { if (!tam(b.baslangic_saat, 0, 23)) return json(res, 400, { hata: 'Başlangıç saati 0-23 olmalı.' }); guncel.baslangic_saat = b.baslangic_saat; }
+    if ('bitis_saat' in b) { if (!tam(b.bitis_saat, 1, 24)) return json(res, 400, { hata: 'Bitiş saati 1-24 olmalı.' }); guncel.bitis_saat = b.bitis_saat; }
+    if ('min_aralik_dk' in b) { if (!tam(b.min_aralik_dk, 15, 240)) return json(res, 400, { hata: 'Asgari aralık 15-240 dakika olmalı.' }); guncel.min_aralik_dk = b.min_aralik_dk; }
+    if ('gunler' in b) { if (!Array.isArray(b.gunler) || !b.gunler.length || !b.gunler.every(g => tam(g, 1, 7))) return json(res, 400, { hata: 'En az bir gün seç.' }); guncel.gunler = [...new Set(b.gunler)].sort(); }
+    if ('mod' in b) { if (!['otomatik', 'onay'].includes(b.mod)) return json(res, 400, { hata: 'Geçersiz mod.' }); guncel.mod = b.mod; }
+    const ok = await jsonGuncelle('hikaye/ayar.json', v => {
+      Object.assign(v, guncel);
+      if (v.bitis_saat <= v.baslangic_saat) return false;
+      if (guncel.aktif === true) { v.ardisik_hata = 0; v.son_not = ''; }
+    }, 'Panel: hikaye ayarı', { aktif: false, mod: 'otomatik', gunluk_sayi: 4, baslangic_saat: 10, bitis_saat: 22, gunler: [1, 2, 3, 4, 5, 6, 7], min_aralik_dk: 60, ardisik_hata: 0, hata_siniri: 3, son_not: '' });
+    hikayeIptal();
+    return ok ? json(res, 200, { ok: true }) : json(res, 400, { hata: 'Ayar kaydedilemedi (bitiş saati başlangıçtan büyük olmalı).' });
+  }
+  if (url.pathname === '/api/hikaye-foto' && req.method === 'POST') {
+    if (+req.headers['content-length'] > 3 * 1024 * 1024) return json(res, 413, { hata: 'Fotoğraf 3 MB’tan büyük olamaz (panel otomatik küçültür).' });
+    let tampon; try { tampon = await govdeIkili(req, 3 * 1024 * 1024); } catch (e) { return json(res, 413, { hata: 'Fotoğraf çok büyük.' }); }
+    const boyut = jpegBoyut(tampon);
+    if (!boyut) return json(res, 400, { hata: 'Bu bir JPEG fotoğraf gibi görünmüyor.' });
+    if (boyut.g < 360 || boyut.g > 4096 || boyut.y > 8192) return json(res, 400, { hata: 'Fotoğraf boyutu uygun değil.' });
+    const liste = await hikayeListesi();
+    if (liste.kuyruk.filter(o => o.durum === 'planli').length >= 60) return json(res, 429, { hata: 'Kuyruk dolu (60 planlı hikaye).' });
+    const dam = damga();
+    const kimlik = 'h' + dam.slice(0, 8) + '-' + dam.slice(8, 14) + '-' + crypto.randomBytes(2).toString('hex').slice(0, 3);
+    const gorsel = `hikaye/gorseller/${kimlik}.jpg`;
+    const r1 = await depoYaz(gorsel, tampon, null, 'Panel: hikaye fotoğrafı');
+    if (!r1.ok) return json(res, 502, { hata: 'Fotoğraf kaydedilemedi (' + r1.status + ').' });
+    const oge = { id: kimlik, kaynak: 'foto', durum: 'planli', olusturma: new Date().toISOString(), gorsel, baslik: temiz(url.searchParams.get('baslik') || '', 80), atif: null, yayin: null, hata: '', deneme: 0 };
+    const r2 = await depoYaz(`hikaye/kuyruk/${kimlik}.json`, JSON.stringify(oge, null, 2), null, 'Panel: hikaye kuyruğa eklendi');
+    hikayeIptal();
+    return r2.ok ? json(res, 200, { ok: true, id: kimlik, boyut }) : json(res, 502, { hata: 'Kuyruk kaydı yazılamadı.' });
+  }
+  if (url.pathname === '/api/hikaye-karar' && req.method === 'POST') {
+    let b; try { b = await govde(req); } catch (e) { return json(res, 400, { hata: 'Geçersiz istek.' }); }
+    if (!HIKAYE_RE.test(String(b.id || ''))) return json(res, 400, { hata: 'Geçersiz kimlik.' });
+    const yol = `hikaye/kuyruk/${b.id}.json`;
+    const k = await depoOku(yol);
+    if (!k) return json(res, 404, { hata: 'Hikaye bulunamadı.' });
+    const oge = JSON.parse(k.metin);
+    if (b.karar === 'sil') {
+      if (!['planli', 'onay_bekliyor', 'reddedildi', 'hata'].includes(oge.durum)) return json(res, 409, { hata: 'Yayınlanmış ya da yayınlanıyor olan hikaye silinemez.' });
+      const gk = oge.gorsel && /^hikaye\/gorseller\/h[\w-]+\.jpg$/.test(oge.gorsel) ? await depoOku(oge.gorsel) : null;
+      if (gk) await depoSil(oge.gorsel, gk.sha, 'Panel: hikaye görseli silindi');
+      const r = await depoSil(yol, k.sha, 'Panel: hikaye silindi');
+      hikayeIptal();
+      return r.ok ? json(res, 200, { ok: true }) : json(res, 502, { hata: 'Silinemedi.' });
+    }
+    if (b.karar === 'onayla' || b.karar === 'reddet') {
+      if (oge.durum !== 'onay_bekliyor') return json(res, 409, { hata: 'Bu hikaye onay beklemiyor.' });
+      oge.durum = b.karar === 'onayla' ? 'planli' : 'reddedildi';
+      const r = await depoYaz(yol, JSON.stringify(oge, null, 2), k.sha, 'Panel: hikaye ' + (b.karar === 'onayla' ? 'onaylandı' : 'reddedildi'));
+      hikayeIptal();
+      return r.ok ? json(res, 200, { ok: true, durum: oge.durum }) : json(res, 502, { hata: 'Kaydedilemedi.' });
+    }
+    return json(res, 400, { hata: 'Geçersiz karar.' });
+  }
+  if (url.pathname === '/api/hikaye-yayinla' && req.method === 'POST') {
+    const simdi = Date.now();
+    while (hikayeTetikler.length && simdi - hikayeTetikler[0] > 3600e3) hikayeTetikler.shift();
+    if (hikayeTetikler.length >= 6) return json(res, 429, { hata: 'Saatte en fazla 6 elle hikaye yayını.' });
+    const dal = await varsayilanDal();
+    const r = await gh(`/repos/${REPO}/actions/workflows/${AKIS_HIKAYE}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: { hemen: 'EVET' } }) });
+    if (r.status !== 204) return json(res, 502, { hata: 'GitHub kabul etmedi (' + r.status + ').' });
+    hikayeTetikler.push(simdi);
+    return json(res, 200, { ok: true });
+  }
   if ((url.pathname === '/api/direktif' || url.pathname === '/api/icerik-uret') && req.method === 'POST') {
     const simdi = Date.now();
     while (direktifler.length && simdi - direktifler[0] > 3600e3) direktifler.shift();
