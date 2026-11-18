@@ -1,0 +1,35 @@
+{
+  "id": "h20261118-231347-i9d",
+  "kaynak": "uretim",
+  "durum": "planli",
+  "olusturma": "2026-11-18T23:13:47.000Z",
+  "gorsel": "hikaye/gorseller/h20261118-231347-i9d.mp4",
+  "baslik": "🟠 Thin layers scraper (tiny+ergonomic)",
+  "atif": {
+    "ad": "🟠 Thin layers scraper (tiny+ergonomic)",
+    "tasarimci": "sh",
+    "lisans": "CC BY",
+    "url": "https://www.printables.com/model/277302-thin-layers-scraper-tinyergonomic",
+    "site": "printables.com",
+    "lisans_teyit": true,
+    "referansli": true
+  },
+  "trend": "",
+  "kontrol": {
+    "puan": 9.0,
+    "deneme": 1,
+    "sorunlar": [
+      "Belirgin yazı/logo yok",
+      "İnsan/karakter yok",
+      "Referansla genel şekil ve parçalar uyumlu"
+    ]
+  },
+  "yayin": null,
+  "hata": "",
+  "deneme": 0,
+  "tur": "video",
+  "muzik": "Sentezlenmiş müzik: Lo-fi sakin (telifsiz, FFmpeg ile üretildi)",
+  "muzik_sira": 13,
+  "muzik_stil": "Lo-fi sakin",
+  "muzik_ton": -2
+}
