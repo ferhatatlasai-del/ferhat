@@ -1,0 +1,35 @@
+{
+  "kimlik": "y20261118-125830",
+  "olusturma": "2026-11-18T12:58:30.413Z",
+  "durum": "video",
+  "kaynak": "bagimsiz",
+  "direktif": "",
+  "konu": "3D baskı ile pratik tasarımlar",
+  "format": "reels",
+  "seri": "",
+  "kanca": "",
+  "video": {
+    "yol": "videolar/yukleme_20261118125711.mp4",
+    "tarih": "2026-11-18T12:58:22.235Z"
+  },
+  "yayinlar": [
+    {
+      "hedef": "youtube",
+      "platform": "youtube",
+      "tur": "shorts",
+      "durum": "basladi",
+      "baslangic": "2026-11-18T12:58:22.235Z",
+      "video": "videolar/yukleme_20261118125711.mp4"
+    },
+    {
+      "hedef": "instagram",
+      "platform": "instagram",
+      "tur": "reels",
+      "durum": "basladi",
+      "baslangic": "2026-11-18T12:58:22.235Z",
+      "video": "videolar/yukleme_20261118125711.mp4"
+    }
+  ],
+  "olcumler": [],
+  "ogrenildi": false
+}
