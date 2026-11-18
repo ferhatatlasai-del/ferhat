@@ -3,7 +3,7 @@
   "mod": "otomatik",
   "gunluk_sayi": 10,
   "baslangic_saat": 10,
-  "bitis_saat": 22,
+  "bitis_saat": 20,
   "gunler": [
     1,
     2,
