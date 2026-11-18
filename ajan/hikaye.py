@@ -33,6 +33,8 @@ import urllib.request
 
 KOK = pathlib.Path(os.environ.get("HIKAYE_KOK") or pathlib.Path(__file__).resolve().parent.parent)
 API = os.environ.get("IG_API_ADRESI") or "https://graph.facebook.com/v21.0"
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import ig_ortak  # noqa: E402  (anahtar türüne göre adres ve hesap)
 AYAR = KOK / "hikaye" / "ayar.json"
 KUYRUK = KOK / "hikaye" / "kuyruk"
 GORSELLER = KOK / "hikaye" / "gorseller"
@@ -149,10 +151,11 @@ def git_kaydet(mesaj, yollar, deneme=4):
 def api(yontem, yol, **parametre):
     parametre["access_token"] = os.environ["IG_ACCESS_TOKEN"]
     govde = urllib.parse.urlencode(parametre)
+    taban = ig_ortak.api_adresi()
     if yontem == "GET":
-        istek = urllib.request.Request(f"{API}/{yol}?{govde}")
+        istek = urllib.request.Request(f"{taban}/{yol}?{govde}")
     else:
-        istek = urllib.request.Request(f"{API}/{yol}", data=govde.encode(), method="POST")
+        istek = urllib.request.Request(f"{taban}/{yol}", data=govde.encode(), method="POST")
     with urllib.request.urlopen(istek, timeout=120) as y:
         return json.load(y)
 
@@ -251,7 +254,7 @@ def gorsel_adresi(o):
 
 def hikaye_yayinla(o):
     """Görseli hikaye olarak yayınlar. (medya_kimligi, link) döndürür."""
-    kimlik = os.environ["IG_USER_ID"]
+    kimlik = ig_ortak.kimlik()
     video = o.get("tur") == "video"
     adres = gorsel_adresi(o)
     if not os.environ.get("HIKAYE_GORSEL_ADRESI") and not adres_hazir_mi(adres):
