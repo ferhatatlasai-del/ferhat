@@ -248,6 +248,23 @@ body.tam .hint{display:none}
 .uretkutu{border:2px solid var(--accent);border-radius:14px;padding:12px;margin:10px 0;background:color-mix(in srgb,var(--accent) 7%,var(--panel))}
 .uretkutu .buyuk{font-size:16px;padding:12px 18px;width:100%}
 .uretkutu .not{margin:8px 0 0}
+
+/* ---- Telefon balonu (Instagram temsili) ---- */
+.tel{position:absolute;left:0;top:0;transform:translate(-50%,-100%);z-index:6;width:168px;background:var(--panel);color:var(--ink);border:2px solid #c13584;border-radius:16px;padding:8px;box-shadow:0 6px 22px rgba(10,20,40,.3);pointer-events:none;font-size:12px;line-height:1.3}
+.tel[hidden]{display:none}
+.tel::after{content:"";position:absolute;left:calc(100% - 26px);bottom:-9px;width:14px;height:14px;background:var(--panel);border-right:2px solid #c13584;border-bottom:2px solid #c13584;transform:translateX(-50%) rotate(45deg)}
+.tel .tust{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.tel .halka{width:24px;height:24px;border-radius:50%;padding:2px;background:linear-gradient(45deg,#fdc468,#e1306c,#5b51d8);flex:none}
+.tel .halka i{display:block;width:100%;height:100%;border-radius:50%;background:var(--panel);border:2px solid var(--panel);box-sizing:border-box;background:#f07a1a}
+.tel .tust b{font-size:12px;flex:1}.tel .tust em{font-style:normal;color:var(--ink2);font-size:11px}
+.tel .hik{aspect-ratio:1/1;border-radius:10px;background:linear-gradient(160deg,#fdc468 0%,#e1306c 55%,#5b51d8 100%);display:grid;place-items:center;color:#fff;text-align:center;padding:6px;position:relative;overflow:hidden}
+.tel .hik big{font-size:34px;line-height:1}
+.tel .hik small{font-size:11px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+.tel .ilerle{position:absolute;left:6px;right:6px;top:5px;height:3px;border-radius:2px;background:rgba(255,255,255,.4);overflow:hidden}
+.tel .ilerle i{display:block;height:100%;width:60%;background:#fff;animation:ilerle 1.6s linear infinite}
+@keyframes ilerle{from{width:0}to{width:100%}}
+.tel .talt{margin-top:6px;font-weight:700;display:flex;align-items:center;gap:5px}
+.tel .talt i{width:16px;height:16px;border-radius:50%;background:#3cc47a;color:#fff;display:inline-grid;place-items:center;font-style:normal;font-size:11px;flex:none}
 </style>
 
 </head><body>
@@ -945,6 +962,7 @@ function frame(){
   var w=view.clientWidth,h=view.clientHeight;
   stations.forEach(function(s){ v3.copy(s.wp).project(cam); s.lb.style.left=((v3.x+1)/2*w)+'px'; s.lb.style.top=((1-v3.y)/2*h)+'px'; });
   if(typeof aksKonum==='function') aksKonum(w,h);
+  if(typeof telKonum==='function') telKonum(w,h);
   need=false;
 }
 
@@ -1183,25 +1201,79 @@ function yayinSahnesiBitir(hedefler,bitti){
 pSifreHazirla(true);
 
 
+
+/* ---------- Hikaye ajanının telefonu: üretilince ve paylaşılınca Instagram temsili ---------- */
+var TEL={mod:'yok',n:0,aktif:false,grup:null,tex:null,ctx:null,zaman:0};
+var telEl=document.createElement('div'); telEl.className='tel'; telEl.hidden=true; $('#labels').appendChild(telEl);
+(function(){
+  var st=ST.hikaye; if(!st||!st.char) return; var c=st.char;
+  var cv2=document.createElement('canvas'); cv2.width=128; cv2.height=256; TEL.ctx=cv2.getContext('2d'); TEL.tex=new THREE.CanvasTexture(cv2);
+  var g=new THREE.Group(); g.position.set(0,-0.62,0.16); g.visible=false; c.aR.add(g);
+  box(0.26,0.44,0.035,mk(0x0e131a,false),0,0,0,g);
+  var ek=new THREE.Mesh(new THREE.PlaneGeometry(0.22,0.38),new THREE.MeshBasicMaterial({map:TEL.tex})); ek.position.set(0,0,0.02); g.add(ek);
+  TEL.grup=g;
+  st.ticks.push(function(t){
+    if(!TEL.aktif) return;
+    c.aR.rotation.x=-1.3+Math.sin(t*2.2)*0.03; c.aR.rotation.z=-0.35; c.aL.rotation.x=-0.8; c.head.rotation.x=0.5; c.head.rotation.y=-0.12;
+    g.rotation.set(-0.4,0,0);
+  });
+})();
+function telCiz(){
+  var x=TEL.ctx; if(!x) return; var w=128,h=256; x.clearRect(0,0,w,h);
+  x.fillStyle='#111'; x.fillRect(0,0,w,h);
+  var g=x.createLinearGradient(0,0,w,h); g.addColorStop(0,'#fdc468'); g.addColorStop(0.5,'#e1306c'); g.addColorStop(1,'#5b51d8'); x.fillStyle=g; rr(x,8,38,w-16,170,12); x.fill();
+  x.strokeStyle=g; x.lineWidth=4; x.beginPath(); x.arc(20,20,10,0,6.3); x.stroke(); x.fillStyle='#fff'; x.font='700 11px Inter,sans-serif'; x.textAlign='left'; x.fillText('gurtechs3d',36,24);
+  x.textAlign='center'; x.fillStyle='#fff'; x.font='700 30px sans-serif';
+  if(TEL.mod==='uretiyor'){ x.fillText('✨',w/2,115); x.font='700 12px Inter,sans-serif'; x.fillText('Üretiliyor'+new Array((Math.floor(Date.now()/500)%4)+1).join('.'),w/2,140); }
+  else if(TEL.mod==='uretildi'){ x.fillText('📸',w/2,110); x.font='700 12px Inter,sans-serif'; x.fillText('Hikaye hazır',w/2,138); x.fillStyle='#3cc47a'; x.beginPath(); x.arc(w/2,240,10,0,6.3); x.fill(); x.fillStyle='#fff'; x.font='700 13px sans-serif'; x.fillText('✓',w/2,245); }
+  else if(TEL.mod==='paylasildi'){ x.fillText('✅',w/2,110); x.font='700 12px Inter,sans-serif'; x.fillText('Paylaşıldı',w/2,138); x.fillStyle='#fff'; x.fillText('Instagram',w/2,156); }
+  TEL.tex.needsUpdate=true;
+}
+setInterval(function(){ if(TEL.mod==='uretiyor'){ telCiz(); need=true; } },500);
+function telDurum(mod,n,sure){
+  TEL.mod=mod; TEL.n=n||0; TEL.aktif=(mod!=='yok'); if(TEL.grup) TEL.grup.visible=TEL.aktif;
+  aksEl.style.visibility=(mod!=='yok'&&selId==='hikaye')?'hidden':'';
+  clearTimeout(TEL.zaman);
+  if(mod==='yok'){ telEl.hidden=true; need=true; return; }
+  telCiz();
+  var baslik=({uretiyor:'Hikaye hazırlanıyor…',uretildi:'Hikaye üretildi'+(n>1?' ('+n+' adet)':''),paylasildi:'Instagram’da paylaşıldı'})[mod];
+  var kucuk=({uretiyor:'Üretiliyor',uretildi:'Hazır, sırada',paylasildi:'Hikaye yayında'})[mod];
+  var emoji=({uretiyor:'✨',uretildi:'📸',paylasildi:'✅'})[mod];
+  telEl.textContent='';
+  var ust=dom('div','tust'); var hl=dom('span','halka'); hl.appendChild(document.createElement('i')); ust.appendChild(hl); ust.appendChild(dom('b',null,'gurtechs3d')); ust.appendChild(dom('em',null,mod==='uretiyor'?'şimdi':'az önce')); telEl.appendChild(ust);
+  var hk=dom('div','hik'); if(mod==='uretiyor'){ var il=dom('div','ilerle'); il.appendChild(document.createElement('i')); hk.appendChild(il); }
+  var ic=document.createElement('div'); ic.appendChild(dom('big',null,emoji)); ic.appendChild(document.createElement('br')); ic.appendChild(dom('small',null,kucuk)); hk.appendChild(ic); telEl.appendChild(hk);
+  var al=dom('div','talt'); if(mod!=='uretiyor'){ al.appendChild(dom('i',null,'✓')); } al.appendChild(document.createTextNode(baslik)); telEl.appendChild(al);
+  telEl.hidden=false; need=true;
+  if(mod!=='uretiyor') TEL.zaman=setTimeout(function(){ telDurum('yok'); },mod==='paylasildi'?9000:7500);
+}
+function telKonum(w,h){
+  if(telEl.hidden||!ST.hikaye) return; var st=ST.hikaye;
+  v3.set(st.a.x,3.7,st.a.z+0.3).project(cam);
+  var x=(v3.x+1)/2*w, y=(1-v3.y)/2*h, gen=telEl.offsetWidth||168, yuk=telEl.offsetHeight||190;
+  x=x-gen/2+26; x=Math.max(gen/2+6,Math.min(w-gen/2-6,x)); y=Math.max(yuk+14,Math.min(h-8,y));
+  telEl.style.left=x+'px'; telEl.style.top=(y-8)+'px';
+}
+
 /* ---------- Hikaye üret ve sıraya koy (Hikaye sekmesi ve ofiste Hikaye ajanı) ---------- */
 var HKM={durum:'bos',mesaj:'',eklenen:0,aktif:false}, hkUretiyor=false;
 function hkSira(){ var k=(HK&&HK.kuyruk)||[]; return k.filter(function(o){return o.durum==='planli'||o.durum==='onay_bekliyor';}).length; }
 function hkUretDurum(t){ var e=$('#hUretNot'); if(e&&t) e.textContent=t; }
 async function hikayeUret(){
   if(hkUretiyor||!hSifreKontrol()) return; hkUretiyor=true;
-  var onceki=hkSira(), t0=Date.now(); HKM.durum='uretiyor'; HKM.mesaj=''; aksCiz();
+  var onceki=hkSira(), t0=Date.now(); HKM.durum='uretiyor'; HKM.mesaj=''; aksCiz(); telDurum('uretiyor');
   var btn=$('#hUret'); if(btn){ btn.disabled=true; btn.textContent='⏳ Hikayeler hazırlanıyor…'; }
   hkUretDurum('Üretim başladı. 2-4 dakika sürer; hikayeler hazır oldukça aşağıdaki kuyrukta görünür.');
   try{ await hPost('/api/uretim-calistir',{}); }
-  catch(e){ HKM.durum='bos'; HKM.mesaj=String(e.message||e); hkUretiyor=false; if(btn){ btn.disabled=false; btn.textContent='✨ Hikaye üret ve sıraya koy'; } hkUretDurum(HKM.mesaj); aksCiz(); return; }
+  catch(e){ telDurum('yok'); HKM.durum='bos'; HKM.mesaj=String(e.message||e); hkUretiyor=false; if(btn){ btn.disabled=false; btn.textContent='✨ Hikaye üret ve sıraya koy'; } hkUretDurum(HKM.mesaj); aksCiz(); return; }
   var eklenen=0;
   while(Date.now()-t0<8*60e3){
     await bekle(YTT.poll>2000?15000:YTT.poll);
     try{ var v=await fetch('/api/hikaye?taze=1').then(function(r){return r.ok?r.json():null;}); if(v){ hikayeCiz(v); eklenen=Math.max(0,hkSira()-onceki); if(eklenen>0&&Date.now()-t0>(YTT.poll>2000?25000:1500)){ await bekle(YTT.poll>2000?20000:YTT.poll); var v2=await fetch('/api/hikaye?taze=1').then(function(r){return r.ok?r.json():null;}); if(v2) hikayeCiz(v2); eklenen=Math.max(0,hkSira()-onceki); break; } } }catch(e){}
   }
   hkUretiyor=false; HKM.eklenen=eklenen;
-  if(eklenen>0){ HKM.durum='bitti'; hkUretDurum(eklenen+' yeni hikaye sıraya girdi. Aşağıdaki kuyrukta görebilirsin.'); toastGoster(eklenen+' yeni hikaye sıraya girdi.'); }
-  else { HKM.durum='bos'; HKM.mesaj='Yeni hikaye çıkmadı (günlük görsel sınırı dolmuş ya da uygun tasarım bulunamamış olabilir).'; hkUretDurum(HKM.mesaj); }
+  if(eklenen>0){ telDurum('uretildi',eklenen); HKM.durum='bitti'; hkUretDurum(eklenen+' yeni hikaye sıraya girdi. Aşağıdaki kuyrukta görebilirsin.'); toastGoster(eklenen+' yeni hikaye sıraya girdi.'); }
+  else { telDurum('yok'); HKM.durum='bos'; HKM.mesaj='Yeni hikaye çıkmadı (günlük görsel sınırı dolmuş ya da uygun tasarım bulunamamış olabilir).'; hkUretDurum(HKM.mesaj); }
   if(btn){ btn.disabled=false; btn.textContent='✨ Hikaye üret ve sıraya koy'; }
   hikayeCek(true); aksCiz();
 }
@@ -1237,6 +1309,66 @@ async function hikayeHemen(){
   aksCiz();
 }
 
+
+/* ---------- Diğer ajanların avatar menüleri (Trend, İçerik, Doktor Filament = Akademi) ---------- */
+var AJM={
+  trend:{ad:'Trend ajanı',renk:'#f0b429',durum:'bos',mesaj:'',aktif:false,bilgi:''},
+  icerik:{ad:'İçerik ajanı',renk:'#2b7de9',durum:'bos',mesaj:'',aktif:false},
+  doktor:{ad:'Doktor Filament · Akademi',renk:'#7c5cff',durum:'bos',mesaj:'',aktif:false}
+};
+function menuluMu(id){ return !!(PLAT[id]||id==='hikaye'||AJM[id]); }
+function ajmCiz(id){
+  var A=AJM[id]; aksEl.hidden=false; aksEl.style.setProperty('--ak',A.renk); aksEl.textContent='';
+  function btn(ad,fn,ana){ var b=document.createElement('button'); b.type='button'; if(ana) b.className='ana'; b.textContent=ad; b.addEventListener('click',fn); aksEl.appendChild(b); return b; }
+  function not(t){ var q=document.createElement('p'); q.className='not'; q.textContent=t; aksEl.appendChild(q); return q; }
+  function git(sek){ return function(){ if(document.body.classList.contains('tam')) tamEkran(false); sekme(sek); }; }
+  var h=document.createElement('h4'); h.innerHTML='<i></i>'+A.ad; aksEl.appendChild(h);
+  if(A.durum==='calisiyor'){ var q=not(''); var sp=document.createElement('span'); sp.className='don'; q.appendChild(sp); q.appendChild(document.createTextNode(A.calisiyorMetni||'Çalışıyor…')); }
+  else {
+    if(id==='trend'){
+      if(A.durum==='bitti') not(A.mesaj);
+      btn('🔎 Trend araştır',trendUret,true); btn('💡 Trend fikirlerini gör',git('icerik'));
+      not(A.bilgi||'Güncel 3D baskı trendlerini internetten araştırır (birkaç sent, 1-2 dk).'); if(A.durum!=='bitti'&&A.mesaj) not(A.mesaj);
+    } else if(id==='icerik'){
+      btn('🎬 Reels senaryosu üret',function(){ icerikUret('reels'); },true); btn('🖼️ Carousel üret',function(){ icerikUret('carousel'); });
+      btn('✍️ Direktifle üret (İçerik sekmesi)',git('icerik')); not('Zincir: trend → fikir → senaryo → video paketi. Sonuç İçerik sekmesinde.'); if(A.mesaj) not(A.mesaj);
+    } else if(id==='doktor'){
+      var bek=((OZ.ak&&OZ.ak.oneriler)||[]).filter(function(x){return x.durum==='onay_bekliyor';}).length;
+      if(A.durum==='bitti') not(A.mesaj);
+      btn('🎓 Akademiyi çalıştır',akademiUret,true); btn('📋 Dersleri gör'+(bek?' ('+bek+' onay bekliyor)':''),git('akademi'));
+      not('Haftalık rapor ve ajanlara ders önerileri; sen onaylamadan uygulanmaz.'); if(A.durum!=='bitti'&&A.mesaj) not(A.mesaj);
+    }
+  }
+  need=true;
+}
+async function trendUret(){
+  if(!hSifreKontrol()) return; var A=AJM.trend, t0=Date.now(); A.durum='calisiyor'; A.calisiyorMetni='Trendler araştırılıyor… (1-2 dk)'; A.mesaj=''; aksCiz();
+  var st=ST.trend; st.busy=true; st.busyRing.visible=true; konus('trx','Trendleri araştırıyorum…',function(){return [st.a.x,st.a.z];});
+  var bitir=function(){ st.busy=false; st.busyRing.visible=false; konus('trx',''); need=true; };
+  try{ await hPost('/api/trend-calistir',{}); } catch(e){ A.durum='bos'; A.mesaj=String(e.message||e); bitir(); aksCiz(); return; }
+  while(Date.now()-t0<8*60e3){
+    await bekle(YTT.poll>2000?15000:YTT.poll);
+    try{ var v=await fetch('/api/trendler?taze=1').then(function(r){return r.ok?r.json():null;});
+      if(v&&v.tarih&&Date.parse(v.tarih)>=t0-5000){ var n=(v.oneriler||[]).length; A.durum='bitti'; A.mesaj='🎉 '+n+' yeni trend fikri hazır.'; A.bilgi=''; bitir(); trendCek(); konus('trx','Yeni fikirler hazır!',function(){return [st.a.x,st.a.z];}); setTimeout(function(){ konus('trx',''); },4000); aksCiz(); return; } }catch(e){}
+  }
+  A.durum='bos'; A.mesaj='Yeni araştırma görünmedi; GitHub Actions’tan kontrol et.'; bitir(); aksCiz();
+}
+function icerikUret(fmt){
+  if(!hSifreKontrol()) return; var A=AJM.icerik; if(busy){ toastGoster('Zincir zaten çalışıyor, ofiste izle.'); return; }
+  var f=$('#zFormat'); if(f) f.value=fmt; A.mesaj='Zincir başladı; ofiste izle, sonuç İçerik sekmesinde.'; senaryo('');
+}
+async function akademiUret(){
+  if(!hSifreKontrol()) return; var A=AJM.doktor; A.durum='calisiyor'; A.calisiyorMetni='Akademi raporu hazırlanıyor… (1 dk)'; A.mesaj=''; aksCiz();
+  try{ await hPost('/api/akademi-calistir',{}); }catch(e){ A.durum='bos'; A.mesaj=String(e.message||e); aksCiz(); return; }
+  var t0=Date.now();
+  while(Date.now()-t0<5*60e3){
+    await bekle(YTT.poll>2000?10000:YTT.poll);
+    try{ var v=await fetch('/api/akademi').then(function(r){return r.ok?r.json():null;});
+      if(v&&v.rapor&&Date.parse(v.rapor.tarih)>=t0-5000){ OZ.ak=v; A.durum='bitti'; A.mesaj='🎉 Rapor hazır; '+((v.oneriler||[]).filter(function(x){return x.durum==='onay_bekliyor';}).length)+' ders onayını bekliyor.'; akademiCek(); aksCiz(); return; } }catch(e){}
+  }
+  A.durum='bos'; A.mesaj='Rapor görünmedi; Akademi sekmesine ya da GitHub Actions’a bak.'; aksCiz();
+}
+
 /* ---------- Ofiste YouTube ve Instagram: video üret, onayla, yayınla, kutla ---------- */
 var PLAT={
   youtube:{ad:'YouTube Shorts',renk:'#e62117',hedef:'youtube',tvAd:'YouTube',tvYayin:'Shorts yayında!',tvYukle:'Shorts yükleniyor',yol:[[9.6,-4.9],[9.6,-2.7],[6.0,-2.6]],yayinBtn:'✅ Onayla ve YouTube’a yayınla'},
@@ -1247,7 +1379,7 @@ var YTT=window.__ytTest||{poll:9000,yayinPoll:8000,alkis:6500};
 var aksEl=document.createElement('div'); aksEl.className='aks'; aksEl.hidden=true; $('#labels').appendChild(aksEl);
 aksEl.addEventListener('pointerdown',function(e){e.stopPropagation();});
 function aksKonum(w,h){
-  if(aksEl.hidden||!(PLAT[selId]||selId==='hikaye')||!ST[selId]) return; var st=ST[selId];
+  if(aksEl.hidden||!menuluMu(selId)||!ST[selId]) return; var st=ST[selId];
   aksEl.classList.toggle('kisa',h<520); aksEl.style.maxHeight=(h-16)+'px';
   var gen=aksEl.offsetWidth||240, yuk=Math.min(aksEl.offsetHeight||120,h-16);
   v3.set(st.a.x,0.1,st.a.z+2.2).project(cam); var xa=(v3.x+1)/2*w, ya=(1-v3.y)/2*h;
@@ -1257,12 +1389,14 @@ function aksKonum(w,h){
   aksEl.classList.toggle('alt',alta||(!uste)); aksEl.classList.toggle('orta',!alta&&!uste);
   aksEl.style.left=x+'px'; aksEl.style.top=top+'px';
 }
+function trendBilgi(){ fetch('/api/trendler').then(function(r){return r.ok?r.json():null;}).then(function(v){ if(v&&v.tarih){ AJM.trend.bilgi='Son araştırma: '+fmt(v.tarih)+' · '+((v.oneriler||[]).length)+' fikir.'; if(selId==='trend') aksCiz(); } }).catch(function(){}); }
 function ytSecim(id){
-  Object.keys(PLAT).forEach(function(k){ YT[k].aktif=(k===id); }); HKM.aktif=(id==='hikaye');
-  if(PLAT[id]){ ytTaslakYukle(id); aksCiz(); } else if(id==='hikaye'){ aksCiz(); } else aksEl.hidden=true;
+  Object.keys(PLAT).forEach(function(k){ YT[k].aktif=(k===id); }); HKM.aktif=(id==='hikaye'); Object.keys(AJM).forEach(function(k){ AJM[k].aktif=(k===id); });
+  if(PLAT[id]){ ytTaslakYukle(id); aksCiz(); } else if(id==='hikaye'||AJM[id]){ if(id==='trend') trendBilgi(); aksCiz(); } else aksEl.hidden=true;
 }
 function aksCiz(){
   if(selId==='hikaye'&&HKM.aktif){ aksEl.hidden=false; hkAksCiz(); return; }
+  if(AJM[selId]&&AJM[selId].aktif){ ajmCiz(selId); return; }
   var k=selId, P=PLAT[k], Y=P&&YT[k]; var goster=!!(P&&Y&&Y.aktif); aksEl.hidden=!goster; if(!goster) return;
   aksEl.style.setProperty('--ak',P.renk); aksEl.textContent='';
   function btn(ad,fn,ana){ var b=document.createElement('button'); b.type='button'; if(ana) b.className='ana'; b.textContent=ad; b.addEventListener('click',fn); aksEl.appendChild(b); return b; }
@@ -1539,7 +1673,7 @@ function hikayeCiz(v){
     durumGorselYenile();
     // yeni yayınlanan hikaye: ajan canlansın
     var enSon=son&&son.yayin?Date.parse(son.yayin.tarih):0;
-    if(hGorulen===null) hGorulen=enSon; else if(enSon>hGorulen){ hGorulen=enSon; hikayeBalon(); }
+    if(hGorulen===null) hGorulen=enSon; else if(enSon>hGorulen){ hGorulen=enSon; hikayeBalon(); telDurum('paylasildi'); }
   }
 }
 

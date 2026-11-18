@@ -122,3 +122,18 @@ Adres sonundaki `#hikaye`, `#video` gibi bağlantılar doğrudan sekmeyi açar. 
 - **Tam ekran:** "⤢ Tam ekran" düğmesi; telefonu yatay çevirince ofis otomatik tam ekran olur (✕ Küçült ile çıkılır).
 - **YouTube ya da Instagram kişisine dokun:** başının altında menü açılır. "Video üret" (Shorts/Reels taslağı hazırlatır) → taslak hazır olunca önizleme ve **"Onayla ve yayınla"** → duvardaki televizyon açılıp logoyu gösterir, yükleme bitince kişi masasından kalkıp televizyona bakarak alkışlar ("Yayında! 🎉").
 - Aynı taslak iki platform için de kullanılabilir (`shorts/<id>.json` içinde `yayinlanan` listesi); yalnızca onayladığın platforma gider. Hiçbir şey onaysız yayınlanmaz.
+
+### Ofiste her ajanın kendi menüsü ve Hikaye ajanının telefonu
+
+Paneldeki düğmelerin hepsi ofiste ilgili ajanın avatarına tıklayınca da çıkar:
+
+| Avatar | Menü |
+|---|---|
+| Hikaye | Hikaye üret ve sıraya koy · Sıradakini şimdi yayınla · Kuyruğu aç |
+| Trend | Trend araştır (`/api/trend-calistir`, saatte en fazla 3) · Trend fikirlerini gör |
+| İçerik | Reels senaryosu üret · Carousel üret · Direktifle üret |
+| Dr. Filament | Akademiyi çalıştır · Dersleri gör |
+| YouTube / Instagram | Short/Reel üret, onayla, yayınla |
+
+Hikaye ajanı hikaye üretirken telefonuna bakar; telefonunun üstünde Instagram benzeri bir balon çıkar:
+üretilirken "Hikaye hazırlanıyor…", kuyruğa girince "Hikaye üretildi", yayınlanınca "Instagram'da paylaşıldı".
