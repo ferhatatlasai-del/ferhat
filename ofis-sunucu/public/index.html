@@ -225,6 +225,13 @@ dd{margin:1px 0 0}
         </details>
         <details class="tr"><summary>Nöbetçi (anahtar ve servis sağlığı)</summary><div class="saglik" id="hSaglik">Henüz denetim yok.</div></details>
       </div>
+      <div class="card pub" id="skKart">
+        <h2>Shorts / Reels üretici</h2>
+        <p class="alt">Haftada iki kez (salı ve cuma 17:00) hikaye görsellerinden 4 sahneli, müzikli kısa video <b>taslağı</b> hazırlar. <b>Sen onaylamadan hiçbir şey yayınlanmaz.</b> Onaylarsan YouTube Shorts ve Instagram Reels'e birlikte çıkar. Başlık ve açıklamayı yayınlamadan önce düzenleyebilirsin.</p>
+        <p class="not" id="skDurum">Yükleniyor…</p>
+        <div class="satir"><button type="button" id="skUret">Şimdi bir taslak üret</button></div>
+        <div id="skListe"></div>
+      </div>
       <div class="card pub" id="akKart">
         <h2>Akademi (ajanlara ders)</h2>
         <p class="alt">Haftada bir ajanların performansına bakar, rapor çıkarır ve ders önerir. <b>Sen onaylamadan hiçbir ders ajanlara uygulanmaz.</b> Onayladığın dersler ajanların istemine eklenir; istediğin zaman kaldırırsın.</p>
@@ -1324,6 +1331,47 @@ $('#akCalistir').addEventListener('click',function(){
   hPost('/api/akademi-calistir',{}).then(function(){ $('#akDurum').textContent='Akademi çalışıyor. Bir dakika içinde rapor ve öneriler burada görünür.'; btn.disabled=false; var n=0; var t=setInterval(function(){ akademiCek(); if(++n>12) clearInterval(t); },10000); }).catch(function(e){ $('#akDurum').textContent=String(e.message||e); btn.disabled=false; });
 });
 akademiCek(); setInterval(akademiCek,300000);
+// Shorts / Reels üretici
+function shortsCiz(v){
+  var t=v.taslaklar||[]; var bekleyen=t.filter(function(x){return x.durum==='onay_bekliyor';});
+  $('#skDurum').textContent=bekleyen.length?(bekleyen.length+' taslak onayını bekliyor.'):'Onay bekleyen taslak yok. '+(t.length?'':'Henüz taslak üretilmedi (salı/cuma 17:00 ya da "şimdi üret").');
+  var kap=$('#skListe'); kap.textContent='';
+  t.forEach(function(x){
+    var d=dom('div','hoge'); d.style.cssText='margin-top:10px;text-align:left;max-width:360px';
+    var vd=document.createElement('video'); vd.controls=true; vd.muted=false; vd.playsInline=true; vd.preload='metadata'; vd.style.cssText='width:100%;border-radius:10px;background:#000'; vd.src='https://raw.githubusercontent.com/'+v.depo+'/'+v.dal+'/'+x.video+'#t=0.5'; d.appendChild(vd);
+    d.appendChild(dom('span','rozet '+(x.durum==='yayinlandi'?'iyi':(x.durum==='onay_bekliyor'?'orta':'zayif')),({onay_bekliyor:'Onay bekliyor',yayinlandi:'Yayına gönderildi',reddedildi:'Reddedildi'}[x.durum]||x.durum)+' · '+Math.round(x.sure||0)+' sn · müzik: '+(x.muzik||'-')));
+    if(x.durum==='onay_bekliyor'){
+      var bas=document.createElement('input'); bas.type='text'; bas.maxLength=100; bas.value=x.baslik||''; bas.style.cssText='width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-top:6px'; d.appendChild(bas);
+      var ac=document.createElement('textarea'); ac.rows=6; ac.maxLength=2000; ac.value=x.aciklama||''; ac.style.cssText='width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-top:6px'; d.appendChild(ac);
+      var onay=false, yb=dom('button','ana','YouTube Shorts + Reels olarak yayınla'); yb.type='button';
+      yb.addEventListener('click',function(){
+        if(!hSifreKontrol()) return;
+        if(!onay){ onay=true; yb.textContent='Emin misin? Evet, yayınla'; setTimeout(function(){ onay=false; yb.textContent='YouTube Shorts + Reels olarak yayınla'; },6000); return; }
+        onay=false; yb.disabled=true;
+        hPost('/api/yayinla',{yol:x.video,baslik:bas.value,aciklama:ac.value,hedefler:['youtube','instagram'],onay:true})
+          .then(function(){ return hPost('/api/shorts-karar',{id:x.id,karar:'yayinlandi'}); })
+          .then(function(){ $('#skDurum').textContent='Yayın başlatıldı (YouTube Shorts + Reels). Birkaç dakika içinde yayında olur.'; shortsCek(); })
+          .catch(function(e){ $('#skDurum').textContent=String(e.message||e); yb.disabled=false; });
+      });
+      d.appendChild(yb);
+      [['Reddet','reddet'],['Sil','sil']].forEach(function(p){ var b=dom('button',null,p[0]); b.type='button'; b.addEventListener('click',function(){ if(!hSifreKontrol()) return; b.disabled=true; hPost('/api/shorts-karar',{id:x.id,karar:p[1]}).then(function(){ shortsCek(); }).catch(function(e){ $('#skDurum').textContent=String(e.message||e); b.disabled=false; }); }); d.appendChild(b); });
+    } else {
+      d.appendChild(dom('div','not',x.baslik||''));
+      if(x.durum==='reddedildi'){ var sb=dom('button',null,'Sil'); sb.type='button'; sb.addEventListener('click',function(){ if(!hSifreKontrol()) return; sb.disabled=true; hPost('/api/shorts-karar',{id:x.id,karar:'sil'}).then(function(){ shortsCek(); }).catch(function(e){ $('#skDurum').textContent=String(e.message||e); sb.disabled=false; }); }); d.appendChild(sb); }
+    }
+    kap.appendChild(d);
+  });
+}
+function shortsCek(){ fetch('/api/shorts').then(function(r){return r.ok?r.json():null;}).then(function(v){ if(v) shortsCiz(v); else $('#skDurum').textContent='Shorts verisi okunamadı.'; }).catch(function(){ $('#skDurum').textContent='Shorts verisi okunamadı.'; }); }
+var skOnay=false;
+$('#skUret').addEventListener('click',function(){
+  if(!hSifreKontrol()) return; var btn=this;
+  if(!skOnay){ skOnay=true; btn.textContent='Emin misin? Evet, üret (birkaç sent)'; setTimeout(function(){ skOnay=false; btn.textContent='Şimdi bir taslak üret'; },6000); return; }
+  skOnay=false; btn.textContent='Şimdi bir taslak üret'; btn.disabled=true;
+  hPost('/api/shorts-calistir',{}).then(function(){ $('#skDurum').textContent='Üretiliyor. Birkaç dakika içinde taslak burada görünür.'; btn.disabled=false; var n=0; var t=setInterval(function(){ shortsCek(); if(++n>16) clearInterval(t); },15000); }).catch(function(e){ $('#skDurum').textContent=String(e.message||e); btn.disabled=false; });
+});
+shortsCek(); setInterval(shortsCek,300000);
+
 
 
 var SR=window.SpeechRecognition||window.webkitSpeechRecognition, rec=null;

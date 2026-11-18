@@ -98,3 +98,10 @@ Haftada bir (pazar 18:00 TR; sunucu zamanlayıcısı ve GitHub iş akışı) `aj
 - **Ders önerileri:** yapay zekâya yalnızca toplu sayılar gider (tasarım adı, trend konusu gibi internetten gelen metinler gitmez; haftada birkaç sent). En çok 3 öneri, her biri somut bir sayıya dayanmalı; talimat/URL içeren ya da kanıtsız öneriler elenir. `akademi/oneriler.json`.
 - **Onay şart:** öneriler "onay bekliyor" olarak panelde (Akademi kartı) görünür. Yalnızca senin ONAYLADIĞIN dersler ajanların istemine eklenir (hikaye, trend, içerik); istediğin zaman "Kaldır"ırsın. Akademi ajanların kodunu ve ayarlarını değiştirmez.
 - Hikaye üretici, öğrenebilmesi için `hikaye/olaylar.jsonl` dosyasına kısa olay kayıtları yazar (neden elendi, denetim sorunları).
+
+### Shorts / Reels üretici
+`ajan/kisa_video.py` (iş akışı `kisa-video.yml`, salı ve cuma 17:00 TR sunucu zamanlayıcısıyla ya da panelden "Şimdi bir taslak üret"):
+- Hikaye ajanının zaten ürettiği, atıflı yapay zekâ görsellerinden 4 sahneli, müzikli (stil dönüşümlü), dikey 9:16 kısa video **taslağı** hazırlar. Yeni görsel üretmez (görsel maliyeti yok). Başlık, ekran kancası ve açıklama için yapay zekâya yalnızca temizlenmiş tasarım adları gider (birkaç sentten az); anahtar yoksa sabit şablon.
+- Açıklamaya her tasarımın adı, tasarımcısı, lisansı ve bağlantısı (CC BY atfı) ile "yapay zekâ görseli" notu yazılır.
+- **Hiçbir şeyi yayınlamaz.** Video `videolar/yukleme_<tarih>.mp4`, taslak `shorts/<kimlik>.json` (durum `onay_bekliyor`). Panelde (Shorts / Reels üretici kartı) videoyu izler, başlık ve açıklamayı düzenler, "YouTube Shorts + Reels olarak yayınla" dersin; mevcut yayın akışı (`/api/yayinla`) çalışır.
+- Aynı anda en çok 3 onay bekleyen taslak tutulur; kullanılmamış hikaye görseli 3'ten azsa üretim beklemeye geçer. YouTube yükleme kotası: yükleme başına 1600 birim (günlük 10.000).
