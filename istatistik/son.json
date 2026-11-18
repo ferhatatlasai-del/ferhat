@@ -1,6 +1,6 @@
 {
- "tarih": "2026-11-18T20:37:58Z",
- "tr_saat": "18.11.2026 23:37",
+ "tarih": "2026-11-18T20:39:55Z",
+ "tr_saat": "18.11.2026 23:39",
  "toplam": {
   "reels": 0,
   "gonderi": 0,
@@ -11,12 +11,12 @@
   "begeni": 0,
   "yorum": 0
  },
- "fark": null,
+ "fark": 0,
  "instagram": {
   "durum": "atlandi",
   "izin": false,
   "takipci": null,
-  "hata": "HTTP 400 kod=100 tür=OAuthException: (#100) Tried accessing nonexisting field (followers_count)",
+  "hata": "graph.instagram.com profil: HTTP 400 kod=190 tür=OAuthException: Invalid OAuth access token - Cannot parse access token | graph.facebook.com profil: HTTP 400 kod=100 tür=OAuthException: (#100) Tried accessing nonexisting field (media_count)",
   "gonderiler": []
  },
  "hikaye_izin": false,
@@ -98,14 +98,14 @@
   "durum": "atlandi",
   "izin": false,
   "videolar": [],
-  "hata": "YouTube okuma izni yok (HTTP 403). Request had insufficient authentication scopes."
+  "hata": "YouTube okuma izni yok (HTTP 403): YT_OKU_REFRESH_TOKEN gerekir. Request had insufficient authentication scopes."
  },
  "eksikler": [
   "Instagram okunamadı",
   "YouTube okunamadı"
  ],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 23:37",
-  "govde": "Toplam 0 · Reels ? · Short ? · Hikaye 0 (5 bugün) · Instagram okunamadı; YouTube okunamadı"
+  "baslik": "📊 İzlenme raporu 23:39",
+  "govde": "Toplam 0 (0) · Reels ? · Short ? · Hikaye 0 (5 bugün) · Instagram okunamadı; YouTube okunamadı"
  }
 }
