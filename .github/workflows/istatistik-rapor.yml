@@ -28,6 +28,7 @@ jobs:
           YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
           YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          YT_OKU_REFRESH_TOKEN: ${{ secrets.YT_OKU_REFRESH_TOKEN }}
           OFIS_ADRES: https://gurtechs-ajan-ofisi.fly.dev
           BILDIRIM_SIRRI: ${{ secrets.BILDIRIM_SIRRI }}
           ELLE: ${{ github.event.inputs.elle }}
