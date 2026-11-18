@@ -105,3 +105,14 @@ Haftada bir (pazar 18:00 TR; sunucu zamanlayıcısı ve GitHub iş akışı) `aj
 - Açıklamaya her tasarımın adı, tasarımcısı, lisansı ve bağlantısı (CC BY atfı) ile "yapay zekâ görseli" notu yazılır.
 - **Hiçbir şeyi yayınlamaz.** Video `videolar/yukleme_<tarih>.mp4`, taslak `shorts/<kimlik>.json` (durum `onay_bekliyor`). Panelde (Shorts / Reels üretici kartı) videoyu izler, başlık ve açıklamayı düzenler, "YouTube Shorts + Reels olarak yayınla" dersin; mevcut yayın akışı (`/api/yayinla`) çalışır.
 - Aynı anda en çok 3 onay bekleyen taslak tutulur; kullanılmamış hikaye görseli 3'ten azsa üretim beklemeye geçer. YouTube yükleme kotası: yükleme başına 1600 birim (günlük 10.000).
+
+### Panel düzeni (sekmeler)
+Panel yedi sekmeye ayrıldı; alttaki rozetler o sekmede bekleyen karar/uyarı sayısını gösterir.
+- **Ofis** (açılış): 3 boyutlu ofis, ajan seçimi, üstte "yapılacaklar" şeridi. Ofis yalnızca bu sekmede görünür ve çizilir; diğer sekmelerde durur.
+- **Özet**: bugünkü yayın/üretim kartları, "Yapılacaklar" listesi (tıklayınca ilgili sekmeye gider), hikaye yayını ve sistem durumu, ajan listesi.
+- **Hikaye**: ajan durumu, kuyruk (onayla/reddet/sil), kendi fotoğraf ve videonu ekleme.
+- **Video**: Shorts / Reels üretici taslakları ve elle video yayınlama.
+- **İçerik**: zincir ("İçerik üret") ve trend fikirleri.
+- **Akademi**: haftalık rapor ve ders önerileri.
+- **Sistem**: hikaye zamanlaması, yapay zekâ üretim ayarları, bildirimler, servis sağlığı, zamanlayıcı.
+Adres sonundaki `#hikaye`, `#video` gibi bağlantılar doğrudan sekmeyi açar. Ofis şifresi gerektiren işlemde üstte tek bir şifre çubuğu açılır.
