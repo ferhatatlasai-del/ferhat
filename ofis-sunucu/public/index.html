@@ -265,6 +265,17 @@ body.tam .hint{display:none}
 @keyframes ilerle{from{width:0}to{width:100%}}
 .tel .talt{margin-top:6px;font-weight:700;display:flex;align-items:center;gap:5px}
 .tel .talt i{width:16px;height:16px;border-radius:50%;background:#3cc47a;color:#fff;display:inline-grid;place-items:center;font-style:normal;font-size:11px;flex:none}
+
+/* ---- İstatistik (izlenme raporu) ---- */
+#isKart .spark{width:100%;height:64px;margin:6px 0 2px;display:block}
+#isKart .spark polyline{fill:none;stroke:var(--accent);stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round}
+#isKart .spark polyline{vector-effect:non-scaling-stroke}
+.isliste{display:grid;gap:6px;margin-top:8px}
+.isliste .isr{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);font-size:13.5px}
+.isliste .isr .rozet{white-space:nowrap}
+.isliste .isr a{color:var(--ink);text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.isliste .isr b{font-variant-numeric:tabular-nums}
+.isliste .isr small{grid-column:2/4;color:var(--ink2)}
 </style>
 
 </head><body>
@@ -322,6 +333,17 @@ body.tam .hint{display:none}
   <section class="gorunum" id="v-ozet" data-v="ozet" hidden>
     <h2 class="baslik">Özet</h2>
     <div class="kartlar" id="ozKartlar"></div>
+    <div class="card pub" id="isKart">
+      <h2>İzlenme raporu</h2>
+      <p class="alt">İstatistikçi ajan günde 5 kez (09, 12, 15, 18, 21) tüm paylaşımların izlenmesini toplar ve telefonuna kısa rapor gönderir: Instagram Reels ve gönderiler, hikayeler ve YouTube Shorts / videolar. Hiçbir şey yayınlamaz.</p>
+      <p class="not" id="isDurum">Yükleniyor…</p>
+      <div class="kartlar" id="isOzet"></div>
+      <svg class="spark" id="isCizgi" viewBox="0 0 300 64" preserveAspectRatio="none" hidden></svg>
+      <div class="satir"><button type="button" class="ana" id="isCalistir">Raporu şimdi hazırla</button><button type="button" id="isAktif">Duraklat</button><button type="button" id="isAtla">Artış yoksa bildirim atla: kapalı</button></div>
+      <p class="not" id="isUyari" hidden></p>
+      <details class="tr" open><summary>En çok izlenenler</summary><div class="isliste" id="isIyi"></div></details>
+      <details class="tr"><summary>Tüm paylaşımlar</summary><div class="isliste" id="isTum"></div></details>
+    </div>
     <div class="card pub"><h2>Yapılacaklar</h2><p class="alt">Senin kararını bekleyen ve dikkat isteyen şeyler.</p><div id="ozYapilacak"></div></div>
     <div class="cift">
       <div class="card pub"><h2>Hikaye yayını</h2><div id="ozHikaye" class="saglik"></div></div>
@@ -493,8 +515,8 @@ var AJ=[
   gorev:'Her gün carousel ya da kısa video planı yazar, üç platform için metin hazırlar.',
   son:'2026-11-15T21:45:14Z',sonuc:'Başarılı, günlük taslak yazıldı.',zaman:'Her gün 09:00 (TR) hedeflenir. GitHub saatlerce geciktirebiliyor (son çalışmalar öğleden sonra oldu).',not:'Model gpt-5.4-mini, bulunamazsa gpt-4o-mini.'},
  {id:'istatistik',ad:'Hesap istatistik ajanı',kisa:'İstatistik',durum:'calisiyor',x:-0.6,z:-5,yaw:0,tip:'istatistik',
-  gorev:'@gurtechs3d takipçi ve son gönderi verisini okur.',
-  son:'2026-11-15T18:25:44Z',sonuc:'Veri yazıldı, son doğrulanan çalışma.',zaman:'İçerik ajanıyla aynı iş akışında, her gün 09:00 (TR).',not:'Salt okunur. Beğeni ve yorum gelir, izlenme sayısı gelmez.'},
+  gorev:'Instagram, hikaye ve YouTube izlenmelerini toplar, telefonuna kısa rapor gönderir.',
+  son:'2026-11-15T18:25:44Z',sonuc:'Veri yazıldı, son doğrulanan çalışma.',zaman:'Günde 5 kez: 09, 12, 15, 18, 21 (TR).',not:'Salt okunur, hiçbir şey yayınlamaz. Hikaye değerleri 24 saatte silindiği için en yüksek değer saklanır. Instagram ve YouTube izinleri yoksa o kısım “?” görünür.'},
  {id:'instagram',ad:'Instagram yayın ajanı',kisa:'Instagram',durum:'hazir',x:4,z:-5,yaw:0,tip:'instagram',
   gorev:'Hazır videoyu Reels olarak yayınlar. Onay kapılıdır.',
   son:'2026-11-15T21:56:49Z',sonuc:'Doktor Filament tanıtım videosu yayınlandı.',zaman:'Elle tetiklenir. Onay kutusuna EVET yazılmazsa yalnızca kontrol eder.',not:'Instagram’da yapay zekâ etiketini açıp açamadığı bilinmiyor.'},
@@ -1255,6 +1277,78 @@ function telKonum(w,h){
   telEl.style.left=x+'px'; telEl.style.top=(y-8)+'px';
 }
 
+
+/* ---------- İstatistikçi: izlenme raporu ---------- */
+var IST=null;
+function isTarih(iso){ if(!iso) return ''; var d=new Date(iso.length<=19&&iso.indexOf('Z')<0&&iso.indexOf('+')<0?iso+'Z':iso); return isNaN(d)?'':d.toLocaleDateString('tr-TR',{day:'numeric',month:'short'}); }
+function isSayi(n){ return (n==null||isNaN(n))?'?':Number(n).toLocaleString('tr-TR'); }
+function isIsaret(n){ return (n>0?'+':'')+isSayi(n); }
+function istatistikCek(){ fetch('/api/istatistik').then(function(r){return r.ok?r.json():null;}).then(function(v){ if(v) istatistikCiz(v); else $('#isDurum').textContent='İstatistik verisi okunamadı.'; }).catch(function(){ $('#isDurum').textContent='İstatistik verisi okunamadı.'; }); }
+function istatistikCiz(v){
+  IST=v; OZ.ist=v; var son=v.son, ay=v.ayar||{};
+  $('#isAktif').textContent=ay.aktif===false?'Raporları aç':'Duraklat';
+  $('#isAtla').textContent='Artış yoksa bildirim atla: '+(ay.artis_yoksa_atla?'açık':'kapalı');
+  var kk=$('#isOzet'); kk.textContent='';
+  if(!son){ $('#isDurum').textContent='Henüz rapor yok. İlk rapor bir sonraki 09/12/15/18/21 saatinde gelir ya da “Raporu şimdi hazırla”ya bas.'; $('#isCizgi').hidden=true; $('#isIyi').textContent=''; $('#isTum').textContent=''; $('#isUyari').hidden=true; return; }
+  var t=son.toplam||{};
+  $('#isDurum').textContent='Son rapor: '+son.tr_saat+' (TR).'+(ay.aktif===false?' Raporlar duraklatılmış.':'');
+  function kart(et,sayi,alt,sinif){ var k=dom('div','kt-kart'+(sinif?' '+sinif:'')); k.appendChild(dom('span','et',et)); k.appendChild(dom('b','sayi',sayi)); if(alt) k.appendChild(dom('small',null,alt)); kk.appendChild(k); }
+  kart('Toplam izlenme',isSayi(t.toplam),son.fark!=null?('önceki rapordan '+isIsaret(son.fark)):'',son.fark>0?'iyi':'');
+  var ig=son.instagram||{}, yt=son.youtube||{};
+  kart('Reels',ig.izin?isSayi(t.reels):'?',ig.izin?'':'izin yok');
+  kart('Short',yt.izin?isSayi(t.short):'?',yt.izin?'':'izin yok');
+  kart('Hikaye',isSayi(t.hikaye),son.hikaye_izin?'bu sefer okundu':'');
+  kart('Takipçi',isSayi(ig.takipci),'');
+  // çizgi grafik
+  var g=(v.gecmis||[]).slice(-40), sv=$('#isCizgi'); sv.textContent='';
+  if(g.length>=2){
+    var vals=g.map(function(x){return x.toplam||0;}), mn=Math.min.apply(null,vals), mx=Math.max.apply(null,vals), aralik=(mx-mn)||1;
+    var pts=vals.map(function(y,i){ return (4+i*(292/(vals.length-1))).toFixed(1)+','+(mx===mn?32:(58-((y-mn)/aralik)*50)).toFixed(1); });
+    var NS='http://www.w3.org/2000/svg'; var pl=document.createElementNS(NS,'polyline'); pl.setAttribute('points',pts.join(' ')); sv.appendChild(pl);
+    sv.hidden=false;
+  } else sv.hidden=true;
+  // uyarılar
+  var u=$('#isUyari'); var ek=son.eksikler||[];
+  if(ek.length){ var ipucu=[]; if(ek.some(function(x){return /Instagram izlenme/.test(x);})) ipucu.push('Instagram izlenmesi için Meta uygulamasında insights izni gerekir.'); if(ek.some(function(x){return /YouTube/.test(x);})) ipucu.push('YouTube için okuma izni gerekir.'); u.textContent='Eksik veri: '+ek.join('; ')+'. '+ipucu.join(' '); u.hidden=false; } else u.hidden=true;
+  // listeler
+  var tum=[]; (ig.gonderiler||[]).forEach(function(x){ tum.push({tur:x.tur,baslik:x.baslik,izlenme:x.izlenme,begeni:x.begeni,yorum:x.yorum,tarih:x.tarih,link:x.link}); });
+  (yt.videolar||[]).forEach(function(x){ tum.push({tur:'YouTube '+x.tur,baslik:x.baslik,izlenme:x.izlenme,begeni:x.begeni,yorum:x.yorum,tarih:x.tarih,link:x.link}); });
+  (son.hikayeler||[]).forEach(function(x){ tum.push({tur:'Hikaye',baslik:x.baslik,izlenme:x.izlenme,erisim:x.erisim,tarih:x.tarih}); });
+  tum.sort(function(a,b){ return (b.tarih||'')<(a.tarih||'')?-1:1; });
+  function satir(o){
+    var r=dom('div','isr'); r.appendChild(dom('span','rozet '+(/Reels|Short/.test(o.tur)?'iyi':(/Hikaye/.test(o.tur)?'orta':'zayif')),o.tur));
+    var ad=o.baslik||'başlıksız'; if(o.link&&/^https:\/\//.test(o.link)){ var a=dom('a',null,ad); a.href=o.link; a.target='_blank'; a.rel='noopener'; r.appendChild(a); } else r.appendChild(dom('span',null,ad));
+    r.appendChild(dom('b',null,o.izlenme==null?'?':isSayi(o.izlenme)));
+    var alt=[isTarih(o.tarih)]; if(o.begeni!=null) alt.push('beğeni '+o.begeni); if(o.yorum) alt.push('yorum '+o.yorum); if(o.erisim) alt.push('erişim '+o.erisim); r.appendChild(dom('small',null,alt.filter(Boolean).join(' · ')));
+    return r;
+  }
+  var iyi=$('#isIyi'); iyi.textContent=''; tum.filter(function(x){return x.izlenme>0;}).sort(function(a,b){return b.izlenme-a.izlenme;}).slice(0,5).forEach(function(o){ iyi.appendChild(satir(o)); }); if(!iyi.firstChild) iyi.appendChild(dom('p','not','İzlenme verisi gelince burada en çok izlenenler görünür.'));
+  var tm=$('#isTum'); tm.textContent=''; tum.slice(0,60).forEach(function(o){ tm.appendChild(satir(o)); });
+  setTimeout(ozetCiz,0); if(typeof selId!=='undefined'&&selId==='istatistik'&&AJM.istatistik&&AJM.istatistik.aktif&&AJM.istatistik.durum!=='calisiyor') aksCiz();
+}
+async function istatistikCalistir(){
+  if(!hSifreKontrol()) return; var A=AJM.istatistik; var onceki=IST&&IST.son?IST.son.tarih:''; var t0=Date.now();
+  var b=$('#isCalistir'); if(b){ b.disabled=true; b.textContent='⏳ Hazırlanıyor…'; } if(A){ A.durum='calisiyor'; A.calisiyorMetni='Rapor hazırlanıyor… (1 dk)'; A.mesaj=''; aksCiz(); }
+  var st=ST.istatistik; if(st){ st.busy=true; st.busyRing.visible=true; konus('isx','Rakamlara bakıyorum…',function(){return [st.a.x,st.a.z];}); }
+  var bitir=function(){ if(st){ st.busy=false; st.busyRing.visible=false; konus('isx',''); } if(b){ b.disabled=false; b.textContent='Raporu şimdi hazırla'; } need=true; };
+  try{ await hPost('/api/istatistik-calistir',{}); }catch(e){ toastGoster(String(e.message||e)); if(A){ A.durum='bos'; A.mesaj=String(e.message||e); aksCiz(); } bitir(); return; }
+  while(Date.now()-t0<5*60e3){
+    await bekle(YTT.poll>2000?10000:YTT.poll);
+    try{ var v=await fetch('/api/istatistik').then(function(r){return r.ok?r.json():null;});
+      if(v&&v.son&&v.son.tarih!==onceki&&Date.parse(v.son.tarih)>=t0-5000){ istatistikCiz(v); if(A){ A.durum='bitti'; A.mesaj='🎉 Rapor hazır: toplam '+isSayi(v.son.toplam.toplam)+' izlenme'+(v.son.fark!=null?' ('+isIsaret(v.son.fark)+')':'')+'.'; aksCiz(); } toastGoster('İzlenme raporu hazır.'); bitir(); return; } }catch(e){}
+  }
+  if(A){ A.durum='bos'; A.mesaj='Rapor görünmedi; GitHub Actions’a bak.'; aksCiz(); } bitir();
+}
+function istatistikAyar(alan){
+  if(!hSifreKontrol()||!IST) return; var ay=IST.ayar||{}; var govde={};
+  govde[alan]=(alan==='aktif')?(ay.aktif===false):!ay.artis_yoksa_atla;
+  hPost('/api/istatistik-ayar',govde).then(function(){ toastGoster('Ayar kaydedildi.'); istatistikCek(); }).catch(function(e){ toastGoster(String(e.message||e)); });
+}
+$('#isCalistir').addEventListener('click',istatistikCalistir);
+$('#isAktif').addEventListener('click',function(){ istatistikAyar('aktif'); });
+$('#isAtla').addEventListener('click',function(){ istatistikAyar('artis_yoksa_atla'); });
+istatistikCek(); setInterval(istatistikCek,300000);
+
 /* ---------- Hikaye üret ve sıraya koy (Hikaye sekmesi ve ofiste Hikaye ajanı) ---------- */
 var HKM={durum:'bos',mesaj:'',eklenen:0,aktif:false}, hkUretiyor=false;
 function hkSira(){ var k=(HK&&HK.kuyruk)||[]; return k.filter(function(o){return o.durum==='planli'||o.durum==='onay_bekliyor';}).length; }
@@ -1314,7 +1408,8 @@ async function hikayeHemen(){
 var AJM={
   trend:{ad:'Trend ajanı',renk:'#f0b429',durum:'bos',mesaj:'',aktif:false,bilgi:''},
   icerik:{ad:'İçerik ajanı',renk:'#2b7de9',durum:'bos',mesaj:'',aktif:false},
-  doktor:{ad:'Doktor Filament · Akademi',renk:'#7c5cff',durum:'bos',mesaj:'',aktif:false}
+  doktor:{ad:'Doktor Filament · Akademi',renk:'#7c5cff',durum:'bos',mesaj:'',aktif:false},
+  istatistik:{ad:'İstatistikçi ajan',renk:'#3cc47a',durum:'bos',mesaj:'',aktif:false}
 };
 function menuluMu(id){ return !!(PLAT[id]||id==='hikaye'||AJM[id]); }
 function ajmCiz(id){
@@ -1332,6 +1427,12 @@ function ajmCiz(id){
     } else if(id==='icerik'){
       btn('🎬 Reels senaryosu üret',function(){ icerikUret('reels'); },true); btn('🖼️ Carousel üret',function(){ icerikUret('carousel'); });
       btn('✍️ Direktifle üret (İçerik sekmesi)',git('icerik')); not('Zincir: trend → fikir → senaryo → video paketi. Sonuç İçerik sekmesinde.'); if(A.mesaj) not(A.mesaj);
+    } else if(id==='istatistik'){
+      var is=IST&&IST.son, ay=(IST&&IST.ayar)||{};
+      if(A.durum==='bitti') not(A.mesaj);
+      btn('📊 Raporu şimdi hazırla',istatistikCalistir,true); btn('📈 Raporları gör',git('ozet'));
+      btn(ay.aktif===false?'▶️ Günlük raporları aç':'⏸️ Günlük raporları duraklat',function(){ istatistikAyar('aktif'); });
+      not(is?('Son rapor: '+is.tr_saat+' · toplam '+isSayi(is.toplam.toplam)+' izlenme'+(is.fark!=null?' ('+isIsaret(is.fark)+')':'')+'.'):'Henüz rapor yok. Günde 5 kez (09, 12, 15, 18, 21) telefonuna gelir.'); if(A.durum!=='bitti'&&A.mesaj) not(A.mesaj);
     } else if(id==='doktor'){
       var bek=((OZ.ak&&OZ.ak.oneriler)||[]).filter(function(x){return x.durum==='onay_bekliyor';}).length;
       if(A.durum==='bitti') not(A.mesaj);

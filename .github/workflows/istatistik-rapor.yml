@@ -1,0 +1,39 @@
+name: İstatistikçi ajan (izlenme raporu ve bildirim)
+
+on:
+  workflow_dispatch:
+    inputs:
+      elle:
+        description: "EVET: elle başlatma (duraklatma ve 'artış yoksa atla' kuralları yok sayılır)"
+        required: false
+        default: "HAYIR"
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: istatistik-rapor
+  cancel-in-progress: false
+
+jobs:
+  rapor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instagram ve YouTube izlenmelerini topla, bildirim gönder
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          OFIS_ADRES: https://gurtechs-ajan-ofisi.fly.dev
+          BILDIRIM_SIRRI: ${{ secrets.BILDIRIM_SIRRI }}
+          ELLE: ${{ github.event.inputs.elle }}
+        run: |
+          if [ "$ELLE" = "EVET" ]; then
+            python3 ajan/istatistik_rapor.py --git --elle
+          else
+            python3 ajan/istatistik_rapor.py --git
+          fi
