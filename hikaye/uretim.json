@@ -6,5 +6,6 @@
   "aylik_gorsel_siniri": 240,
   "kalite": "low",
   "kuyruk_hedefi": 8,
-  "referans": "zorunlu"
+  "referans": "zorunlu",
+  "muzik": true
 }
