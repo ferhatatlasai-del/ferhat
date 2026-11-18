@@ -1,0 +1,31 @@
+{
+  "id": "h20261118-170355-f8u",
+  "kaynak": "uretim",
+  "durum": "planli",
+  "olusturma": "2026-11-18T17:03:56.000Z",
+  "gorsel": "hikaye/gorseller/h20261118-170355-f8u.mp4",
+  "baslik": "How To Print Glass",
+  "atif": {
+    "ad": "How To Print Glass",
+    "tasarimci": "Rygar1432",
+    "lisans": "CC BY",
+    "url": "https://www.printables.com/model/15310-how-to-print-glass",
+    "site": "printables.com",
+    "lisans_teyit": true,
+    "referansli": true
+  },
+  "trend": "",
+  "kontrol": {
+    "puan": 9.0,
+    "deneme": 1,
+    "sorunlar": []
+  },
+  "yayin": null,
+  "hata": "",
+  "deneme": 0,
+  "tur": "video",
+  "muzik": "Sentezlenmiş müzik: Lo-fi sakin (telifsiz, FFmpeg ile üretildi)",
+  "muzik_sira": 7,
+  "muzik_stil": "Lo-fi sakin",
+  "muzik_ton": 2
+}
