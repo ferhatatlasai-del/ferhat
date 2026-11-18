@@ -1,7 +1,7 @@
 {
   "id": "h20261118-033530-c7l",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-18T03:35:30.000Z",
   "gorsel": "hikaye/gorseller/h20261118-033530-c7l.mp4",
   "baslik": "Customizable & stackable beer crate for all types of batteries",
@@ -21,7 +21,9 @@
     "sorunlar": []
   },
   "yayin": {
-    "tarih": "2026-11-18T13:05:56Z"
+    "tarih": "2026-11-18T13:07:14Z",
+    "medya_kimligi": "18134890051757273",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4033135141455225538"
   },
   "hata": "",
   "deneme": 0,
