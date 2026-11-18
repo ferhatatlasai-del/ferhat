@@ -21,16 +21,18 @@ import urllib.parse
 import urllib.request
 
 KOK = pathlib.Path(__file__).resolve().parent.parent
-API = "https://graph.facebook.com/v21.0"
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import ig_ortak  # noqa: E402  (anahtar türüne göre adres ve hesap)
 
 
 def api(yontem, yol, **parametre):
     parametre["access_token"] = os.environ["IG_ACCESS_TOKEN"]
     govde = urllib.parse.urlencode(parametre)
+    taban = ig_ortak.api_adresi()
     if yontem == "GET":
-        istek = urllib.request.Request(f"{API}/{yol}?{govde}")
+        istek = urllib.request.Request(f"{taban}/{yol}?{govde}")
     else:
-        istek = urllib.request.Request(f"{API}/{yol}", data=govde.encode(), method="POST")
+        istek = urllib.request.Request(f"{taban}/{yol}", data=govde.encode(), method="POST")
     with urllib.request.urlopen(istek, timeout=120) as yanit:
         return json.load(yanit)
 
@@ -74,7 +76,7 @@ def main():
     for gerekli in ("IG_ACCESS_TOKEN", "IG_USER_ID"):
         if not os.environ.get(gerekli):
             sys.exit(f"{gerekli} tanımlı değil.")
-    kimlik = os.environ["IG_USER_ID"]
+    kimlik = ig_ortak.kimlik()
     aciklama = (KOK / a.aciklama_dosyasi).read_text(encoding="utf-8").strip()
     if not aciklama:
         sys.exit("Açıklama dosyası boş.")

@@ -17,6 +17,8 @@ import urllib.request
 
 KOK = pathlib.Path(os.environ.get("HIKAYE_KOK") or pathlib.Path(__file__).resolve().parent.parent)
 IG_API = os.environ.get("IG_API_ADRESI") or "https://graph.facebook.com/v21.0"
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import ig_ortak  # noqa: E402  (anahtar türüne göre adres ve hesap)
 OPENAI = os.environ.get("OPENAI_BASE_URL") or "https://api.openai.com/v1"
 YT_TOKEN = os.environ.get("YT_TOKEN_ADRESI") or "https://oauth2.googleapis.com/token"
 SAGLIK = KOK / "hikaye" / "saglik.json"
@@ -36,9 +38,10 @@ def kontrol_instagram():
     tok, kim = os.environ.get("IG_ACCESS_TOKEN"), os.environ.get("IG_USER_ID")
     if not (tok and kim):
         return "atlandi", "IG_ACCESS_TOKEN ya da IG_USER_ID tanımlı değil"
-    kod, govde = iste(urllib.request.Request(f"{IG_API}/{kim}?" + urllib.parse.urlencode({"fields": "username", "access_token": tok})))
+    taban, kim_gercek, tur = ig_ortak.baglanti()
+    kod, govde = iste(urllib.request.Request(f"{taban}/{kim_gercek}?" + urllib.parse.urlencode({"fields": "username", "access_token": tok})))
     if kod == 200:
-        return "iyi", "Instagram anahtarı çalışıyor"
+        return "iyi", "Instagram anahtarı çalışıyor" + (" (Instagram girişli)" if tur == "instagram" else "")
     try:
         h = json.loads(govde).get("error", {})
         return "sorun", f"Instagram anahtarı reddedildi (kod {h.get('code')}): {str(h.get('message'))[:140]}. Anahtarı yenilemek gerekebilir."
