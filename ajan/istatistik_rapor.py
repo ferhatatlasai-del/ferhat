@@ -281,14 +281,18 @@ def en_iyi(ig, yt, hikayeler):
     return max(adaylar) if adaylar else None
 
 
-def bildirim_metni(an, ig, yt, hikayeler, top, onceki, eksikler):
+def bildirim_metni(an, ig, yt, hikayeler, top, onceki, eksikler, hikaye_izin=False):
     fark = top["toplam"] - (onceki or {}).get("toplam", top["toplam"])
     bugun_hikaye = sum(1 for e in hikayeler.values() if (e.get("tarih") or "")[:10] == simdi().strftime("%Y-%m-%d"))
     baslik = f"📊 İzlenme raporu {tr_saat(an).strftime('%H:%M')}"
-    parca = [f"Toplam {sayi(top['toplam'])}" + (f" ({isaretli(fark)})" if onceki else "")]
+    eksik_veri = not ig["izin"] or not yt["izin"]
+    parca = [f"Toplam {sayi(top['toplam'])}" + (" (eksik veri)" if eksik_veri else (f" ({isaretli(fark)})" if onceki else ""))]
     parca.append(f"Reels {sayi(top['reels'])}" if ig["izin"] else "Reels ?")
     parca.append(f"Short {sayi(top['short'])}" if yt["izin"] else "Short ?")
-    parca.append(f"Hikaye {sayi(top['hikaye'])}" + (f" ({bugun_hikaye} bugün)" if bugun_hikaye else ""))
+    if top["hikaye"] > 0 or hikaye_izin:
+        parca.append(f"Hikaye {sayi(top['hikaye'])}" + (f" ({bugun_hikaye} bugün)" if bugun_hikaye else ""))
+    else:
+        parca.append("Hikaye ?")
     if ig.get("takipci") is not None:
         pf = ((onceki or {}).get("takipci"))
         parca.append(f"Takipçi {sayi(ig['takipci'])}" + (f" ({isaretli(ig['takipci'] - pf)})" if isinstance(pf, int) and ig["takipci"] != pf else ""))
@@ -336,7 +340,7 @@ def calis(a):
         eksikler.append("YouTube okunamadı")
     elif not yt["izin"]:
         eksikler.append("YouTube izni yok")
-    baslik, govde, fark = bildirim_metni(an, ig, yt, hikayeler, top, onceki, eksikler)
+    baslik, govde, fark = bildirim_metni(an, ig, yt, hikayeler, top, onceki, eksikler, hikaye_izin)
     satir = {"t": an.strftime("%Y-%m-%dT%H:%M:%SZ"), "toplam": top["toplam"], "reels": top["reels"], "short": top["short"], "hikaye": top["hikaye"],
              "gonderi": top["gonderi"], "youtube_video": top["youtube_video"], "begeni": top["begeni"], "yorum": top["yorum"], "takipci": ig.get("takipci")}
     son = {"tarih": satir["t"], "tr_saat": tr_saat(an).strftime("%d.%m.%Y %H:%M"), "toplam": top, "fark": fark if onceki else None,
