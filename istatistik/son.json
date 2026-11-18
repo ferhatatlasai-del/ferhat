@@ -1,6 +1,6 @@
 {
- "tarih": "2026-11-18T21:26:54Z",
- "tr_saat": "19.11.2026 00:26",
+ "tarih": "2026-11-18T21:37:54Z",
+ "tr_saat": "19.11.2026 00:37",
  "toplam": {
   "reels": 0,
   "gonderi": 0,
@@ -8,204 +8,17 @@
   "youtube_video": 0,
   "hikaye": 0,
   "toplam": 0,
-  "begeni": 91,
-  "yorum": 4
+  "begeni": 0,
+  "yorum": 0
  },
  "fark": 0,
  "instagram": {
-  "durum": "tamam",
+  "durum": "atlandi",
   "izin": false,
-  "takipci": 417,
-  "hata": "HTTP 400 kod=10 tür=OAuthException: (#10) Application does not have permission for this action",
-  "gonderiler": [
-   {
-    "id": "18655251088021009",
-    "tur": "Reels",
-    "tarih": "2026-11-18T21:22:50",
-    "baslik": "🤖 Doktor Filament yapay zekâ ile üretilmiş bir karakterdir.",
-    "begeni": 1,
-    "yorum": 0,
-    "link": "https://www.instagram.com/reel/Df5dfOAjiMp/",
-    "izlenme": null,
-    "erisim": null
-   },
-   {
-    "id": "18140690902641017",
-    "tur": "Reels",
-    "tarih": "2026-11-18T12:59:15",
-    "baslik": "3D baskıyla ortaya çıkan bu tasarımlar günlük hayatta işe ya",
-    "begeni": 2,
-    "yorum": 0,
-    "link": "https://www.instagram.com/reel/Df4j3AnDmy-/",
-    "izlenme": null,
-    "erisim": null
-   },
-   {
-    "id": "17925649080445339",
-    "tur": "Reels",
-    "tarih": "2026-11-16T21:09:39",
-    "baslik": "Kablolar neden hep masadan kayıp gidiyor? 🤔",
-    "begeni": 5,
-    "yorum": 0,
-    "link": "https://www.instagram.com/reel/Df0SY8TGKVZ/",
-    "izlenme": null,
-    "erisim": null
-   },
-   {
-    "id": "18121842679765284",
-    "tur": "Reels",
-    "tarih": "2026-11-15T21:56:42",
-    "baslik": "Tanışın: Doktor Filament! 🤖",
-    "begeni": 3,
-    "yorum": 1,
-    "link": "https://www.instagram.com/reel/Dfxy_-8Ekyj/",
-    "izlenme": null,
-    "erisim": null
-   },
-   {
-    "id": "18077982347330509",
-    "tur": "Reels",
-    "tarih": "2025-11-26T21:36:54",
-    "baslik": "",
-    "begeni": 5,
-    "yorum": 0,
-    "link": "https://www.instagram.com/reel/DRiPXb3DV4_/",
-    "izlenme": null,
-    "erisim": null
-   },
-   {
-    "id": "18087680845783056",
-    "tur": "Reels",
-    "tarih": "2025-11-26T21:26:21",
-    "baslik": "",
-    "begeni": 1,
-    "yorum": 0,
-    "link": "https://www.instagram.com/reel/DRiOJ_8DRtD/",
-    "izlenme": null,
-    "erisim": null
-   },
-   {
-    "id": "17925571536036735",
-    "tur": "Reels",
-    "tarih": "2025-11-26T21:24:59",
-    "baslik": "",
-    "begeni": 0,
-    "yorum": 0,
-    "link": "https://www.instagram.com/reel/DRiN1x9jQRo/",
-    "izlenme": null,
-    "erisim": null
-   },
-   {
-    "id": "18024177350788655",
-    "tur": "Reels",
-    "tarih": "2025-11-26T21:12:23",
-    "baslik": "",
-    "begeni": 3,
-    "yorum": 0,
-    "link": "https://www.instagram.com/reel/DRiMSwBjebh/",
-    "izlenme": null,
-    "erisim": null
-   },
-   {
-    "id": "17902051764316083",
-    "tur": "Carousel",
-    "tarih": "2025-11-25T16:14:11",
-    "baslik": "",
-    "begeni": 9,
-    "yorum": 0,
-    "link": "https://www.instagram.com/p/DRfFpT9jSGU/",
-    "izlenme": null,
-    "erisim": null
-   },
-   {
-    "id": "18061404866228773",
-    "tur": "Reels",
-    "tarih": "2025-11-25T14:51:08",
-    "baslik": "",
-    "begeni": 5,
-    "yorum": 0,
-    "link": "https://www.instagram.com/reel/DRe8HKLDF1d/",
-    "izlenme": null,
-    "erisim": null
-   },
-   {
-    "id": "17988727496860329",
-    "tur": "Reels",
-    "tarih": "2025-11-24T22:52:21",
-    "baslik": "",
-    "begeni": 8,
-    "yorum": 0,
-    "link": "https://www.instagram.com/reel/DRdNvQ9DCoV/",
-    "izlenme": null,
-    "erisim": null
-   },
-   {
-    "id": "17869715757471348",
-    "tur": "Reels",
-    "tarih": "2025-11-23T14:52:38",
-    "baslik": "",
-    "begeni": 8,
-    "yorum": 0,
-    "link": "https://www.instagram.com/reel/DRZyqwWDPQf/",
-    "izlenme": null,
-    "erisim": null
-   },
-   {
-    "id": "17921189679057607",
-    "tur": "Reels",
-    "tarih": "2025-11-20T08:54:12",
-    "baslik": "",
-    "begeni": 10,
-    "yorum": 0,
-    "link": "https://www.instagram.com/reel/DRRbTo1DUSe/",
-    "izlenme": null,
-    "erisim": null
-   },
-   {
-    "id": "18431533186104720",
-    "tur": "Gönderi",
-    "tarih": "2025-11-20T08:20:57",
-    "baslik": "",
-    "begeni": 1,
-    "yorum": 0,
-    "link": "https://www.instagram.com/p/DRRXg0pjTLj/",
-    "izlenme": null,
-    "erisim": null
-   },
-   {
-    "id": "17869567401403137",
-    "tur": "Reels",
-    "tarih": "2025-11-20T07:17:34",
-    "baslik": "",
-    "begeni": 5,
-    "yorum": 0,
-    "link": "https://www.instagram.com/reel/DRRQKm5jfHB/",
-    "izlenme": null,
-    "erisim": null
-   },
-   {
-    "id": "18129327340498739",
-    "tur": "Reels",
-    "tarih": "2025-11-20T06:46:52",
-    "baslik": "",
-    "begeni": 5,
-    "yorum": 0,
-    "link": "https://www.instagram.com/reel/DRRMoWPjSbJ/",
-    "izlenme": null,
-    "erisim": null
-   },
-   {
-    "id": "17932977092596567",
-    "tur": "Reels",
-    "tarih": "2023-06-01T18:45:56",
-    "baslik": "",
-    "begeni": 20,
-    "yorum": 3,
-    "link": "https://www.instagram.com/reel/Cs9VDkhARub/",
-    "izlenme": null,
-    "erisim": null
-   }
-  ]
+  "takipci": null,
+  "hata": "graph.instagram.com profil: HTTP 400 kod=190 tür=OAuthException: Invalid OAuth access token - Cannot parse access token | graph.facebook.com profil: HTTP 400 kod=100 tür=GraphMethodException: Unsupported get request. Object with ID '17841457188392262' does not exist, cannot be loaded due to missing permissions, or does not support this operation. Please read the Graph A",
+  "gonderiler": [],
+  "anahtar_izinleri": null
  },
  "hikaye_izin": false,
  "hikayeler": [
@@ -297,11 +110,11 @@
   "hata": "YouTube okuma izni yok (HTTP 403): YT_OKU_REFRESH_TOKEN gerekir. Request had insufficient authentication scopes."
  },
  "eksikler": [
-  "Instagram izlenme izni yok",
+  "Instagram okunamadı",
   "YouTube okunamadı"
  ],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 00:26",
-  "govde": "Toplam 0 (eksik veri) · Reels ? · Short ? · Hikaye ? · Takipçi 417 · Instagram izlenme izni yok; YouTube okunamadı"
+  "baslik": "📊 İzlenme raporu 00:37",
+  "govde": "Toplam 0 (eksik veri) · Reels ? · Short ? · Hikaye ? · Instagram okunamadı; YouTube okunamadı"
  }
 }
