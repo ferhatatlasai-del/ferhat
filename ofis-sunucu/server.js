@@ -291,6 +291,7 @@ async function ajanDurumlari() {
 
 async function api(req, res, url) {
   if (url.pathname === '/api/ping') return json(res, 200, { ok: true, hazir: !!(TOKEN && SIFRE), bildirim: BILDIRIM_ACIK });
+  if (url.pathname === '/api/zamanlayici') return json(res, 200, { acik: !ZAM_KAPALI && !!TOKEN, son: zamSon });
   if (url.pathname === '/api/kuru-kayit' && BILDIRIM_KURU) return json(res, 200, kuruKayit);
   if (url.pathname === '/api/vapid') return json(res, 200, { acik: BILDIRIM_ACIK, anahtar: BILDIRIM_ACIK ? VAPID_PUB : null });
   if (url.pathname === '/api/hikaye') {
@@ -644,3 +645,41 @@ http.createServer(async (req, res) => {
     json(res, 500, { hata: gecersiz ? 'GitHub anahtarında geçersiz karakter var. Anahtarı yeniden kaydet.' : 'Sunucu hatası (' + ((e && e.name) || '?') + ').' });
   }
 }).listen(PORT, () => console.log('Ajan ofisi dinliyor: ' + PORT));
+
+// ---- Zamanlayıcı: GitHub'ın zamanlayıcısı çalışmaları atlayabildiği için tetikleri sunucu kendisi verir ----
+// Türkiye saati (UTC+3). Saat başı :05'te hikaye yayın kontrolü (10:05-22:05), her gün 08:20'de görsel üretimi, pazartesi/perşembe 06:30'da trend ajanı.
+// İş akışları kendi kararını verir (slot, günlük sınır); çift tetik zararsızdır (ortak kilit + "önce talep et" mantığı).
+const ZAM_KAPALI = process.env.ZAMANLAYICI === 'kapali';
+const zamSon = { yayin: null, uretim: null, trend: null, hata: null };
+const zamYapilan = new Set();
+function zamSimdiTR() { const z = process.env.ZAM_ZAMAN ? new Date(process.env.ZAM_ZAMAN) : new Date(); return new Date(z.getTime() + 3 * 3600e3); }
+async function zamTetikle(akis, girdi, ad) {
+  try {
+    const dal = await varsayilanDal();
+    const r = await gh(`/repos/${REPO}/actions/workflows/${akis}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: girdi || {} }) });
+    if (r.status === 204) { zamSon[ad] = new Date().toISOString(); console.log('Zamanlayıcı tetikledi: ' + akis); return true; }
+    zamSon.hata = `${akis}: GitHub ${r.status}`; console.log('Zamanlayıcı tetiklenemedi: ' + zamSon.hata);
+  } catch (e) { zamSon.hata = `${akis}: ${e.name}`; console.log('Zamanlayıcı hatası: ' + e.name); }
+  return false;
+}
+async function zamKontrol() {
+  if (ZAM_KAPALI || !TOKEN) return;
+  const t = zamSimdiTR(), gun = t.toISOString().slice(0, 10), saat = t.getUTCHours(), dk = t.getUTCMinutes(), haftaGunu = t.getUTCDay();
+  // hikaye yayın kontrolü: 10:05-22:05, saat başı (kaçırıldıysa o saat içinde bir kez)
+  if (saat >= 10 && saat <= 22 && dk >= 5) {
+    const anahtar = `y${gun}-${saat}`;
+    if (!zamYapilan.has(anahtar)) { zamYapilan.add(anahtar); await zamTetikle(AKIS_HIKAYE, {}, 'yayin'); }
+  }
+  // görsel üretimi: her gün 08:20'den sonra bir kez (pazar dahil)
+  if (saat > 8 || (saat === 8 && dk >= 20)) {
+    const anahtar = `u${gun}`;
+    if (saat < 12 && !zamYapilan.has(anahtar)) { zamYapilan.add(anahtar); await zamTetikle(AKIS_URETIM, {}, 'uretim'); }
+  }
+  // trend ajanı: pazartesi ve perşembe 06:30'dan sonra bir kez
+  if ((haftaGunu === 1 || haftaGunu === 4) && (saat > 6 || (saat === 6 && dk >= 30)) && saat < 12) {
+    const anahtar = `t${gun}`;
+    if (!zamYapilan.has(anahtar)) { zamYapilan.add(anahtar); await zamTetikle('trend.yml', {}, 'trend'); }
+  }
+  if (zamYapilan.size > 200) { const eski = [...zamYapilan].slice(0, 100); eski.forEach(k => zamYapilan.delete(k)); }
+}
+if (!ZAM_KAPALI) { setInterval(() => { zamKontrol().catch(() => {}); }, 60e3); setTimeout(() => { zamKontrol().catch(() => {}); }, 20e3); }
