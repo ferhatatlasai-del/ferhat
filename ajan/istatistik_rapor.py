@@ -99,15 +99,35 @@ def instagram_topla():
     if not os.environ.get("IG_ACCESS_TOKEN"):
         sonuc["hata"] = "IG_ACCESS_TOKEN tanımlı değil"
         return sonuc, None
+    hatalar = []
     for taban, kimlik in IG.ADAYLAR:
-        try:
-            profil = IG.al(taban, kimlik, fields="username,followers_count,media_count")
-            medya = IG.al(taban, f"{kimlik}/media", fields="id,caption,media_type,media_product_type,like_count,comments_count,timestamp,permalink", limit=30)
-        except urllib.error.HTTPError as e:
-            sonuc["hata"] = IG.hata_ozeti(e)
+        ad = taban.split("//")[1].split("/")[0]
+        profil = medya = None
+        son_hata = ""
+        for alanlar in ("username,followers_count,media_count", "username,followers_count", "username,media_count"):
+            try:
+                profil = IG.al(taban, kimlik, fields=alanlar)
+                break
+            except urllib.error.HTTPError as e:
+                son_hata = "profil: " + IG.hata_ozeti(e)
+            except Exception as e:
+                son_hata = f"profil: alınamadı ({type(e).__name__})"
+        if profil is None:
+            hatalar.append(f"{ad} {son_hata}")
             continue
-        except Exception as e:
-            sonuc["hata"] = f"alınamadı ({type(e).__name__})"
+        # gönderi alanları kademeli: en zengin liste kabul edilmezse eski, çalıştığı bilinen listeye dön
+        for alanlar in ("id,caption,media_type,media_product_type,like_count,comments_count,timestamp,permalink",
+                        "id,caption,media_type,like_count,comments_count,timestamp,permalink",
+                        "id,caption,media_type,like_count,comments_count,timestamp"):
+            try:
+                medya = IG.al(taban, f"{kimlik}/media", fields=alanlar, limit=30)
+                break
+            except urllib.error.HTTPError as e:
+                son_hata = "gönderiler: " + IG.hata_ozeti(e)
+            except Exception as e:
+                son_hata = f"gönderiler: alınamadı ({type(e).__name__})"
+        if medya is None:
+            hatalar.append(f"{ad} {son_hata}")
             continue
         sonuc["durum"] = "tamam"
         sonuc["takipci"] = profil.get("followers_count")
@@ -133,7 +153,10 @@ def instagram_topla():
                     sonuc["hata"] = hata
             sonuc["gonderiler"].append(kayit)
         sonuc["izin"] = izinli > 0
+        if hatalar and not sonuc["hata"]:
+            sonuc["hata"] = " | ".join(hatalar)
         return sonuc, taban
+    sonuc["hata"] = " | ".join(hatalar) or sonuc["hata"]
     return sonuc, None
 
 
@@ -190,13 +213,14 @@ def yt_istek(yol, belirtec, **p):
 
 def youtube_topla():
     sonuc = {"durum": "atlandi", "izin": False, "videolar": [], "hata": ""}
-    gerekli = ("YT_CLIENT_ID", "YT_CLIENT_SECRET", "YT_REFRESH_TOKEN")
-    if not all(os.environ.get(k) for k in gerekli):
+    # Yükleme anahtarı yalnızca video yükleme izni taşır; izlenmeyi okumak için ayrı bir okuma anahtarı (YT_OKU_REFRESH_TOKEN) kullanılır.
+    yenileme = os.environ.get("YT_OKU_REFRESH_TOKEN") or os.environ.get("YT_REFRESH_TOKEN")
+    if not (os.environ.get("YT_CLIENT_ID") and os.environ.get("YT_CLIENT_SECRET") and yenileme):
         sonuc["hata"] = "YouTube anahtarları tanımlı değil"
         return sonuc
     try:
         veri = urllib.parse.urlencode({"client_id": os.environ["YT_CLIENT_ID"], "client_secret": os.environ["YT_CLIENT_SECRET"],
-                                       "refresh_token": os.environ["YT_REFRESH_TOKEN"], "grant_type": "refresh_token"}).encode()
+                                       "refresh_token": yenileme, "grant_type": "refresh_token"}).encode()
         with urllib.request.urlopen(urllib.request.Request(os.environ.get("YT_TOKEN_ADRES") or "https://oauth2.googleapis.com/token", data=veri), timeout=40) as y:
             belirtec = json.load(y)["access_token"]
     except Exception as e:
@@ -217,7 +241,7 @@ def youtube_topla():
             ayrinti = json.loads(e.read().decode("utf-8")).get("error", {}).get("message", "")[:140]
         except Exception:
             ayrinti = ""
-        sonuc["hata"] = f"YouTube HTTP {e.code}: {ayrinti}" if e.code != 403 else f"YouTube okuma izni yok (HTTP 403). {ayrinti}"
+        sonuc["hata"] = f"YouTube HTTP {e.code}: {ayrinti}" if e.code != 403 else f"YouTube okuma izni yok (HTTP 403): YT_OKU_REFRESH_TOKEN gerekir. {ayrinti}"
         return sonuc
     except Exception as e:
         sonuc["hata"] = f"YouTube okunamadı ({type(e).__name__})"
