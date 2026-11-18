@@ -40,6 +40,7 @@ import urllib.request
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import hikaye as H  # noqa: E402
 import thingiverse as TV  # noqa: E402
+import hikaye_muzik as MZ  # noqa: E402
 import shorts_uret as SU  # noqa: E402
 import uret  # noqa: E402
 
@@ -54,7 +55,7 @@ ADAYLAR = KOK / "hikaye" / "adaylar.json"
 ADAY_OMRU_GUN = 4   # aynı arama sonucu bu kadar gün yeniden kullanılır (her çalışmada pahalı arama yapılmaz)
 IZINLI_SITELER = ("printables.com", "makerworld.com", "thingiverse.com")
 VARSAYILAN = {"aktif": False, "mod": "otomatik", "gunluk_uretim": 3, "gunluk_gorsel_siniri": 6,
-              "aylik_gorsel_siniri": 90, "kalite": "low", "kuyruk_hedefi": 6, "referans": "zorunlu"}
+              "aylik_gorsel_siniri": 90, "kalite": "low", "kuyruk_hedefi": 6, "referans": "zorunlu", "muzik": True}
 ARAC_TURLERI = ["web_search", "web_search_preview"]
 BOT_ADI = "Mozilla/5.0 (compatible; DoktorFilamentBot/1.0; tasarim atfi icin tek sayfa onizleme)"
 REFERANS_EN_BUYUK = 8 * 1024 * 1024
@@ -1106,6 +1107,12 @@ def calis(a):
                "kontrol": {"puan": kabul[1]["puan"], "deneme": kabul[2], "sorunlar": kabul[1]["sorunlar"]},
                "yayin": None, "hata": "", "deneme": 0}
         yaz(H.KUYRUK / f"{kimlik}.json", oge)
+        if ayar.get("muzik", True):
+            try:
+                MZ.kayit_donustur(kimlik)   # foto hikaye -> 12 sn'lik müzikli (tempolu, telifsiz) video
+                print(f"  {t['ad']}: müzikli videoya çevrildi")
+            except BaseException as e:   # SystemExit dahil; başarısızsa foto hikaye olarak kalır
+                print(f"  {t['ad']}: müzikli video yapılamadı, foto olarak kalacak ({type(e).__name__}: {str(e)[:120]})")
         kullanilan.append({"url": t["_adres"], "ad": t["ad"], "tarih": H.simdi().strftime("%Y-%m-%d")})
         yaz(KULLANILAN, kullanilan[-200:])
         uretilen.append(t["ad"])

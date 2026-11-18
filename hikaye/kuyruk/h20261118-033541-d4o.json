@@ -3,7 +3,7 @@
   "kaynak": "uretim",
   "durum": "planli",
   "olusturma": "2026-11-18T03:35:41.000Z",
-  "gorsel": "hikaye/gorseller/h20261118-033541-d4o.jpg",
+  "gorsel": "hikaye/gorseller/h20261118-033541-d4o.mp4",
   "baslik": "Portable Cable Organizer / Winder",
   "atif": {
     "ad": "Portable Cable Organizer / Winder",
@@ -22,5 +22,7 @@
   },
   "yayin": null,
   "hata": "",
-  "deneme": 0
+  "deneme": 0,
+  "tur": "video",
+  "muzik": "Sentezlenmiş tempolu müzik (telifsiz, FFmpeg ile üretildi)"
 }

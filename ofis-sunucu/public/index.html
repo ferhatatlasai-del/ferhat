@@ -207,6 +207,7 @@ dd{margin:1px 0 0}
             <div class="ayarsat"><label>Mod <select id="uMod"><option value="otomatik">Otomatik (kuyruğa girer, yayınlanır)</option><option value="onay">Onaylı (ben onaylarım)</option></select></label></div>
             <div class="ayarsat"><label>Günde en çok <input type="number" id="uGun" min="1" max="12"> hikaye üret</label><label>Günlük görsel sınırı <input type="number" id="uGSin" min="1" max="40"></label><label>Aylık görsel sınırı <input type="number" id="uASin" min="1" max="600"></label></div>
             <div class="ayarsat"><label>Kuyruk hedefi <input type="number" id="uHed" min="1" max="30"></label><label>Kalite <select id="uKal"><option value="low">Düşük (ucuz)</option><option value="medium">Orta</option><option value="high">Yüksek (pahalı)</option></select></label><label>Referans fotoğraf <select id="uRef"><option value="zorunlu">Zorunlu (fotoğraf alınamazsa üretme)</option><option value="tercih">Tercih (yoksa metinden çiz, daha az benzer)</option></select></label></div>
+            <div class="ayarsat"><label><input type="checkbox" id="uMuzik"> Müzikli video yap (12 sn, Instagram tarzı tempolu müzik; müzik telifsiz ve kendimiz üretiriz)</label></div>
             <div class="satir"><button type="button" id="uKaydet">Üretim ayarını kaydet</button></div>
             <p class="not">Görsel başına maliyet seçtiğin kaliteye göre değişir; günlük ve aylık görsel sınırları harcamayı üstten kapatır. İlk günlerde sınırları düşük tut, OpenAI panelinden harcamayı da izle.</p>
           </div>
@@ -1120,7 +1121,7 @@ function uretimCiz(v){
   $('#uDurum').textContent=(u.aktif?'Üretim açık':'Üretim kapalı')+' ('+(u.mod==='onay'?'onaylı':'otomatik')+'). Bugün '+h.bugun+'/'+(u.gunluk_gorsel_siniri||'?')+' görsel, bu ay '+h.ay+'/'+(u.aylik_gorsel_siniri||'?')+' görsel üretildi.';
   $('#uAktif').textContent=u.aktif?'Üretimi kapat':'Üretimi aç';
   var ak=document.activeElement&&document.activeElement.closest?document.activeElement.closest('#uDetay'):null;
-  if(!ak){ $('#uMod').value=u.mod||'otomatik'; $('#uGun').value=u.gunluk_uretim||4; $('#uGSin').value=u.gunluk_gorsel_siniri||12; $('#uASin').value=u.aylik_gorsel_siniri||150; $('#uHed').value=u.kuyruk_hedefi||8; $('#uKal').value=u.kalite||'low'; $('#uRef').value=u.referans||'zorunlu'; }
+  if(!ak){ $('#uMod').value=u.mod||'otomatik'; $('#uGun').value=u.gunluk_uretim||4; $('#uGSin').value=u.gunluk_gorsel_siniri||12; $('#uASin').value=u.aylik_gorsel_siniri||150; $('#uHed').value=u.kuyruk_hedefi||8; $('#uKal').value=u.kalite||'low'; $('#uRef').value=u.referans||'zorunlu'; $('#uMuzik').checked=u.muzik!==false; }
 }
 $('#uAktif').addEventListener('click',function(){
   if(!hSifreKontrol()||!HK) return; var yeni=!(HK.uretim&&HK.uretim.aktif), btn=this; btn.disabled=true;
@@ -1128,7 +1129,7 @@ $('#uAktif').addEventListener('click',function(){
 });
 $('#uKaydet').addEventListener('click',function(){
   if(!hSifreKontrol()) return; var btn=this; btn.disabled=true;
-  hPost('/api/uretim-ayar',{mod:$('#uMod').value,gunluk_uretim:+$('#uGun').value,gunluk_gorsel_siniri:+$('#uGSin').value,aylik_gorsel_siniri:+$('#uASin').value,kuyruk_hedefi:+$('#uHed').value,kalite:$('#uKal').value,referans:$('#uRef').value})
+  hPost('/api/uretim-ayar',{mod:$('#uMod').value,gunluk_uretim:+$('#uGun').value,gunluk_gorsel_siniri:+$('#uGSin').value,aylik_gorsel_siniri:+$('#uASin').value,kuyruk_hedefi:+$('#uHed').value,kalite:$('#uKal').value,referans:$('#uRef').value,muzik:$('#uMuzik').checked})
     .then(function(){ btn.disabled=false; $('#uDurum').textContent='Üretim ayarı kaydedildi.'; hikayeCek(true); }).catch(function(e){ $('#uDurum').textContent=String(e.message||e); btn.disabled=false; });
 });
 var uOnay=false;
