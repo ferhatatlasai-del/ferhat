@@ -93,7 +93,12 @@ def prompt_olustur():
     gercek, _ = thingiverse_gercek_veri()
     onceki = onceki_konular()
     onceki_metin = ("\nGEÇEN ARAŞTIRMADA ÖNERİLENLER (aynı konuları TEKRARLAMA, yeni alanlar keşfet): " + "; ".join(onceki) + "\n") if onceki else ""
-    return PROMPT.format(bugun=bugun, gercek_veri=("\n" + gercek) if gercek else "", onceki=onceki_metin)
+    try:
+        import akademi
+        dersler = akademi.akademi_dersleri("trend")
+    except Exception:
+        dersler = ""
+    return PROMPT.format(bugun=bugun, gercek_veri=("\n" + gercek) if gercek else "", onceki=onceki_metin) + dersler
 
 
 def ornekler_bul(arama_terimi, adet=3):

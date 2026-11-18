@@ -41,6 +41,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import hikaye as H  # noqa: E402
 import thingiverse as TV  # noqa: E402
 import hikaye_muzik as MZ  # noqa: E402
+import akademi as AK  # noqa: E402
 import shorts_uret as SU  # noqa: E402
 import uret  # noqa: E402
 
@@ -66,6 +67,23 @@ SAHNELER = [
     "a light concrete workbench with a blurred row of storage drawers in the background",
 ]
 YAPAY_ZEKA_ETIKETI = "Yapay zekâ görseli (temsili)"
+
+
+OLAYLAR = KOK / "hikaye" / "olaylar.jsonl"
+OLAY_SINIRI = 500
+
+
+def olay(tur, **ayrinti):
+    """Akademi ajanının öğrenmesi için kısa olay kaydı (neden elendi, denetim sorunları). Hata verirse sessizce geçer."""
+    try:
+        kayit = {"t": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "tur": tur}
+        kayit.update({k: v for k, v in ayrinti.items() if v not in (None, "", [])})
+        OLAYLAR.parent.mkdir(parents=True, exist_ok=True)
+        satirlar = OLAYLAR.read_text(encoding="utf-8").splitlines() if OLAYLAR.exists() else []
+        satirlar.append(json.dumps(kayit, ensure_ascii=False))
+        OLAYLAR.write_text("\n".join(satirlar[-OLAY_SINIRI:]) + "\n", encoding="utf-8")
+    except Exception:
+        pass
 
 
 def hata(m, kod=1):
@@ -238,6 +256,7 @@ def tasarim_ara():
     trend_metni, konular = trend_yonlendirmesi()
     print(f"Trend ajanı yönlendirmesi: {len(konular)} konu" + (f" ({'; '.join(k[:30] for k in konular[:4])}…)" if konular else " (trend verisi yok ya da 7 günden eski)"))
     istem = ARAMA_ISTEMI.replace("KESİN KURALLAR:", trend_metni + "KESİN KURALLAR:", 1) if trend_metni else ARAMA_ISTEMI
+    istem += AK.akademi_dersleri("hikaye")
     veri, arama_sayisi = arama_istegi(istem, 300)
     if veri is None:
         hata("Web arama aracı kullanılamadı; tasarım araştırması yapılamadı.")
@@ -1019,6 +1038,7 @@ def calis(a):
             durum, neden = printables_dogrula(t)
             print(f"  {t['ad']}: Printables servisi: {neden}")
             if durum is False:
+                olay("lisans_elendi", site="printables.com", neden=neden[:100])
                 atlanan.append((t["ad"], neden))
                 kullanilan.append({"url": t["_adres"], "ad": t["ad"], "tarih": H.simdi().strftime("%Y-%m-%d"), "durum": "lisans_uygun_degil"})
                 yaz(KULLANILAN, kullanilan[-200:])
@@ -1047,6 +1067,7 @@ def calis(a):
                 print(f"  {t['ad']}: bir fotoğraf uygun değil ({neden[:90]})")
             if not referans:
                 print(f"  {t['ad']}: referans fotoğraf bulunamadı: {son_neden}")
+                olay("referans_yok", site=t.get("_site"), uygunsuz=uygunsuz, neden=son_neden[:140])
                 if ayar.get("referans", "zorunlu") == "zorunlu":
                     atlanan.append((t["ad"], f"referans yok: {son_neden}"))
                     if uygunsuz:   # fotoğrafları gerçekten uygunsuz: bir daha denenmesin
@@ -1061,12 +1082,16 @@ def calis(a):
                 break
             try:
                 if referans:
-                    b64 = gorsel_duzenle(REFERANSLI_ISTEM.format(sahne=SAHNELER[(sira + deneme) % len(SAHNELER)]), referans, ayar["kalite"])
+                    ders_ek = AK.akademi_dersleri("hikaye")
+                    istem = REFERANSLI_ISTEM.format(sahne=SAHNELER[(sira + deneme) % len(SAHNELER)]) + (
+                        " Additional studio rules (follow them, in Turkish): " + ders_ek.replace("\n", " ") if ders_ek else "")
+                    b64 = gorsel_duzenle(istem, referans, ayar["kalite"])
                 else:
                     prompt = sahne_promptu(t, karakterli=(sira % 3 == 2))
                     b64 = gorsel_uret(prompt, ayar["kalite"])
             except urllib.error.HTTPError as e:
                 print(f"  görsel üretilemedi ({http_hata_ozeti(e)})")
+                olay("gorsel_hatasi", neden=http_hata_ozeti(e)[:120])
                 atlanan.append((t["ad"], http_hata_ozeti(e)))
                 gorsel_hatasi = True
                 break
@@ -1082,6 +1107,7 @@ def calis(a):
                 print(f"  denetim çalışmadı ({type(e).__name__}); şüphede yayınlanmaz, atlanıyor")
                 gecti, kontrol = False, {"puan": 0, "sorunlar": ["denetim çalışmadı"]}
             print(f"  {t['ad']}: deneme {deneme + 1}, denetim {'GEÇTİ' if gecti else 'GEÇMEDİ'} (puan {kontrol['puan']}) {kontrol['sorunlar']}")
+            olay("denetim", gecti=gecti, deneme=deneme + 1, puan=kontrol["puan"], site=t.get("_site"), sorunlar=[x[:90] for x in kontrol["sorunlar"][:3]])
             if gecti:
                 kabul = (b64, kontrol, deneme + 1)
                 break
@@ -1119,6 +1145,7 @@ def calis(a):
         kullanilan.append({"url": t["_adres"], "ad": t["ad"], "tarih": H.simdi().strftime("%Y-%m-%d")})
         yaz(KULLANILAN, kullanilan[-200:])
         uretilen.append(t["ad"])
+        olay("uretildi", site=t.get("_site"), trend=bool(t.get("trend_konusu")), deneme=kabul[2], puan=kabul[1]["puan"])
 
     print(f"Üretilen: {len(uretilen)} ({', '.join(uretilen) or '-'}). Atlanan: {len(atlanan)}. Bugün görsel: {gun_say}, bu ay: {ay_say}.")
     if a.git:
