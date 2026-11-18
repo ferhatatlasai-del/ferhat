@@ -24,5 +24,8 @@
   "hata": "",
   "deneme": 0,
   "tur": "video",
-  "muzik": "Sentezlenmiş tempolu müzik (telifsiz, FFmpeg ile üretildi)"
+  "muzik": "Sentezlenmiş müzik: Parlak neşeli (telifsiz, FFmpeg ile üretildi)",
+  "muzik_sira": 2,
+  "muzik_stil": "Parlak neşeli",
+  "muzik_ton": 0
 }

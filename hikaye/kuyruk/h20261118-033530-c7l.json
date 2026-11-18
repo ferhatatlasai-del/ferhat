@@ -24,5 +24,8 @@
   "hata": "",
   "deneme": 0,
   "tur": "video",
-  "muzik": "Sentezlenmiş tempolu müzik (telifsiz, FFmpeg ile üretildi)"
+  "muzik": "Sentezlenmiş müzik: Lo-fi sakin (telifsiz, FFmpeg ile üretildi)",
+  "muzik_sira": 1,
+  "muzik_stil": "Lo-fi sakin",
+  "muzik_ton": 0
 }
