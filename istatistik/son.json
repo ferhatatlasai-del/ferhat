@@ -1,0 +1,111 @@
+{
+ "tarih": "2026-11-18T20:37:58Z",
+ "tr_saat": "18.11.2026 23:37",
+ "toplam": {
+  "reels": 0,
+  "gonderi": 0,
+  "short": 0,
+  "youtube_video": 0,
+  "hikaye": 0,
+  "toplam": 0,
+  "begeni": 0,
+  "yorum": 0
+ },
+ "fark": null,
+ "instagram": {
+  "durum": "atlandi",
+  "izin": false,
+  "takipci": null,
+  "hata": "HTTP 400 kod=100 tür=OAuthException: (#100) Tried accessing nonexisting field (followers_count)",
+  "gonderiler": []
+ },
+ "hikaye_izin": false,
+ "hikayeler": [
+  {
+   "id": "17912210697596736",
+   "tarih": "2026-11-18T17:06:54Z",
+   "baslik": "Cat Stretch Voronoi Remix",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
+   "id": "18022122551968417",
+   "tarih": "2026-11-18T15:06:23Z",
+   "baslik": "Portable Cable Organizer / Winder",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
+   "id": "18134890051757273",
+   "tarih": "2026-11-18T13:07:14Z",
+   "baslik": "Customizable & stackable beer crate for all types of batteri",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
+   "id": "18121125191002878",
+   "tarih": "2026-11-18T11:06:52Z",
+   "baslik": "LUCKY 13 Printable Jointed Figure",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
+   "id": "17980307817167880",
+   "tarih": "2026-11-18T06:38:12Z",
+   "baslik": "REMIX of \"Parametric Rugged Box\" - No Assembly Required",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
+   "id": "18084222266348034",
+   "tarih": "2026-11-17T21:43:04Z",
+   "baslik": "modular organizer",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
+   "id": "17948136738363409",
+   "tarih": "2026-11-17T19:36:23Z",
+   "baslik": "Mini Clamp Print-in-place",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
+   "id": "18026215241945756",
+   "tarih": "2026-11-17T12:51:06Z",
+   "baslik": "Hikaye",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
+   "id": "18065779874555894",
+   "tarih": "2026-11-17T12:13:10Z",
+   "baslik": "Hikaye",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  }
+ ],
+ "youtube": {
+  "durum": "atlandi",
+  "izin": false,
+  "videolar": [],
+  "hata": "YouTube okuma izni yok (HTTP 403). Request had insufficient authentication scopes."
+ },
+ "eksikler": [
+  "Instagram okunamadı",
+  "YouTube okunamadı"
+ ],
+ "bildirim": {
+  "baslik": "📊 İzlenme raporu 23:37",
+  "govde": "Toplam 0 · Reels ? · Short ? · Hikaye 0 (5 bugün) · Instagram okunamadı; YouTube okunamadı"
+ }
+}
