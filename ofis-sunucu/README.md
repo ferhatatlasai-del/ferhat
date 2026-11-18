@@ -137,3 +137,15 @@ Paneldeki düğmelerin hepsi ofiste ilgili ajanın avatarına tıklayınca da ç
 
 Hikaye ajanı hikaye üretirken telefonuna bakar; telefonunun üstünde Instagram benzeri bir balon çıkar:
 üretilirken "Hikaye hazırlanıyor…", kuyruğa girince "Hikaye üretildi", yayınlanınca "Instagram'da paylaşıldı".
+
+### İstatistikçi ajan: günde 5 izlenme raporu
+
+Her gün Türkiye saatiyle 09, 12, 15, 18 ve 21'de (sunucu zamanlayıcısı `istatistik-rapor.yml` iş akışını tetikler) İstatistikçi ajan tüm paylaşımların izlenmesini toplar ve telefona kısa bir bildirim gönderir:
+`Toplam 905 (+86) · Reels 410 · Short 220 · Hikaye 95 (4 bugün) · Takipçi 420 · En iyi Reels: ...`
+
+- **Kaynaklar:** Instagram Reels/video/gönderiler (izlenme, erişim, beğeni, yorum), yayınlanmış hikayeler (kuyruktaki `medya_kimligi` ile), YouTube Shorts ve videolar (izlenme, beğeni, yorum). Yalnızca okur, hiçbir şey yayınlamaz.
+- **Hikaye:** Instagram hikaye değerlerini yalnızca yayındayken (yaklaşık 24 saat) verir; bu yüzden her çalışmada okunur ve en yüksek değer `istatistik/hikayeler.json` içinde saklanır.
+- **Çıktılar:** `istatistik/son.json` (panel okur), `istatistik/gecmis.jsonl` (artış ve grafik), `istatistik/ayar.json` (`aktif`, `artis_yoksa_atla`).
+- **Panel:** Özet sekmesinde "İzlenme raporu" kartı (toplam, Reels, Short, Hikaye, takipçi, grafik, en çok izlenenler, tüm paylaşımlar; duraklat ve "artış yoksa bildirim atla" düğmeleri). Ofiste İstatistik avatarına dokununca: rapor hazırla, raporları gör, günlük raporları duraklat/aç.
+- **İzinler:** Instagram izlenmesi için Meta uygulamasında insights izni, YouTube için okuma izni gerekir. Yoksa ilgili kısım "?" görünür, bildirimin sonunda "izin yok" yazar ve rapor kalan verilerle yine çıkar.
+- **Elle:** `POST /api/istatistik-calistir` (saatte en fazla 4); elle başlatma duraklatma ve "artış yoksa atla" kurallarını yok sayar. Bildirim gerçek gönderim için `OFIS_ADRES` ve `BILDIRIM_SIRRI` kullanır.
