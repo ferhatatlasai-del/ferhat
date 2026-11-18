@@ -938,6 +938,9 @@ def calis(a):
         return 0
     harcama = json_oku(HARCAMA, {})
     gun_say, ay_say, gun, ay = harcama_say(harcama, an)
+    if gun_say > 0 and not a.hemen:
+        print(f"Karar: bekle (bugün zaten üretim yapıldı: {gun_say} görsel; çift tetik ve çift harcama önlenir)")
+        return 0
     if gun_say >= ayar["gunluk_gorsel_siniri"] or ay_say >= ayar["aylik_gorsel_siniri"]:
         print(f"Karar: bekle (harcama sınırı: bugün {gun_say}/{ayar['gunluk_gorsel_siniri']}, bu ay {ay_say}/{ayar['aylik_gorsel_siniri']})")
         return 0
