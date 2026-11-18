@@ -2,12 +2,15 @@
   "id": "h20261118-212202-c61",
   "kaynak": "yayin",
   "tur": "video",
-  "durum": "planli",
+  "durum": "yayinlaniyor",
   "olusturma": "2026-11-18T21:22:02.644Z",
   "gorsel": "videolar/yukleme_20261118211525.mp4",
   "baslik": "GURTECH 3D",
   "atif": null,
-  "yayin": null,
+  "yayin": {
+    "tarih": "2026-11-18T21:22:17Z"
+  },
   "hata": "",
-  "deneme": 0
+  "deneme": 0,
+  "hazir": "hikaye/gorseller/h20261118-212202-c61_hazir.mp4"
 }
