@@ -1,6 +1,6 @@
 {
- "tarih": "2026-11-18T21:26:54Z",
- "tr_saat": "19.11.2026 00:26",
+ "tarih": "2026-11-18T21:28:37Z",
+ "tr_saat": "19.11.2026 00:28",
  "toplam": {
   "reels": 0,
   "gonderi": 0,
@@ -205,6 +205,15 @@
     "izlenme": null,
     "erisim": null
    }
+  ],
+  "anahtar_izinleri": [
+   "ads_management",
+   "ads_read",
+   "instagram_basic",
+   "instagram_content_publish",
+   "instagram_manage_comments",
+   "instagram_manage_messages",
+   "public_profile"
   ]
  },
  "hikaye_izin": false,
@@ -301,7 +310,7 @@
   "YouTube okunamadı"
  ],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 00:26",
+  "baslik": "📊 İzlenme raporu 00:28",
   "govde": "Toplam 0 (eksik veri) · Reels ? · Short ? · Hikaye ? · Takipçi 417 · Instagram izlenme izni yok; YouTube okunamadı"
  }
 }
