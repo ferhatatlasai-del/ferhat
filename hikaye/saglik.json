@@ -1,0 +1,30 @@
+{
+  "tarih": "2026-11-18T13:55:33Z",
+  "kontroller": [
+    {
+      "ad": "Instagram",
+      "durum": "iyi",
+      "not": "Instagram anahtarı çalışıyor"
+    },
+    {
+      "ad": "YouTube",
+      "durum": "iyi",
+      "not": "YouTube izni çalışıyor"
+    },
+    {
+      "ad": "OpenAI",
+      "durum": "iyi",
+      "not": "OpenAI anahtarı çalışıyor"
+    },
+    {
+      "ad": "Ofis sunucusu",
+      "durum": "iyi",
+      "not": "Ofis sunucusu çalışıyor"
+    },
+    {
+      "ad": "Hikaye kuyruğu",
+      "durum": "sorun",
+      "not": "Hikaye kuyruğu azaldı (1 planlı hikaye kaldı, günlük 6). Yeni fotoğraf ekle."
+    }
+  ]
+}
