@@ -1,7 +1,7 @@
 {
   "id": "h20261118-170228-b0i",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-18T17:02:28.000Z",
   "gorsel": "hikaye/gorseller/h20261118-170228-b0i.mp4",
   "baslik": "Cat Stretch Voronoi Remix",
@@ -21,7 +21,9 @@
     "sorunlar": []
   },
   "yayin": {
-    "tarih": "2026-11-18T17:05:55Z"
+    "tarih": "2026-11-18T17:06:54Z",
+    "medya_kimligi": "17912210697596736",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4033255759320706124"
   },
   "hata": "",
   "deneme": 0,
