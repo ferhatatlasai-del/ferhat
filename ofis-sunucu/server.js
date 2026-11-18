@@ -29,6 +29,8 @@ const AKIS_YT = 'youtube-yukle.yml';
 const AKIS_HIKAYE = 'hikaye-yayinla.yml';
 const AKIS_URETIM = 'hikaye-uret.yml';
 const AKIS_AKADEMI = 'akademi.yml';
+const AKIS_KISA = 'kisa-video.yml';
+const SHORTS_RE = /^s\d{8}-\d{6}$/;
 const AKADEMI_RE = /^o\d{8}-\d+$/;
 const HIKAYE_RE = /^h\d{8}-\d{6}-[a-z0-9]{3}$/;
 const AJAN_AKISLARI = { hikaye: 'hikaye-yayinla.yml', icerik: ['gunluk-taslak.yml', 'zincir.yml'], istatistik: 'gunluk-taslak.yml', instagram: 'yayinla.yml', youtube: 'youtube-yukle.yml', gorsel: 'zincir.yml', trend: 'trend.yml' };
@@ -36,7 +38,7 @@ let ajanOnbellek = { t: 0, veri: null };
 let trendOnbellek = { t: 0, veri: null };
 let zincirOnbellek = { t: 0, veri: null };
 let hikayeOnbellek = { t: 0, veri: null };
-const hikayeTetikler = [], uretimTetikler = [], akademiTetikler = [], bildirimler = [];
+const hikayeTetikler = [], uretimTetikler = [], akademiTetikler = [], kisaTetikler = [], bildirimler = [];
 const guncellenenler = new Set();
 const GH_API = process.env.GH_API || 'https://api.github.com';
 const MAX_VIDEO = 30 * 1024 * 1024;
@@ -309,6 +311,16 @@ async function api(req, res, url) {
       return json(res, 200, { rapor: r ? JSON.parse(r.metin) : null, oneriler: o ? (JSON.parse(o.metin).oneriler || []) : [] });
     } catch (e) { return json(res, 502, { hata: 'Akademi verisi okunamadı.' }); }
   }
+  if (url.pathname === '/api/shorts') {
+    if (!TOKEN) return json(res, 503, { hata: 'Sunucuda GITHUB_TOKEN tanımlı değil.' });
+    try {
+      const dal = await varsayilanDal();
+      const r = await gh(`/repos/${REPO}/contents/shorts?ref=${encodeURIComponent(dal)}`);
+      const adlar = r.ok ? (await r.json()).map(f => f.name).filter(n => /^s\d{8}-\d{6}\.json$/.test(n)).sort().reverse().slice(0, 10) : [];
+      const taslaklar = (await Promise.all(adlar.map(a => depoOku('shorts/' + a).then(k => k && JSON.parse(k.metin)).catch(() => null)))).filter(Boolean);
+      return json(res, 200, { depo: REPO, dal, taslaklar });
+    } catch (e) { return json(res, 502, { hata: 'Shorts taslakları okunamadı.' }); }
+  }
   if (url.pathname === '/api/bildir' && req.method === 'POST') {
     // Sunucudan sunucuya: ajanlar (GitHub iş akışları) kendi sırlarıyla bildirim ister
     if (!BILDIRIM_ACIK) return json(res, 503, { hata: 'Bildirim kapalı (VAPID anahtarları ya da BILDIRIM_SIRRI eksik).' });
@@ -413,6 +425,35 @@ async function api(req, res, url) {
     const r = await gh(`/repos/${REPO}/actions/workflows/${AKIS_AKADEMI}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: {} }) });
     if (r.status !== 204) return json(res, 502, { hata: 'GitHub kabul etmedi (' + r.status + ').' });
     akademiTetikler.push(simdi);
+    return json(res, 200, { ok: true });
+  }
+  if (url.pathname === '/api/shorts-karar' && req.method === 'POST') {
+    let b; try { b = await govde(req); } catch (e) { return json(res, 400, { hata: 'Geçersiz istek.' }); }
+    if (!SHORTS_RE.test(String(b.id || ''))) return json(res, 400, { hata: 'Geçersiz kimlik.' });
+    if (!['reddet', 'sil', 'yayinlandi'].includes(b.karar)) return json(res, 400, { hata: 'Geçersiz karar.' });
+    const yol = `shorts/${b.id}.json`;
+    const k = await depoOku(yol);
+    if (!k) return json(res, 404, { hata: 'Taslak bulunamadı.' });
+    const t = JSON.parse(k.metin);
+    if (b.karar === 'sil') {
+      if (t.durum === 'yayinlandi') return json(res, 409, { hata: 'Yayınlanmış taslak silinemez.' });
+      if (/^videolar\/yukleme_\d{14}\.mp4$/.test(t.video || '')) { const vk = await depoOku(t.video); if (vk) await depoSil(t.video, vk.sha, 'Panel: Shorts videosu silindi'); }
+      const r = await depoSil(yol, k.sha, 'Panel: Shorts taslağı silindi');
+      return r.ok ? json(res, 200, { ok: true }) : json(res, 502, { hata: 'Silinemedi.' });
+    }
+    t.durum = b.karar === 'reddet' ? 'reddedildi' : 'yayinlandi';
+    if (b.karar === 'yayinlandi') t.yayin_tarihi = new Date().toISOString();
+    const r = await depoYaz(yol, JSON.stringify(t, null, 2), k.sha, 'Panel: Shorts taslağı ' + t.durum);
+    return r.ok ? json(res, 200, { ok: true, durum: t.durum }) : json(res, 502, { hata: 'Kaydedilemedi.' });
+  }
+  if (url.pathname === '/api/shorts-calistir' && req.method === 'POST') {
+    const simdi = Date.now();
+    while (kisaTetikler.length && simdi - kisaTetikler[0] > 3600e3) kisaTetikler.shift();
+    if (kisaTetikler.length >= 3) return json(res, 429, { hata: 'Saatte en fazla 3 elle Shorts üretimi.' });
+    const dal = await varsayilanDal();
+    const r = await gh(`/repos/${REPO}/actions/workflows/${AKIS_KISA}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: { hemen: 'EVET' } }) });
+    if (r.status !== 204) return json(res, 502, { hata: 'GitHub kabul etmedi (' + r.status + ').' });
+    kisaTetikler.push(simdi);
     return json(res, 200, { ok: true });
   }
   if (url.pathname === '/api/uretim-ayar' && req.method === 'POST') {
@@ -686,7 +727,7 @@ http.createServer(async (req, res) => {
 // Türkiye saati (UTC+3). Saat başı :05'te hikaye yayın kontrolü (10:05-22:05), her gün 08:20'de görsel üretimi, pazartesi/perşembe 06:30'da trend ajanı.
 // İş akışları kendi kararını verir (slot, günlük sınır); çift tetik zararsızdır (ortak kilit + "önce talep et" mantığı).
 const ZAM_KAPALI = process.env.ZAMANLAYICI === 'kapali';
-const zamSon = { yayin: null, uretim: null, trend: null, akademi: null, hata: null };
+const zamSon = { yayin: null, uretim: null, trend: null, akademi: null, kisa: null, hata: null };
 const zamYapilan = new Set();
 function zamSimdiTR() { const z = process.env.ZAM_ZAMAN ? new Date(process.env.ZAM_ZAMAN) : new Date(); return new Date(z.getTime() + 3 * 3600e3); }
 async function zamTetikle(akis, girdi, ad) {
@@ -715,6 +756,11 @@ async function zamKontrol() {
   if ((haftaGunu === 1 || haftaGunu === 4) && (saat > 6 || (saat === 6 && dk >= 30)) && saat < 12) {
     const anahtar = `t${gun}`;
     if (!zamYapilan.has(anahtar)) { zamYapilan.add(anahtar); await zamTetikle('trend.yml', {}, 'trend'); }
+  }
+  // kısa video (Shorts/Reels) taslağı: salı ve cuma 17:00'den sonra bir kez
+  if ((haftaGunu === 2 || haftaGunu === 5) && saat >= 17 && saat < 22) {
+    const anahtar = `k${gun}`;
+    if (!zamYapilan.has(anahtar)) { zamYapilan.add(anahtar); await zamTetikle(AKIS_KISA, {}, 'kisa'); }
   }
   // akademi ajanı: pazar 18:00'den sonra bir kez
   if (haftaGunu === 0 && saat >= 18 && saat < 23) {
