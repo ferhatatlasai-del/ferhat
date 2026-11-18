@@ -1,6 +1,6 @@
 {
- "tarih": "2026-11-18T21:05:47Z",
- "tr_saat": "19.11.2026 00:05",
+ "tarih": "2026-11-18T21:26:54Z",
+ "tr_saat": "19.11.2026 00:26",
  "toplam": {
   "reels": 0,
   "gonderi": 0,
@@ -8,7 +8,7 @@
   "youtube_video": 0,
   "hikaye": 0,
   "toplam": 0,
-  "begeni": 90,
+  "begeni": 91,
   "yorum": 4
  },
  "fark": 0,
@@ -18,6 +18,17 @@
   "takipci": 417,
   "hata": "HTTP 400 kod=10 tür=OAuthException: (#10) Application does not have permission for this action",
   "gonderiler": [
+   {
+    "id": "18655251088021009",
+    "tur": "Reels",
+    "tarih": "2026-11-18T21:22:50",
+    "baslik": "🤖 Doktor Filament yapay zekâ ile üretilmiş bir karakterdir.",
+    "begeni": 1,
+    "yorum": 0,
+    "link": "https://www.instagram.com/reel/Df5dfOAjiMp/",
+    "izlenme": null,
+    "erisim": null
+   },
    {
     "id": "18140690902641017",
     "tur": "Reels",
@@ -199,6 +210,14 @@
  "hikaye_izin": false,
  "hikayeler": [
   {
+   "id": "17872622289660510",
+   "tarih": "2026-11-18T21:23:54Z",
+   "baslik": "GURTECH 3D",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
    "id": "17912210697596736",
    "tarih": "2026-11-18T17:06:54Z",
    "baslik": "Cat Stretch Voronoi Remix",
@@ -282,7 +301,7 @@
   "YouTube okunamadı"
  ],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 00:05",
+  "baslik": "📊 İzlenme raporu 00:26",
   "govde": "Toplam 0 (eksik veri) · Reels ? · Short ? · Hikaye ? · Takipçi 417 · Instagram izlenme izni yok; YouTube okunamadı"
  }
 }
