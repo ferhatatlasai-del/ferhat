@@ -1,0 +1,49 @@
+name: Hikaye ajanı (belirli saatte yayınla)
+
+on:
+  workflow_dispatch:
+    inputs:
+      kimlik:
+        description: "Yayınlanacak hikaye kimliği (örn. h20261118-033530-c7l)"
+        required: true
+      utc_saat:
+        description: "Yayın saati, UTC, SS:DD (Türkiye saatinden 3 saat çıkar; örn. 09:30 TR = 06:30)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  bekle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - name: Hedef saate kadar bekle (geçmişse hemen devam eder)
+        env:
+          UTC_SAAT: ${{ inputs.utc_saat }}
+          KIMLIK: ${{ inputs.kimlik }}
+        run: |
+          [[ "$UTC_SAAT" =~ ^([01][0-9]|2[0-3]):[0-5][0-9]$ ]] || { echo "Geçersiz saat"; exit 1; }
+          [[ "$KIMLIK" =~ ^h[0-9]{8}-[0-9]{6}-[a-z0-9]{3}$ ]] || { echo "Geçersiz kimlik"; exit 1; }
+          hedef=$(date -u -d "today $UTC_SAAT" +%s)
+          simdi=$(date -u +%s)
+          bekle=$((hedef - simdi))
+          if [ "$bekle" -gt 0 ] && [ "$bekle" -lt 14000 ]; then echo "$bekle sn beklenecek"; sleep "$bekle"; else echo "Bekleme yok ($bekle)"; fi
+
+  yayinla:
+    needs: bekle
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    concurrency:
+      group: hikaye
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - name: Hikayeyi yayınla
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: "17841457188392262"
+          OFIS_ADRES: "https://gurtechs-ajan-ofisi.fly.dev"
+          BILDIRIM_SIRRI: ${{ secrets.BILDIRIM_SIRRI }}
+          KIMLIK: ${{ inputs.kimlik }}
+        run: python3 ajan/hikaye.py yayinla --git --kimlik "$KIMLIK"

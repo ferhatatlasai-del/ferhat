@@ -3,7 +3,7 @@
   "kaynak": "uretim",
   "durum": "planli",
   "olusturma": "2026-11-17T22:02:17.000Z",
-  "gorsel": "hikaye/gorseller/h20261117-220216-b0i.jpg",
+  "gorsel": "hikaye/gorseller/h20261117-220216-b0i.mp4",
   "baslik": "REMIX of \"Parametric Rugged Box\" - No Assembly Required",
   "atif": {
     "ad": "REMIX of \"Parametric Rugged Box\" - No Assembly Required",
@@ -22,5 +22,7 @@
   },
   "yayin": null,
   "hata": "",
-  "deneme": 0
+  "deneme": 0,
+  "tur": "video",
+  "muzik": "Sentezlenmiş ambiyans (telifsiz, FFmpeg ile üretildi)"
 }
