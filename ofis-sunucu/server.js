@@ -30,6 +30,7 @@ const AKIS_HIKAYE = 'hikaye-yayinla.yml';
 const AKIS_URETIM = 'hikaye-uret.yml';
 const AKIS_AKADEMI = 'akademi.yml';
 const AKIS_KISA = 'kisa-video.yml';
+const AKIS_TREND = 'trend.yml';
 const SHORTS_RE = /^s\d{8}-\d{6}$/;
 const AKADEMI_RE = /^o\d{8}-\d+$/;
 const HIKAYE_RE = /^h\d{8}-\d{6}-[a-z0-9]{3}$/;
@@ -38,7 +39,7 @@ let ajanOnbellek = { t: 0, veri: null };
 let trendOnbellek = { t: 0, veri: null };
 let zincirOnbellek = { t: 0, veri: null };
 let hikayeOnbellek = { t: 0, veri: null };
-const hikayeTetikler = [], uretimTetikler = [], akademiTetikler = [], kisaTetikler = [], bildirimler = [];
+const hikayeTetikler = [], uretimTetikler = [], akademiTetikler = [], kisaTetikler = [], trendTetikler = [], bildirimler = [];
 const guncellenenler = new Set();
 const GH_API = process.env.GH_API || 'https://api.github.com';
 const MAX_VIDEO = 30 * 1024 * 1024;
@@ -350,7 +351,7 @@ async function api(req, res, url) {
   }
   if (url.pathname === '/api/trendler') {
     if (!TOKEN) return json(res, 503, { hata: 'Sunucuda GITHUB_TOKEN tanımlı değil.' });
-    if (Date.now() - trendOnbellek.t < 60e3 && trendOnbellek.veri) return json(res, 200, trendOnbellek.veri);
+    if (!url.searchParams.get('taze') && Date.now() - trendOnbellek.t < 60e3 && trendOnbellek.veri) return json(res, 200, trendOnbellek.veri);
     try {
       const dal = await varsayilanDal();
       const r = await gh(`/repos/${REPO}/contents/ajan/trendler.json?ref=${encodeURIComponent(dal)}`);
@@ -458,6 +459,16 @@ async function api(req, res, url) {
     const r = await gh(`/repos/${REPO}/actions/workflows/${AKIS_KISA}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: { hemen: 'EVET' } }) });
     if (r.status !== 204) return json(res, 502, { hata: 'GitHub kabul etmedi (' + r.status + ').' });
     kisaTetikler.push(simdi);
+    return json(res, 200, { ok: true });
+  }
+  if (url.pathname === '/api/trend-calistir' && req.method === 'POST') {
+    const simdi = Date.now();
+    while (trendTetikler.length && simdi - trendTetikler[0] > 3600e3) trendTetikler.shift();
+    if (trendTetikler.length >= 3) return json(res, 429, { hata: 'Saatte en fazla 3 elle trend araştırması.' });
+    const dal = await varsayilanDal();
+    const r = await gh(`/repos/${REPO}/actions/workflows/${AKIS_TREND}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: {} }) });
+    if (r.status !== 204) return json(res, 502, { hata: 'GitHub kabul etmedi (' + r.status + ').' });
+    trendTetikler.push(simdi);
     return json(res, 200, { ok: true });
   }
   if (url.pathname === '/api/uretim-ayar' && req.method === 'POST') {
