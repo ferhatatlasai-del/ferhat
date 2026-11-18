@@ -1293,11 +1293,11 @@ function istatistikCiz(v){
   var t=son.toplam||{};
   $('#isDurum').textContent='Son rapor: '+son.tr_saat+' (TR).'+(ay.aktif===false?' Raporlar duraklatılmış.':'');
   function kart(et,sayi,alt,sinif){ var k=dom('div','kt-kart'+(sinif?' '+sinif:'')); k.appendChild(dom('span','et',et)); k.appendChild(dom('b','sayi',sayi)); if(alt) k.appendChild(dom('small',null,alt)); kk.appendChild(k); }
-  kart('Toplam izlenme',isSayi(t.toplam),son.fark!=null?('önceki rapordan '+isIsaret(son.fark)):'',son.fark>0?'iyi':'');
-  var ig=son.instagram||{}, yt=son.youtube||{};
+  var ig=son.instagram||{}, yt=son.youtube||{}, eksikVeri=!ig.izin||!yt.izin;
+  kart('Toplam izlenme',isSayi(t.toplam),eksikVeri?'eksik veri (izin yok)':(son.fark!=null?('önceki rapordan '+isIsaret(son.fark)):''),(!eksikVeri&&son.fark>0)?'iyi':'');
   kart('Reels',ig.izin?isSayi(t.reels):'?',ig.izin?'':'izin yok');
   kart('Short',yt.izin?isSayi(t.short):'?',yt.izin?'':'izin yok');
-  kart('Hikaye',isSayi(t.hikaye),son.hikaye_izin?'bu sefer okundu':'');
+  kart('Hikaye',(son.hikaye_izin||t.hikaye>0)?isSayi(t.hikaye):'?',son.hikaye_izin?'bu sefer okundu':(t.hikaye>0?'':'izin yok'));
   kart('Takipçi',isSayi(ig.takipci),'');
   // çizgi grafik
   var g=(v.gecmis||[]).slice(-40), sv=$('#isCizgi'); sv.textContent='';
