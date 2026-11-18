@@ -153,11 +153,21 @@ def instagram_topla():
                     sonuc["hata"] = hata
             sonuc["gonderiler"].append(kayit)
         sonuc["izin"] = izinli > 0
+        sonuc["anahtar_izinleri"] = anahtar_izinleri(taban)
         if hatalar and not sonuc["hata"]:
             sonuc["hata"] = " | ".join(hatalar)
         return sonuc, taban
     sonuc["hata"] = " | ".join(hatalar) or sonuc["hata"]
     return sonuc, None
+
+
+def anahtar_izinleri(taban):
+    """Anahtara verilmiş izinlerin adları (anahtarın kendisi değil). Hangi iznin eksik olduğunu görmek için."""
+    try:
+        veri = IG.al(taban, "me/permissions")
+        return sorted(f"{x.get('permission')}" + ("" if x.get("status") == "granted" else f"({x.get('status')})") for x in veri.get("data", []))
+    except Exception:
+        return None
 
 
 def hikayeleri_topla(taban):
@@ -344,13 +354,15 @@ def calis(a):
     satir = {"t": an.strftime("%Y-%m-%dT%H:%M:%SZ"), "toplam": top["toplam"], "reels": top["reels"], "short": top["short"], "hikaye": top["hikaye"],
              "gonderi": top["gonderi"], "youtube_video": top["youtube_video"], "begeni": top["begeni"], "yorum": top["yorum"], "takipci": ig.get("takipci")}
     son = {"tarih": satir["t"], "tr_saat": tr_saat(an).strftime("%d.%m.%Y %H:%M"), "toplam": top, "fark": fark if onceki else None,
-           "instagram": {k: ig[k] for k in ("durum", "izin", "takipci", "hata", "gonderiler")}, "hikaye_izin": hikaye_izin,
+           "instagram": {k: ig.get(k) for k in ("durum", "izin", "takipci", "hata", "gonderiler", "anahtar_izinleri")}, "hikaye_izin": hikaye_izin,
            "hikayeler": sorted(({"id": k, **v} for k, v in hikayeler.items()), key=lambda x: x.get("tarih", ""), reverse=True)[:40],
            "youtube": yt, "eksikler": eksikler, "bildirim": {"baslik": baslik, "govde": govde}}
     print(baslik)
     print(govde)
     if eksikler:
         print("Eksik:", "; ".join(eksikler), "| IG:", ig.get("hata", ""), "| YT:", yt.get("hata", ""))
+    if ig.get("anahtar_izinleri") is not None:
+        print("Instagram anahtarındaki izinler:", ", ".join(ig["anahtar_izinleri"]) or "(boş)")
     if a.kuru:
         return 0
     json_yaz(KLASOR / "son.json", son)
