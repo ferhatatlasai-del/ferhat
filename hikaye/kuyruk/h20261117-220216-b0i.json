@@ -1,7 +1,7 @@
 {
   "id": "h20261117-220216-b0i",
   "kaynak": "uretim",
-  "durum": "planli",
+  "durum": "yayinlaniyor",
   "olusturma": "2026-11-17T22:02:17.000Z",
   "gorsel": "hikaye/gorseller/h20261117-220216-b0i.mp4",
   "baslik": "REMIX of \"Parametric Rugged Box\" - No Assembly Required",
@@ -20,7 +20,9 @@
     "deneme": 1,
     "sorunlar": []
   },
-  "yayin": null,
+  "yayin": {
+    "tarih": "2026-11-18T06:30:10Z"
+  },
   "hata": "",
   "deneme": 0,
   "tur": "video",
