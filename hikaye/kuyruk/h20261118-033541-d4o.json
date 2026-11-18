@@ -1,7 +1,7 @@
 {
   "id": "h20261118-033541-d4o",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-18T03:35:41.000Z",
   "gorsel": "hikaye/gorseller/h20261118-033541-d4o.mp4",
   "baslik": "Portable Cable Organizer / Winder",
@@ -21,7 +21,9 @@
     "sorunlar": []
   },
   "yayin": {
-    "tarih": "2026-11-18T15:05:23Z"
+    "tarih": "2026-11-18T15:06:23Z",
+    "medya_kimligi": "18022122551968417",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4033195099919828992"
   },
   "hata": "",
   "deneme": 0,
