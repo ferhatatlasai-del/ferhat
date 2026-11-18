@@ -1,10 +1,10 @@
 {
-  "tarih": "2026-11-18T22:38:15Z",
+  "tarih": "2026-11-18T22:39:53Z",
   "kontroller": [
     {
       "ad": "Instagram",
-      "durum": "sorun",
-      "not": "Instagram anahtarı reddedildi (kod 100): Unsupported get request. Object with ID '17841457188392262' does not exist, cannot be loaded due to missing permissions, or does not support. Anahtarı yenilemek gerekebilir."
+      "durum": "iyi",
+      "not": "Instagram anahtarı çalışıyor"
     },
     {
       "ad": "YouTube",
