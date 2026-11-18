@@ -158,6 +158,7 @@ def instagram_topla():
             sonuc["hata"] = " | ".join(hatalar)
         return sonuc, taban
     sonuc["hata"] = " | ".join(hatalar) or sonuc["hata"]
+    sonuc["tani"] = anahtar_tani()
     return sonuc, None
 
 
@@ -168,6 +169,29 @@ def anahtar_izinleri(taban):
         return sorted(f"{x.get('permission')}" + ("" if x.get("status") == "granted" else f"({x.get('status')})") for x in veri.get("data", []))
     except Exception:
         return None
+
+
+def anahtar_tani():
+    """Instagram profili okunamadığında: anahtar hangi izinlere ve hangi Instagram hesaplarına erişebiliyor? (anahtar yazılmaz)"""
+    taban = "https://graph.facebook.com/v21.0"
+    cikti = {}
+    try:
+        veri = IG.al(taban, "me/permissions")
+        cikti["izinler"] = sorted(f"{x.get('permission')}" + ("" if x.get("status") == "granted" else f"({x.get('status')})") for x in veri.get("data", []))
+    except urllib.error.HTTPError as e:
+        cikti["izinler"] = "okunamadı: " + IG.hata_ozeti(e)[:120]
+    except Exception as e:
+        cikti["izinler"] = f"okunamadı ({type(e).__name__})"
+    try:
+        veri = IG.al(taban, "me/accounts", fields="instagram_business_account", limit=25)
+        sayfalar = veri.get("data", [])
+        cikti["sayfa_sayisi"] = len(sayfalar)
+        cikti["instagram_kimlikleri"] = [str((x.get("instagram_business_account") or {}).get("id")) for x in sayfalar if x.get("instagram_business_account")]
+    except urllib.error.HTTPError as e:
+        cikti["sayfalar"] = "okunamadı: " + IG.hata_ozeti(e)[:120]
+    except Exception as e:
+        cikti["sayfalar"] = f"okunamadı ({type(e).__name__})"
+    return cikti
 
 
 def hikayeleri_topla(taban):
@@ -361,6 +385,8 @@ def calis(a):
     print(govde)
     if eksikler:
         print("Eksik:", "; ".join(eksikler), "| IG:", ig.get("hata", ""), "| YT:", yt.get("hata", ""))
+    if ig.get("tani"):
+        print("Anahtar tanısı:", json.dumps(ig["tani"], ensure_ascii=False))
     if ig.get("anahtar_izinleri") is not None:
         print("Instagram anahtarındaki izinler:", ", ".join(ig["anahtar_izinleri"]) or "(boş)")
     if a.kuru:
