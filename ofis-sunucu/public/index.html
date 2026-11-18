@@ -245,6 +245,9 @@ body.tam .hint{display:none}
 @keyframes don{to{transform:rotate(360deg)}}
 .aks a{color:var(--ready);font-weight:600}
 @media (max-width:720px){body.tam .nav{display:none!important}}
+.uretkutu{border:2px solid var(--accent);border-radius:14px;padding:12px;margin:10px 0;background:color-mix(in srgb,var(--accent) 7%,var(--panel))}
+.uretkutu .buyuk{font-size:16px;padding:12px 18px;width:100%}
+.uretkutu .not{margin:8px 0 0}
 </style>
 
 </head><body>
@@ -316,6 +319,10 @@ body.tam .hint{display:none}
       <div class="card pub" id="hKart">
         <h2>Hikaye ajanı</h2>
         <p class="alt">Kuyruktaki fotoğraf ve videoları senin ayarladığın aralıkta Instagram hikayesi olarak yayınlar. <b>Fotoğrafı kuyruğa koymak, yayın onayı sayılır.</b> Hikaye API’si yazı eklemez, yalnızca görsel gider. Yayınlanan hikaye API ile silinemez, Instagram uygulamasından silersin.</p>
+        <div class="uretkutu">
+          <button type="button" class="ana buyuk" id="hUret">✨ Hikaye üret ve sıraya koy</button>
+          <p class="not" id="hUretNot">Yapay zekâ trend ve Printables’tan tasarım seçer, görseli hazırlar, müzikli videoya çevirir ve sıraya koyar. Birkaç dakika sürer, günlük görsel sınırı geçerlidir. Mod “Onaylı” ise hikayeler önce senden onay bekler.</p>
+        </div>
         <p class="not" id="hDurum">Yükleniyor…</p>
         <input type="password" id="hSifre" autocomplete="current-password" placeholder="Ofis şifresi" hidden style="margin-top:8px;width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px">
         <div class="satir"><button type="button" class="ana" id="hAktif">Etkinleştir</button><button type="button" id="hHemen">Şimdi bir hikaye yayınla</button></div>
@@ -1175,6 +1182,61 @@ function yayinSahnesiBitir(hedefler,bitti){
 }
 pSifreHazirla(true);
 
+
+/* ---------- Hikaye üret ve sıraya koy (Hikaye sekmesi ve ofiste Hikaye ajanı) ---------- */
+var HKM={durum:'bos',mesaj:'',eklenen:0,aktif:false}, hkUretiyor=false;
+function hkSira(){ var k=(HK&&HK.kuyruk)||[]; return k.filter(function(o){return o.durum==='planli'||o.durum==='onay_bekliyor';}).length; }
+function hkUretDurum(t){ var e=$('#hUretNot'); if(e&&t) e.textContent=t; }
+async function hikayeUret(){
+  if(hkUretiyor||!hSifreKontrol()) return; hkUretiyor=true;
+  var onceki=hkSira(), t0=Date.now(); HKM.durum='uretiyor'; HKM.mesaj=''; aksCiz();
+  var btn=$('#hUret'); if(btn){ btn.disabled=true; btn.textContent='⏳ Hikayeler hazırlanıyor…'; }
+  hkUretDurum('Üretim başladı. 2-4 dakika sürer; hikayeler hazır oldukça aşağıdaki kuyrukta görünür.');
+  try{ await hPost('/api/uretim-calistir',{}); }
+  catch(e){ HKM.durum='bos'; HKM.mesaj=String(e.message||e); hkUretiyor=false; if(btn){ btn.disabled=false; btn.textContent='✨ Hikaye üret ve sıraya koy'; } hkUretDurum(HKM.mesaj); aksCiz(); return; }
+  var eklenen=0;
+  while(Date.now()-t0<8*60e3){
+    await bekle(YTT.poll>2000?15000:YTT.poll);
+    try{ var v=await fetch('/api/hikaye?taze=1').then(function(r){return r.ok?r.json():null;}); if(v){ hikayeCiz(v); eklenen=Math.max(0,hkSira()-onceki); if(eklenen>0&&Date.now()-t0>(YTT.poll>2000?25000:1500)){ await bekle(YTT.poll>2000?20000:YTT.poll); var v2=await fetch('/api/hikaye?taze=1').then(function(r){return r.ok?r.json():null;}); if(v2) hikayeCiz(v2); eklenen=Math.max(0,hkSira()-onceki); break; } } }catch(e){}
+  }
+  hkUretiyor=false; HKM.eklenen=eklenen;
+  if(eklenen>0){ HKM.durum='bitti'; hkUretDurum(eklenen+' yeni hikaye sıraya girdi. Aşağıdaki kuyrukta görebilirsin.'); toastGoster(eklenen+' yeni hikaye sıraya girdi.'); }
+  else { HKM.durum='bos'; HKM.mesaj='Yeni hikaye çıkmadı (günlük görsel sınırı dolmuş ya da uygun tasarım bulunamamış olabilir).'; hkUretDurum(HKM.mesaj); }
+  if(btn){ btn.disabled=false; btn.textContent='✨ Hikaye üret ve sıraya koy'; }
+  hikayeCek(true); aksCiz();
+}
+var hkOnay=false;
+$('#hUret').addEventListener('click',function(){
+  var b=this; if(hkUretiyor) return;
+  if(!hkOnay){ hkOnay=true; b.textContent='Emin misin? Evet, üret (görsel maliyeti var)'; setTimeout(function(){ if(hkOnay){ hkOnay=false; if(!hkUretiyor) b.textContent='✨ Hikaye üret ve sıraya koy'; } },6000); return; }
+  hkOnay=false; hikayeUret();
+});
+function hkAksCiz(){
+  aksEl.style.setProperty('--ak','#c13584'); aksEl.textContent='';
+  function btn(ad,fn,ana){ var b=document.createElement('button'); b.type='button'; if(ana) b.className='ana'; b.textContent=ad; b.addEventListener('click',fn); aksEl.appendChild(b); return b; }
+  function not(t){ var q=document.createElement('p'); q.className='not'; q.textContent=t; aksEl.appendChild(q); return q; }
+  var h=document.createElement('h4'); h.innerHTML='<i></i>Hikaye ajanı'; aksEl.appendChild(h);
+  var ks=hkSira(), ay=(HK&&HK.ayar)||{};
+  if(HKM.durum==='uretiyor'){ var q=not(''); var sp=document.createElement('span'); sp.className='don'; q.appendChild(sp); q.appendChild(document.createTextNode('Hikayeler hazırlanıyor… (2-4 dk)')); }
+  else {
+    if(HKM.durum==='bitti') not(HKM.eklenen+' yeni hikaye sıraya girdi. 🎉');
+    btn('✨ Hikaye üret ve sıraya koy',function(){ hkOnayAks(); },true);
+    btn('⏩ Sıradakini şimdi yayınla',function(){ hikayeHemen(); });
+    btn('📱 Hikaye kuyruğunu aç',function(){ if(document.body.classList.contains('tam')) tamEkran(false); sekme('hikaye'); });
+    not('Kuyrukta '+ks+' hikaye bekliyor'+(ay.aktif===false?' (yayın ajanı duraklatılmış).':'.'));
+    if(HKM.mesaj) not(HKM.mesaj);
+  }
+  need=true;
+}
+var hkAksOnay=false;
+function hkOnayAks(){ if(!hkAksOnay){ hkAksOnay=true; toastGoster('Hikaye üretimi görsel maliyeti çıkarır. Onaylamak için düğmeye bir kez daha bas.'); setTimeout(function(){ hkAksOnay=false; },6000); return; } hkAksOnay=false; hikayeUret(); }
+async function hikayeHemen(){
+  if(!hSifreKontrol()) return;
+  try{ await hPost('/api/hikaye-yayinla',{}); HKM.mesaj='Yayın başlatıldı; bir iki dakikada hikaye çıkar.'; hikayeBalon(); setTimeout(function(){ hikayeCek(true); },30000); }
+  catch(e){ HKM.mesaj=String(e.message||e); }
+  aksCiz();
+}
+
 /* ---------- Ofiste YouTube ve Instagram: video üret, onayla, yayınla, kutla ---------- */
 var PLAT={
   youtube:{ad:'YouTube Shorts',renk:'#e62117',hedef:'youtube',tvAd:'YouTube',tvYayin:'Shorts yayında!',tvYukle:'Shorts yükleniyor',yol:[[9.6,-4.9],[9.6,-2.7],[6.0,-2.6]],yayinBtn:'✅ Onayla ve YouTube’a yayınla'},
@@ -1185,7 +1247,7 @@ var YTT=window.__ytTest||{poll:9000,yayinPoll:8000,alkis:6500};
 var aksEl=document.createElement('div'); aksEl.className='aks'; aksEl.hidden=true; $('#labels').appendChild(aksEl);
 aksEl.addEventListener('pointerdown',function(e){e.stopPropagation();});
 function aksKonum(w,h){
-  if(aksEl.hidden||!PLAT[selId]||!ST[selId]) return; var st=ST[selId];
+  if(aksEl.hidden||!(PLAT[selId]||selId==='hikaye')||!ST[selId]) return; var st=ST[selId];
   aksEl.classList.toggle('kisa',h<520); aksEl.style.maxHeight=(h-16)+'px';
   var gen=aksEl.offsetWidth||240, yuk=Math.min(aksEl.offsetHeight||120,h-16);
   v3.set(st.a.x,0.1,st.a.z+2.2).project(cam); var xa=(v3.x+1)/2*w, ya=(1-v3.y)/2*h;
@@ -1196,10 +1258,11 @@ function aksKonum(w,h){
   aksEl.style.left=x+'px'; aksEl.style.top=top+'px';
 }
 function ytSecim(id){
-  Object.keys(PLAT).forEach(function(k){ YT[k].aktif=(k===id); });
-  if(PLAT[id]){ ytTaslakYukle(id); aksCiz(); } else aksEl.hidden=true;
+  Object.keys(PLAT).forEach(function(k){ YT[k].aktif=(k===id); }); HKM.aktif=(id==='hikaye');
+  if(PLAT[id]){ ytTaslakYukle(id); aksCiz(); } else if(id==='hikaye'){ aksCiz(); } else aksEl.hidden=true;
 }
 function aksCiz(){
+  if(selId==='hikaye'&&HKM.aktif){ aksEl.hidden=false; hkAksCiz(); return; }
   var k=selId, P=PLAT[k], Y=P&&YT[k]; var goster=!!(P&&Y&&Y.aktif); aksEl.hidden=!goster; if(!goster) return;
   aksEl.style.setProperty('--ak',P.renk); aksEl.textContent='';
   function btn(ad,fn,ana){ var b=document.createElement('button'); b.type='button'; if(ana) b.className='ana'; b.textContent=ad; b.addEventListener('click',fn); aksEl.appendChild(b); return b; }
@@ -1469,8 +1532,10 @@ function hikayeCiz(v){
   var aj=BY.hikaye; if(aj){
     aj.durum=a.aktif?(aj.sonSonuc==='failure'?'hata':'calisiyor'):'hazir';
     var son=k.filter(function(o){return o.yayin&&o.yayin.tarih;}).sort(function(x,y){return Date.parse(y.yayin.tarih)-Date.parse(x.yayin.tarih);})[0];
-    if(son){ aj.son=son.yayin.tarih; aj.sonuc=son.durum==='yayinda'?'Son hikaye yayınlandı.':(son.durum==='hata'?'Son hikaye hata verdi.':'Son hikaye: '+son.durum); }
-    aj.sonuc=(a.aktif?'':'Duraklatılmış. ')+(aj.sonuc||'Henüz yayınlamadı.')+(a.son_not?' '+a.son_not:'');
+    if(aj.temelSonuc===undefined) aj.temelSonuc=aj.sonuc||'';
+    var temel=aj.temelSonuc||'Henüz yayınlamadı.';
+    if(son){ aj.son=son.yayin.tarih; temel=son.durum==='yayinda'?'Son hikaye yayınlandı.':(son.durum==='hata'?'Son hikaye hata verdi.':'Son hikaye: '+son.durum); }
+    aj.sonuc=(a.aktif?'':'Duraklatılmış. ')+temel+(a.son_not?' '+a.son_not:'');   // her yenilemede sıfırdan kurulur (üst üste eklenmez)
     durumGorselYenile();
     // yeni yayınlanan hikaye: ajan canlansın
     var enSon=son&&son.yayin?Date.parse(son.yayin.tarih):0;
