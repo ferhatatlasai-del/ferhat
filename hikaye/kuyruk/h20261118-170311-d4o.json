@@ -1,0 +1,34 @@
+{
+  "id": "h20261118-170311-d4o",
+  "kaynak": "uretim",
+  "durum": "planli",
+  "olusturma": "2026-11-18T17:03:12.000Z",
+  "gorsel": "hikaye/gorseller/h20261118-170311-d4o.mp4",
+  "baslik": "Silica gel spool container",
+  "atif": {
+    "ad": "Silica gel spool container",
+    "tasarimci": "gdrag",
+    "lisans": "CC0",
+    "url": "https://www.printables.com/model/65922-silica-gel-spool-container",
+    "site": "printables.com",
+    "lisans_teyit": true,
+    "referansli": true
+  },
+  "trend": "",
+  "kontrol": {
+    "puan": 8.0,
+    "deneme": 1,
+    "sorunlar": [
+      "Arka plan referans fotoğraftan farklı ve stilize.",
+      "Yüzey detayları biraz daha pürüzsüz ve parlak görünüyor."
+    ]
+  },
+  "yayin": null,
+  "hata": "",
+  "deneme": 0,
+  "tur": "video",
+  "muzik": "Sentezlenmiş müzik: Chill gece (telifsiz, FFmpeg ile üretildi)",
+  "muzik_sira": 5,
+  "muzik_stil": "Chill gece",
+  "muzik_ton": 0
+}
