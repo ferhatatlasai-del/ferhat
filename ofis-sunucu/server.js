@@ -441,8 +441,12 @@ async function api(req, res, url) {
       const r = await depoSil(yol, k.sha, 'Panel: Shorts taslağı silindi');
       return r.ok ? json(res, 200, { ok: true }) : json(res, 502, { hata: 'Silinemedi.' });
     }
-    t.durum = b.karar === 'reddet' ? 'reddedildi' : 'yayinlandi';
-    if (b.karar === 'yayinlandi') t.yayin_tarihi = new Date().toISOString();
+    if (b.karar === 'reddet') t.durum = 'reddedildi';
+    else if (['youtube', 'instagram'].includes(b.hedef)) {   // tek platform yayınlandı: diğeri için taslak beklemeye devam eder
+      t.yayinlanan = [...new Set([...(t.yayinlanan || []), b.hedef])];
+      t.yayin_tarihi = new Date().toISOString();
+      if (t.yayinlanan.includes('youtube') && t.yayinlanan.includes('instagram')) t.durum = 'yayinlandi';
+    } else { t.durum = 'yayinlandi'; t.yayinlanan = ['youtube', 'instagram']; t.yayin_tarihi = new Date().toISOString(); }
     const r = await depoYaz(yol, JSON.stringify(t, null, 2), k.sha, 'Panel: Shorts taslağı ' + t.durum);
     return r.ok ? json(res, 200, { ok: true, durum: t.durum }) : json(res, 502, { hata: 'Kaydedilemedi.' });
   }

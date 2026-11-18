@@ -116,3 +116,9 @@ Panel yedi sekmeye ayrıldı; alttaki rozetler o sekmede bekleyen karar/uyarı s
 - **Akademi**: haftalık rapor ve ders önerileri.
 - **Sistem**: hikaye zamanlaması, yapay zekâ üretim ayarları, bildirimler, servis sağlığı, zamanlayıcı.
 Adres sonundaki `#hikaye`, `#video` gibi bağlantılar doğrudan sekmeyi açar. Ofis şifresi gerektiren işlemde üstte tek bir şifre çubuğu açılır.
+
+### Ofiste video üretme ve yayınlama (YouTube ve Instagram)
+- **Serbest kamera:** sürükle = sınırsız dönüş (7-86° yükseklik), iki parmak = yakınlaştır ve kaydır, sağ tuş / Shift+sürükle = kaydır, "Tüm ofis" = sıfırla.
+- **Tam ekran:** "⤢ Tam ekran" düğmesi; telefonu yatay çevirince ofis otomatik tam ekran olur (✕ Küçült ile çıkılır).
+- **YouTube ya da Instagram kişisine dokun:** başının altında menü açılır. "Video üret" (Shorts/Reels taslağı hazırlatır) → taslak hazır olunca önizleme ve **"Onayla ve yayınla"** → duvardaki televizyon açılıp logoyu gösterir, yükleme bitince kişi masasından kalkıp televizyona bakarak alkışlar ("Yayında! 🎉").
+- Aynı taslak iki platform için de kullanılabilir (`shorts/<id>.json` içinde `yayinlanan` listesi); yalnızca onayladığın platforma gider. Hiçbir şey onaysız yayınlanmaz.
