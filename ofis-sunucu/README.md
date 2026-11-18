@@ -149,3 +149,9 @@ Her gün Türkiye saatiyle 09, 12, 15, 18 ve 21'de (sunucu zamanlayıcısı `ist
 - **Panel:** Özet sekmesinde "İzlenme raporu" kartı (toplam, Reels, Short, Hikaye, takipçi, grafik, en çok izlenenler, tüm paylaşımlar; duraklat ve "artış yoksa bildirim atla" düğmeleri). Ofiste İstatistik avatarına dokununca: rapor hazırla, raporları gör, günlük raporları duraklat/aç.
 - **İzinler:** Instagram izlenmesi için Meta uygulamasında insights izni, YouTube için okuma izni gerekir. Yoksa ilgili kısım "?" görünür, bildirimin sonunda "izin yok" yazar ve rapor kalan verilerle yine çıkar.
 - **Elle:** `POST /api/istatistik-calistir` (saatte en fazla 4); elle başlatma duraklatma ve "artış yoksa atla" kurallarını yok sayar. Bildirim gerçek gönderim için `OFIS_ADRES` ve `BILDIRIM_SIRRI` kullanır.
+
+### Ofis müziği
+
+Ofis tam ekran olunca (düğmeyle ya da telefonu yan çevirince otomatik) hafif bir arka plan müziği çalar; tam ekrandan çıkınca, sayfa arka plana geçince ya da 🎵 düğmesiyle kapatınca durur. Tercih tarayıcıda hatırlanır.
+Müzik dosya değil, tarayıcıda WebAudio ile üretilir (yumuşak elektrik piyano akorları, bas, fırça ritmi; 76 BPM, iki akor dizisi dönüşümlü): telif sorunu ve ek yükleme yoktur. Ses seviyesi bilerek düşüktür (yaklaşık −30 dBFS); telefonun kendi ses düğmesiyle ayarlanır.
+Telefon yan çevrilince tarayıcı sayfada daha önce hiç dokunuş görmediyse sesi başlatmaz; bu durumda "ekrana bir kez dokun" uyarısı çıkar.

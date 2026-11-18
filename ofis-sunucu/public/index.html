@@ -308,7 +308,7 @@ body.tam .hint{display:none}
       <div id="view">
         <canvas id="cv" aria-label="Ajanların çalıştığı 3 boyutlu ofis"></canvas>
         <div id="labels"></div>
-        <div class="tools"><button id="btnAll" type="button">Tüm ofis</button><button id="btnTam" type="button" aria-pressed="false">⤢ Tam ekran</button></div>
+        <div class="tools"><button id="btnAll" type="button">Tüm ofis</button><button id="btnTam" type="button" aria-pressed="false">⤢ Tam ekran</button><button id="btnSes" type="button" aria-pressed="true" title="Ofis müziği">🎵</button></div>
         <div id="ofisBilgi" hidden></div>
         <div class="hint">Sürükle: döndür · İki parmak: yakınlaştır ve kaydır · Sağ tuş / Shift+sürükle: kaydır</div>
       </div>
@@ -2145,6 +2145,109 @@ function zamanlayiciCek(){
 }
 zamanlayiciCek(); setInterval(zamanlayiciCek,300000);
 
+
+// ---- Ofis müziği (tam ekranda hafif arka plan; tamamen kodla üretilir, telifsiz) ----
+var MZK=(function(){
+  var BPM=76, ADIM=60/BPM/2, VOL=0.85, BUL=0.25;
+  var P_A=[{k:48,a:[64,67,71,74]},{k:45,a:[60,64,67,71]},{k:50,a:[60,65,69,72]},{k:43,a:[59,62,65,69]}];
+  var P_B=[{k:53,a:[57,60,64,67]},{k:52,a:[55,59,62,67]},{k:50,a:[60,65,69,72]},{k:43,a:[59,62,65,69]}];
+  var o={ctx:null,bus:null,master:null,tim:null,sonra:0,adim:0,calisiyor:false,sayac:0,bekle:false};
+  function hz(m){ return 440*Math.pow(2,(m-69)/12); }
+  function gurultu(ctx,sn){ var n=Math.floor(ctx.sampleRate*sn), b=ctx.createBuffer(1,n,ctx.sampleRate), v=b.getChannelData(0); for(var i=0;i<n;i++) v[i]=Math.random()*2-1; return b; }
+  function yankiBuf(ctx){ var sn=2.0, n=Math.floor(ctx.sampleRate*sn), b=ctx.createBuffer(2,n,ctx.sampleRate); for(var c=0;c<2;c++){ var v=b.getChannelData(c); for(var i=0;i<n;i++) v[i]=(Math.random()*2-1)*Math.pow(1-i/n,3.2); } return b; }
+  function zincir(ctx,hedef){
+    var bus=ctx.createGain(); bus.gain.value=1;
+    var lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=3800; lp.Q.value=0.4;
+    var kuru=ctx.createGain(); kuru.gain.value=0.8;
+    var kon=ctx.createConvolver(); kon.buffer=yankiBuf(ctx); var yas=ctx.createGain(); yas.gain.value=0.32;
+    var sik=ctx.createDynamicsCompressor(); sik.threshold.value=-22; sik.ratio.value=3; sik.attack.value=0.02; sik.release.value=0.25;
+    bus.connect(lp); lp.connect(kuru); lp.connect(kon); kon.connect(yas); kuru.connect(sik); yas.connect(sik); sik.connect(hedef);
+    return bus;
+  }
+  function piyano(ctx,bus,m,t,vel,uzun){
+    var f=hz(m), g=ctx.createGain(), lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=2300; lp.Q.value=0.3;
+    var o1=ctx.createOscillator(); o1.type='sine'; o1.frequency.value=f;
+    var o2=ctx.createOscillator(); o2.type='triangle'; o2.frequency.value=f*2.004; var g2=ctx.createGain(); g2.gain.value=0.22;
+    var o3=ctx.createOscillator(); o3.type='sine'; o3.frequency.value=f*1.003; var g3=ctx.createGain(); g3.gain.value=0.5;
+    o1.connect(g); o3.connect(g3); g3.connect(g); o2.connect(g2); g2.connect(g); g.connect(lp); lp.connect(bus);
+    var son=t+uzun;
+    g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(vel,t+0.008); g.gain.exponentialRampToValueAtTime(vel*0.35,t+0.35); g.gain.exponentialRampToValueAtTime(0.0001,son);
+    o1.start(t); o2.start(t); o3.start(t); o1.stop(son+0.05); o2.stop(son+0.05); o3.stop(son+0.05);
+  }
+  function bas(ctx,bus,m,t,vel,uzun){
+    var f=hz(m), g=ctx.createGain(), o1=ctx.createOscillator(); o1.type='sine'; o1.frequency.value=f;
+    var o2=ctx.createOscillator(); o2.type='triangle'; o2.frequency.value=f; var g2=ctx.createGain(); g2.gain.value=0.25;
+    o1.connect(g); o2.connect(g2); g2.connect(g); g.connect(bus);
+    g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(vel,t+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t+uzun);
+    o1.start(t); o2.start(t); o1.stop(t+uzun+0.05); o2.stop(t+uzun+0.05);
+  }
+  function firca(ctx,bus,t,vel,sk){
+    if(!o.gur||o.gur.ctx!==ctx) o.gur={ctx:ctx,buf:gurultu(ctx,0.5)};
+    var src=ctx.createBufferSource(); src.buffer=o.gur.buf; var f=ctx.createBiquadFilter(); f.type='bandpass'; f.frequency.value=sk||6500; f.Q.value=0.8;
+    var g=ctx.createGain(); src.connect(f); f.connect(g); g.connect(bus);
+    g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(vel,t+0.004); g.gain.exponentialRampToValueAtTime(0.0001,t+0.11);
+    src.start(t,Math.random()*0.3); src.stop(t+0.14);
+  }
+  // Bir sekizlik adımı çalar (ölçü başına 8 adım). t: çalma zamanı (ctx saati)
+  function adimCal(ctx,bus,t,adim){
+    var olcu=Math.floor(adim/8), ad=adim%8, bolum=Math.floor(olcu/4)%2, ak=(bolum===0?P_A:P_B)[olcu%4];
+    var sal=(ad%2===1)?ADIM*0.16:0, tt=t+sal+(Math.random()*0.012-0.006);
+    function v(x){ return x*(0.9+Math.random()*0.2); }
+    if(ad===0){ ak.a.forEach(function(m,i){ piyano(ctx,bus,m,tt+i*0.018,v(0.05),ADIM*7.2); }); bas(ctx,bus,ak.k,tt,v(0.2),ADIM*3.6); }
+    if(ad===3){ ak.a.slice(1).forEach(function(m,i){ piyano(ctx,bus,m,tt+i*0.014,v(0.028),ADIM*3.5); }); }
+    if(ad===4){ bas(ctx,bus,ak.k+((olcu%2)?7:0),tt,v(0.14),ADIM*3); }
+    if(ad===6){ piyano(ctx,bus,ak.a[(olcu+1)%4]+12,tt,v(0.022),ADIM*3); }
+    if(ad===2||ad===6) firca(ctx,bus,tt,v(0.035),5200);
+    if(ad%2===1) firca(ctx,bus,tt,v(0.016),8200);
+    o.sayac++;
+  }
+  function olustur(){
+    if(o.ctx) return o.ctx;
+    var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return null;
+    o.ctx=new AC(); o.master=o.ctx.createGain(); o.master.gain.value=0; o.master.connect(o.ctx.destination); o.bus=zincir(o.ctx,o.master);
+    return o.ctx;
+  }
+  function planla(){
+    var ctx=o.ctx; if(!ctx||!o.calisiyor) return;
+    while(o.sonra<ctx.currentTime+0.3){ adimCal(ctx,o.bus,o.sonra,o.adim); o.adim++; o.sonra+=ADIM; }
+  }
+  o.basla=function(){
+    var ctx=olustur(); if(!ctx||o.calisiyor) return; o.calisiyor=true;
+    var basla=function(){
+      if(!o.calisiyor) return;
+      o.sonra=ctx.currentTime+0.15; if(o.adim%8) o.adim+=8-(o.adim%8);
+      o.master.gain.cancelScheduledValues(ctx.currentTime); o.master.gain.setValueAtTime(o.master.gain.value,ctx.currentTime); o.master.gain.linearRampToValueAtTime(VOL,ctx.currentTime+2.5);
+      clearInterval(o.tim); o.tim=setInterval(planla,110); planla();
+    };
+    var pr=ctx.state==='suspended'&&ctx.resume?ctx.resume():null;
+    if(pr&&pr.then){ pr.then(basla,function(){}); } else basla();
+    // Tarayıcı kullanıcı dokunuşu bekliyorsa: ilk dokunuşta başlat
+    setTimeout(function(){ if(o.calisiyor&&ctx.state!=='running'&&!o.bekle){ o.bekle=true; if(typeof toastGoster==='function') toastGoster('Ofis müziği için ekrana bir kez dokun.'); var al=function(){ document.removeEventListener('pointerdown',al,true); o.bekle=false; if(o.calisiyor&&ctx.resume) ctx.resume().then(basla,function(){}); }; document.addEventListener('pointerdown',al,true); } },500);
+  };
+  o.dur=function(){
+    var ctx=o.ctx; if(!ctx||!o.calisiyor) return; o.calisiyor=false; clearInterval(o.tim);
+    try{ o.master.gain.cancelScheduledValues(ctx.currentTime); o.master.gain.setValueAtTime(o.master.gain.value,ctx.currentTime); o.master.gain.linearRampToValueAtTime(0,ctx.currentTime+0.8); }catch(e){}
+    setTimeout(function(){ if(!o.calisiyor&&ctx.state==='running'&&ctx.suspend) ctx.suspend(); },1000);
+  };
+  o.adimCal=adimCal; o.zincir=zincir; o.ADIM=ADIM; o.VOL=VOL;
+  return o;
+})();
+window.__ofisMuzik=MZK;
+function sesTercih(){ try{ return localStorage.getItem('ofisMuzik')!=='kapali'; }catch(e){ return true; } }
+function sesDugme(){ var b=$('#btnSes'); if(!b) return; var ac=sesTercih(); b.textContent=ac?'🎵':'🔇'; b.setAttribute('aria-pressed',ac?'true':'false'); b.title=ac?'Ofis müziği açık (kapatmak için dokun)':'Ofis müziği kapalı (açmak için dokun)'; }
+function muzikDurumu(){
+  var tam=document.body.classList.contains('tam');
+  if(tam&&sesTercih()&&!document.hidden) MZK.basla(); else MZK.dur();
+}
+$('#btnSes').addEventListener('click',function(){
+  try{ localStorage.setItem('ofisMuzik',sesTercih()?'kapali':'acik'); }catch(e){}
+  sesDugme();
+  if(sesTercih()&&!document.body.classList.contains('tam')) toastGoster('Müzik, ofis tam ekranken çalar.');
+  muzikDurumu();
+});
+document.addEventListener('visibilitychange',muzikDurumu);
+sesDugme();
+
 // ---- Tam ekran ofis (düğme + telefonda yatay döndürünce otomatik) ----
 var aktifSekme='ofis', tamOto=false, tamKapatildi=false;
 function bilgiKatman(){
@@ -2159,6 +2262,7 @@ function tamEkran(ac,oto){
   if(ac&&!oto&&document.documentElement.requestFullscreen){ try{ document.documentElement.requestFullscreen().catch(function(){}); }catch(e){} }
   if(!ac&&document.fullscreenElement&&document.exitFullscreen){ try{ document.exitFullscreen(); }catch(e){} }
   bilgiKatman(); if(typeof aksCiz==='function') aksCiz(); need=true; setTimeout(function(){ layout(); need=true; },60);
+  muzikDurumu();
 }
 $('#btnTam').addEventListener('click',function(){ var ac=!document.body.classList.contains('tam'); if(!ac&&tamOto) tamKapatildi=true; tamEkran(ac,false); });
 document.addEventListener('fullscreenchange',function(){ if(!document.fullscreenElement&&document.body.classList.contains('tam')&&!tamOto) tamEkran(false); });
