@@ -1,0 +1,68 @@
+{
+  "tarih": "2026-11-18T11:04:18Z",
+  "gun": 7,
+  "hikaye": {
+    "olusturulan": 8,
+    "durumlar": {
+      "yayinda": 5,
+      "planli": 3
+    },
+    "kaynaklar": {
+      "uretim": 6,
+      "video": 1,
+      "foto": 1
+    },
+    "ort_kontrol_puani": 8.83,
+    "ort_deneme": 1.17,
+    "referansli": 6,
+    "trend_kaynakli": 2,
+    "muzikli": 4,
+    "yayin_gunluk": {
+      "2026-11-17": 3,
+      "2026-11-18": 2
+    }
+  },
+  "olaylar": {
+    "olaylar": {},
+    "denetim_deneme": 0,
+    "denetim_gecen": 0,
+    "denetim_gecme_orani": null,
+    "en_sik_denetim_sorunlari": [],
+    "elenen_lisanslar": {},
+    "referans_sorunlari": {},
+    "gorsel_hatalari": 0
+  },
+  "elenenler": {
+    "uretildi": 10,
+    "atlandi": 11,
+    "lisans_uygun_degil": 16
+  },
+  "harcama": {
+    "gunluk_gorsel": {
+      "2026-11-17": 6,
+      "2026-11-18": 12
+    },
+    "bu_ay": 18,
+    "son_7_gun_toplam": 18
+  },
+  "zincir": {
+    "kayit": 6,
+    "formatlar": {
+      "reels": 5,
+      "carousel": 1
+    },
+    "ort_elestiri_puani": 6.25,
+    "tekrarlanan_konu_sayisi": 0
+  },
+  "trend": {
+    "tarih": "2026-11-16T21:45:29Z",
+    "oneri": 7,
+    "dogrulanan": 7,
+    "kategori_sayisi": 1,
+    "en_cok_kategori": [
+      "yok",
+      7
+    ]
+  },
+  "calismalar": null
+}

@@ -233,6 +233,15 @@ def fikir_blogu(fikir):
             + json.dumps(fikir, ensure_ascii=False) + "\n\n")
 
 
+def _akademi(ajan):
+    """Akademi'nin kullanıcı tarafından ONAYLANMIŞ dersleri (yoksa boş)."""
+    try:
+        import akademi
+        return akademi.akademi_dersleri(ajan)
+    except Exception:
+        return ""
+
+
 def prompt_olustur(bugun, direktif="", fikir=None):
     sistem = (
         "Sen sosyal medya içerik ajanısın. Kanal profiline ve stratejiye kesinlikle uy. "
@@ -297,6 +306,7 @@ KALİTE KURALLARI:
 - Caption ve açıklamalara hashtag YAZMA ve yapay zekâ açıklaması YAZMA (kod ekler). Slayt ve sahne metinlerine numara yazma. Her zaman 5-8 hashtag döndür.
 - Türkçe doğal konuşma dilinde olsun; çeviri gibi ya da anlamsız kalıp cümleler yazma (ör. "en sessiz yardımcı", "baskı devreye girer"). Yüksek sesle okuyunca doğal durmayan cümleyi sadeleştir.
 - Üç platform metni birbirinin kopyası olmasın; YouTube başlığı arama odaklı, Instagram ve Facebook daha samimi olsun."""
+    kullanici += _akademi("icerik")
     return sistem, kullanici
 
 

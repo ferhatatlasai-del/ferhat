@@ -225,6 +225,14 @@ dd{margin:1px 0 0}
         </details>
         <details class="tr"><summary>Nöbetçi (anahtar ve servis sağlığı)</summary><div class="saglik" id="hSaglik">Henüz denetim yok.</div></details>
       </div>
+      <div class="card pub" id="akKart">
+        <h2>Akademi (ajanlara ders)</h2>
+        <p class="alt">Haftada bir ajanların performansına bakar, rapor çıkarır ve ders önerir. <b>Sen onaylamadan hiçbir ders ajanlara uygulanmaz.</b> Onayladığın dersler ajanların istemine eklenir; istediğin zaman kaldırırsın.</p>
+        <p class="not" id="akDurum">Yükleniyor…</p>
+        <div class="satir"><button type="button" id="akCalistir">Akademiyi şimdi çalıştır</button></div>
+        <div id="akOneriler"></div>
+        <details class="tr"><summary>Son haftalık rapor</summary><div class="gov" id="akRapor">Henüz rapor yok.</div></details>
+      </div>
       <div class="card pub" id="trKart">
         <h2>Trend fikirleri</h2>
         <p class="alt" id="trAlt">Yükleniyor…</p>
@@ -1275,6 +1283,48 @@ function trendCiz(v){
 }
 function trendCek(){ fetch('/api/trendler').then(function(r){return r.ok?r.json():null;}).then(function(v){ if(v) trendCiz(v); else $('#trAlt').textContent='Trendler okunamadı.'; }).catch(function(){ $('#trAlt').textContent='Trendler okunamadı.'; }); }
 trendCek(); setInterval(trendCek,600000);
+// Akademi
+function akademiCiz(v){
+  var r=v.rapor, o=v.oneriler||[];
+  var bekleyen=o.filter(function(x){return x.durum==='onay_bekliyor';}), onayli=o.filter(function(x){return x.durum==='onayli';});
+  $('#akDurum').textContent=(r?('Son rapor: '+fmt(r.tarih)+'. '):'Henüz rapor yok (ilk rapor pazar akşamı ya da "şimdi çalıştır" ile). ')+bekleyen.length+' ders onay bekliyor, '+onayli.length+' onaylı ders ajanlarda aktif.';
+  var kap=$('#akOneriler'); kap.textContent='';
+  var ADLAR={hikaye:'Hikaye ajanı',trend:'Trend ajanı',icerik:'İçerik ajanı',sistem:'Sistem (sana öneri)'};
+  function kart(x){
+    var d=dom('div','hoge'); d.style.cssText='margin-top:8px;text-align:left';
+    d.appendChild(dom('span','rozet '+(x.durum==='onayli'?'iyi':'orta'),(x.durum==='onayli'?'Onaylı · ':'Onay bekliyor · ')+(ADLAR[x.ajan]||x.ajan)));
+    d.appendChild(dom('div',null,x.baslik));
+    d.appendChild(dom('div','not',x.ders));
+    d.appendChild(dom('div','not','Kanıt: '+x.kanit));
+    function dugme(ad2,karar){ var b=dom('button',null,ad2); b.type='button'; b.addEventListener('click',function(){ if(!hSifreKontrol()) return; b.disabled=true; hPost('/api/akademi-karar',{id:x.id,karar:karar}).then(function(){ akademiCek(); }).catch(function(e){ $('#akDurum').textContent=String(e.message||e); b.disabled=false; }); }); d.appendChild(b); }
+    if(x.durum==='onay_bekliyor'){ dugme('Onayla','onayla'); dugme('Reddet','reddet'); }
+    if(x.durum==='onayli') dugme('Kaldır','kaldir');
+    return d;
+  }
+  bekleyen.concat(onayli).forEach(function(x){ kap.appendChild(kart(x)); });
+  if(!bekleyen.length&&!onayli.length) kap.appendChild(dom('p','not','Şu an ders önerisi yok. Rapor güzelse ya da veri azsa boş kalması normal.'));
+  var rp=$('#akRapor'); rp.textContent='';
+  if(r){
+    var h=r.hikaye||{}, ol=r.olaylar||{}, ha=r.harcama||{};
+    [['Hikaye',(h.olusturulan||0)+' oluşturuldu · ort. kontrol puanı '+(h.ort_kontrol_puani==null?'-':h.ort_kontrol_puani)+' · referanslı '+(h.referansli||0)+' · trend kaynaklı '+(h.trend_kaynakli||0)+' · müzikli '+(h.muzikli||0)],
+     ['Denetim',(ol.denetim_deneme||0)+' deneme, '+(ol.denetim_gecen||0)+' geçti'+(ol.denetim_gecme_orani==null?'':' (oran '+ol.denetim_gecme_orani+')')],
+     ['En sık sorunlar',(ol.en_sik_denetim_sorunlari||[]).map(function(p){return p[0]+' ×'+p[1];}).join('; ')||'-'],
+     ['Elenen lisanslar',Object.keys(ol.elenen_lisanslar||{}).map(function(k){return k+' ×'+ol.elenen_lisanslar[k];}).join('; ')||'-'],
+     ['Görsel harcaması','son 7 gün '+(ha.son_7_gun_toplam||0)+', bu ay '+(ha.bu_ay||0)]
+    ].forEach(function(s){ var p=dom('p','not'); var b=document.createElement('b'); b.textContent=s[0]+': '; p.appendChild(b); p.appendChild(document.createTextNode(s[1])); rp.appendChild(p); });
+    var c=r.calismalar; if(c&&!c.hata){ Object.keys(c).sort().forEach(function(k){ var x=c[k]; rp.appendChild(dom('p','not',k+': '+x.calisma+' çalışma, '+x.basarisiz+' başarısız')); }); }
+  }
+}
+function akademiCek(){ fetch('/api/akademi').then(function(r){return r.ok?r.json():null;}).then(function(v){ if(v) akademiCiz(v); else $('#akDurum').textContent='Akademi verisi okunamadı.'; }).catch(function(){ $('#akDurum').textContent='Akademi verisi okunamadı.'; }); }
+var akOnay=false;
+$('#akCalistir').addEventListener('click',function(){
+  if(!hSifreKontrol()) return; var btn=this;
+  if(!akOnay){ akOnay=true; btn.textContent='Emin misin? Evet, çalıştır (birkaç sent)'; setTimeout(function(){ akOnay=false; btn.textContent='Akademiyi şimdi çalıştır'; },6000); return; }
+  akOnay=false; btn.textContent='Akademiyi şimdi çalıştır'; btn.disabled=true;
+  hPost('/api/akademi-calistir',{}).then(function(){ $('#akDurum').textContent='Akademi çalışıyor. Bir dakika içinde rapor ve öneriler burada görünür.'; btn.disabled=false; var n=0; var t=setInterval(function(){ akademiCek(); if(++n>12) clearInterval(t); },10000); }).catch(function(e){ $('#akDurum').textContent=String(e.message||e); btn.disabled=false; });
+});
+akademiCek(); setInterval(akademiCek,300000);
+
 
 var SR=window.SpeechRecognition||window.webkitSpeechRecognition, rec=null;
 document.addEventListener('click',function(e){

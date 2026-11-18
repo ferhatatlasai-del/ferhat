@@ -1,0 +1,28 @@
+name: Akademi ajanı (haftalık rapor ve ders önerileri)
+
+on:
+  schedule:
+    - cron: "0 15 * * 0"   # pazar 15:00 UTC = 18:00 Türkiye (sunucu zamanlayıcısı da tetikler)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: akademi
+  cancel-in-progress: false
+
+jobs:
+  akademi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Haftalık raporu çıkar, ders önerilerini yaz
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5.4-mini' }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python3 ajan/akademi.py --git

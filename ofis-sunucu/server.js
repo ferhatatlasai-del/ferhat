@@ -28,13 +28,15 @@ const AKIS_YT = 'youtube-yukle.yml';
 // Ajan kimliği -> iş akışı dosyası (panel durumu buradan okunur)
 const AKIS_HIKAYE = 'hikaye-yayinla.yml';
 const AKIS_URETIM = 'hikaye-uret.yml';
+const AKIS_AKADEMI = 'akademi.yml';
+const AKADEMI_RE = /^o\d{8}-\d+$/;
 const HIKAYE_RE = /^h\d{8}-\d{6}-[a-z0-9]{3}$/;
 const AJAN_AKISLARI = { hikaye: 'hikaye-yayinla.yml', icerik: ['gunluk-taslak.yml', 'zincir.yml'], istatistik: 'gunluk-taslak.yml', instagram: 'yayinla.yml', youtube: 'youtube-yukle.yml', gorsel: 'zincir.yml', trend: 'trend.yml' };
 let ajanOnbellek = { t: 0, veri: null };
 let trendOnbellek = { t: 0, veri: null };
 let zincirOnbellek = { t: 0, veri: null };
 let hikayeOnbellek = { t: 0, veri: null };
-const hikayeTetikler = [], uretimTetikler = [], bildirimler = [];
+const hikayeTetikler = [], uretimTetikler = [], akademiTetikler = [], bildirimler = [];
 const guncellenenler = new Set();
 const GH_API = process.env.GH_API || 'https://api.github.com';
 const MAX_VIDEO = 30 * 1024 * 1024;
@@ -299,6 +301,14 @@ async function api(req, res, url) {
     if (url.searchParams.get('taze')) hikayeIptal();
     try { return json(res, 200, await hikayeListesi()); } catch (e) { return json(res, 502, { hata: 'Hikaye verisi okunamadı.' }); }
   }
+  if (url.pathname === '/api/akademi') {
+    if (!TOKEN) return json(res, 503, { hata: 'Sunucuda GITHUB_TOKEN tanımlı değil.' });
+    try {
+      const r = await depoOku('akademi/rapor-son.json').catch(() => null);
+      const o = await depoOku('akademi/oneriler.json').catch(() => null);
+      return json(res, 200, { rapor: r ? JSON.parse(r.metin) : null, oneriler: o ? (JSON.parse(o.metin).oneriler || []) : [] });
+    } catch (e) { return json(res, 502, { hata: 'Akademi verisi okunamadı.' }); }
+  }
   if (url.pathname === '/api/bildir' && req.method === 'POST') {
     // Sunucudan sunucuya: ajanlar (GitHub iş akışları) kendi sırlarıyla bildirim ister
     if (!BILDIRIM_ACIK) return json(res, 503, { hata: 'Bildirim kapalı (VAPID anahtarları ya da BILDIRIM_SIRRI eksik).' });
@@ -378,6 +388,32 @@ async function api(req, res, url) {
     }, 'Panel: hikaye ayarı', { aktif: false, mod: 'otomatik', gunluk_sayi: 4, baslangic_saat: 10, bitis_saat: 22, gunler: [1, 2, 3, 4, 5, 6, 7], min_aralik_dk: 60, ardisik_hata: 0, hata_siniri: 3, son_not: '' });
     hikayeIptal();
     return ok ? json(res, 200, { ok: true }) : json(res, 400, { hata: 'Ayar kaydedilemedi (bitiş saati başlangıçtan büyük olmalı).' });
+  }
+  if (url.pathname === '/api/akademi-karar' && req.method === 'POST') {
+    let b; try { b = await govde(req); } catch (e) { return json(res, 400, { hata: 'Geçersiz istek.' }); }
+    if (!AKADEMI_RE.test(String(b.id || ''))) return json(res, 400, { hata: 'Geçersiz kimlik.' });
+    if (!['onayla', 'reddet', 'kaldir', 'sil'].includes(b.karar)) return json(res, 400, { hata: 'Geçersiz karar.' });
+    let bulundu = false;
+    const ok = await jsonGuncelle('akademi/oneriler.json', v => {
+      v.oneriler = v.oneriler || [];
+      const o = v.oneriler.find(x => x.id === b.id);
+      if (!o) return false;
+      bulundu = true;
+      if (b.karar === 'onayla') o.durum = 'onayli';
+      else if (b.karar === 'reddet' || b.karar === 'kaldir') o.durum = 'reddedildi';
+      else v.oneriler = v.oneriler.filter(x => x.id !== b.id);
+    }, 'Panel: akademi dersi ' + b.karar, { oneriler: [] });
+    return ok ? json(res, 200, { ok: true }) : json(res, bulundu ? 502 : 404, { hata: bulundu ? 'Kaydedilemedi.' : 'Öneri bulunamadı.' });
+  }
+  if (url.pathname === '/api/akademi-calistir' && req.method === 'POST') {
+    const simdi = Date.now();
+    while (akademiTetikler.length && simdi - akademiTetikler[0] > 3600e3) akademiTetikler.shift();
+    if (akademiTetikler.length >= 3) return json(res, 429, { hata: 'Saatte en fazla 3 elle akademi çalıştırması.' });
+    const dal = await varsayilanDal();
+    const r = await gh(`/repos/${REPO}/actions/workflows/${AKIS_AKADEMI}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: {} }) });
+    if (r.status !== 204) return json(res, 502, { hata: 'GitHub kabul etmedi (' + r.status + ').' });
+    akademiTetikler.push(simdi);
+    return json(res, 200, { ok: true });
   }
   if (url.pathname === '/api/uretim-ayar' && req.method === 'POST') {
     let b; try { b = await govde(req); } catch (e) { return json(res, 400, { hata: 'Geçersiz istek.' }); }
@@ -650,7 +686,7 @@ http.createServer(async (req, res) => {
 // Türkiye saati (UTC+3). Saat başı :05'te hikaye yayın kontrolü (10:05-22:05), her gün 08:20'de görsel üretimi, pazartesi/perşembe 06:30'da trend ajanı.
 // İş akışları kendi kararını verir (slot, günlük sınır); çift tetik zararsızdır (ortak kilit + "önce talep et" mantığı).
 const ZAM_KAPALI = process.env.ZAMANLAYICI === 'kapali';
-const zamSon = { yayin: null, uretim: null, trend: null, hata: null };
+const zamSon = { yayin: null, uretim: null, trend: null, akademi: null, hata: null };
 const zamYapilan = new Set();
 function zamSimdiTR() { const z = process.env.ZAM_ZAMAN ? new Date(process.env.ZAM_ZAMAN) : new Date(); return new Date(z.getTime() + 3 * 3600e3); }
 async function zamTetikle(akis, girdi, ad) {
@@ -679,6 +715,11 @@ async function zamKontrol() {
   if ((haftaGunu === 1 || haftaGunu === 4) && (saat > 6 || (saat === 6 && dk >= 30)) && saat < 12) {
     const anahtar = `t${gun}`;
     if (!zamYapilan.has(anahtar)) { zamYapilan.add(anahtar); await zamTetikle('trend.yml', {}, 'trend'); }
+  }
+  // akademi ajanı: pazar 18:00'den sonra bir kez
+  if (haftaGunu === 0 && saat >= 18 && saat < 23) {
+    const anahtar = `a${gun}`;
+    if (!zamYapilan.has(anahtar)) { zamYapilan.add(anahtar); await zamTetikle(AKIS_AKADEMI, {}, 'akademi'); }
   }
   if (zamYapilan.size > 200) { const eski = [...zamYapilan].slice(0, 100); eski.forEach(k => zamYapilan.delete(k)); }
 }
