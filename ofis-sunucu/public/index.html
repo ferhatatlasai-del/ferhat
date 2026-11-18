@@ -145,20 +145,100 @@ dd{margin:1px 0 0}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .note{margin-top:12px;font-size:12.5px;color:var(--ink2)}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+/* ---- Sekmeli yerleşim ---- */
+body{padding-bottom:32px}
+.ust{margin-bottom:10px}
+.ust h1{font-size:clamp(22px,4vw,30px)}
+.ust .sub{margin:2px 0 0;font-size:13.5px}
+.nav{display:flex;gap:6px;overflow-x:auto;padding:4px 0 10px;position:sticky;top:0;z-index:20;background:var(--bg);scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav button{position:relative;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:14px;font-weight:600;color:var(--ink2)}
+.nav button[aria-current="page"]{background:var(--accent);border-color:var(--accent);color:#111}
+.nav .rz{background:var(--err);color:#fff;border-radius:999px;font-size:11px;line-height:1;min-width:18px;padding:3px 5px;text-align:center;font-weight:700}
+.nav .rz[hidden]{display:none}
+.gorunum[hidden]{display:none}
+h2.baslik{font-family:var(--font-head);font-size:clamp(22px,4vw,28px);margin:6px 0 4px;letter-spacing:-.01em}
+.kolon{display:grid;gap:0;max-width:860px}
+.kolon>.card.pub{margin-top:14px}
+.cift{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
+@media (min-width:860px){.cift{grid-template-columns:1fr 1fr}.cift>.card{margin-top:16px}}
+.kartlar{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:10px 0 0}
+.kt-kart{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;gap:2px;align-content:start}
+.kt-kart b.sayi{font-family:var(--font-head);font-size:30px;line-height:1.1;font-variant-numeric:tabular-nums}
+.kt-kart span.et{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);font-weight:600}
+.kt-kart small{color:var(--ink2);font-size:12.5px}
+.kt-kart.uyari{border-color:var(--err)}.kt-kart.uyari b.sayi{color:var(--err)}
+.kt-kart.iyi b.sayi{color:var(--ok)}
+.yap{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;margin-top:8px;background:var(--bg);width:100%;text-align:left;font-size:14px}
+.yap b{min-width:26px;height:26px;border-radius:999px;display:inline-grid;place-items:center;background:var(--accent);color:#111;font-size:13px}
+.yap.kt b{background:var(--err);color:#fff}
+.yap span{flex:1}.yap em{font-style:normal;color:var(--ink2);font-size:12.5px}
+.yap.hepsi{background:color-mix(in srgb,var(--ok) 10%,var(--bg));border-color:var(--ok);cursor:default}
+.serit{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.serit .yap{width:auto;margin:0;padding:6px 12px;border-radius:999px;font-size:13px}
+.serit .yap b{min-width:22px;height:22px;font-size:12px}
+.ajanlar{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.ajanlar button{display:flex;align-items:center;gap:8px;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:8px 10px;font-size:13.5px}
+.ajanlar i{width:9px;height:9px;border-radius:50%;flex:none}
+.gov{display:grid;gap:8px;font-size:14px}
+.gov .not{margin:0}
+.gsifre{position:sticky;top:50px;z-index:25;margin-bottom:10px;border-color:var(--accent)}
+.gsifre input{flex:1;min-width:160px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.gsifre .satir{display:flex;gap:8px;margin:6px 0 0}
+.gsifre button{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-weight:600}
+.gsifre button.ana{background:var(--accent);border-color:var(--accent);color:#111}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:40;max-width:min(92vw,520px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+.toast[hidden]{display:none}
+@media (max-width:720px){
+  body{padding-bottom:92px}
+  .nav{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:30;justify-content:space-around;gap:0;padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));background:var(--panel);border-top:1px solid var(--line);overflow:visible}
+  .nav button{flex-direction:column;gap:1px;border:0;background:none;border-radius:10px;padding:4px 2px;font-size:10.5px;flex:1;min-width:0}
+  .nav button .ik{font-size:19px;line-height:1.1}
+  .nav button[aria-current="page"]{background:color-mix(in srgb,var(--accent) 22%,transparent);color:var(--ink)}
+  .nav .rz{position:absolute;top:0;right:8px;font-size:10px;min-width:16px;padding:2px 4px}
+  .toast{bottom:84px}
+  .gsifre{top:8px}
+}
+
+h3.alt-baslik{font-family:var(--font-head);font-size:16px;margin:18px 0 2px}
+@media (max-width:720px){
+  .serit{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-bottom:10px}
+  .serit::-webkit-scrollbar{display:none}
+  .serit .yap{flex:none;font-size:12.5px;padding:5px 10px}
+  .serit .yap em{display:none}
+  .ust .sub{display:none}
+  .next{font-size:12px;padding:4px 10px}
+}
 </style>
 
 </head><body>
 <div class="wrap">
-  <header>
+  <header class="ust">
     <div>
       <h1>Ajan Ofisi</h1>
-      <p class="sub">Gür-Techs 3D ekibi çalışma başında. Bir ajana dokun, görevini ve son çalışmasını gör.</p>
+      <p class="sub">Gür-Techs 3D ekibinin kontrol paneli</p>
     </div>
     <div class="next" id="next">Sonraki otomatik çalışma: <b id="nextT">…</b></div>
   </header>
+  <nav class="nav" id="nav" aria-label="Bölümler">
+    <button type="button" data-v="ofis"><span class="ik">🏢</span><span class="et">Ofis</span><span class="rz" hidden></span></button>
+    <button type="button" data-v="ozet"><span class="ik">📊</span><span class="et">Özet</span><span class="rz" hidden></span></button>
+    <button type="button" data-v="hikaye"><span class="ik">📱</span><span class="et">Hikaye</span><span class="rz" hidden></span></button>
+    <button type="button" data-v="video"><span class="ik">🎬</span><span class="et">Video</span><span class="rz" hidden></span></button>
+    <button type="button" data-v="icerik"><span class="ik">✍️</span><span class="et">İçerik</span><span class="rz" hidden></span></button>
+    <button type="button" data-v="akademi"><span class="ik">🎓</span><span class="et">Akademi</span><span class="rz" hidden></span></button>
+    <button type="button" data-v="sistem"><span class="ik">⚙️</span><span class="et">Sistem</span><span class="rz" hidden></span></button>
+  </nav>
+  <div class="card gsifre" id="gSifreSerit" hidden>
+    <label for="gSifre"><b>Ofis şifresi</b> (bu işlem için gerekli)</label>
+    <div class="satir"><input type="password" id="gSifre" autocomplete="current-password" placeholder="Ofis şifresi"><button type="button" class="ana" id="gSifreKaydet">Kaydet</button></div>
+  </div>
 
-  <div class="grid">
-    <div>
+  <section class="gorunum" id="v-ofis" data-v="ofis">
+    <div class="serit" id="serit" hidden></div>
+    <div class="grid">
+      <div>
       <div id="view">
         <canvas id="cv" aria-label="Ajanların çalıştığı 3 boyutlu ofis"></canvas>
         <div id="labels"></div>
@@ -174,76 +254,56 @@ dd{margin:1px 0 0}
         <span><i style="background:var(--you)"></i>Sen</span>
       </div>
       <div class="chips" id="chips"></div>
-      <div class="card pub" id="zKart">
-        <h2>Zincir</h2>
-        <p class="alt">Her içerik bir dişlide ilerler: fikir, senaryo, video, yayın, ölçüm, öğrenme. “İçerik üret” zinciri başlatır: trend kontrol edilir, içerik ajanı en gerçekçi fikri seçer, senaryo ve video paketi hazırlanır. Videoyu sen yaparsın.</p>
-        <label class="k" for="zFormat">İçerik biçimi</label>
-        <select id="zFormat"><option value="reels" selected>Video senaryosu (Reels / Shorts)</option><option value="carousel">Carousel (görsel slaytlar)</option><option value="otomatik">Ajan seçsin</option></select>
-        <div class="satir"><button type="button" class="ana" id="zUret">İçerik üret</button></div>
-        <input type="text" id="zDirektif" maxlength="500" placeholder="İsteğe bağlı direktif (boş bırakabilirsin)" style="width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px">
-        <input type="password" id="zSifre" autocomplete="current-password" placeholder="Ofis şifresi" hidden style="margin-top:8px;width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px">
-        <p class="not" id="zDurum">Zincir kayıtları yükleniyor…</p>
-        <div id="zListe"></div>
       </div>
+    <aside class="side">
+      <div class="card" id="run" hidden><h2>Zincir çalışması</h2><ol class="steps" id="steps"></ol><p id="stmsg"></p><div class="dsat"><button type="button" id="btnAtla" hidden>Anlatmayı atla</button></div><div id="sonuc"></div></div>
+      <div class="card" id="info" aria-live="polite"></div>
+      <p class="note" id="snap"></p>
+    </aside>
+    </div>
+  </section>
+
+  <section class="gorunum" id="v-ozet" data-v="ozet" hidden>
+    <h2 class="baslik">Özet</h2>
+    <div class="kartlar" id="ozKartlar"></div>
+    <div class="card pub"><h2>Yapılacaklar</h2><p class="alt">Senin kararını bekleyen ve dikkat isteyen şeyler.</p><div id="ozYapilacak"></div></div>
+    <div class="cift">
+      <div class="card pub"><h2>Hikaye yayını</h2><div id="ozHikaye" class="saglik"></div></div>
+      <div class="card pub"><h2>Sistem</h2><div id="ozSistem" class="saglik"></div></div>
+    </div>
+    <div class="card pub"><h2>Ajanlar</h2><p class="alt">Birine dokun, ofiste gör.</p><div id="ozAjanlar" class="ajanlar"></div></div>
+  </section>
+
+  <section class="gorunum" id="v-hikaye" data-v="hikaye" hidden>
+    <h2 class="baslik">Hikayeler</h2>
+    <div class="kolon">
       <div class="card pub" id="hKart">
         <h2>Hikaye ajanı</h2>
         <p class="alt">Kuyruktaki fotoğraf ve videoları senin ayarladığın aralıkta Instagram hikayesi olarak yayınlar. <b>Fotoğrafı kuyruğa koymak, yayın onayı sayılır.</b> Hikaye API’si yazı eklemez, yalnızca görsel gider. Yayınlanan hikaye API ile silinemez, Instagram uygulamasından silersin.</p>
         <p class="not" id="hDurum">Yükleniyor…</p>
         <input type="password" id="hSifre" autocomplete="current-password" placeholder="Ofis şifresi" hidden style="margin-top:8px;width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px">
         <div class="satir"><button type="button" class="ana" id="hAktif">Etkinleştir</button><button type="button" id="hHemen">Şimdi bir hikaye yayınla</button></div>
-        <details class="tr"><summary>Zamanlama ayarı</summary>
-          <div class="gov">
-            <div class="ayarsat"><label>Günde <input type="number" id="hSayi" min="1" max="12"> hikaye</label><label>Saat <input type="number" id="hBas" min="0" max="23">:00 ile <input type="number" id="hBit" min="1" max="24">:00 arası (Türkiye saati)</label></div>
-            <div class="gunler" id="hGunler"></div>
-            <div class="satir"><button type="button" id="hKaydet">Ayarı kaydet</button></div>
-            <p class="not">GitHub’ın saatlik kontrolü bazen saatlerce gecikebilir; hikayeler belirlediğin aralığa yayılır ama tam saatinde çıkmayabilir.</p>
-          </div>
-        </details>
-        <details class="tr" id="uDetay"><summary>Yapay zekâ görsel üretimi (Kademe 2)</summary>
-          <div class="gov">
-            <p class="not">Ajan Printables ve MakerWorld’de revaçtaki tasarımları arar, <b>yalnızca CC0 ve CC BY lisanslı</b> olanlardan, kendi sahnesinde <b>benzer (kopya olmayan) temsili görseller</b> üretir. Görsele “Yapay zekâ görseli (temsili)” etiketi ve tasarımın adı, tasarımcısı, lisansı işlenir. Yapay zekâ kendi kalite kontrolünü yapar, geçemeyeni atar. Yayınlanınca bildirim gelir, beğenmediğini sen silersin. <b>Başlangıçta kapalıdır.</b></p>
-            <p class="not" id="uDurum">Yükleniyor…</p>
-            <div class="satir"><button type="button" class="ana" id="uAktif">Üretimi aç</button><button type="button" id="uHemen">Şimdi üret</button></div>
-            <div class="ayarsat"><label>Mod <select id="uMod"><option value="otomatik">Otomatik (kuyruğa girer, yayınlanır)</option><option value="onay">Onaylı (ben onaylarım)</option></select></label></div>
-            <div class="ayarsat"><label>Günde en çok <input type="number" id="uGun" min="1" max="12"> hikaye üret</label><label>Günlük görsel sınırı <input type="number" id="uGSin" min="1" max="40"></label><label>Aylık görsel sınırı <input type="number" id="uASin" min="1" max="600"></label></div>
-            <div class="ayarsat"><label>Kuyruk hedefi <input type="number" id="uHed" min="1" max="30"></label><label>Kalite <select id="uKal"><option value="low">Düşük (ucuz)</option><option value="medium">Orta</option><option value="high">Yüksek (pahalı)</option></select></label><label>Referans fotoğraf <select id="uRef"><option value="zorunlu">Zorunlu (fotoğraf alınamazsa üretme)</option><option value="tercih">Tercih (yoksa metinden çiz, daha az benzer)</option></select></label></div>
-            <div class="ayarsat"><label><input type="checkbox" id="uMuzik"> Müzikli video yap (12 sn, Instagram tarzı tempolu müzik; müzik telifsiz ve kendimiz üretiriz)</label></div>
-            <div class="satir"><button type="button" id="uKaydet">Üretim ayarını kaydet</button></div>
-            <p class="not">Görsel başına maliyet seçtiğin kaliteye göre değişir; günlük ve aylık görsel sınırları harcamayı üstten kapatır. İlk günlerde sınırları düşük tut, OpenAI panelinden harcamayı da izle.</p>
-          </div>
-        </details>
+        <h3 class="alt-baslik">Kuyruk</h3>
+        <div class="hgrid" id="hListe"></div>
+        <h3 class="alt-baslik">Kendi fotoğraf ya da videonu ekle</h3>
         <label class="k" for="hDosya">Fotoğraf ya da video ekle (birden fazla seçebilirsin)</label>
         <div class="satir"><input type="file" id="hDosya" accept="image/*,video/mp4" multiple><button type="button" id="hYukle" disabled>Kuyruğa ekle</button></div>
         <input type="text" id="hBaslik" maxlength="80" placeholder="İsteğe bağlı not (yalnızca senin için, hikayede görünmez)" style="width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px">
         <p class="not" id="hYukleDurum">Fotoğraflar telefonunda otomatik dikey (9:16) hikaye boyutuna getirilir. Video: MP4, 3-60 sn, en fazla 30 MB. Dikey 9:16 H.264 ise olduğu gibi yayınlanır, değilse otomatik uyarlanır.</p>
-        <div class="hgrid" id="hListe"></div>
-        <details class="tr"><summary>Bildirimler (Android web push)</summary>
-          <div class="gov">
-            <p class="not" id="bDurum">Bildirim durumu kontrol ediliyor…</p>
-            <div class="satir"><button type="button" class="ana" id="bAc">Bildirimleri aç</button><button type="button" id="bDene">Deneme bildirimi gönder</button></div>
-          </div>
-        </details>
-        <details class="tr"><summary>Nöbetçi (anahtar ve servis sağlığı)</summary><div class="saglik" id="hSaglik">Henüz denetim yok.</div></details>
       </div>
+
+    </div>
+  </section>
+
+  <section class="gorunum" id="v-video" data-v="video" hidden>
+    <h2 class="baslik">Videolar</h2>
+    <div class="kolon">
       <div class="card pub" id="skKart">
         <h2>Shorts / Reels üretici</h2>
         <p class="alt">Haftada iki kez (salı ve cuma 17:00) hikaye görsellerinden 4 sahneli, müzikli kısa video <b>taslağı</b> hazırlar. <b>Sen onaylamadan hiçbir şey yayınlanmaz.</b> Onaylarsan YouTube Shorts ve Instagram Reels'e birlikte çıkar. Başlık ve açıklamayı yayınlamadan önce düzenleyebilirsin.</p>
         <p class="not" id="skDurum">Yükleniyor…</p>
         <div class="satir"><button type="button" id="skUret">Şimdi bir taslak üret</button></div>
         <div id="skListe"></div>
-      </div>
-      <div class="card pub" id="akKart">
-        <h2>Akademi (ajanlara ders)</h2>
-        <p class="alt">Haftada bir ajanların performansına bakar, rapor çıkarır ve ders önerir. <b>Sen onaylamadan hiçbir ders ajanlara uygulanmaz.</b> Onayladığın dersler ajanların istemine eklenir; istediğin zaman kaldırırsın.</p>
-        <p class="not" id="akDurum">Yükleniyor…</p>
-        <div class="satir"><button type="button" id="akCalistir">Akademiyi şimdi çalıştır</button></div>
-        <div id="akOneriler"></div>
-        <details class="tr"><summary>Son haftalık rapor</summary><div class="gov" id="akRapor">Henüz rapor yok.</div></details>
-      </div>
-      <div class="card pub" id="trKart">
-        <h2>Trend fikirleri</h2>
-        <p class="alt" id="trAlt">Yükleniyor…</p>
-        <div id="trListe"></div>
       </div>
       <div class="card pub" id="pub">
         <h2>Video yayınla</h2>
@@ -272,14 +332,88 @@ dd{margin:1px 0 0}
         <div class="sonuc" id="pSonuc"></div>
         <p class="hata" id="pHata" hidden></p>
       </div>
+
     </div>
-    <aside class="side">
-      <div class="card" id="run" hidden><h2>Zincir çalışması</h2><ol class="steps" id="steps"></ol><p id="stmsg"></p><div class="dsat"><button type="button" id="btnAtla" hidden>Anlatmayı atla</button></div><div id="sonuc"></div></div>
-      <div class="card" id="info" aria-live="polite"></div>
-      <p class="note" id="snap"></p>
-    </aside>
-  </div>
+  </section>
+
+  <section class="gorunum" id="v-icerik" data-v="icerik" hidden>
+    <h2 class="baslik">İçerik</h2>
+    <div class="kolon">
+      <div class="card pub" id="zKart">
+        <h2>Zincir</h2>
+        <p class="alt">Her içerik bir dişlide ilerler: fikir, senaryo, video, yayın, ölçüm, öğrenme. “İçerik üret” zinciri başlatır: trend kontrol edilir, içerik ajanı en gerçekçi fikri seçer, senaryo ve video paketi hazırlanır. Videoyu sen yaparsın.</p>
+        <label class="k" for="zFormat">İçerik biçimi</label>
+        <select id="zFormat"><option value="reels" selected>Video senaryosu (Reels / Shorts)</option><option value="carousel">Carousel (görsel slaytlar)</option><option value="otomatik">Ajan seçsin</option></select>
+        <div class="satir"><button type="button" class="ana" id="zUret">İçerik üret</button></div>
+        <input type="text" id="zDirektif" maxlength="500" placeholder="İsteğe bağlı direktif (boş bırakabilirsin)" style="width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px">
+        <input type="password" id="zSifre" autocomplete="current-password" placeholder="Ofis şifresi" hidden style="margin-top:8px;width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px">
+        <p class="not" id="zDurum">Zincir kayıtları yükleniyor…</p>
+        <div id="zListe"></div>
+      </div>
+      <div class="card pub" id="trKart">
+        <h2>Trend fikirleri</h2>
+        <p class="alt" id="trAlt">Yükleniyor…</p>
+        <div id="trListe"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="gorunum" id="v-akademi" data-v="akademi" hidden>
+    <h2 class="baslik">Akademi</h2>
+    <div class="kolon">
+      <div class="card pub" id="akKart">
+        <h2>Akademi (ajanlara ders)</h2>
+        <p class="alt">Haftada bir ajanların performansına bakar, rapor çıkarır ve ders önerir. <b>Sen onaylamadan hiçbir ders ajanlara uygulanmaz.</b> Onayladığın dersler ajanların istemine eklenir; istediğin zaman kaldırırsın.</p>
+        <p class="not" id="akDurum">Yükleniyor…</p>
+        <div class="satir"><button type="button" id="akCalistir">Akademiyi şimdi çalıştır</button></div>
+        <div id="akOneriler"></div>
+        <details class="tr"><summary>Son haftalık rapor</summary><div class="gov" id="akRapor">Henüz rapor yok.</div></details>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="gorunum" id="v-sistem" data-v="sistem" hidden>
+    <h2 class="baslik">Sistem ve ayarlar</h2>
+    <div class="kolon">
+      <div class="card pub"><h2>Hikaye zamanlaması</h2><p class="alt">Hikaye ajanının günde kaç hikaye, hangi saatler arasında ve hangi günlerde yayınlayacağı.</p>        
+          <div class="gov">
+            <div class="ayarsat"><label>Günde <input type="number" id="hSayi" min="1" max="12"> hikaye</label><label>Saat <input type="number" id="hBas" min="0" max="23">:00 ile <input type="number" id="hBit" min="1" max="24">:00 arası (Türkiye saati)</label></div>
+            <div class="gunler" id="hGunler"></div>
+            <div class="satir"><button type="button" id="hKaydet">Ayarı kaydet</button></div>
+            <p class="not">GitHub’ın saatlik kontrolü bazen saatlerce gecikebilir; hikayeler belirlediğin aralığa yayılır ama tam saatinde çıkmayabilir.</p>
+          </div>
+        
 </div>
+      <div class="card pub" id="uDetay"><h2>Yapay zekâ görsel üretimi</h2>        
+          <div class="gov">
+            <p class="not">Ajan Printables'ın lisans filtreli aramasından (yalnızca <b>CC0 ve CC BY</b>) ve Thingiverse'ten popüler tasarımları seçer, tasarımcının fotoğrafını referans alıp <b>aynı nesneyi kendi sahnesinde yeniden çizer</b>. Görsele "Yapay zekâ görseli (temsili)" etiketi ve atıf yazılır, yapay zekâ kendi kalite kontrolünü yapar. Üretilen hikayeler isteğe bağlı olarak müzikli videoya çevrilir.</p>
+            <p class="not" id="uDurum">Yükleniyor…</p>
+            <div class="satir"><button type="button" class="ana" id="uAktif">Üretimi aç</button><button type="button" id="uHemen">Şimdi üret</button></div>
+            <div class="ayarsat"><label>Mod <select id="uMod"><option value="otomatik">Otomatik (kuyruğa girer, yayınlanır)</option><option value="onay">Onaylı (ben onaylarım)</option></select></label></div>
+            <div class="ayarsat"><label>Günde en çok <input type="number" id="uGun" min="1" max="12"> hikaye üret</label><label>Günlük görsel sınırı <input type="number" id="uGSin" min="1" max="40"></label><label>Aylık görsel sınırı <input type="number" id="uASin" min="1" max="600"></label></div>
+            <div class="ayarsat"><label>Kuyruk hedefi <input type="number" id="uHed" min="1" max="30"></label><label>Kalite <select id="uKal"><option value="low">Düşük (ucuz)</option><option value="medium">Orta</option><option value="high">Yüksek (pahalı)</option></select></label><label>Referans fotoğraf <select id="uRef"><option value="zorunlu">Zorunlu (fotoğraf alınamazsa üretme)</option><option value="tercih">Tercih (yoksa metinden çiz, daha az benzer)</option></select></label></div>
+            <div class="ayarsat"><label><input type="checkbox" id="uMuzik"> Müzikli video yap (12 sn, Instagram tarzı tempolu müzik; müzik telifsiz ve kendimiz üretiriz)</label></div>
+            <div class="satir"><button type="button" id="uKaydet">Üretim ayarını kaydet</button></div>
+            <p class="not">Görsel başına maliyet seçtiğin kaliteye göre değişir; günlük ve aylık görsel sınırları harcamayı üstten kapatır. İlk günlerde sınırları düşük tut, OpenAI panelinden harcamayı da izle.</p>
+          </div>
+        
+</div>
+      <div class="card pub"><h2>Bildirimler</h2>        
+          <div class="gov">
+            <p class="not" id="bDurum">Bildirim durumu kontrol ediliyor…</p>
+            <div class="satir"><button type="button" class="ana" id="bAc">Bildirimleri aç</button><button type="button" id="bDene">Deneme bildirimi gönder</button></div>
+          </div>
+        
+</div>
+      <div class="card pub"><h2>Servis sağlığı (Nöbetçi)</h2><p class="alt">Anahtarlar ve servisler günlük denetlenir; sorun olursa burada kırmızı görünür.</p><div class="saglik" id="hSaglik">Henüz denetim yok.</div></div>
+      <div class="card pub"><h2>Zamanlayıcı</h2><p class="alt">Sunucu, iş akışlarını Türkiye saatiyle kendisi tetikler (GitHub’ın zamanlayıcısı çalışmaları atlayabildiği için).</p><div class="saglik" id="zamDurum">Yükleniyor…</div></div>
+
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -327,6 +461,7 @@ var AJ=[
   son:'2026-11-16T07:00:00Z',sonuc:'Videoyu YouTube’a yüklemeye onay verdin.',zaman:'İstediğin zaman.',not:'Sen onaylamadan hiçbir şey yayınlanmaz.'}
 ];
 var BY={}; AJ.forEach(function(a){BY[a.id]=a;});
+var OZ={};
 var $=function(s){return document.querySelector(s);};
 function cssv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
 function fmt(iso){
@@ -704,7 +839,7 @@ function pick(e){
 var v3=new THREE.Vector3(), clock=new THREE.Clock(), T=0, lastScr=0;
 function frame(){
   requestAnimationFrame(frame);
-  if(document.hidden) return;
+  if(document.hidden||!view.clientWidth) return;
   var dt=Math.min(clock.getDelta(),0.1); if(!still) T+=dt; if(sahnede) need=true;
   var moving=target.distanceTo(goal)>0.01||Math.abs(zoom-tz)>0.005;
   if(moving){ target.lerp(goal,Math.min(1,dt*5)); zoom+=(tz-zoom)*Math.min(1,dt*5); need=true; }
@@ -765,7 +900,7 @@ function chk(r){return r.json().then(function(j){ if(!r.ok){ if(r.status===401){
 function apiGet(u){return fetch(u,{headers:{'X-Sifre':SIF}}).then(chk);}
 function apiIcerikUret(metin){var f=$('#zFormat'); return fetch('/api/icerik-uret',{method:'POST',headers:{'X-Sifre':SIF,'Content-Type':'application/json'},body:JSON.stringify({metin:metin||'',format:f?f.value:'reels'})}).then(chk);}
 function apiPost(metin){return fetch('/api/direktif',{method:'POST',headers:{'X-Sifre':SIF,'Content-Type':'application/json'},body:JSON.stringify({metin:metin})}).then(chk);}
-fetch('/api/ping').then(function(r){return r.json();}).then(function(j){ if(j&&j.ok){ MOD=j.hazir?'sunucu':'demo'; if(selId==='icerik') renderInfo(); if(typeof pSifreHazirla==='function') pSifreHazirla(); } }).catch(function(){});
+fetch('/api/ping').then(function(r){return r.json();}).then(function(j){ if(j&&j.ok){ MOD=j.hazir?'sunucu':'demo'; if(selId==='icerik') renderInfo(); if(typeof pSifreHazirla==='function') pSifreHazirla(true); } }).catch(function(){});
 
 var ADIMLAR=['İstek iletildi','Trend kontrolü','İçerik ajanı','Video paketi','Hazır'];
 function adimlar(n,msg,hata){
@@ -857,8 +992,8 @@ async function senaryo(metin){
 /* ---------- Video yayınla ---------- */
 var pDosya=null, pYol=null, pBaslangic=null, pBekle=false;
 function pHata(t){var e=$('#pHata'); e.textContent=t||''; e.hidden=!t;}
-function pSifreHazirla(){var h=!(MOD==='sunucu'&&!SIF); $('#pSifre').hidden=h; $('#zSifre').hidden=h; var hs=$('#hSifre'); if(hs) hs.hidden=h;}
-function pSifreOku(){var hs=$('#hSifre'); var v=($('#pSifre').value||$('#zSifre').value||(hs&&hs.value)||''); if(v){SIF=v; try{localStorage.setItem('ofisSifre',SIF);}catch(x){}}}
+function pSifreHazirla(sessiz){var h=!(MOD==='sunucu'&&!SIF)||!!sessiz; $('#pSifre').hidden=true; $('#zSifre').hidden=true; var hs=$('#hSifre'); if(hs) hs.hidden=true; var g=$('#gSifreSerit'); if(g){ g.hidden=h; if(!h){ var gi=$('#gSifre'); if(gi) gi.focus(); } }}
+function pSifreOku(){var hs=$('#hSifre'); var gs=$('#gSifre'); var v=((gs&&gs.value)||$('#pSifre').value||$('#zSifre').value||(hs&&hs.value)||''); if(v){SIF=v; try{localStorage.setItem('ofisSifre',SIF);}catch(x){}}}
 $('#pDosya').addEventListener('change',function(){
   pHata(''); pYol=null; $('#pForm').hidden=true; $('#pSonuc').innerHTML='';
   var f=this.files&&this.files[0]; pDosya=null; $('#pYukle').disabled=true;
@@ -949,7 +1084,7 @@ async function yayinSahnesi(hedefler){
 function yayinSahnesiBitir(hedefler,bitti){
   hedefler.forEach(function(t){var st=ST[t]; if(st){st.busy=false; st.busyRing.visible=false;}});
 }
-pSifreHazirla();
+pSifreHazirla(true);
 
 /* ---------- Canlı durum (GitHub'daki gerçek çalışmalar) ---------- */
 var ZAMANLI={icerik:36,istatistik:36,trend:96};
@@ -1055,8 +1190,9 @@ function zincirCiz(z){
     d.appendChild(g); kap.appendChild(d);
   });
 }
-function zincirAc(id){ var d=document.getElementById('z_'+id); if(d){ d.open=true; d.scrollIntoView({behavior:'smooth',block:'center'}); } }
+function zincirAc(id){ sekme('icerik'); var d=document.getElementById('z_'+id); if(d){ d.open=true; d.scrollIntoView({behavior:'smooth',block:'center'}); } }
 function zincirSec(id){
+  sekme('video');
   var sel=$('#pIcerik'); sel.value=id;
   var k=((ZINCIR&&ZINCIR.kayitlar)||[]).filter(function(x){return x.kimlik===id;})[0];
   if(k&&k.metinler){ $('#pBaslik').value=k.metinler.youtube_baslik||k.konu||''; $('#pAciklama').value=k.metinler.aciklama||''; }
@@ -1075,9 +1211,10 @@ zincirCek(); setInterval(zincirCek,300000);
 var HK=null, hGorulen=null, hOnay=false;
 function trGun(iso){ try{return new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Istanbul'}).format(new Date(iso));}catch(e){return '';} }
 var GUN_AD=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
-function hSifreKontrol(){ pSifreOku(); if(MOD==='sunucu'&&!SIF){ pSifreHazirla(); $('#hDurum').textContent='Önce ofis şifresini yaz.'; return false; } if(MOD!=='sunucu'){ $('#hDurum').textContent='Sunucu bağlı değil.'; return false; } return true; }
+function hSifreKontrol(){ pSifreOku(); if(MOD==='sunucu'&&!SIF){ pSifreHazirla(); toastGoster('Önce yukarıya ofis şifresini yazıp Kaydet’e bas.'); return false; } if(MOD!=='sunucu'){ toastGoster('Sunucu bağlı değil.'); return false; } return true; }
 function hPost(yol,govde){ return fetch(yol,{method:'POST',headers:{'X-Sifre':SIF,'Content-Type':'application/json'},body:JSON.stringify(govde||{})}).then(chk); }
 function hikayeCiz(v){
+  OZ.hk=v; setTimeout(ozetCiz,0);
   HK=v; var a=v.ayar||{}, k=v.kuyruk||[];
   var bugun=trGun(new Date().toISOString());
   var bugunSay=k.filter(function(o){return (o.durum==='yayinda'||o.durum==='yayinlaniyor')&&o.yayin&&o.yayin.tarih&&trGun(o.yayin.tarih)===bugun;}).length;
@@ -1281,8 +1418,8 @@ function trendCiz(v){
     g.appendChild(kx);
     var b=dom('button',null,'Bu fikirle direktif ver'); b.type='button';
     b.addEventListener('click',function(){
-      select('icerik'); var ta=$('#dMetin');
-      if(ta){ ta.value='Şu trendden esinlenerek özgün bir içerik üret (kimseyi kopyalama, son yayınladıklarımızı tekrar etme): '+o.konu+'. Açı: '+(o.kanca_acisi||''); ta.scrollIntoView({behavior:'smooth',block:'center'}); ta.focus(); }
+      var ta=$('#zDirektif');
+      if(ta){ ta.value='Şu trendden esinlenerek özgün bir içerik üret (kimseyi kopyalama, son yayınladıklarımızı tekrar etme): '+o.konu+'. Açı: '+(o.kanca_acisi||''); $('#zKart').scrollIntoView({behavior:'smooth',block:'start'}); ta.focus(); toastGoster('Direktif kutusuna yazıldı. Şimdi “İçerik üret”e basabilirsin.'); }
     });
     g.appendChild(b); d.appendChild(g); kap.appendChild(d);
   });
@@ -1292,6 +1429,7 @@ function trendCek(){ fetch('/api/trendler').then(function(r){return r.ok?r.json(
 trendCek(); setInterval(trendCek,600000);
 // Akademi
 function akademiCiz(v){
+  OZ.ak=v; setTimeout(ozetCiz,0);
   var r=v.rapor, o=v.oneriler||[];
   var bekleyen=o.filter(function(x){return x.durum==='onay_bekliyor';}), onayli=o.filter(function(x){return x.durum==='onayli';});
   $('#akDurum').textContent=(r?('Son rapor: '+fmt(r.tarih)+'. '):'Henüz rapor yok (ilk rapor pazar akşamı ya da "şimdi çalıştır" ile). ')+bekleyen.length+' ders onay bekliyor, '+onayli.length+' onaylı ders ajanlarda aktif.';
@@ -1333,12 +1471,13 @@ $('#akCalistir').addEventListener('click',function(){
 akademiCek(); setInterval(akademiCek,300000);
 // Shorts / Reels üretici
 function shortsCiz(v){
+  OZ.sk=v; setTimeout(ozetCiz,0);
   var t=v.taslaklar||[]; var bekleyen=t.filter(function(x){return x.durum==='onay_bekliyor';});
   $('#skDurum').textContent=bekleyen.length?(bekleyen.length+' taslak onayını bekliyor.'):'Onay bekleyen taslak yok. '+(t.length?'':'Henüz taslak üretilmedi (salı/cuma 17:00 ya da "şimdi üret").');
   var kap=$('#skListe'); kap.textContent='';
   t.forEach(function(x){
     var d=dom('div','hoge'); d.style.cssText='margin-top:10px;text-align:left;max-width:360px';
-    var vd=document.createElement('video'); vd.controls=true; vd.muted=false; vd.playsInline=true; vd.preload='metadata'; vd.style.cssText='width:100%;border-radius:10px;background:#000'; vd.src='https://raw.githubusercontent.com/'+v.depo+'/'+v.dal+'/'+x.video+'#t=0.5'; d.appendChild(vd);
+    var vd=document.createElement('video'); vd.controls=true; vd.muted=false; vd.playsInline=true; vd.preload='metadata'; vd.style.cssText='width:100%;max-width:260px;display:block;border-radius:10px;background:#000'; vd.src='https://raw.githubusercontent.com/'+v.depo+'/'+v.dal+'/'+x.video+'#t=0.5'; d.appendChild(vd);
     d.appendChild(dom('span','rozet '+(x.durum==='yayinlandi'?'iyi':(x.durum==='onay_bekliyor'?'orta':'zayif')),({onay_bekliyor:'Onay bekliyor',yayinlandi:'Yayına gönderildi',reddedildi:'Reddedildi'}[x.durum]||x.durum)+' · '+Math.round(x.sure||0)+' sn · müzik: '+(x.muzik||'-')));
     if(x.durum==='onay_bekliyor'){
       var bas=document.createElement('input'); bas.type='text'; bas.maxLength=100; bas.value=x.baslik||''; bas.style.cssText='width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-top:6px'; d.appendChild(bas);
@@ -1393,6 +1532,107 @@ document.addEventListener('click',function(e){
     b.disabled=true; senaryo(m2);
   }
 });
+
+
+// ---- Sekmeler, özet panosu, bildirim şeridi ----
+var SEKMELER=['ofis','ozet','hikaye','video','icerik','akademi','sistem'];
+function toastGoster(t){ var e=$('#toast'); if(!e) return; e.textContent=t; e.hidden=false; clearTimeout(toastGoster.z); toastGoster.z=setTimeout(function(){ e.hidden=true; },4500); }
+function sekme(ad,kaydirma){
+  if(SEKMELER.indexOf(ad)<0) ad='ofis';
+  document.querySelectorAll('.gorunum').forEach(function(g){ g.hidden=(g.dataset.v!==ad); });
+  document.querySelectorAll('#nav button').forEach(function(b){ if(b.dataset.v===ad) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
+  try{ history.replaceState(null,'','#'+ad); }catch(e){}
+  try{ localStorage.setItem('ofisSekme',ad); }catch(e){}
+  if(ad==='ofis'){ need=true; setTimeout(function(){ layout(); need=true; },30); }
+  if(ad==='sistem') zamanlayiciCek();
+  if(kaydirma!==false) window.scrollTo({top:0,behavior:'auto'});
+}
+document.querySelector('#nav').addEventListener('click',function(e){ var b=e.target.closest('button[data-v]'); if(b) sekme(b.dataset.v); });
+window.addEventListener('hashchange',function(){ sekme((location.hash||'').slice(1),false); });
+$('#gSifreKaydet').addEventListener('click',function(){ var v=($('#gSifre').value||'').trim(); if(!v) return; SIF=v; try{localStorage.setItem('ofisSifre',SIF);}catch(x){} $('#gSifre').value=''; $('#gSifreSerit').hidden=true; toastGoster('Şifre kaydedildi. İşlemi tekrar dene.'); });
+$('#gSifre').addEventListener('keydown',function(e){ if(e.key==='Enter') $('#gSifreKaydet').click(); });
+
+function bugunTR(){ return trGun(new Date().toISOString()); }
+function sayilar(){
+  var hk=OZ.hk||{}, k=hk.kuyruk||[], a=hk.ayar||{}, u=hk.uretim||{}, bg=bugunTR();
+  var yay=k.filter(function(o){return (o.durum==='yayinda'||o.durum==='yayinlaniyor')&&o.yayin&&o.yayin.tarih&&trGun(o.yayin.tarih)===bg;}).length;
+  var sag=(hk.saglik&&hk.saglik.kontroller)||[];
+  return {hk:hk,k:k,a:a,u:u,yay:yay,planli:k.filter(function(o){return o.durum==='planli';}).length,
+    onay:k.filter(function(o){return o.durum==='onay_bekliyor';}).length, hata:k.filter(function(o){return o.durum==='hata';}).length,
+    sagSorun:sag.filter(function(c){return c.durum==='sorun'||c.durum==='kt';}).length,
+    shorts:((OZ.sk&&OZ.sk.taslaklar)||[]).filter(function(x){return x.durum==='onay_bekliyor';}).length,
+    ders:((OZ.ak&&OZ.ak.oneriler)||[]).filter(function(x){return x.durum==='onay_bekliyor';}).length,
+    zamKapali:OZ.zam&&OZ.zam.acik===false};
+}
+function sonrakiSlot(a){
+  var n=a.gunluk_sayi||0, bas=+a.baslangic_saat, bit=+a.baslangic_saat+0; bit=+a.bitis_saat;
+  if(!n||!(bit>bas)) return '-';
+  var simdi=new Date(), tr=new Date(simdi.getTime()+3*3600e3), s=tr.getUTCHours()+tr.getUTCMinutes()/60;
+  for(var i=0;i<n;i++){ var t=bas+i*(bit-bas)/n; if(t>s) return (t%1?t.toFixed(1):t)+':00 (TR)'; }
+  return 'yarın '+bas+':00 (TR)';
+}
+function yapilacaklar(){
+  var s=sayilar(), l=[];
+  if(s.onay) l.push({n:s.onay,t:'Hikaye onay bekliyor',e:'Hikayeler',v:'hikaye'});
+  if(s.shorts) l.push({n:s.shorts,t:'Shorts taslağı onay bekliyor',e:'Videolar',v:'video'});
+  if(s.ders) l.push({n:s.ders,t:'Akademi dersi onay bekliyor',e:'Akademi',v:'akademi'});
+  if(s.hata) l.push({n:s.hata,t:'Hatalı hikaye var',e:'Hikayeler',v:'hikaye',kt:1});
+  if(s.sagSorun) l.push({n:s.sagSorun,t:'Servis sağlığında sorun',e:'Sistem',v:'sistem',kt:1});
+  if(s.zamKapali) l.push({n:'!',t:'Zamanlayıcı kapalı ya da yanıt vermiyor',e:'Sistem',v:'sistem',kt:1});
+  if(OZ.hk&&s.hk.ayar&&s.hk.ayar.aktif&&s.planli===0&&s.onay===0) l.push({n:'!',t:'Hikaye kuyruğu boş, yayınlanacak bir şey yok',e:'Hikayeler',v:'hikaye'});
+  return l;
+}
+function yapBtn(o){ var b=dom('button','yap'+(o.kt?' kt':'')); b.type='button'; b.appendChild(dom('b',null,String(o.n))); b.appendChild(dom('span',null,o.t)); b.appendChild(dom('em',null,o.e+' →')); b.addEventListener('click',function(){ sekme(o.v); }); return b; }
+function ozetCiz(){
+  var s=sayilar(), l=yapilacaklar();
+  // sekme rozetleri
+  var rz={hikaye:s.onay+s.hata,video:s.shorts,akademi:s.ders,sistem:s.sagSorun+(s.zamKapali?1:0),ozet:l.length};
+  document.querySelectorAll('#nav button').forEach(function(b){ var e=b.querySelector('.rz'); var n=rz[b.dataset.v]||0; if(e){ e.hidden=!n; e.textContent=n; } });
+  // ofis şeridi
+  var se=$('#serit'); if(se){ se.textContent=''; l.slice(0,4).forEach(function(o){ se.appendChild(yapBtn(o)); }); se.hidden=!l.length; }
+  // özet kartları
+  var kk=$('#ozKartlar'); if(!kk) return; kk.textContent='';
+  function t(sayi,et,alt,sinif){ var d=dom('div','kt-kart'+(sinif?' '+sinif:'')); d.appendChild(dom('span','et',et)); d.appendChild(dom('b','sayi',String(sayi))); if(alt) d.appendChild(dom('small',null,alt)); kk.appendChild(d); }
+  t(s.yay+' / '+(s.a.gunluk_sayi||'-'),'Bugün yayınlanan hikaye','Sıradaki slot: '+sonrakiSlot(s.a),s.yay?'iyi':'');
+  t(s.planli,'Sırada bekleyen','Onay bekleyen: '+s.onay,s.planli?'':'uyari');
+  var h=OZ.hk&&OZ.hk.harcama||{bugun:0,ay:0};
+  t((h.bugun||0)+' / '+(s.u.gunluk_gorsel_siniri||'-'),'Bugünkü görsel üretimi','Bu ay: '+(h.ay||0)+' / '+(s.u.aylik_gorsel_siniri||'-')+' görsel');
+  t(l.length,'Yapılacak','Bekleyen karar ve uyarılar',l.length?'uyari':'iyi');
+  // yapılacaklar
+  var y=$('#ozYapilacak'); y.textContent='';
+  if(!l.length){ var ok=dom('div','yap hepsi'); ok.appendChild(dom('b',null,'✓')); ok.appendChild(dom('span',null,'Her şey yolunda, bekleyen karar yok.')); y.appendChild(ok); }
+  else l.forEach(function(o){ y.appendChild(yapBtn(o)); });
+  // hikaye yayını
+  var oh=$('#ozHikaye'); oh.textContent='';
+  function sat(kap,ad,deg,sinif){ var d=dom('div',sinif||''); d.appendChild(document.createElement('i')); d.appendChild(document.createTextNode(ad+': '+deg)); kap.appendChild(d); }
+  sat(oh,'Yayın ajanı',s.a.aktif?'çalışıyor':'duraklatılmış',s.a.aktif?'iyi':'sorun');
+  sat(oh,'Günlük hedef',(s.a.gunluk_sayi||'-')+' hikaye, '+(s.a.baslangic_saat!=null?s.a.baslangic_saat:'-')+':00-'+(s.a.bitis_saat!=null?s.a.bitis_saat:'-')+':00');
+  sat(oh,'Yapay zekâ üretimi',s.u.aktif?('açık ('+(s.u.mod==='onay'?'onaylı':'otomatik')+(s.u.muzik!==false?', müzikli':'')+')'):'kapalı',s.u.aktif?'iyi':'');
+  // sistem
+  var os=$('#ozSistem'); os.textContent='';
+  var sag=(OZ.hk&&OZ.hk.saglik&&OZ.hk.saglik.kontroller)||[];
+  sat(os,'Servis sağlığı',sag.length?(s.sagSorun?(s.sagSorun+' sorun'):'sorun yok'):'denetim yok',s.sagSorun?'sorun':(sag.length?'iyi':''));
+  var z=OZ.zam; sat(os,'Zamanlayıcı',z?(z.acik===false?'kapalı':'açık'):'okunuyor…',z&&z.acik===false?'sorun':(z?'iyi':''));
+  if(z&&z.son&&z.son.yayin) sat(os,'Son yayın kontrolü',fmt(z.son.yayin));
+  sat(os,'Bildirimler',(OZ.hk&&OZ.hk.bildirim)?'sunucuda açık':'kapalı');
+  // ajanlar
+  var oa=$('#ozAjanlar'); oa.textContent='';
+  AJ.forEach(function(a){ var b=dom('button'); b.type='button'; var i=document.createElement('i'); i.style.background=(DURUM[a.durum]||{}).c||'#8a94a3'; b.appendChild(i); b.appendChild(document.createTextNode(a.kisa)); b.addEventListener('click',function(){ sekme('ofis'); select(a.id); }); oa.appendChild(b); });
+}
+function zamanlayiciCek(){
+  fetch('/api/zamanlayici').then(function(r){return r.ok?r.json():null;}).then(function(v){
+    if(!v) return; OZ.zam=v; ozetCiz();
+    var k=$('#zamDurum'); if(!k) return; k.textContent='';
+    function sat(ad,deg,sinif){ var d=dom('div',sinif||''); d.appendChild(document.createElement('i')); d.appendChild(document.createTextNode(ad+': '+deg)); k.appendChild(d); }
+    sat('Durum',v.acik?'açık':'kapalı',v.acik?'iyi':'sorun');
+    var son=v.son||{};
+    [['yayin','Son hikaye yayın tetiği'],['uretim','Son görsel üretimi tetiği'],['trend','Son trend tetiği'],['akademi','Son akademi tetiği'],['kisa','Son Shorts tetiği']].forEach(function(p){ sat(p[1],son[p[0]]?fmt(son[p[0]]):'henüz (sunucu yeniden başladığında sıfırlanır)'); });
+    if(son.hata) sat('Son hata',son.hata,'sorun');
+  }).catch(function(){});
+}
+zamanlayiciCek(); setInterval(zamanlayiciCek,300000);
+var ilk=(location.hash||'').slice(1); if(SEKMELER.indexOf(ilk)<0) ilk='ofis';
+sekme(ilk,false); ozetCiz();
 
 layout(); place();
 if(window.ResizeObserver) new ResizeObserver(function(){layout();need=true;}).observe(view); else window.addEventListener('resize',function(){layout();need=true;});
