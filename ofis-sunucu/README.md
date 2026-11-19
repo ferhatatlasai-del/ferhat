@@ -40,7 +40,7 @@ Panel, çalışma adımlarını `/api/durum` ile GitHub'dan okur ve animasyonu g
 
 ## Hikaye ajanı ve bildirimler
 - `hikaye/ayar.json` (zamanlama, başlangıçta **duraklatılmış**), `hikaye/kuyruk/*.json`, `hikaye/gorseller/*.jpg`.
-- `hikaye-yayinla.yml` her saat başı çalışır (GitHub geciktirebilir); `ajan/hikaye.py` slot hesabını yapar. Çift yayını önlemek için önce "yayınlanıyor" işaretini depoya yazar, yazamazsa yayınlamaz. Ardışık 3 hatada kendini duraklatır.
+- `hikaye-yayinla.yml` yarım saatte bir çalışır, :05 ve :35 (GitHub geciktirebilir); `ajan/hikaye.py` slot hesabını yapar. Çift yayını önlemek için önce "yayınlanıyor" işaretini depoya yazar, yazamazsa yayınlamaz. Ardışık 3 hatada kendini duraklatır.
 - Fotoğrafı panelde kuyruğa koymak yayın onayı sayılır. Panel fotoğrafı telefonda 1080x1920 JPEG'e küçültür.
 - `nobetci.yml` günlük Instagram, YouTube, OpenAI anahtarlarını ve ofis sunucusunu denetler, sonucu `hikaye/saglik.json`'a yazar, yeni sorunda bildirim gönderir.
 
@@ -88,7 +88,7 @@ Fotoğraf alınamazsa (site engellerse) "zorunlu" modda o tasarım atlanır; "te
 - Hikaye üreticisi Trend ajanının konularını ve İngilizce arama terimlerini kullanır; adayların yarısı trend konularına uyar.
 
 ### Zamanlayıcı (Fly sunucusunda)
-GitHub'ın zamanlayıcısı çalışmaları atlayabildiği için sunucu tetikleri kendisi verir (Türkiye saati): saat başı :05'te hikaye yayın kontrolü (10:05–22:05), her gün 08:20'de görsel üretimi, pazartesi/perşembe 06:30'da trend ajanı.
+GitHub'ın zamanlayıcısı çalışmaları atlayabildiği için sunucu tetikleri kendisi verir (Türkiye saati): yarım saatte bir (:05 ve :35) hikaye yayın kontrolü (10:05–22:35), her gün 08:20'de görsel üretimi, pazartesi/perşembe 06:30'da trend ajanı.
 Sunucunun sürekli açık olması gerekir (`fly.toml`: `auto_stop_machines = "off"`, `min_machines_running = 1`). Durum: `/api/zamanlayici`. Kapatmak için `ZAMANLAYICI=kapali` ortam değişkeni.
 GitHub'ın kendi zamanlayıcısı yedek olarak durur; çift tetik zararsızdır (yayın: ortak kilit + slot mantığı; üretim: günde bir kez).
 
@@ -155,3 +155,6 @@ Her gün Türkiye saatiyle 09, 12, 15, 18 ve 21'de (sunucu zamanlayıcısı `ist
 Ofis tam ekran olunca (düğmeyle ya da telefonu yan çevirince otomatik) hafif bir arka plan müziği çalar; tam ekrandan çıkınca, sayfa arka plana geçince ya da 🎵 düğmesiyle kapatınca durur. Tercih tarayıcıda hatırlanır.
 Müzik dosya değil, tarayıcıda WebAudio ile üretilir (yumuşak elektrik piyano akorları, bas, fırça ritmi; 76 BPM, iki akor dizisi dönüşümlü): telif sorunu ve ek yükleme yoktur. Ses seviyesi bilerek düşüktür (yaklaşık −30 dBFS); telefonun kendi ses düğmesiyle ayarlanır.
 Telefon yan çevrilince tarayıcı sayfada daha önce hiç dokunuş görmediyse sesi başlatmaz; bu durumda "ekrana bir kez dokun" uyarısı çıkar.
+
+### Günlük hikaye sayısı neden ayarın altında kalabilir? (düzeltildi)
+Her kontrol en çok bir hikaye yayınlar. Eskiden kontrol saat başıydı ve iki hikaye arası alt sınır 60 dk'ydı; yayın birkaç dakika gecikmeyle çıktığı için bir sonraki saat başında "60 dk dolmadı" denip atlanıyor, günde 12 ayarında 7-9 hikaye çıkıyordu. Artık kontrol yarım saatte bir yapılır ve alt sınır, slot aralığının %60'ını aşamaz (12 hikaye 10:00-20:00 için 30 dk). Simülasyonda 4, 6, 10 ve 12 ayarlarının hepsi tam sayıya ulaşır.
