@@ -5,9 +5,10 @@
 - **Hesap:** @gurtechs3d
 - **Takipçi:** 417
 - **Takip edilen:** 167
-- **Gönderi sayısı:** 17
+- **Gönderi sayısı:** 18
 
 ## Son gönderiler (yeniden eskiye)
+- 2026-11-19 | VIDEO | beğeni 1 · yorum 0 | "Gurtech 3d"
 - 2026-11-18 | VIDEO | beğeni 2 · yorum 0 | "🤖 Doktor Filament yapay zekâ ile üretilmiş bir karakterdir."
 - 2026-11-18 | VIDEO | beğeni 2 · yorum 0 | "3D baskıyla ortaya çıkan bu tasarımlar günlük hayatta işe yarayan çözü"
 - 2026-11-16 | VIDEO | beğeni 5 · yorum 0 | "Kablolar neden hep masadan kayıp gidiyor? 🤔"
@@ -19,4 +20,3 @@
 - 2025-11-25 | CAROUSEL_ALBUM | beğeni 9 · yorum 0 | ""
 - 2025-11-25 | VIDEO | beğeni 5 · yorum 0 | ""
 - 2025-11-24 | VIDEO | beğeni 8 · yorum 0 | ""
-- 2025-11-23 | VIDEO | beğeni 8 · yorum 0 | ""
