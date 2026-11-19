@@ -1,7 +1,7 @@
 {
   "kimlik": "y20261119-215841",
   "olusturma": "2026-11-19T21:58:41.695Z",
-  "durum": "video",
+  "durum": "yayinda",
   "kaynak": "bagimsiz",
   "direktif": "",
   "konu": "Dr. Filament ile 3D Yazıcılar Nasıl Çalışır? | gurtech3d",
@@ -25,9 +25,13 @@
       "hedef": "youtube",
       "platform": "youtube",
       "tur": "shorts",
-      "durum": "basladi",
+      "durum": "yayinda",
       "baslangic": "2026-11-19T21:58:32.138Z",
-      "video": "videolar/yukleme_20261119215755.mp4"
+      "video": "videolar/yukleme_20261119215755.mp4",
+      "tarih": "2026-11-19T21:59:07Z",
+      "link": "https://www.youtube.com/shorts/MGVp8xfBUtc",
+      "medya_kimligi": "MGVp8xfBUtc",
+      "adres": "https://github.com/ferhatatlasai-del/ferhat/actions/runs/44624092534"
     },
     {
       "hedef": "hikaye",
