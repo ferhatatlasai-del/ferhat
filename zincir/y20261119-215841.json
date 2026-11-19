@@ -1,0 +1,43 @@
+{
+  "kimlik": "y20261119-215841",
+  "olusturma": "2026-11-19T21:58:41.695Z",
+  "durum": "video",
+  "kaynak": "bagimsiz",
+  "direktif": "",
+  "konu": "Dr. Filament ile 3D Yazıcılar Nasıl Çalışır? | gurtech3d",
+  "format": "reels",
+  "seri": "",
+  "kanca": "",
+  "video": {
+    "yol": "videolar/yukleme_20261119215755.mp4",
+    "tarih": "2026-11-19T21:58:32.138Z"
+  },
+  "yayinlar": [
+    {
+      "hedef": "instagram",
+      "platform": "instagram",
+      "tur": "reels",
+      "durum": "basladi",
+      "baslangic": "2026-11-19T21:58:32.138Z",
+      "video": "videolar/yukleme_20261119215755.mp4"
+    },
+    {
+      "hedef": "youtube",
+      "platform": "youtube",
+      "tur": "shorts",
+      "durum": "basladi",
+      "baslangic": "2026-11-19T21:58:32.138Z",
+      "video": "videolar/yukleme_20261119215755.mp4"
+    },
+    {
+      "hedef": "hikaye",
+      "platform": "instagram",
+      "tur": "hikaye",
+      "durum": "basladi",
+      "baslangic": "2026-11-19T21:58:32.138Z",
+      "video": "videolar/yukleme_20261119215755.mp4"
+    }
+  ],
+  "olcumler": [],
+  "ogrenildi": false
+}
