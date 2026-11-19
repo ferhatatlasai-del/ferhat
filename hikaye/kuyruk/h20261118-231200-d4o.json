@@ -1,7 +1,7 @@
 {
   "id": "h20261118-231200-d4o",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-18T23:12:01.000Z",
   "gorsel": "hikaye/gorseller/h20261118-231200-d4o.mp4",
   "baslik": "Precision Tweezers v2 - 3D Folding",
@@ -21,7 +21,9 @@
     "sorunlar": []
   },
   "yayin": {
-    "tarih": "2026-11-19T16:24:18Z"
+    "tarih": "2026-11-19T16:26:01Z",
+    "medya_kimligi": "17937205662142257",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4033959986014020291"
   },
   "hata": "",
   "deneme": 0,
