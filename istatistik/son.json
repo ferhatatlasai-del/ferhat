@@ -1,6 +1,6 @@
 {
- "tarih": "2026-11-19T09:00:22Z",
- "tr_saat": "19.11.2026 12:00",
+ "tarih": "2026-11-19T12:00:35Z",
+ "tr_saat": "19.11.2026 15:00",
  "toplam": {
   "reels": 0,
   "gonderi": 0,
@@ -18,6 +18,28 @@
   "takipci": 417,
   "hata": "HTTP 400 kod=10 tür=OAuthException: (#10) Application does not have permission for this action",
   "gonderiler": [
+   {
+    "id": "18147205042514343",
+    "tur": "Reels",
+    "tarih": "2026-11-19T11:01:12",
+    "baslik": "🤖 Doktor Filament yapay zekâ ile üretilmiş bir karakterdir.",
+    "begeni": 0,
+    "yorum": 0,
+    "link": "https://www.instagram.com/reel/Df67JNCGR7a/",
+    "izlenme": null,
+    "erisim": null
+   },
+   {
+    "id": "18132390508855696",
+    "tur": "Reels",
+    "tarih": "2026-11-19T11:00:30",
+    "baslik": "Gurtech 3d",
+    "begeni": 0,
+    "yorum": 0,
+    "link": "https://www.instagram.com/reel/Df67FfFgMHC/",
+    "izlenme": null,
+    "erisim": null
+   },
    {
     "id": "18655251088021009",
     "tur": "Reels",
@@ -219,6 +241,22 @@
  "hikaye_izin": false,
  "hikayeler": [
   {
+   "id": "18573121390077618",
+   "tarih": "2026-11-19T11:02:09Z",
+   "baslik": "Işıltılı detaylar",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
+   "id": "18146966305609623",
+   "tarih": "2026-11-19T09:23:49Z",
+   "baslik": "Silica gel spool container",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
    "id": "18359945398169882",
    "tarih": "2026-11-19T06:38:30Z",
    "baslik": "Realistic Skull Candy Bowl | Halloween Skull Decoration",
@@ -318,7 +356,7 @@
   "YouTube okunamadı"
  ],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 12:00",
+  "baslik": "📊 İzlenme raporu 15:00",
   "govde": "Toplam 0 (eksik veri) · Reels ? · Short ? · Hikaye ? · Takipçi 417 · Instagram izlenme izni yok; YouTube okunamadı"
  }
 }
