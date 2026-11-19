@@ -1,0 +1,34 @@
+{
+  "oneriler": [
+    {
+      "ajan": "hikaye",
+      "baslik": "referanssız üretimi durdur",
+      "ders": "Referans görsel yoksa üretimi başlatma.",
+      "kanit": "21 denetimde 1 kez referans yok kaydı var.",
+      "onem": 1,
+      "id": "o20261119-1",
+      "tarih": "2026-11-19T06:40:00Z",
+      "durum": "onay_bekliyor"
+    },
+    {
+      "ajan": "hikaye",
+      "baslik": "logo ve marka yazısını temizle",
+      "ders": "Görselde marka yazısı ya da logo görünürse üretimi reddet.",
+      "kanit": "En sık sorunlardan 2'si marka/logoya bağlı.",
+      "onem": 1,
+      "id": "o20261119-2",
+      "tarih": "2026-11-19T06:40:00Z",
+      "durum": "onay_bekliyor"
+    },
+    {
+      "ajan": "trend",
+      "baslik": "tek kategoriye yüklenme",
+      "ders": "Aynı kategoriye art arda konu çıkarma.",
+      "kanit": "12 öneri içinde en çok kategori sadece 1 kez geçti.",
+      "onem": 1,
+      "id": "o20261119-3",
+      "tarih": "2026-11-19T06:40:00Z",
+      "durum": "onay_bekliyor"
+    }
+  ]
+}
