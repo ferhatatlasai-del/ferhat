@@ -17,9 +17,13 @@
       "hedef": "instagram",
       "platform": "instagram",
       "tur": "reels",
-      "durum": "basladi",
+      "durum": "yayinda",
       "baslangic": "2026-11-18T21:22:01.671Z",
-      "video": "videolar/yukleme_20261118211525.mp4"
+      "video": "videolar/yukleme_20261118211525.mp4",
+      "tarih": "2026-11-19T11:01:20Z",
+      "link": "https://www.instagram.com/reel/Df67JNCGR7a/",
+      "medya_kimligi": "18147205042514343",
+      "adres": "https://github.com/ferhatatlasai-del/ferhat/actions/runs/44510832528"
     },
     {
       "hedef": "youtube",
