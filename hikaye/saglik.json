@@ -1,10 +1,10 @@
 {
-  "tarih": "2026-11-19T14:24:48Z",
+  "tarih": "2026-11-19T20:54:25Z",
   "kontroller": [
     {
       "ad": "Instagram",
-      "durum": "iyi",
-      "not": "Instagram anahtarı çalışıyor"
+      "durum": "sorun",
+      "not": "Instagram anahtarı reddedildi (kod 200): API access blocked.. Anahtarı yenilemek gerekebilir."
     },
     {
       "ad": "YouTube",
@@ -24,7 +24,7 @@
     {
       "ad": "Hikaye kuyruğu",
       "durum": "sorun",
-      "not": "Hikaye kuyruğu azaldı (8 planlı hikaye kaldı, günlük 12). Yeni fotoğraf ekle."
+      "not": "Hikaye kuyruğu azaldı (6 planlı hikaye kaldı, günlük 12). Yeni fotoğraf ekle."
     }
   ]
 }
