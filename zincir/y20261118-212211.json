@@ -1,7 +1,7 @@
 {
   "kimlik": "y20261118-212211",
   "olusturma": "2026-11-18T21:22:11.244Z",
-  "durum": "video",
+  "durum": "yayinda",
   "kaynak": "bagimsiz",
   "direktif": "",
   "konu": "GURTECH 3D",
@@ -25,9 +25,13 @@
       "hedef": "youtube",
       "platform": "youtube",
       "tur": "shorts",
-      "durum": "basladi",
+      "durum": "yayinda",
       "baslangic": "2026-11-18T21:22:01.671Z",
-      "video": "videolar/yukleme_20261118211525.mp4"
+      "video": "videolar/yukleme_20261118211525.mp4",
+      "tarih": "2026-11-19T11:00:36Z",
+      "link": "https://www.youtube.com/shorts/2myyoKYJny8",
+      "medya_kimligi": "2myyoKYJny8",
+      "adres": "https://github.com/ferhatatlasai-del/ferhat/actions/runs/44510836316"
     },
     {
       "hedef": "hikaye",
