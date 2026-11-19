@@ -1,6 +1,6 @@
 {
- "tarih": "2026-11-19T12:00:35Z",
- "tr_saat": "19.11.2026 15:00",
+ "tarih": "2026-11-19T15:00:30Z",
+ "tr_saat": "19.11.2026 18:00",
  "toplam": {
   "reels": 0,
   "gonderi": 0,
@@ -8,7 +8,7 @@
   "youtube_video": 0,
   "hikaye": 0,
   "toplam": 0,
-  "begeni": 92,
+  "begeni": 93,
   "yorum": 4
  },
  "fark": 0,
@@ -19,22 +19,11 @@
   "hata": "HTTP 400 kod=10 tür=OAuthException: (#10) Application does not have permission for this action",
   "gonderiler": [
    {
-    "id": "18147205042514343",
-    "tur": "Reels",
-    "tarih": "2026-11-19T11:01:12",
-    "baslik": "🤖 Doktor Filament yapay zekâ ile üretilmiş bir karakterdir.",
-    "begeni": 0,
-    "yorum": 0,
-    "link": "https://www.instagram.com/reel/Df67JNCGR7a/",
-    "izlenme": null,
-    "erisim": null
-   },
-   {
     "id": "18132390508855696",
     "tur": "Reels",
     "tarih": "2026-11-19T11:00:30",
     "baslik": "Gurtech 3d",
-    "begeni": 0,
+    "begeni": 1,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df67FfFgMHC/",
     "izlenme": null,
@@ -241,6 +230,14 @@
  "hikaye_izin": false,
  "hikayeler": [
   {
+   "id": "18127512928899352",
+   "tarih": "2026-11-19T13:08:49Z",
+   "baslik": "Gridfinity Modular Drawer System",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
    "id": "18573121390077618",
    "tarih": "2026-11-19T11:02:09Z",
    "baslik": "Işıltılı detaylar",
@@ -356,7 +353,7 @@
   "YouTube okunamadı"
  ],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 15:00",
+  "baslik": "📊 İzlenme raporu 18:00",
   "govde": "Toplam 0 (eksik veri) · Reels ? · Short ? · Hikaye ? · Takipçi 417 · Instagram izlenme izni yok; YouTube okunamadı"
  }
 }
