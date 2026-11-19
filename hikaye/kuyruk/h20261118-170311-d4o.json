@@ -1,7 +1,7 @@
 {
   "id": "h20261118-170311-d4o",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-18T17:03:12.000Z",
   "gorsel": "hikaye/gorseller/h20261118-170311-d4o.mp4",
   "baslik": "Silica gel spool container",
@@ -24,7 +24,9 @@
     ]
   },
   "yayin": {
-    "tarih": "2026-11-19T09:05:28Z"
+    "tarih": "2026-11-19T09:23:49Z",
+    "medya_kimligi": "18146966305609623",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4033747423184835412"
   },
   "hata": "",
   "deneme": 0,
