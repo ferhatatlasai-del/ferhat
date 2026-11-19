@@ -1,7 +1,7 @@
 {
   "kimlik": "y20261119-105958",
   "olusturma": "2026-11-19T10:59:58.591Z",
-  "durum": "video",
+  "durum": "yayinda",
   "kaynak": "bagimsiz",
   "direktif": "",
   "konu": "Işıltılı detaylar",
@@ -25,9 +25,13 @@
       "hedef": "youtube",
       "platform": "youtube",
       "tur": "shorts",
-      "durum": "basladi",
+      "durum": "yayinda",
       "baslangic": "2026-11-19T10:59:48.886Z",
-      "video": "videolar/yukleme_20261119105850.mp4"
+      "video": "videolar/yukleme_20261119105850.mp4",
+      "tarih": "2026-11-19T11:00:08Z",
+      "link": "https://www.youtube.com/shorts/8g5NkhSeonc",
+      "medya_kimligi": "8g5NkhSeonc",
+      "adres": "https://github.com/ferhatatlasai-del/ferhat/actions/runs/44510757160"
     },
     {
       "hedef": "hikaye",
