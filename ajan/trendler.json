@@ -1,115 +1,226 @@
 {
-  "tarih": "2026-11-16T21:45:29Z",
+  "tarih": "2026-11-19T03:30:46Z",
   "model": "gpt-5.4-mini",
   "arac": "web_search",
   "oneriler": [
     {
-      "konu": "Print-in-place menteşeli kutu",
-      "neden_trend": "Reddit’te son haftalarda print-in-place menteşe ve kapak tasarımları tekrar tekrar öne çıkıyor; r/functionalprint ve r/3Dprinting içinde parametreli, tek parça çalışan kapaklı kutulara dair paylaşımlar ve sorun/çözüm tartışmaları var. YouTube’da da print-in-place menteşe nasıl tasarlanır içerikleri yüksek görünürlük almış durumda. ([reddit.com](https://www.reddit.com/r/functionalprint/comments/1qt72c5/messing_around_with_a_parametric_printinplace/?utm_source=openai))",
-      "kaynaklar": [
-        "https://www.reddit.com/r/functionalprint/comments/1qt72c5/messing_around_with_a_parametric_printinplace/",
-        "https://www.reddit.com/r/functionalprint/comments/1m6hf3l"
-      ],
-      "basilabilir": true,
-      "basilabilir_notu": "Ev tipi FDM yazıcıyla basılabilir; tek parça mekanizma olduğu için destek gerektirmez ama tolerans ve köprüleme kalitesi önemli.",
-      "kanca_acisi": "Doktor Filament, ‘mühendislik hilesi’ gibi görünen ama evde tek seferde çalışan bir kutu yapıyor: destek istemeyen menteşe neden bazen fail, bazen mucize olur?",
-      "format_onerisi": "reels",
-      "risk": "yok",
-      "guven": "yuksek",
-      "dogrulandi": true
-    },
-    {
-      "konu": "Destek çıkarma kurtarma taktiği",
-      "neden_trend": "r/3Dprinting’de son 2-4 haftada desteklerin zor sökülmesi ve baskıya yapışması konusunda birden fazla başlık açılmış; bu, yeni başlayanların en sık yaşadığı acı noktalardan biri olarak yeniden görünür olmuş. Aynı anda YouTube Shorts tarafında overhang ve support ayarı iyileştirme videoları öne çıkıyor. ([reddit.com](https://www.reddit.com/r/3Dprinting/comments/1xa85f0/how_to_remove_supports_easily_in_detailed_prints/?utm_source=openai))",
-      "kaynaklar": [
-        "https://www.reddit.com/r/3Dprinting/comments/1xa85f0/how_to_remove_supports_easily_in_detailed_prints/",
-        "https://www.youtube.com/watch?v=ZD28LiSAFqc"
-      ],
-      "basilabilir": false,
-      "basilabilir_notu": "Bu bir nesne değil; baskı sonrası problem/işlem konusu. Baskı yapılmaz, ama sorunlu parça yeniden baskıya gitmeden önce kurtarma tekniği anlatılabilir.",
-      "kanca_acisi": "Doktor Filament, ‘destek sökme ameliyatı’ yapıyor: hangi durumda maket bıçağı, hangi durumda pense, hangi durumda tekrar baskı?",
-      "format_onerisi": "carousel",
-      "risk": "yok",
-      "guven": "yuksek",
-      "dogrulandi": true
-    },
-    {
-      "konu": "1.75 mm filament pimli modüler organizer",
-      "neden_trend": "r/3Dprinting’de son dönemde modüler parça organizer’ları ve basit mekanik çözümler dikkat çekiyor; özellikle menteşe pimi olarak 1.75 mm filament kullanımı pratik bir hack olarak öne çıktı. Bu tarz ‘hardware’siz’ fonksiyonel baskılar r/functionalprint kültüründe de güçlü biçimde yankı buluyor. ([reddit.com](https://www.reddit.com/r/3Dprinting/comments/1wff6rs/yet_another_modular_parts_organizer_but_this_one/?utm_source=openai))",
-      "kaynaklar": [
-        "https://www.reddit.com/r/3Dprinting/comments/1wff6rs/yet_another_modular_parts_organizer_but_this_one/",
-        "https://www.reddit.com/r/functionalprint/comments/1m6hf3l"
-      ],
-      "basilabilir": true,
-      "basilabilir_notu": "Çoğu ev tipi FDM yazıcıyla basılabilir; standart filament parçası pim olarak kullanıldığı için ek metal parça gerektirmez.",
-      "kanca_acisi": "Doktor Filament’in atölyesinde vida yok, pim yok, sadece filament var: modüler kutu nasıl kurulur?",
-      "format_onerisi": "carousel",
-      "risk": "yok",
-      "guven": "orta",
-      "dogrulandi": true
-    },
-    {
-      "konu": "Kablo düzenleyen masa klipsi",
-      "neden_trend": "Pinterest’in kendi içerik sayfalarında bile 3D baskıda en iyi çalışan fikirlerin ‘günlük sürtünmeyi azaltan’ küçük düzenleyiciler olduğu vurgulanıyor; kablo organizer’ları ve masa üstü düzen çözümleri tekrar öne çıkarılıyor. TikTok Shop arama sonuçlarında da organizer ve tool organizer ürünleri yoğun şekilde listeleniyor, bu da kısa video tüketiminde talebin canlı olduğuna işaret ediyor. ([guide.pinterest.com](https://guide.pinterest.com/diy-and-crafts/3d-print-for-women/?utm_source=openai))",
+      "konu": "Köşe raf altı askılı mini saksı",
+      "kategori": "bahçe/balkon",
+      "arama_terimi_en": "corner planter",
+      "neden_trend": "Pinterest’te ev dekoru/mini saksı ekseni, düzeni bozmayan küçük ama estetik parçalar olarak öne çıkıyor; son dönemde “compact planter” ve benzeri aramalar pratik + dekoratif kullanımda ilgi görüyor. Bu konu, bahçe/balkon alanında göze hoş görünen ama küçük alan çözümleri kategorisine uyuyor.",
       "kaynaklar": [
         "https://guide.pinterest.com/diy-and-crafts/3d-print-for-women/"
       ],
       "basilabilir": true,
-      "basilabilir_notu": "Basit bir masa üstü klips veya kanal parçası olduğu için ev tipi FDM yazıcıyla rahatça basılabilir.",
-      "kanca_acisi": "Doktor Filament, masadaki kablo kaosunu 30 saniyede ‘şehir planı’na çeviriyor: tek bir küçük parça nasıl düzen hissi yaratır?",
+      "basilabilir_notu": "Evet; tek parça veya destek az gerektiren şekilde PLA/PETG ile masaüstü yazıcılarda basılabilir.",
+      "kanca_acisi": "“Balkon yoksa da bahçe hissi olur mu?” Doktor Filament, pencere önüne takılan minik bir saksı ile dar alanlarda yeşil köşe kuruyor.",
       "format_onerisi": "carousel",
       "risk": "yok",
       "guven": "orta",
-      "dogrulandi": true
+      "dogrulandi": true,
+      "ornekler": []
     },
     {
-      "konu": "Katlanır snap-latch kutu",
-      "neden_trend": "Reddit’te snap-latch ve kapak mekanizmaları özellikle fonksiyonel baskı başlıklarında tekrar görünür oldu; kullanıcılar küçük kutularda kapak, buton ve kilit mekanizmasını ‘tek baskıda’ çözmeye çalışıyor. Bu, izleyicinin ‘vay be, bu da 3D baskı mı?’ tepkisi vereceği bir alan. ([reddit.com](https://www.reddit.com/r/functionalprint/comments/1m6hf3l?utm_source=openai))",
+      "konu": "Masa kenarına takılan poşet tutucu kanca",
+      "kategori": "ev/mutfak",
+      "arama_terimi_en": "bag clip hanger",
+      "neden_trend": "Ev içi günlük sürtünmeyi çözen küçük araçlar ve askılı çözümler sosyal platformlarda sürekli ilgi görüyor; Reddit’te de “organisational prints” ve pratik ev çözümleri sık anılıyor. Bu parça, mutfakta poşeti açık tutma ya da geçici asma işini görerek kullanılabilirlik vaadi taşıyor.",
       "kaynaklar": [
-        "https://www.reddit.com/r/functionalprint/comments/1m6hf3l"
+        "https://www.reddit.com/r/3Dprinting/comments/1h14odr/what_are_the_most_useful_things_youve_printed/",
+        "https://guide.pinterest.com/diy-and-crafts/3d-printed-merch-ideas/"
       ],
       "basilabilir": true,
-      "basilabilir_notu": "Ev tipi yazıcıyla basılabilir; ancak kilit tırnağı ve esneyen bölge için malzeme seçimi ve katman yönü önemli.",
-      "kanca_acisi": "Doktor Filament’in ‘tek parça mucizesi’: kapak, kilit ve buton ayrı parça olmadan nasıl çalışır?",
+      "basilabilir_notu": "Evet; küçük, hızlı ve masa kenarı ölçüsüne göre ölçeklenebilir.",
+      "kanca_acisi": "“Mutfakta elin doluyken üçüncü bir el lazım.” Doktor Filament, poşeti askıya alan tek hamlelik bir çözüm anlatıyor.",
       "format_onerisi": "reels",
       "risk": "yok",
       "guven": "orta",
-      "dogrulandi": true
+      "dogrulandi": true,
+      "ornekler": []
     },
     {
-      "konu": "Telefon standı değil, katlanır telefon standı/desk dock",
-      "neden_trend": "Pinterest rehberleri son dönemde 3D baskıda en iyi çalışan işlerin ‘her gün kullanılan küçük nesneler’ olduğunu tekrar vurguluyor; telefon standı, küçük organizer ve masa aksesuarları bu dilin merkezinde. Bu konu, çok genel olmadan ‘katlanır’ veya ‘kilitli’ bir mekanizmayla yeni açı bulabilir. ([guide.pinterest.com](https://guide.pinterest.com/diy-and-crafts/3d-print-for-women/?utm_source=openai))",
+      "konu": "Bisiklet gidonuna geçen minik telefon/ışık aparatı",
+      "kategori": "araç/bisiklet",
+      "arama_terimi_en": "bike mount",
+      "neden_trend": "Görsel olarak güçlü ve işlev odaklı aksesuarlar YouTube Shorts’ta iyi performans gösterebiliyor; kısa videoda “önce sorun, sonra çözüm” anlatımı dikkat çekiyor. Bisiklet tarafında pratik aparat ve mount fikirleri, fonksiyonel baskı izleyicisinin ilgisini çeken klasik ama hâlâ talep gören bir alan.",
+      "kaynaklar": [
+        "https://www.youtube.com/watch?v=DeURZeiXB4I",
+        "https://www.reddit.com/r/3Dprinting/comments/1sn5vu3/what_are_you_printing_on_a_regular_basis/"
+      ],
+      "basilabilir": true,
+      "basilabilir_notu": "Evet; ama yük taşıyacağı için PETG/ASA daha uygun, tolerans ayarı önemli.",
+      "kanca_acisi": "“Telefonu gidonda taşımak mı, yoksa titreşimle dans ettirmek mi?” Doktor Filament, güvenli bir klips-mantığıyla gösteriyor.",
+      "format_onerisi": "reels",
+      "risk": "yok",
+      "guven": "orta",
+      "dogrulandi": true,
+      "ornekler": []
+    },
+    {
+      "konu": "Tasma askılı mama kabı yükseltici",
+      "kategori": "evcil hayvan",
+      "arama_terimi_en": "pet bowl stand",
+      "neden_trend": "Reddit’te fonksiyonel baskılar arasında evcil hayvanla ilgili günlük kullanım objeleri sık görünür; küçük ama net fayda sağlayan ürünler paylaşılmaya yatkın. Bu konu, “güzel görünen ama asıl işi olan” nesne tipine uyuyor.",
+      "kaynaklar": [
+        "https://www.reddit.com/r/3Dprinting/comments/1sn5vu3/what_are_you_printing_on_a_regular_basis/"
+      ],
+      "basilabilir": true,
+      "basilabilir_notu": "Evet; iki ayaklı veya tek parçalı yükseltici olarak ev yazıcısında üretilebilir.",
+      "kanca_acisi": "“Kedinin su kabı niye kayıyor?” Doktor Filament, zeminde gezmeyen akıllı bir yükseltici tasarımını anlatıyor.",
+      "format_onerisi": "carousel",
+      "risk": "yok",
+      "guven": "orta",
+      "dogrulandi": true,
+      "ornekler": []
+    },
+    {
+      "konu": "Dönen mini zeka oyunu küpü",
+      "kategori": "oyuncak/oyun/bulmaca",
+      "arama_terimi_en": "puzzle cube",
+      "neden_trend": "Printables’ta bulmaca/fidget/top gibi kategoriler hâlâ canlı; “spinning cube” ve benzeri kompakt oyun parçaları görünür ilgi görüyor. TikTok/Shorts formatında eli meşgul eden, sesi ve hareketi olan nesneler kısa videoda iyi çalışır.",
+      "kaynaklar": [
+        "https://www.printables.com/tag/tabletop",
+        "https://www.youtube.com/watch?v=DhqUcumT-7k"
+      ],
+      "basilabilir": true,
+      "basilabilir_notu": "Evet; destek istemeyen ya da minimum destekli mekanik oyuncak olarak basılabilir.",
+      "kanca_acisi": "“Bir küp ama tek hareketi yok.” Doktor Filament, döndükçe açılan küçük bir bulmacayı çözüyor.",
+      "format_onerisi": "reels",
+      "risk": "yok",
+      "guven": "orta",
+      "dogrulandi": true,
+      "ornekler": []
+    },
+    {
+      "konu": "Kabloyu duvara sıfırdan taşıyan köşeli kablo kılavuzu",
+      "kategori": "teknoloji aksesuarı",
+      "arama_terimi_en": "cable guide",
+      "neden_trend": "Kablo düzeni, masa düzeni ve küçük yapışan aksesuarlar Pinterest ve Reddit’te sürekli tekrar eden pratik ihtiyaçlar arasında. “Az yer kaplayan, temiz görünüm veren” çözümler kısa videolarda güçlü bir dönüşüm hissi yaratıyor.",
+      "kaynaklar": [
+        "https://guide.pinterest.com/diy-and-crafts/3d-printed-merch-ideas/",
+        "https://guide.pinterest.com/diy-and-crafts/3d-printer-and-cricut-projects/",
+        "https://www.reddit.com/r/3Dprinting/comments/1h14odr/what_are_the_most_useful_things_youve_printed/"
+      ],
+      "basilabilir": true,
+      "basilabilir_notu": "Evet; küçük ve hızlı, duvar yapışkanıyla birlikte kullanılabilir.",
+      "kanca_acisi": "“Kabloyu saklamak değil, ona rota çizmek.” Doktor Filament, kablo kaosunu mimariye çeviriyor.",
+      "format_onerisi": "carousel",
+      "risk": "yok",
+      "guven": "orta",
+      "dogrulandi": true,
+      "ornekler": []
+    },
+    {
+      "konu": "Ayarlanabilir pense/yan keski standı",
+      "kategori": "atölye/el aleti",
+      "arama_terimi_en": "tool stand",
+      "neden_trend": "Reddit’te atölye ve printer çevresi için düzenleyici prints sürekli öne çıkıyor; tool organizer, tool box ve parça tutucular tekrar eden popüler temalar arasında. El aletini dik ve erişilebilir tutan stand, hem fonksiyonel hem de görsel olarak tatmin edici.",
+      "kaynaklar": [
+        "https://www.reddit.com/r/3Dprinting/comments/1h14odr/what_are_the_most_useful_things_youve_printed/",
+        "https://www.reddit.com/r/3Dprinting/comments/1sn5vu3/what_are_you_printing_on_a_regular_basis/"
+      ],
+      "basilabilir": true,
+      "basilabilir_notu": "Evet; küçük atölye organizatörü olarak ev tipi yazıcıda basılabilir.",
+      "kanca_acisi": "“Alet masada yatınca kaybolur.” Doktor Filament, tek bakışta erişilen bir stand kurguluyor.",
+      "format_onerisi": "carousel",
+      "risk": "yok",
+      "guven": "orta",
+      "dogrulandi": true,
+      "ornekler": []
+    },
+    {
+      "konu": "Yılbaşı için kişiselleştirilebilir isimli yıldız süs",
+      "kategori": "hediye/mevsimsel",
+      "arama_terimi_en": "name ornament",
+      "neden_trend": "Pinterest’te hediye ve dekor tarafında kişisel dokunuşlu, küçük ve anlamlı nesneler öne çıkıyor; sezon yaklaşırken bu tür süsler paylaşılabilirlik kazanıyor. Hediye objelerinde isimlendirme ve basit geometrik form birlikte iyi çalışıyor.",
+      "kaynaklar": [
+        "https://guide.pinterest.com/diy-and-crafts/3d-printed-gifts-for-grandma/",
+        "https://guide.pinterest.com/diy-and-crafts/3d-printed-merch-ideas/"
+      ],
+      "basilabilir": true,
+      "basilabilir_notu": "Evet; tek renk ya da çok renkli filamentle basılabilir, düşük riskli.",
+      "kanca_acisi": "“Hediye kutudan değil, ısmarlama gibi dursun.” Doktor Filament, isme göre büyüyen bir süs tasarlıyor.",
+      "format_onerisi": "reels",
+      "risk": "yok",
+      "guven": "orta",
+      "dogrulandi": true,
+      "ornekler": []
+    },
+    {
+      "konu": "Kilitlenebilen kapaklı seyahat diş fırçası kutusu",
+      "kategori": "kamp/seyahat",
+      "arama_terimi_en": "travel case",
+      "neden_trend": "Kompakt, çantada kaybolmayan ve bir şeyi temiz tutan küçük seyahat çözümleri sosyal platformlarda güçlüdür; görünümü sade olan taşınabilir parçalar ilgi çeker. Bu konu hem kamp/seyahat hem de günlük çanta düzeni için kullanılabilir.",
       "kaynaklar": [
         "https://guide.pinterest.com/diy-and-crafts/3d-print-for-women/"
       ],
       "basilabilir": true,
-      "basilabilir_notu": "Basit geometriyle çoğu FDM yazıcıda basılabilir; katlanır versiyonunda menteşe toleransı gerekir.",
-      "kanca_acisi": "Doktor Filament, telefonu ‘sadece tutan’ değil, masada yer açan bir aparata dönüştürüyor: neden bu kadar küçük şeyler bu kadar tatmin edici?",
+      "basilabilir_notu": "Evet; tek parçalı veya snap-fit kapaklı olarak basılabilir.",
+      "kanca_acisi": "“Çantada karışan tek şey anılar olsun.” Doktor Filament, küçük ama hijyenik bir yol kutusu kuruyor.",
       "format_onerisi": "carousel",
       "risk": "yok",
       "guven": "orta",
-      "dogrulandi": true
+      "dogrulandi": true,
+      "ornekler": []
     },
     {
-      "konu": "Desteksiz overhang testi parçası",
-      "neden_trend": "YouTube Shorts tarafında 3D baskıda overhang iyileştirme ve slicer ayarı içerikleri görünür şekilde dolaşıyor; kullanıcılar support, açı ve ilk katman gibi temel ayarları kısa videolarda öğrenmek istiyor. Bu da küçük test modellerinin tekrar ilgi gördüğünü gösteriyor. ([youtube.com](https://www.youtube.com/watch?v=ZD28LiSAFqc&utm_source=openai))",
+      "konu": "Kırık kulp yerine geçen çekmece parmak halkası",
+      "kategori": "tamir/yedek parça",
+      "arama_terimi_en": "drawer pull",
+      "neden_trend": "Fonksiyonel baskı topluluklarında gerçek tamir parçaları her zaman ilgi görür; kullanıcılar “hazır parça yerine ölçüye göre üretim” fikrine cevap veriyor. Kırık kulp gibi sıradan arızalar kısa formatta önce sorun, sonra çözüm şeklinde iyi anlatılır.",
       "kaynaklar": [
-        "https://www.youtube.com/watch?v=ZD28LiSAFqc"
+        "https://www.reddit.com/r/3Dprinting/comments/1sn5vu3/what_are_you_printing_on_a_regular_basis/"
       ],
       "basilabilir": true,
-      "basilabilir_notu": "Evet; çok küçük bir test modeli olarak hemen her ev tipi FDM yazıcıda basılabilir.",
-      "kanca_acisi": "Doktor Filament, ‘neden bu köşe çirkin çıktı?’ sorusunu tek test parçasıyla çözüyor; izleyiciye mini laboratuvar kuruyor.",
+      "basilabilir_notu": "Evet; yük taşımayan veya orta yükteki çekmeceler için ev yazıcısında basılabilir.",
+      "kanca_acisi": "“Kırık kulp, dolabın sonu değil.” Doktor Filament, ölçü alıp anında yedek parça üretiyor.",
+      "format_onerisi": "reels",
+      "risk": "yok",
+      "guven": "orta",
+      "dogrulandi": true,
+      "ornekler": []
+    },
+    {
+      "konu": "Kendinden etiketli çekmeceli küçük ilaç dışı düzen kutusu",
+      "kategori": "ofis/okul",
+      "arama_terimi_en": "label box",
+      "neden_trend": "Düzenleme, etiketleme ve modüler küçük kutular Pinterest’te ve 3D baskı topluluklarında tekrar eden bir tema; ancak bu öneri ilaç kutusu değil, genel kırtasiye/masa düzeni olarak düşünülmeli. Görsel olarak çok katmanlı ve carousel için uygun.",
+      "kaynaklar": [
+        "https://guide.pinterest.com/diy-and-crafts/3d-printer-and-cricut-projects/",
+        "https://www.reddit.com/r/3Dprinting/comments/1h14odr/what_are_the_most_useful_things_youve_printed/"
+      ],
+      "basilabilir": true,
+      "basilabilir_notu": "Evet; küçük çekmeceli kutu olarak basılabilir, ancak hareketli parçalar için tolerans gerekir.",
+      "kanca_acisi": "“Masadaki dağınıklık, sadece isim bekleyen parçalar.” Doktor Filament, etiketle düzeni görünür kılıyor.",
       "format_onerisi": "carousel",
       "risk": "yok",
       "guven": "orta",
-      "dogrulandi": true
+      "dogrulandi": true,
+      "ornekler": []
+    },
+    {
+      "konu": "Parmakla çevrilen mini masa vantilatörü dişlisi değil, hava yönlendirici kanat",
+      "kategori": "dekor/aydınlatma",
+      "arama_terimi_en": "air diffuser",
+      "neden_trend": "YouTube Shorts’ta tatmin edici hareket ve mekanik görsel efektler iyi performans gösterebiliyor; mekanik hissi olan ama pratik de görünen nesneler dikkat çekiyor. Hava yönlendiren dekoratif parça, saf süsten daha ilginç durur ve baskının hareket hissini öne çıkarır.",
+      "kaynaklar": [
+        "https://www.youtube.com/watch?v=DhqUcumT-7k"
+      ],
+      "basilabilir": true,
+      "basilabilir_notu": "Evet; aktif elektronik içermeyen dekoratif yönlendirici olarak basılabilir.",
+      "kanca_acisi": "“Döner, parlar, dikkat çeker; ama işlevsiz değil.” Doktor Filament, masa üstünde hareketi dekor haline getiriyor.",
+      "format_onerisi": "reels",
+      "risk": "yok",
+      "guven": "orta",
+      "dogrulandi": true,
+      "ornekler": []
     }
   ],
   "asiri_kullanilan": [
-    "Benchy",
-    "Kamera test filamentleri",
-    "Gökkuşağı renkli ejderha/dragon figürleri",
-    "Fidget toy",
-    "Lego uyumlu stand/raf"
+    "print-in-place menteşeli kutu",
+    "kablo klipsi / masa kablo tutucu",
+    "telefon standı",
+    "Gridfinity / modüler organizer",
+    "benchy / test modeli"
   ]
 }
