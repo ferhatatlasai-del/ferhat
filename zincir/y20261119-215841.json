@@ -41,9 +41,13 @@
       "hedef": "hikaye",
       "platform": "instagram",
       "tur": "hikaye",
-      "durum": "basladi",
+      "durum": "yayinda",
       "baslangic": "2026-11-19T21:58:32.138Z",
-      "video": "videolar/yukleme_20261119215755.mp4"
+      "video": "videolar/yukleme_20261119215755.mp4",
+      "tarih": "2026-11-19T22:00:03Z",
+      "link": "https://www.instagram.com/stories/gurtechs3d/4034128063000043477",
+      "medya_kimligi": "18119590649026120",
+      "adres": "https://github.com/ferhatatlasai-del/ferhat/actions/runs/44624095981"
     }
   ],
   "olcumler": [],
