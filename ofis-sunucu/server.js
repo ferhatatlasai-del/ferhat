@@ -57,6 +57,8 @@ function sifreDogru(girilen) {
 
 // Çok basit hız sınırı: yanlış şifre ve direktif için IP başına
 const yanlis = new Map(), direktifler = [], yayinlar = [], linkler = new Map();
+const videoIzi = new Map();      // yüklenen video yolu -> içerik özeti (aynı videonun iki kez yayınlanmasını önler)
+const sonYayinlar = new Map();   // içerik özeti ya da yol -> { hedef: zaman }
 function ip(req) { return (req.headers['fly-client-ip'] || req.socket.remoteAddress || '?'); }
 function kilitliMi(req) { const k = yanlis.get(ip(req)); return k && k.n >= 8 && Date.now() - k.t < 15 * 60e3; }
 function yanlisKaydet(req) { const k = yanlis.get(ip(req)) || { n: 0, t: 0 }; k.n = Date.now() - k.t > 15 * 60e3 ? 1 : k.n + 1; k.t = Date.now(); yanlis.set(ip(req), k); }
@@ -621,9 +623,11 @@ async function api(req, res, url) {
     if (+req.headers['content-length'] > MAX_VIDEO) return json(res, 413, { hata: 'Video 30 MB’tan büyük olamaz.' });
     let tampon; try { tampon = await govdeIkili(req, MAX_VIDEO); } catch (e) { return json(res, 413, { hata: 'Video 30 MB’tan büyük olamaz.' }); }
     if (tampon.length < 1024 || tampon.slice(4, 8).toString('latin1') !== 'ftyp') return json(res, 400, { hata: 'Bu bir MP4 video dosyası gibi görünmüyor.' });
+    const ozet = crypto.createHash('sha256').update(tampon).digest('hex');
     const dal = await varsayilanDal();
     const yol = `videolar/yukleme_${damga()}.mp4`;
     try { await dosyaYaz(yol, tampon, 'Panelden video yüklendi', dal); } catch (e) { return json(res, 502, { hata: e.kullanici ? e.message : 'Video kaydedilemedi.' }); }
+    videoIzi.set(yol, ozet); if (videoIzi.size > 300) videoIzi.delete(videoIzi.keys().next().value);
     const icerik = url.searchParams.get('icerik') || '';
     let bagli = false;
     if (icerik) bagli = await kayitGuncelle(icerik, v => { v.video = { yol, tarih: new Date().toISOString() }; if (v.durum === 'senaryo') v.durum = 'video'; }, 'Zincir: video yüklendi');
@@ -643,6 +647,14 @@ async function api(req, res, url) {
     const baslik = temiz(b.baslik, 100), aciklama = temiz(b.aciklama, 2000);
     if (metinGerek && baslik.length < 3) return json(res, 400, { hata: 'Başlık çok kısa.' });
     if (metinGerek && aciklama.length < 3) return json(res, 400, { hata: 'Açıklama çok kısa.' });
+    // Aynı video (içerik olarak) 24 saat içinde aynı platforma zaten gönderildiyse engelle; panel onay alıp 'tekrar' ile yeniden dener
+    const izAnahtari = videoIzi.get(b.yol) || b.yol, onceki = sonYayinlar.get(izAnahtari) || {};
+    const cakisan = hedefler.filter(h => h !== 'hikaye' && onceki[h] && simdi - onceki[h] < 24 * 3600e3);
+    if (cakisan.length && b.tekrar !== true) {
+      const ad2 = { youtube: 'YouTube', instagram: 'Instagram' };
+      const dk = Math.max(1, Math.round((simdi - Math.max(...cakisan.map(h => onceki[h]))) / 60e3));
+      return json(res, 409, { hata: `Bu video ${dk} dk önce ${cakisan.map(h => ad2[h]).join(' ve ')} için zaten gönderilmiş.` });
+    }
     const dal = await varsayilanDal();
     const ad = b.yol.slice('videolar/'.length, -4);
     const metin = metinGerek ? yzEkle(aciklama) : '';
@@ -672,6 +684,8 @@ async function api(req, res, url) {
       sonuc[h] = r.status === 204 ? 'basladi' : 'GitHub kabul etmedi (' + r.status + ')';
     }
     yayinlar.push(simdi);
+    for (const h of hedefler) if (sonuc[h] === 'basladi') { onceki[h] = simdi; sonYayinlar.set(izAnahtari, onceki); }
+    if (sonYayinlar.size > 300) sonYayinlar.delete(sonYayinlar.keys().next().value);
     // Zincir kaydı: seçili içeriğe ya da yeni bağımsız kayda yayın girişi ekle
     let icerik = KAYIT_RE.test(String(b.icerik || '')) ? b.icerik : '';
     const girisler = hedefler.filter(h => sonuc[h] === 'basladi').map(h => ({ hedef: h, platform: h === 'youtube' ? 'youtube' : 'instagram', tur: h === 'instagram' ? 'reels' : (h === 'youtube' ? 'shorts' : 'hikaye'), durum: 'basladi', baslangic, video: b.yol }));

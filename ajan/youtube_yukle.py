@@ -16,7 +16,10 @@ import argparse
 import json
 import os
 import pathlib
+import re
+import subprocess
 import sys
+import tempfile
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -73,6 +76,89 @@ def metni_oku(yol):
     return baslik, aciklama
 
 
+SHORT_EN_FAZLA_SN = 180   # YouTube Shorts üst sınırı (3 dakika)
+
+
+def video_bilgisi(video):
+    """(genislik, yukseklik, sure_sn, kodek) ya da None (ffprobe yoksa/okunamazsa). Telefon dönüklüğü hesaba katılır."""
+    try:
+        c = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries",
+                            "stream=width,height,codec_name:stream_tags=rotate:stream_side_data=rotation:format=duration",
+                            "-of", "json", str(video)], capture_output=True, text=True, timeout=60)
+        v = json.loads(c.stdout or "{}")
+        st = (v.get("streams") or [{}])[0]
+        g, y = int(st["width"]), int(st["height"])
+        dondur = 0
+        for sd in st.get("side_data_list") or []:
+            if "rotation" in sd:
+                dondur = int(sd["rotation"])
+        dondur = dondur or int((st.get("tags") or {}).get("rotate", 0) or 0)
+        if abs(dondur) % 180 == 90:
+            g, y = y, g
+        return g, y, float((v.get("format") or {}).get("duration") or 0), st.get("codec_name", "?")
+    except Exception:
+        return None
+
+
+def siyah_kenar_kirp(video, g, y):
+    """Videonun kendi içindeki siyah şeritleri (letterbox) bulur; belirgin biçimde varsa 'crop=...' filtresini döndürür."""
+    try:
+        c = subprocess.run(["ffmpeg", "-v", "info", "-ss", "1", "-t", "6", "-i", str(video), "-vf", "cropdetect=24:2:0", "-an", "-f", "null", "-"],
+                           capture_output=True, text=True, timeout=120)
+        bulunan = re.findall(r"crop=(\d+):(\d+):(\d+):(\d+)", c.stderr or "")
+        if not bulunan:
+            return ""
+        sayac = {}
+        for t in bulunan:
+            sayac[t] = sayac.get(t, 0) + 1
+        en_sik = max(sayac, key=lambda k: (sayac[k], -int(k[0]) * int(k[1])))   # çoğunlukla ölçülen kırpma (parlak sahnelerdeki tam kare ölçümü yanıltmasın)
+        w, h, x, yy = (int(v) for v in en_sik)
+        w, h = w - w % 2, h - h % 2
+        if w < g * 0.5 or h < y * 0.5:   # ölçüm güvenilmez (neredeyse tamamen karanlık video vb.)
+            return ""
+        if (g * y - w * h) / (g * y) < 0.04:   # kayda değer siyah şerit yok
+            return ""
+        return f"crop={w}:{h}:{x}:{yy}"
+    except Exception:
+        return ""
+
+
+def dikey_hazirla(video, klasor):
+    """YouTube bir videoyu yalnızca kare ya da dikey (9:16) ve en çok 3 dk ise Short sayar; '#Shorts' yazısı tek başına yetmez.
+    Yatay (ör. 4:3 ya da 16:9) video, bulanık arka planlı 1080x1920 dikey videoya çevrilir. Zaten dikey/kare ise olduğu gibi gönderilir."""
+    b = video_bilgisi(video)
+    if not b:
+        print("UYARI: video bilgisi okunamadı (ffprobe yok olabilir); video olduğu gibi gönderilecek.")
+        return video
+    g, y, sure, kodek = b
+    print(f"Video: {g}x{y}, {sure:.0f} sn, {kodek}")
+    if sure > SHORT_EN_FAZLA_SN:
+        print(f"UYARI: video {SHORT_EN_FAZLA_SN} sn'den uzun; YouTube bunu Short saymaz, normal video olarak yüklenecek.")
+        return video
+    if y >= g:
+        print("Video kare ya da dikey: Short olarak sayılır, olduğu gibi gönderilecek.")
+        return video
+    cikis = pathlib.Path(klasor) / "short_dikey.mp4"
+    print("Video yatay: YouTube Short saymaz. Bulanık arka planlı 1080x1920 dikey videoya çevriliyor…")
+    kirp = siyah_kenar_kirp(video, g, y)
+    if kirp:
+        print(f"Siyah kenarlar kırpılıyor: {kirp}")
+    on = (kirp + ",") if kirp else ""
+    filtre = (f"[0:v]{on}split[a][b];"
+              "[a]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=28:6[bg];"
+              "[b]scale=1080:-2:force_original_aspect_ratio=decrease[on];"
+              "[bg][on]overlay=(W-w)/2:(H-h)/2,format=yuv420p[v]")
+    c = subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", str(video), "-filter_complex", filtre, "-map", "[v]", "-map", "0:a?",
+                        "-c:v", "libx264", "-preset", "veryfast", "-crf", "23", "-r", "30", "-c:a", "aac", "-b:a", "128k",
+                        "-movflags", "+faststart", str(cikis)], capture_output=True, text=True, timeout=900)
+    if c.returncode != 0 or not cikis.exists() or cikis.stat().st_size < 1024:
+        print("UYARI: dikeye çevirme başarısız (" + (c.stderr or "")[-200:].strip() + "); video olduğu gibi gönderilecek.")
+        return video
+    ny = video_bilgisi(cikis)
+    print(f"Dönüştürüldü: {ny[0]}x{ny[1]}, {cikis.stat().st_size // 1024} KB" if ny else "Dönüştürüldü.")
+    return cikis
+
+
 def yukle(erisim, video, baslik, aciklama, gizlilik):
     boyut = video.stat().st_size
     metadata = {
@@ -119,9 +205,14 @@ def main():
     erisim = erisim_anahtari()
     print("Yetkilendirme çalışıyor (erişim anahtarı alındı).")
     if not a.yukle:
+        b = video_bilgisi(video)
+        if b:
+            print(f"Video: {b[0]}x{b[1]}, {b[2]:.0f} sn. " + ("Short sayılır." if b[1] >= b[0] and b[2] <= SHORT_EN_FAZLA_SN else "Yatay/uzun: yüklemede dikeye çevrilecek (3 dk üstü çevrilmez)."))
         print(f"KONTROL MODU: '{baslik}' ({video.stat().st_size // 1024} KB) yüklenmeye hazır. YÜKLENMEDİ.")
         return
-    veri = yukle(erisim, video, baslik, aciklama, a.gizlilik)
+    with tempfile.TemporaryDirectory() as gecici:
+        gonderilecek = dikey_hazirla(video, gecici)
+        veri = yukle(erisim, gonderilecek, baslik, aciklama, a.gizlilik)
     gercek = (veri.get("status") or {}).get("privacyStatus", "?")
     print(f"YÜKLENDİ. Video kimliği: {veri['id']}")
     print(f"Bağlantı: https://www.youtube.com/shorts/{veri['id']}")

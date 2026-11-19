@@ -1171,14 +1171,15 @@ $('#pYayinla').addEventListener('click',function(){
 $('#pVazgec').addEventListener('click',function(){ $('#pOnay').hidden=true; $('#pYayinla').disabled=false; });
 $('#pEvet').addEventListener('click',function(){
   var hedefler=[]; if($('#pIg').checked) hedefler.push('instagram'); if($('#pYt').checked) hedefler.push('youtube'); if($('#pHk').checked) hedefler.push('hikaye');
-  $('#pOnay').hidden=true; pHata(''); $('#pDurum').textContent='Yayın başlatılıyor…';
-  fetch('/api/yayinla',{method:'POST',headers:{'X-Sifre':SIF,'Content-Type':'application/json'},body:JSON.stringify({onay:true,yol:pYol,hedefler:hedefler,baslik:$('#pBaslik').value,aciklama:$('#pAciklama').value,icerik:$('#pIcerik').value})}).then(chk).then(function(j){
+  $('#pOnay').hidden=true; pHata(''); $('#pDurum').textContent='Yayın başlatılıyor…'; var tekrarIste=pTekrar===true; pTekrar=false;
+  fetch('/api/yayinla',{method:'POST',headers:{'X-Sifre':SIF,'Content-Type':'application/json'},body:JSON.stringify({onay:true,tekrar:tekrarIste,yol:pYol,hedefler:hedefler,baslik:$('#pBaslik').value,aciklama:$('#pAciklama').value,icerik:$('#pIcerik').value})}).then(chk).then(function(j){
     pBaslangic=j.baslangic; var h='';
     hedefler.forEach(function(t){ h+='<div class="cal" id="pS_'+t+'"><i></i><span>'+({instagram:'Instagram Reels',youtube:'YouTube Shorts',hikaye:'Instagram Hikaye'}[t]||t)+': '+(j.sonuc[t]==='basladi'?'sırada…':j.sonuc[t])+'</span></div>'; });
     $('#pSonuc').innerHTML=h; $('#pDurum').textContent='Yayın başladı. Bir iki dakika sürer.';
     yayinSahnesi(hedefler); yayinTakip(hedefler,Date.now(),j.icerik||'');
-  }).catch(function(e){ pHata(String(e.message||e)); $('#pYayinla').disabled=false; $('#pDurum').textContent='Yayın başlatılamadı.'; });
+  }).catch(function(e){ var m=String(e.message||e); if(/zaten gönderilmiş/.test(m)&&window.confirm(m+'\n\nYine de tekrar yayınlansın mı?')){ pTekrar=true; $('#pEvet').click(); return; } pHata(m); $('#pYayinla').disabled=false; $('#pDurum').textContent=/zaten gönderilmiş/.test(m)?'Aynı video tekrar gönderilmedi.':'Yayın başlatılamadı.'; });
 });
+var pTekrar=false;
 function pSatir(t,sinif,metin,link){
   var e=$('#pS_'+t); if(!e) return; e.className=sinif;
   e.innerHTML='<i></i><span></span>'; e.querySelector('span').textContent=({instagram:'Instagram Reels',youtube:'YouTube Shorts',hikaye:'Instagram Hikaye'}[t]||t)+': '+metin;
