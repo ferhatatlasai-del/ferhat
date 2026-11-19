@@ -158,3 +158,7 @@ Telefon yan çevrilince tarayıcı sayfada daha önce hiç dokunuş görmediyse 
 
 ### Günlük hikaye sayısı neden ayarın altında kalabilir? (düzeltildi)
 Her kontrol en çok bir hikaye yayınlar. Eskiden kontrol saat başıydı ve iki hikaye arası alt sınır 60 dk'ydı; yayın birkaç dakika gecikmeyle çıktığı için bir sonraki saat başında "60 dk dolmadı" denip atlanıyor, günde 12 ayarında 7-9 hikaye çıkıyordu. Artık kontrol yarım saatte bir yapılır ve alt sınır, slot aralığının %60'ını aşamaz (12 hikaye 10:00-20:00 için 30 dk). Simülasyonda 4, 6, 10 ve 12 ayarlarının hepsi tam sayıya ulaşır.
+
+### YouTube Short olması ve çift paylaşım (düzeltildi)
+- **Short:** YouTube bir videoyu yalnızca kare ya da dikey (9:16) ve en çok 3 dk ise Short sayar; açıklamadaki `#Shorts` tek başına yetmez. Panelden dışarıdan yüklenen yatay video (ör. 640x480) normal video olarak çıkıyordu. `youtube_yukle.py` artık yatay videoyu, içindeki siyah şeritleri kırparak, bulanık arka planlı 1080x1920 dikey videoya çevirip öyle yükler. Zaten dikey/kare video olduğu gibi gider; 3 dk'dan uzun video çevrilmez (uyarı yazılır). İş akışı ffmpeg'i gerektiğinde kurar.
+- **Çift paylaşım:** Aynı video içerik olarak (dosya adı farklı olsa bile) 24 saat içinde aynı platforma gönderildiyse sunucu "zaten gönderilmiş" der; panel "Yine de tekrar yayınlansın mı?" diye sorar, onaylarsan gönderir. Kayıt sunucu belleğinde tutulur (yeniden başlatınca sıfırlanır).
