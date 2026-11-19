@@ -1,0 +1,43 @@
+{
+  "kimlik": "y20261119-105958",
+  "olusturma": "2026-11-19T10:59:58.591Z",
+  "durum": "video",
+  "kaynak": "bagimsiz",
+  "direktif": "",
+  "konu": "Işıltılı detaylar",
+  "format": "reels",
+  "seri": "",
+  "kanca": "",
+  "video": {
+    "yol": "videolar/yukleme_20261119105850.mp4",
+    "tarih": "2026-11-19T10:59:48.886Z"
+  },
+  "yayinlar": [
+    {
+      "hedef": "instagram",
+      "platform": "instagram",
+      "tur": "reels",
+      "durum": "basladi",
+      "baslangic": "2026-11-19T10:59:48.886Z",
+      "video": "videolar/yukleme_20261119105850.mp4"
+    },
+    {
+      "hedef": "youtube",
+      "platform": "youtube",
+      "tur": "shorts",
+      "durum": "basladi",
+      "baslangic": "2026-11-19T10:59:48.886Z",
+      "video": "videolar/yukleme_20261119105850.mp4"
+    },
+    {
+      "hedef": "hikaye",
+      "platform": "instagram",
+      "tur": "hikaye",
+      "durum": "basladi",
+      "baslangic": "2026-11-19T10:59:48.886Z",
+      "video": "videolar/yukleme_20261119105850.mp4"
+    }
+  ],
+  "olcumler": [],
+  "ogrenildi": false
+}
