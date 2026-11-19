@@ -358,6 +358,11 @@ def calis(a):
         print("İstatistik raporu duraklatılmış (panelden açılabilir); atlandı.")
         return 0
     an = simdi()
+    # İstatistik için ayrı bir anahtar tanımlıysa onu kullan: yayın anahtarı (IG_ACCESS_TOKEN) deneme yüzünden bozulmasın
+    ozel = (os.environ.get("IG_ISTATISTIK_TOKEN") or "").strip()
+    if ozel:
+        os.environ["IG_ACCESS_TOKEN"] = ozel
+        print("Instagram: istatistik için ayrı anahtar (IG_ISTATISTIK_TOKEN) kullanılıyor.")
     ig, taban = instagram_topla()
     hikayeler, hikaye_izin = hikayeleri_topla(taban)
     yt = youtube_topla()

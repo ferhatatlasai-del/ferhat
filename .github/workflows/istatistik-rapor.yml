@@ -25,6 +25,7 @@ jobs:
       - name: Instagram ve YouTube izlenmelerini topla, bildirim gönder
         env:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_ISTATISTIK_TOKEN: ${{ secrets.IG_ISTATISTIK_TOKEN }}
           IG_USER_ID: "17841457188392262"
           YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
