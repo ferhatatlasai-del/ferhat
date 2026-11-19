@@ -12,3 +12,27 @@
 {"t": "2026-11-18T17:04:24Z", "tur": "denetim", "gecti": false, "deneme": 2, "puan": 8.0, "site": "printables.com", "sorunlar": ["Referansta Colgate marka tüp görünüyor, logo/marka var", "Üretim görseli referansla uyumlu genel formda", "Hikaye görseli temsili, ancak referans fotoğrafındaki tüp detayı doğrudan gösterilmiyor"]}
 {"t": "2026-11-18T17:04:35Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
 {"t": "2026-11-18T17:04:45Z", "tur": "uretildi", "site": "printables.com", "trend": false, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-18T23:11:19Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-18T23:11:28Z", "tur": "uretildi", "site": "printables.com", "trend": false, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-18T23:11:39Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-18T23:11:48Z", "tur": "uretildi", "site": "printables.com", "trend": false, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-18T23:12:00Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-18T23:12:10Z", "tur": "uretildi", "site": "printables.com", "trend": false, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-18T23:12:21Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-18T23:12:31Z", "tur": "uretildi", "site": "printables.com", "trend": false, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-18T23:12:43Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-18T23:12:53Z", "tur": "uretildi", "site": "printables.com", "trend": false, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-18T23:13:04Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 9.0, "site": "printables.com", "sorunlar": ["Kontrolcü yüzeyinde Nintendo Joy-Con’a ait düğme yazıları/sembolleri var", "Arka planda ikinci bir Joy-Con görülüyor; ürün sunumu dikkati dağıtıyor"]}
+{"t": "2026-11-18T23:13:16Z", "tur": "denetim", "gecti": false, "deneme": 2, "puan": 8.0, "site": "printables.com", "sorunlar": ["Görüntüde Nintendo Switch Joy-Con'a ait tanınabilir tasarım öğeleri var", "Konsol/ürün markasıyla ilişkili tanınmış oyun kontrolcüsü olduğu için marka unsuru mevcut"]}
+{"t": "2026-11-18T23:13:28Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-18T23:13:37Z", "tur": "uretildi", "site": "printables.com", "trend": false, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-18T23:13:47Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com", "sorunlar": ["Belirgin yazı/logo yok", "İnsan/karakter yok", "Referansla genel şekil ve parçalar uyumlu"]}
+{"t": "2026-11-18T23:13:57Z", "tur": "uretildi", "site": "printables.com", "trend": false, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-18T23:14:01Z", "tur": "referans_yok", "site": "printables.com", "uygunsuz": 3, "neden": "uygun değil (Karede büyük başlık, logo ve alt yazılar var; ana nesne görünse de baskın metinler görseli kaplıyor.)"}
+{"t": "2026-11-18T23:14:11Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com", "sorunlar": ["Belirgin bir sorun görünmüyor"]}
+{"t": "2026-11-18T23:14:20Z", "tur": "uretildi", "site": "printables.com", "trend": false, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-18T23:14:33Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-18T23:14:42Z", "tur": "uretildi", "site": "printables.com", "trend": false, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-18T23:14:53Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 7.0, "site": "printables.com", "sorunlar": ["Kartlarda okunabilir yazılar var", "Önde görünen kartta marka/ürün ibaresi benzeri yazı bulunuyor", "Arka planda referansla birebir aynı olmayan stil farkları var"]}
+{"t": "2026-11-18T23:15:03Z", "tur": "denetim", "gecti": true, "deneme": 2, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-18T23:15:12Z", "tur": "uretildi", "site": "printables.com", "trend": false, "deneme": 2, "puan": 9.0}

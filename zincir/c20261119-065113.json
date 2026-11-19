@@ -1,0 +1,103 @@
+{
+  "kimlik": "c20261119-065113",
+  "olusturma": "2026-11-19T06:51:13Z",
+  "durum": "senaryo",
+  "kaynak": "direktif",
+  "direktif": "Şu trendden esinlenerek özgün bir içerik üret (kimseyi kopyalama, son yayınladıklarımızı tekrar etme): Kilitlenebilen kapaklı seyahat diş fırçası kutusu. Açı: “Çantada karışan tek şey anılar olsun.” Doktor Filament, küçük ama hijyenik bir yol kutusu kuruyor.",
+  "konu": "Dönen mini zeka küpü bulmacası",
+  "format": "reels",
+  "seri": "Doktor Notu",
+  "kanca": "Bu küçük küp, içte iki işi birden çeviriyor.",
+  "taslak": "taslaklar/2026-11-19_zincir_065113.md",
+  "taslak_json": "zincir/c20261119-065113_taslak.json",
+  "fikir": {
+    "konu": "Dönen mini zeka küpü bulmacası",
+    "neden": "Eli meşgul eden, dönme hareketi gösteren ve merak uyandıran küçük bir oyuncak kısa videoya uygun.",
+    "trend_baglantisi": "[KAYNAKLI] dönen mini zeka oyunu küpü",
+    "puan": 26.3,
+    "benzerlik": 0.09090909090909091
+  },
+  "elestiri": {
+    "puan": 5,
+    "ilk_puan": 6,
+    "turlar": 3,
+    "uygulandi": true
+  },
+  "trend": {
+    "tarih": "2026-11-19T03:30:46Z",
+    "yenilendi": false
+  },
+  "metinler": {
+    "youtube_baslik": "Dönen mini zeka küpü nasıl çalışır?",
+    "aciklama": "Bu küçük küp, elde çevrilince bambaşka davranıyor.\nKatmanlar birleşince minik bir mekanik oyun çıkıyor.\nDoktor Filament bugün iç düzeni açtı.\nYorumda bir sonraki baskıyı yaz.\n\n#3Dbaskı #3Dyazıcı #fidget #bulmaca #maker #doktorfilament #gurtechs3d"
+  },
+  "video": null,
+  "yayinlar": [],
+  "olcumler": [],
+  "ogrenildi": false,
+  "paket": {
+    "tur": "reels",
+    "toplam_sn": 29,
+    "sahneler": [
+      {
+        "no": 1,
+        "sure_sn": 5,
+        "gorsel": "Doktor Filament atölyede dönen mini küp bulmacayı elinde tutuyor, yakın plan, yumuşak mor-pembe ışık, arka planda bulanık 3D yazıcılar ve filament makaraları.",
+        "ekran_yazisi": "Bu küçük küp, içte iki işi birden çeviriyor.",
+        "seslendirme": "Merhaba, ben Doktor Filament! Yapay zekâyım, tek hastalığım katman katman merak!",
+        "prompt": "Doctor Filament in a tidy 3D printing workshop holds a small rotating cube puzzle close to camera, soft purple and pink lighting, blurred printers and filament spools in the background, cinematic close-up. Doctor Filament: a fictional, eccentric but friendly inventor character, photorealistic, wearing a gray 3D-printed horned headpiece with visible layer lines, round gray 3D-printed glasses frames, a high-collared gray jacket with colorful wires and small circuit-board details, colorful headphones around his neck and small gold earrings, warm smile, expressive eyes, in a tidy 3D printing workshop with colorful filament spools and printers with soft purple and pink lighting blurred in the background. Vertical 9:16 short-form video, smooth natural motion, no on-screen text, no readable text or letters on clothing or objects, no logos, no watermark.",
+        "karakter": true
+      },
+      {
+        "no": 2,
+        "sure_sn": 5,
+        "gorsel": "Küçük küpün dış çerçevesi ve yuvarlak dönen iç parçaları yakın planda gösteriliyor, sade bir masa üstünde.",
+        "ekran_yazisi": "Önce dış çerçeve oturur.",
+        "seslendirme": "Önce dış çerçeve geliyor. Sonra iç halkalar yerleşiyor.",
+        "prompt": "Close-up of a 3D printed cube puzzle outer frame and inner rotating rings on a clean tabletop, slow mechanical motion, soft studio lighting. Vertical 9:16 short-form video, smooth natural motion, no on-screen text, no readable text or letters on clothing or objects, no logos, no watermark.",
+        "karakter": false
+      },
+      {
+        "no": 3,
+        "sure_sn": 5,
+        "gorsel": "Ayrık baskı parçaları havada hizalanmış gibi gösteriliyor, katman çizgileri belirgin, montaj öncesi düzenli görünüm.",
+        "ekran_yazisi": "İç halkalar ayrı parçadır.",
+        "seslendirme": "İç halkalar ayrı basılır. Sonra aynı gövdeye geçer.",
+        "prompt": "Exploded view of the cube puzzle parts aligned in midair, visible layer lines, clean assembly layout, technical product showcase lighting. Vertical 9:16 short-form video, smooth natural motion, no on-screen text, no readable text or letters on clothing or objects, no logos, no watermark.",
+        "karakter": false
+      },
+      {
+        "no": 4,
+        "sure_sn": 5,
+        "gorsel": "Bir el küpü çeviriyor, iç halkalar farklı yöne dönüyor, mekanizma tatmin edici şekilde hareket ediyor.",
+        "ekran_yazisi": "Bir çevirme, içi hareketlendirir.",
+        "seslendirme": "Bir yüzü çevirince içerideki düzen değişir.",
+        "prompt": "A hand rotates the 3D printed cube puzzle, inner rings turning in different directions, satisfying mechanical motion, close-up on tabletop. Vertical 9:16 short-form video, smooth natural motion, no on-screen text, no readable text or letters on clothing or objects, no logos, no watermark.",
+        "karakter": false
+      },
+      {
+        "no": 5,
+        "sure_sn": 5,
+        "gorsel": "Küpün tamamlanmış hali masada dönüyor, arka planda mor ışık ve bulanık atölye detayları var.",
+        "ekran_yazisi": "Küçük, ama elde uzun kalır.",
+        "seslendirme": "Masada küçük durur. Elde merak uzar.",
+        "prompt": "Finished 3D printed rotating cube puzzle spinning gently on a table, blurred workshop background, soft purple and pink ambient light. Vertical 9:16 short-form video, smooth natural motion, no on-screen text, no readable text or letters on clothing or objects, no logos, no watermark.",
+        "karakter": false
+      },
+      {
+        "no": 6,
+        "sure_sn": 4,
+        "gorsel": "Doktor Filament kameraya dönmüş, elinde küpü tutuyor, sıcak gülümseme ile kapanış yapıyor.",
+        "ekran_yazisi": "Sıradaki baskı ne olsun?",
+        "seslendirme": "Sıradaki baskı ne olsun? Yorumlara yaz, reçeteyi ben yazayım!",
+        "prompt": "Doctor Filament in the workshop faces camera with the finished cube puzzle in hand, warm smile, soft purple and pink lighting, blurred printers and filament spools behind. Doctor Filament: a fictional, eccentric but friendly inventor character, photorealistic, wearing a gray 3D-printed horned headpiece with visible layer lines, round gray 3D-printed glasses frames, a high-collared gray jacket with colorful wires and small circuit-board details, colorful headphones around his neck and small gold earrings, warm smile, expressive eyes, in a tidy 3D printing workshop with colorful filament spools and printers with soft purple and pink lighting blurred in the background. Vertical 9:16 short-form video, smooth natural motion, no on-screen text, no readable text or letters on clothing or objects, no logos, no watermark.",
+        "karakter": true
+      }
+    ],
+    "uyarilar": [],
+    "notlar": [
+      "Sahne 1: konuşma (11 kelime) 4 sn'ye sığmıyordu, süre 5 sn'ye çıkarıldı."
+    ]
+  },
+  "model_notu": "CC0 veya CC BY lisanslı basit bir rotating cube puzzle, twisty cube, interlocking ring cube ya da kendi çizilebilecek dış çerçeve + dönen halka geometrisi aranmalı; marka, logo ve ticari olmayan lisanslı model kullanılmamalı."
+}

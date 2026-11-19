@@ -1,0 +1,72 @@
+{
+  "konu": "Dönen mini zeka küpü bulmacası",
+  "format": "reels",
+  "seri": "Doktor Notu",
+  "kanca": "Bu küçük küp, içte iki işi birden çeviriyor.",
+  "slaytlar": [],
+  "sure_sn": 24,
+  "sahneler": [
+    {
+      "sure_sn": 4,
+      "gorsel": "Doktor Filament atölyede dönen mini küp bulmacayı elinde tutuyor, yakın plan, yumuşak mor-pembe ışık, arka planda bulanık 3D yazıcılar ve filament makaraları.",
+      "ekran_yazisi": "Bu küçük küp, içte iki işi birden çeviriyor.",
+      "seslendirme": "Merhaba, ben Doktor Filament! Yapay zekâyım, tek hastalığım katman katman merak!",
+      "karakter_gorunur": true,
+      "sahne_promptu": "Doctor Filament in a tidy 3D printing workshop holds a small rotating cube puzzle close to camera, soft purple and pink lighting, blurred printers and filament spools in the background, cinematic close-up."
+    },
+    {
+      "sure_sn": 5,
+      "gorsel": "Küçük küpün dış çerçevesi ve yuvarlak dönen iç parçaları yakın planda gösteriliyor, sade bir masa üstünde.",
+      "ekran_yazisi": "Önce dış çerçeve oturur.",
+      "seslendirme": "Önce dış çerçeve geliyor. Sonra iç halkalar yerleşiyor.",
+      "karakter_gorunur": false,
+      "sahne_promptu": "Close-up of a 3D printed cube puzzle outer frame and inner rotating rings on a clean tabletop, slow mechanical motion, soft studio lighting."
+    },
+    {
+      "sure_sn": 5,
+      "gorsel": "Ayrık baskı parçaları havada hizalanmış gibi gösteriliyor, katman çizgileri belirgin, montaj öncesi düzenli görünüm.",
+      "ekran_yazisi": "İç halkalar ayrı parçadır.",
+      "seslendirme": "İç halkalar ayrı basılır. Sonra aynı gövdeye geçer.",
+      "karakter_gorunur": false,
+      "sahne_promptu": "Exploded view of the cube puzzle parts aligned in midair, visible layer lines, clean assembly layout, technical product showcase lighting."
+    },
+    {
+      "sure_sn": 5,
+      "gorsel": "Bir el küpü çeviriyor, iç halkalar farklı yöne dönüyor, mekanizma tatmin edici şekilde hareket ediyor.",
+      "ekran_yazisi": "Bir çevirme, içi hareketlendirir.",
+      "seslendirme": "Bir yüzü çevirince içerideki düzen değişir.",
+      "karakter_gorunur": false,
+      "sahne_promptu": "A hand rotates the 3D printed cube puzzle, inner rings turning in different directions, satisfying mechanical motion, close-up on tabletop."
+    },
+    {
+      "sure_sn": 5,
+      "gorsel": "Küpün tamamlanmış hali masada dönüyor, arka planda mor ışık ve bulanık atölye detayları var.",
+      "ekran_yazisi": "Küçük, ama elde uzun kalır.",
+      "seslendirme": "Masada küçük durur. Elde merak uzar.",
+      "karakter_gorunur": false,
+      "sahne_promptu": "Finished 3D printed rotating cube puzzle spinning gently on a table, blurred workshop background, soft purple and pink ambient light."
+    },
+    {
+      "sure_sn": 4,
+      "gorsel": "Doktor Filament kameraya dönmüş, elinde küpü tutuyor, sıcak gülümseme ile kapanış yapıyor.",
+      "ekran_yazisi": "Sıradaki baskı ne olsun?",
+      "seslendirme": "Sıradaki baskı ne olsun? Yorumlara yaz, reçeteyi ben yazayım!",
+      "karakter_gorunur": true,
+      "sahne_promptu": "Doctor Filament in the workshop faces camera with the finished cube puzzle in hand, warm smile, soft purple and pink lighting, blurred printers and filament spools behind."
+    }
+  ],
+  "instagram_caption": "Bu küçük küp, elde çevrilince bambaşka davranıyor.\nKatmanlar birleşince minik bir mekanik oyun çıkıyor.\nDoktor Filament bugün iç düzeni açtı.\nYorumda bir sonraki baskıyı yaz.",
+  "youtube_baslik": "Dönen mini zeka küpü nasıl çalışır?",
+  "youtube_aciklama": "Bu videoda küçük bir 3D baskı bulmacasının nasıl katman katman kurulduğunu gösteriyorum. Doktor Filament ile dönen parçaların sade ama merak uyandıran yapısına bakalım.",
+  "facebook_caption": "Bir küp, ama tek işi dönmek değil.\nKatmanlar birleşince küçük bir bulmaca doğuyor.\nBir sonraki baskı fikrini yorumda bırak.",
+  "hashtagler": [
+    "#3Dbaskı",
+    "#3Dyazıcı",
+    "#fidget",
+    "#bulmaca",
+    "#maker",
+    "#doktorfilament",
+    "#gurtechs3d"
+  ],
+  "model_notu": "CC0 veya CC BY lisanslı basit bir rotating cube puzzle, twisty cube, interlocking ring cube ya da kendi çizilebilecek dış çerçeve + dönen halka geometrisi aranmalı; marka, logo ve ticari olmayan lisanslı model kullanılmamalı."
+}

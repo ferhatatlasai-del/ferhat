@@ -1,0 +1,64 @@
+{
+  "oneriler": [
+    {
+      "ajan": "hikaye",
+      "baslik": "referanssız üretimi durdur",
+      "ders": "Referans görsel yoksa üretimi başlatma.",
+      "kanit": "21 denetimde 1 kez referans yok kaydı var.",
+      "onem": 1,
+      "id": "o20261119-1",
+      "tarih": "2026-11-19T06:40:00Z",
+      "durum": "onayli"
+    },
+    {
+      "ajan": "hikaye",
+      "baslik": "logo ve marka yazısını temizle",
+      "ders": "Görselde marka yazısı ya da logo görünürse üretimi reddet.",
+      "kanit": "En sık sorunlardan 2'si marka/logoya bağlı.",
+      "onem": 1,
+      "id": "o20261119-2",
+      "tarih": "2026-11-19T06:40:00Z",
+      "durum": "onayli"
+    },
+    {
+      "ajan": "trend",
+      "baslik": "tek kategoriye yüklenme",
+      "ders": "Aynı kategoriye art arda konu çıkarma.",
+      "kanit": "12 öneri içinde en çok kategori sadece 1 kez geçti.",
+      "onem": 1,
+      "id": "o20261119-3",
+      "tarih": "2026-11-19T06:40:00Z",
+      "durum": "onayli"
+    },
+    {
+      "ajan": "hikaye",
+      "baslik": "Referans görseli zorunlu kıl",
+      "ders": "Referanssız üretimi durdur.",
+      "kanit": "21 denetimin 1'i referans yok; 17 içerik referanslı.",
+      "onem": 1,
+      "id": "o20261119-4",
+      "tarih": "2026-11-19T19:40:46Z",
+      "durum": "onayli"
+    },
+    {
+      "ajan": "hikaye",
+      "baslik": "Marka öğelerini temizle",
+      "ders": "Referans görselde marka ve logo görünüyorsa üretimi el.</nodes>",
+      "kanit": "6 denetim sorunu marka ya da logo içeren referanslara bağlı.",
+      "onem": 2,
+      "id": "o20261119-5",
+      "tarih": "2026-11-19T19:40:46Z",
+      "durum": "onayli"
+    },
+    {
+      "ajan": "trend",
+      "baslik": "Kategori çeşitliliğini artır",
+      "ders": "Araç ve bisiklet dışındaki kategorileri öncele.",
+      "kanit": "11 önerinin 2'si araç/bisiklet; en yoğun kategori bu.",
+      "onem": 3,
+      "id": "o20261119-6",
+      "tarih": "2026-11-19T19:40:46Z",
+      "durum": "reddedildi"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "aktif": true,
   "mod": "otomatik",
-  "gunluk_sayi": 10,
+  "gunluk_sayi": 12,
   "baslangic_saat": 10,
   "bitis_saat": 20,
   "gunler": [

@@ -1,68 +1,208 @@
 {
-  "tarih": "2026-11-18T11:04:18Z",
+  "tarih": "2026-11-19T19:40:39Z",
   "gun": 7,
   "hikaye": {
-    "olusturulan": 8,
+    "olusturulan": 22,
     "durumlar": {
-      "yayinda": 5,
-      "planli": 3
+      "yayinda": 16,
+      "planli": 6
     },
     "kaynaklar": {
-      "uretim": 6,
-      "video": 1,
-      "foto": 1
+      "foto": 1,
+      "uretim": 18,
+      "yayin": 2,
+      "video": 1
     },
-    "ort_kontrol_puani": 8.83,
-    "ort_deneme": 1.17,
-    "referansli": 6,
+    "ort_kontrol_puani": 8.89,
+    "ort_deneme": 1.11,
+    "referansli": 17,
     "trend_kaynakli": 2,
-    "muzikli": 4,
+    "muzikli": 16,
     "yayin_gunluk": {
       "2026-11-17": 3,
-      "2026-11-18": 2
+      "2026-11-18": 6,
+      "2026-11-19": 7
     }
   },
   "olaylar": {
-    "olaylar": {},
-    "denetim_deneme": 0,
-    "denetim_gecen": 0,
-    "denetim_gecme_orani": null,
-    "en_sik_denetim_sorunlari": [],
+    "olaylar": {
+      "denetim": 21,
+      "uretildi": 16,
+      "referans_yok": 1
+    },
+    "denetim_deneme": 21,
+    "denetim_gecen": 16,
+    "denetim_gecme_orani": 0.76,
+    "en_sik_denetim_sorunlari": [
+      [
+        "referans görselde colgate marka yazısı ve logo var",
+        1
+      ],
+      [
+        "i̇kinci görselde marka/ürün ambalajı görünüyor",
+        1
+      ],
+      [
+        "ön görselde nesne tek başına, arka plan daha temiz ve stilize",
+        1
+      ],
+      [
+        "referansta colgate marka tüp görünüyor, logo/marka var",
+        1
+      ],
+      [
+        "üretim görseli referansla uyumlu genel formda",
+        1
+      ],
+      [
+        "hikaye görseli temsili, ancak referans fotoğrafındaki tüp detayı doğrudan göster",
+        1
+      ]
+    ],
     "elenen_lisanslar": {},
-    "referans_sorunlari": {},
+    "referans_sorunlari": {
+      "uygun değil": 1
+    },
     "gorsel_hatalari": 0
   },
   "elenenler": {
-    "uretildi": 10,
-    "atlandi": 11,
+    "uretildi": 26,
+    "atlandi": 13,
     "lisans_uygun_degil": 16
   },
   "harcama": {
     "gunluk_gorsel": {
       "2026-11-17": 6,
-      "2026-11-18": 12
+      "2026-11-18": 20,
+      "2026-11-19": 13
     },
-    "bu_ay": 18,
-    "son_7_gun_toplam": 18
+    "bu_ay": 39,
+    "son_7_gun_toplam": 39
   },
   "zincir": {
-    "kayit": 6,
+    "kayit": 10,
     "formatlar": {
-      "reels": 5,
-      "carousel": 1
+      "carousel": 1,
+      "reels": 9
     },
-    "ort_elestiri_puani": 6.25,
+    "ort_elestiri_puani": 6.0,
     "tekrarlanan_konu_sayisi": 0
   },
   "trend": {
-    "tarih": "2026-11-16T21:45:29Z",
-    "oneri": 7,
-    "dogrulanan": 7,
-    "kategori_sayisi": 1,
+    "tarih": "2026-11-19T12:02:48Z",
+    "oneri": 11,
+    "dogrulanan": 11,
+    "kategori_sayisi": 8,
     "en_cok_kategori": [
-      "yok",
-      7
+      "araç/bisiklet",
+      2
     ]
   },
-  "calismalar": null
+  "calismalar": {
+    "Akademi ajanı (haftalık rapor ve ders önerileri)": {
+      "calisma": 2,
+      "basarisiz": 0,
+      "iptal": 0,
+      "zamanlayici": 0,
+      "elle": 2
+    },
+    "Hikaye ajanı (yayınla)": {
+      "calisma": 43,
+      "basarisiz": 3,
+      "iptal": 1,
+      "zamanlayici": 4,
+      "elle": 39
+    },
+    "İstatistikçi ajan (izlenme raporu ve bildirim)": {
+      "calisma": 19,
+      "basarisiz": 0,
+      "iptal": 0,
+      "zamanlayici": 0,
+      "elle": 19
+    },
+    "Günlük içerik taslağı": {
+      "calisma": 16,
+      "basarisiz": 0,
+      "iptal": 0,
+      "zamanlayici": 5,
+      "elle": 11
+    },
+    "Hikaye ajanı (yapay zekâ görseli üret)": {
+      "calisma": 25,
+      "basarisiz": 1,
+      "iptal": 1,
+      "zamanlayici": 2,
+      "elle": 23
+    },
+    "Nöbetçi (anahtar ve servis sağlığı)": {
+      "calisma": 7,
+      "basarisiz": 7,
+      "iptal": 0,
+      "zamanlayici": 2,
+      "elle": 5
+    },
+    "Trend ajanı": {
+      "calisma": 3,
+      "basarisiz": 0,
+      "iptal": 0,
+      "zamanlayici": 1,
+      "elle": 2
+    },
+    "YouTube'a yükle (Shorts)": {
+      "calisma": 8,
+      "basarisiz": 1,
+      "iptal": 0,
+      "zamanlayici": 0,
+      "elle": 8
+    },
+    "Instagram'a yayınla (Reels)": {
+      "calisma": 7,
+      "basarisiz": 0,
+      "iptal": 0,
+      "zamanlayici": 0,
+      "elle": 7
+    },
+    "İçerik zinciri": {
+      "calisma": 5,
+      "basarisiz": 0,
+      "iptal": 0,
+      "zamanlayici": 0,
+      "elle": 5
+    },
+    "Ajan Ofisi'ni Fly'a yükle": {
+      "calisma": 4,
+      "basarisiz": 0,
+      "iptal": 0,
+      "zamanlayici": 0,
+      "elle": 4
+    },
+    "Shorts / Reels üretici (taslak hazırla, yayınlamaz)": {
+      "calisma": 1,
+      "basarisiz": 0,
+      "iptal": 0,
+      "zamanlayici": 0,
+      "elle": 1
+    },
+    "Hikaye ajanı (belirli saatte yayınla)": {
+      "calisma": 1,
+      "basarisiz": 0,
+      "iptal": 0,
+      "zamanlayici": 0,
+      "elle": 1
+    },
+    "Printables servis teşhisi (ücretsiz)": {
+      "calisma": 3,
+      "basarisiz": 0,
+      "iptal": 0,
+      "zamanlayici": 0,
+      "elle": 3
+    },
+    "İçerik ajanı (direktifle)": {
+      "calisma": 2,
+      "basarisiz": 0,
+      "iptal": 0,
+      "zamanlayici": 0,
+      "elle": 2
+    }
+  }
 }

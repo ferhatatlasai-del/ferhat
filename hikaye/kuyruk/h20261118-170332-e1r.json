@@ -1,7 +1,7 @@
 {
   "id": "h20261118-170332-e1r",
   "kaynak": "uretim",
-  "durum": "planli",
+  "durum": "yayinda",
   "olusturma": "2026-11-18T17:03:32.000Z",
   "gorsel": "hikaye/gorseller/h20261118-170332-e1r.mp4",
   "baslik": "Gridfinity Modular Drawer System",
@@ -20,7 +20,11 @@
     "deneme": 1,
     "sorunlar": []
   },
-  "yayin": null,
+  "yayin": {
+    "tarih": "2026-11-19T13:08:49Z",
+    "medya_kimligi": "18127512928899352",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4033860719027722856"
+  },
   "hata": "",
   "deneme": 0,
   "tur": "video",
