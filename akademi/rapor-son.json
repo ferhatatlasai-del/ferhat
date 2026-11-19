@@ -1,27 +1,27 @@
 {
-  "tarih": "2026-11-19T06:39:53Z",
+  "tarih": "2026-11-19T19:40:39Z",
   "gun": 7,
   "hikaye": {
-    "olusturulan": 23,
+    "olusturulan": 22,
     "durumlar": {
-      "planli": 12,
-      "yayinda": 11
+      "yayinda": 16,
+      "planli": 6
     },
     "kaynaklar": {
-      "uretim": 20,
       "foto": 1,
-      "video": 1,
-      "yayin": 1
+      "uretim": 18,
+      "yayin": 2,
+      "video": 1
     },
-    "ort_kontrol_puani": 8.9,
-    "ort_deneme": 1.1,
-    "referansli": 19,
+    "ort_kontrol_puani": 8.89,
+    "ort_deneme": 1.11,
+    "referansli": 17,
     "trend_kaynakli": 2,
-    "muzikli": 18,
+    "muzikli": 16,
     "yayin_gunluk": {
       "2026-11-17": 3,
       "2026-11-18": 6,
-      "2026-11-19": 2
+      "2026-11-19": 7
     }
   },
   "olaylar": {
@@ -80,59 +80,94 @@
     "son_7_gun_toplam": 39
   },
   "zincir": {
-    "kayit": 8,
+    "kayit": 10,
     "formatlar": {
       "carousel": 1,
-      "reels": 7
+      "reels": 9
     },
-    "ort_elestiri_puani": 6.25,
+    "ort_elestiri_puani": 6.0,
     "tekrarlanan_konu_sayisi": 0
   },
   "trend": {
-    "tarih": "2026-11-19T03:30:46Z",
-    "oneri": 12,
-    "dogrulanan": 12,
-    "kategori_sayisi": 12,
+    "tarih": "2026-11-19T12:02:48Z",
+    "oneri": 11,
+    "dogrulanan": 11,
+    "kategori_sayisi": 8,
     "en_cok_kategori": [
-      "bahçe/balkon",
-      1
+      "araç/bisiklet",
+      2
     ]
   },
   "calismalar": {
     "Akademi ajanı (haftalık rapor ve ders önerileri)": {
-      "calisma": 1,
-      "basarisiz": 0,
-      "iptal": 0,
-      "zamanlayici": 0,
-      "elle": 1
-    },
-    "Hikaye ajanı (yayınla)": {
-      "calisma": 27,
-      "basarisiz": 2,
-      "iptal": 0,
-      "zamanlayici": 3,
-      "elle": 24
-    },
-    "İstatistikçi ajan (izlenme raporu ve bildirim)": {
-      "calisma": 15,
-      "basarisiz": 0,
-      "iptal": 0,
-      "zamanlayici": 0,
-      "elle": 15
-    },
-    "Hikaye ajanı (yapay zekâ görseli üret)": {
-      "calisma": 24,
-      "basarisiz": 1,
-      "iptal": 1,
-      "zamanlayici": 1,
-      "elle": 23
-    },
-    "Trend ajanı": {
       "calisma": 2,
       "basarisiz": 0,
       "iptal": 0,
       "zamanlayici": 0,
       "elle": 2
+    },
+    "Hikaye ajanı (yayınla)": {
+      "calisma": 43,
+      "basarisiz": 3,
+      "iptal": 1,
+      "zamanlayici": 4,
+      "elle": 39
+    },
+    "İstatistikçi ajan (izlenme raporu ve bildirim)": {
+      "calisma": 19,
+      "basarisiz": 0,
+      "iptal": 0,
+      "zamanlayici": 0,
+      "elle": 19
+    },
+    "Günlük içerik taslağı": {
+      "calisma": 16,
+      "basarisiz": 0,
+      "iptal": 0,
+      "zamanlayici": 5,
+      "elle": 11
+    },
+    "Hikaye ajanı (yapay zekâ görseli üret)": {
+      "calisma": 25,
+      "basarisiz": 1,
+      "iptal": 1,
+      "zamanlayici": 2,
+      "elle": 23
+    },
+    "Nöbetçi (anahtar ve servis sağlığı)": {
+      "calisma": 7,
+      "basarisiz": 7,
+      "iptal": 0,
+      "zamanlayici": 2,
+      "elle": 5
+    },
+    "Trend ajanı": {
+      "calisma": 3,
+      "basarisiz": 0,
+      "iptal": 0,
+      "zamanlayici": 1,
+      "elle": 2
+    },
+    "YouTube'a yükle (Shorts)": {
+      "calisma": 8,
+      "basarisiz": 1,
+      "iptal": 0,
+      "zamanlayici": 0,
+      "elle": 8
+    },
+    "Instagram'a yayınla (Reels)": {
+      "calisma": 7,
+      "basarisiz": 0,
+      "iptal": 0,
+      "zamanlayici": 0,
+      "elle": 7
+    },
+    "İçerik zinciri": {
+      "calisma": 5,
+      "basarisiz": 0,
+      "iptal": 0,
+      "zamanlayici": 0,
+      "elle": 5
     },
     "Ajan Ofisi'ni Fly'a yükle": {
       "calisma": 4,
@@ -140,34 +175,6 @@
       "iptal": 0,
       "zamanlayici": 0,
       "elle": 4
-    },
-    "Nöbetçi (anahtar ve servis sağlığı)": {
-      "calisma": 6,
-      "basarisiz": 6,
-      "iptal": 0,
-      "zamanlayici": 1,
-      "elle": 5
-    },
-    "YouTube'a yükle (Shorts)": {
-      "calisma": 6,
-      "basarisiz": 1,
-      "iptal": 0,
-      "zamanlayici": 0,
-      "elle": 6
-    },
-    "Instagram'a yayınla (Reels)": {
-      "calisma": 5,
-      "basarisiz": 0,
-      "iptal": 0,
-      "zamanlayici": 0,
-      "elle": 5
-    },
-    "Günlük içerik taslağı": {
-      "calisma": 15,
-      "basarisiz": 0,
-      "iptal": 0,
-      "zamanlayici": 4,
-      "elle": 11
     },
     "Shorts / Reels üretici (taslak hazırla, yayınlamaz)": {
       "calisma": 1,
@@ -189,13 +196,6 @@
       "iptal": 0,
       "zamanlayici": 0,
       "elle": 3
-    },
-    "İçerik zinciri": {
-      "calisma": 4,
-      "basarisiz": 0,
-      "iptal": 0,
-      "zamanlayici": 0,
-      "elle": 4
     },
     "İçerik ajanı (direktifle)": {
       "calisma": 2,
