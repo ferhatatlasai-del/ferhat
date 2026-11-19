@@ -1,6 +1,6 @@
 {
- "tarih": "2026-11-19T06:00:17Z",
- "tr_saat": "19.11.2026 09:00",
+ "tarih": "2026-11-19T09:00:22Z",
+ "tr_saat": "19.11.2026 12:00",
  "toplam": {
   "reels": 0,
   "gonderi": 0,
@@ -219,6 +219,14 @@
  "hikaye_izin": false,
  "hikayeler": [
   {
+   "id": "18359945398169882",
+   "tarih": "2026-11-19T06:38:30Z",
+   "baslik": "Realistic Skull Candy Bowl | Halloween Skull Decoration",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
    "id": "17872622289660510",
    "tarih": "2026-11-18T21:23:54Z",
    "baslik": "GURTECH 3D",
@@ -310,7 +318,7 @@
   "YouTube okunamadı"
  ],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 09:00",
+  "baslik": "📊 İzlenme raporu 12:00",
   "govde": "Toplam 0 (eksik veri) · Reels ? · Short ? · Hikaye ? · Takipçi 417 · Instagram izlenme izni yok; YouTube okunamadı"
  }
 }
