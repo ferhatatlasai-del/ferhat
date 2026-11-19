@@ -791,9 +791,10 @@ async function zamTetikle(akis, girdi, ad) {
 async function zamKontrol() {
   if (ZAM_KAPALI || !TOKEN) return;
   const t = zamSimdiTR(), gun = t.toISOString().slice(0, 10), saat = t.getUTCHours(), dk = t.getUTCMinutes(), haftaGunu = t.getUTCDay();
-  // hikaye yayın kontrolü: 10:05-22:05, saat başı (kaçırıldıysa o saat içinde bir kez)
+  // hikaye yayın kontrolü: 10:05-22:35, yarım saatte bir (:05 ve :35; kaçırıldıysa o yarım saat içinde bir kez).
+  // Her kontrol en çok bir hikaye yayınlar; yarım saatlik kontrol, günde 12-20 hikayeye ulaşmayı mümkün kılar.
   if (saat >= 10 && saat <= 22 && dk >= 5) {
-    const anahtar = `y${gun}-${saat}`;
+    const anahtar = `y${gun}-${saat}-${dk >= 35 ? 'b' : 'a'}`;
     if (!zamYapilan.has(anahtar)) { zamYapilan.add(anahtar); await zamTetikle(AKIS_HIKAYE, {}, 'yayin'); }
   }
   // görsel üretimi: her gün 08:20'den sonra bir kez (pazar dahil)

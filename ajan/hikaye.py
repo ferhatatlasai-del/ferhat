@@ -117,8 +117,12 @@ def karar(ayar, ogeler, an, hemen=False, kimlik=None):
     if bugun:
         son = max(tr_zaman(o["yayin"]["tarih"]) for o in bugun)
         gecen = (yerel - son).total_seconds() / 60
-        if gecen < ayar["min_aralik_dk"]:
-            return False, f"son hikayeden {gecen:.0f} dk geçti, en az {ayar['min_aralik_dk']} dk gerekir", None
+        # Alt sınır slot aralığından büyük olamaz: yoksa kontrol saatindeki küçük gecikmeler bir sonraki slotu kaçırtır
+        # ve gün sonunda ayarlanan sayıya ulaşılamaz. Slot aralığının %60'ı ile ayardaki en düşük değer kullanılır.
+        slot_dk = (bit - bas) * 60 / n
+        alt_sinir = min(float(ayar["min_aralik_dk"]), 0.6 * slot_dk)
+        if gecen < alt_sinir:
+            return False, f"son hikayeden {gecen:.0f} dk geçti, en az {alt_sinir:.0f} dk gerekir", None
     if not sirada:
         return False, "kuyrukta planlı hikaye yok (kuyruk boş)", None
     return True, f"slot {gelen}/{n} geldi, {len(bugun)} yayınlandı", sirada[0]
