@@ -1,7 +1,7 @@
 {
   "aktif": true,
   "mod": "otomatik",
-  "gunluk_uretim": 12,
+  "gunluk_uretim": 8,
   "gunluk_gorsel_siniri": 20,
   "aylik_gorsel_siniri": 240,
   "kalite": "low",
