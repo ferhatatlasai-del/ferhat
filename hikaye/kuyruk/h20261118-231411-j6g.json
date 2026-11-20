@@ -1,7 +1,7 @@
 {
   "id": "h20261118-231411-j6g",
   "kaynak": "uretim",
-  "durum": "planli",
+  "durum": "yayinlaniyor",
   "olusturma": "2026-11-18T23:14:11.000Z",
   "gorsel": "hikaye/gorseller/h20261118-231411-j6g.mp4",
   "baslik": "Build Tray — Modular Organizer for Assembly, Disassembly and Maintenance",
@@ -22,7 +22,9 @@
       "Belirgin bir sorun görünmüyor"
     ]
   },
-  "yayin": null,
+  "yayin": {
+    "tarih": "2026-11-20T10:35:57Z"
+  },
   "hata": "",
   "deneme": 0,
   "tur": "video",
