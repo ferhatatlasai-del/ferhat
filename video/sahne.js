@@ -59,6 +59,39 @@ function tozGuncelle(p, t) {
 }
 function onaylaPil(g, ok) { return ok; }
 
+
+function ortamHaritasi() {   // stüdyo ışığı gibi: gradyan + yumuşak ışık kutuları → parlak yüzeylerde gerçekçi yansıma
+  const c = document.createElement('canvas'); c.width = 512; c.height = 256; const x = c.getContext('2d');
+  const g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, '#41588f'); g.addColorStop(.5, '#1b2744'); g.addColorStop(1, '#0a0f1e'); x.fillStyle = g; x.fillRect(0, 0, 512, 256);
+  [[90, 60, 120, 40, '#ffffff'], [330, 50, 90, 30, '#ffd9b0'], [450, 100, 60, 60, '#7fe8ff'], [200, 120, 70, 24, '#ff9a4d']].forEach(a => { x.fillStyle = a[4]; x.filter = 'blur(10px)'; x.fillRect(a[0], a[1], a[2], a[3]); });
+  const t = new T.CanvasTexture(c); t.mapping = T.EquirectangularReflectionMapping;
+  const pm = new T.PMREMGenerator(renderer); const e = pm.fromEquirectangular(t).texture; pm.dispose(); return e;
+}
+function havuzTex(renk) { const c = document.createElement('canvas'); c.width = c.height = 256; const x = c.getContext('2d'); const g = x.createRadialGradient(128, 128, 0, 128, 128, 128); g.addColorStop(0, renk); g.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = g; x.fillRect(0, 0, 256, 256); return new T.CanvasTexture(c); }
+function zeminIsigi(g, r, renk) {   // nesnenin altında zemine yayılan renkli ışık havuzu
+  const m = new T.Mesh(new T.CircleGeometry(r, 48), new T.MeshBasicMaterial({ map: havuzTex(renk || 'rgba(255,122,26,.55)'), transparent: true, blending: T.AdditiveBlending, depthWrite: false }));
+  m.rotation.x = -Math.PI / 2; m.position.y = -1.49; g.add(m); return m;
+}
+function bokeh(g, tohum) {   // arka planda yumuşak, yavaş kayan ışık küreleri (derinlik hissi)
+  const R = rng(tohum || 5), liste = [];
+  for (let i = 0; i < 16; i++) { const renk = [0x22d3ee, 0xff7a1a, 0x7c5cff, 0xff4d8d][i % 4], s = parilti(renk, 3 + R() * 7, .1 + R() * .12); s.userData = { x: (R() - .5) * 46, y: 1 + R() * 14, z: -10 - R() * 26, v: .1 + R() * .25, f: R() * 6 }; g.add(s); liste.push(s); }
+  return liste;
+}
+function bokehGuncelle(liste, t) { liste.forEach(s => { const u = s.userData; s.position.set(u.x + Math.sin(t * u.v + u.f) * 1.5, u.y + Math.cos(t * u.v * .8 + u.f) * 1.2, u.z); }); }
+function yaziciArka(g, x, z) {   // arka planda ayrıntılı yazıcı gövdesi: alüminyum profiller, üst kiriş, makara, ekran
+  const a = new T.Group(), alu = { metalness: .9, roughness: .3 };
+  [-5.2, 5.2].forEach(px => { const d = kutu(.7, 13, .7, 0x98a6c4, alu); d.position.set(px, 5, 0); a.add(d); for (let i = 0; i < 9; i++) { const g1 = kutu(.74, .05, .74, 0x1b2236); g1.position.set(px, -1 + i * 1.4, 0); a.add(g1); } });
+  const kiris = kutu(11.4, .8, .9, 0x98a6c4, alu); kiris.position.y = 11.6; a.add(kiris);
+  const ray = kutu(10.2, .35, .35, 0x2a3350, { metalness: .8, roughness: .4 }); ray.position.set(0, 7.6, .2); a.add(ray);
+  const tas = kutu(1.7, 1.1, 1.3, 0xff7a1a, { metalness: .3, roughness: .45 }); tas.position.set(-1.2, 7.6, .8); a.add(tas);
+  const mk = new T.Group(); const kasnak = silin(2.6, 2.6, .35, 0x20283f, 40, { metalness: .6 }); kasnak.rotation.x = Math.PI / 2; mk.add(kasnak);
+  const sarim = silin(2.2, 2.2, .9, 0xff7a1a, 40, { flatShading: false, roughness: .4, emissive: 0x6a2800, emissiveIntensity: .35 }); sarim.rotation.x = Math.PI / 2; mk.add(sarim);
+  const kb = silin(.7, .7, 1.0, 0x0e1424, 24); kb.rotation.x = Math.PI / 2; mk.add(kb); mk.position.set(7.6, 9.6, .5); mk.userData.don = true; a.add(mk); a.userData.makara = mk;
+  const kutuE = kutu(3.2, 2.2, 1.4, 0x141b2e, { metalness: .5 }); kutuE.position.set(-7.6, 1.3, .6); a.add(kutuE);
+  const ekran = kutu(2.4, 1.3, .06, 0x22d3ee, { emissive: 0x22d3ee, emissiveIntensity: .9, roughness: .2 }); ekran.position.set(-7.6, 1.5, 1.33); a.add(ekran);
+  a.position.set(x || 0, -.6, z == null ? -9 : z); g.add(a); return a;
+}
+
 /* ---------- 2D metin ---------- */
 function yazi(s, x, y, boyut, o) {
   o = o || {};
@@ -379,21 +412,28 @@ window.hazirla = async function (plan, olcek) {
   glc = document.getElementById('gl'); c2 = document.getElementById('c2');
   renderer = new T.WebGLRenderer({ canvas: glc, antialias: true, preserveDrawingBuffer: true });
   renderer.setPixelRatio(1); renderer.setSize(W * OL, H * OL, false);
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap;
+  renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = .95;
   c2.width = W * OL; c2.height = H * OL; ctx = c2.getContext('2d');
   await document.fonts.load('800 80px IB'); await document.fonts.load('600 40px IS');
   GLOW = glowTex();
-  scene3 = new T.Scene(); scene3.background = new T.Color(RENK.bg); scene3.fog = new T.Fog(RENK.bg, 26, 80);
+  scene3 = new T.Scene(); scene3.background = new T.Color(RENK.bg); scene3.environment = ortamHaritasi(); scene3.fog = new T.Fog(RENK.bg, 26, 80);
   kam = new T.PerspectiveCamera(46, W / H, .1, 300);
   const zemin = new T.Mesh(new T.PlaneGeometry(OFS * (plan.sahneler.length + 4), 160), new T.MeshBasicMaterial({ map: gridTex() }));
   zemin.material.map.repeat.set(OFS * (plan.sahneler.length + 4) / 4, 40); zemin.rotation.x = -Math.PI / 2; zemin.position.set(OFS * plan.sahneler.length / 2, -1.52, 0); scene3.add(zemin);
-  scene3.add(new T.HemisphereLight(0xaec8ff, 0x1a1030, .5));
-  isiklar.k = new T.DirectionalLight(0xfff0dd, .8); scene3.add(isiklar.k, isiklar.k.target);
+  scene3.add(new T.HemisphereLight(0xaec8ff, 0x1a1030, .35));
+  isiklar.k = new T.DirectionalLight(0xfff0dd, 1.0); isiklar.k.castShadow = true; isiklar.k.shadow.mapSize.set(1536, 1536);
+  Object.assign(isiklar.k.shadow.camera, { left: -13, right: 13, top: 13, bottom: -13, near: 1, far: 70 }); isiklar.k.shadow.bias = -.0006; isiklar.k.shadow.radius = 3; scene3.add(isiklar.k, isiklar.k.target);
   isiklar.r = new T.PointLight(0x22d3ee, .6, 60); scene3.add(isiklar.r);
   isiklar.s = new T.PointLight(0xff7a1a, .35, 40); scene3.add(isiklar.s);
   sahneler = plan.sahneler.map((s, i) => {
     const g = new T.Group(); g.position.set(i * OFS, 0, 0); scene3.add(g);
     const yap = SAHNE[s.tip] || SAHNE.baski;
-    return Object.assign({ g, s }, yap(g, s.params || {}));
+    const n = Object.assign({ g, s }, yap(g, s.params || {}));
+    if (['baski', 'hiz', 'yapistirici', 'ozet', 'sicaklik', 'temizlik'].includes(s.tip)) n.yazici = yaziciArka(g, 0, -10);
+    n.bokeh = bokeh(g, 11 + i * 7); n.havuz = zeminIsigi(g, 12, s.tip === 'sicaklik' ? 'rgba(255,90,40,.5)' : s.tip === 'temizlik' ? 'rgba(34,211,238,.4)' : 'rgba(255,122,26,.5)');
+    g.traverse(m => { if (m.isMesh) { const mm = m.material; const seffaf = mm && (mm.transparent || mm.isMeshBasicMaterial); if (mm && mm.isMeshStandardMaterial) mm.envMapIntensity = .45; m.castShadow = !seffaf; m.receiveShadow = !seffaf; } });
+    return n;
   });
   return { sahne: sahneler.length };
 };
@@ -426,7 +466,7 @@ function ciz3(t) {
   kam.position.set(c[0] + Math.sin(t * 1.3) * .04, c[1] + Math.cos(t * 1.1) * .04, c[2]); kam.lookAt(c[3], c[4], c[5]); kam.rotation.z += sar2 * Math.sin(t * 40);
   isiklar.k.position.set(c[3] + 8, 14, c[5] + 8); isiklar.k.target.position.set(c[3], 0, c[5]);
   isiklar.r.position.set(c[3] - 8, 6, c[5] + 4); isiklar.s.position.set(c[3] + 3, 3, c[5] + 6);
-  sahneler.forEach((n, i) => { const d = n.s.t1 - n.s.t0, lt = clamp(t - n.s.t0, 0, d + 1), p = clamp((t - n.s.t0) / d); n.g.visible = Math.abs(i * OFS - c[3]) < OFS * 1.1; if (n.g.visible) n.upd(p, lt, d); });
+  sahneler.forEach((n, i) => { const d = n.s.t1 - n.s.t0, lt = clamp(t - n.s.t0, 0, d + 1), p = clamp((t - n.s.t0) / d); n.g.visible = Math.abs(i * OFS - c[3]) < OFS * 1.1; if (n.g.visible) { n.upd(p, lt, d); bokehGuncelle(n.bokeh, t); if (n.yazici) n.yazici.userData.makara.rotation.z = -t * .6; n.havuz.material.opacity = .85 + .15 * Math.sin(t * 2 + i); } });
   renderer.render(scene3, kam);
 }
 
@@ -464,12 +504,40 @@ function ekranYazilari(t) {
   const son = P.sure - t, bas = t; const kar = Math.max(1 - k01(bas, 0, .25), 1 - k01(son, 0, .5)); if (kar > 0) { ctx.fillStyle = `rgba(5,8,18,${kar.toFixed(3)})`; ctx.fillRect(0, 0, W, H); }
 }
 
+let BK1, BK2, BK0, BRT, BBUF;
+function parlama() {   // bloom: sahneyi küçük bir hedefe ayrıca çizer (ucuz), parlak bölgeyi süzüp bulanıklaştırır, üste "lighter" ile ekler
+  const w0 = Math.round(c2.width / 5), h0 = Math.round(c2.height / 5), w2 = Math.round(c2.width / 12), h2 = Math.round(c2.height / 12);
+  if (!BK1) {
+    BK0 = document.createElement('canvas'); BK1 = document.createElement('canvas'); BK2 = document.createElement('canvas');
+    BK0.width = BK1.width = w0; BK0.height = BK1.height = h0; BK2.width = w2; BK2.height = h2;
+    BRT = new T.WebGLRenderTarget(w0, h0); BBUF = new Uint8ClampedArray(w0 * h0 * 4);
+  }
+  const sg = renderer.shadowMap.enabled; renderer.shadowMap.autoUpdate = false;
+  renderer.setRenderTarget(BRT); renderer.render(scene3, kam); renderer.setRenderTarget(null); renderer.shadowMap.autoUpdate = true;
+  renderer.readRenderTargetPixels(BRT, 0, 0, w0, h0, new Uint8Array(BBUF.buffer));
+  const z = BK0.getContext('2d'), a = BK1.getContext('2d'), b = BK2.getContext('2d');
+  z.putImageData(new ImageData(BBUF, w0, h0), 0, 0);
+  a.save(); a.setTransform(1, 0, 0, -1, 0, h0); a.filter = 'brightness(.5) contrast(3.4) blur(2px)'; a.drawImage(BK0, 0, 0); a.restore();
+  b.filter = 'blur(2px)'; b.drawImage(BK1, 0, 0, w2, h2); b.filter = 'none';
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalCompositeOperation = 'lighter'; ctx.imageSmoothingQuality = 'high';
+  ctx.globalAlpha = .45; ctx.drawImage(BK2, 0, 0, c2.width, c2.height); ctx.restore();
+}
+function hud(t, s, lt, d) {   // nesne alanının köşe işaretleri (hareket tasarımı detayı)
+  const a = outCubic(k01(lt, .2, .7)) * (1 - k01(lt, d - .4, d - .1)) * .75, x0 = 70, x1 = W - 70, y0 = 420, y1 = 980, u = 64 + 6 * Math.sin(t * 3);
+  if (a <= 0.01) return;
+  ctx.save(); ctx.globalAlpha = a; ctx.strokeStyle = '#22d3ee'; ctx.lineWidth = 5; ctx.lineCap = 'round'; ctx.shadowColor = '#22d3ee'; ctx.shadowBlur = 14;
+  [[x0, y0, 1, 1], [x1, y0, -1, 1], [x0, y1, 1, -1], [x1, y1, -1, -1]].forEach(([x, y, dx, dy]) => { ctx.beginPath(); ctx.moveTo(x + dx * u, y); ctx.lineTo(x, y); ctx.lineTo(x, y + dy * u); ctx.stroke(); });
+  ctx.restore();
+}
 window.kare = function (t, kalite) {
   // geçiş penceresinde hareket bulanıklığı: 4 alt kare ortalaması
   let gecis = false; for (let k = 0; k < sahneler.length - 1; k++) if (Math.abs(t - sahneler[k].s.t1) < GECIS / 2) gecis = true;
   ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, c2.width, c2.height);
   const n = gecis ? 4 : 1;
   for (let k = 0; k < n; k++) { ciz3(Math.max(0, t - k * .011)); ctx.globalAlpha = 1 / (k + 1); ctx.drawImage(glc, 0, 0, c2.width, c2.height); }
-  ctx.globalAlpha = 1; ctx.setTransform(OL, 0, 0, OL, 0, 0); ekranYazilari(t);
-  return c2.toDataURL('image/jpeg', kalite || .9).slice(23);
+  ctx.globalAlpha = 1; parlama();
+  ctx.setTransform(OL, 0, 0, OL, 0, 0);
+  let i = sahneler.findIndex(x => t < x.s.t1); if (i < 0) i = sahneler.length - 1; const sc = sahneler[i].s; hud(t, sc, t - sc.t0, sc.t1 - sc.t0);
+  ekranYazilari(t);
+  return c2.toDataURL('image/jpeg', kalite || .92).slice(23);
 };
