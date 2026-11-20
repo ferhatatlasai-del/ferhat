@@ -1352,6 +1352,16 @@ istatistikCek(); setInterval(istatistikCek,300000);
 
 /* ---------- Hikaye üret ve sıraya koy (Hikaye sekmesi ve ofiste Hikaye ajanı) ---------- */
 var HKM={durum:'bos',mesaj:'',eklenen:0,aktif:false}, hkUretiyor=false;
+function sagKontrolleri(hk){
+  // Nöbetçi günde bir kez çalışır; kuyruk satırı bayat kalmasın diye o satırı anlık kuyruk ve ayardan yeniden hesaplarız.
+  var kon=((hk&&hk.saglik&&hk.saglik.kontroller)||[]).slice();
+  if(!hk||!hk.kuyruk||!hk.ayar) return kon;
+  var planli=hk.kuyruk.filter(function(o){return o.durum==='planli';}).length, n=hk.ayar.gunluk_sayi||4;
+  var y=(hk.ayar.aktif&&planli<n)?{ad:'Hikaye kuyruğu',durum:'sorun',not:'Hikaye kuyruğu azaldı ('+planli+' planlı hikaye kaldı, günlük '+n+'). Yeni hikaye üret.'}
+    :{ad:'Hikaye kuyruğu',durum:'iyi',not:'Kuyrukta '+planli+' planlı hikaye var (günlük '+n+').'};
+  var i=kon.findIndex(function(c){return c.ad==='Hikaye kuyruğu';}); if(i>=0) kon[i]=y; else kon.push(y);
+  return kon;
+}
 function hkSira(){ var k=(HK&&HK.kuyruk)||[]; return k.filter(function(o){return o.durum==='planli'||o.durum==='onay_bekliyor';}).length; }
 function hkUretDurum(t){ var e=$('#hUretNot'); if(e&&t) e.textContent=t; }
 async function hikayeUret(){
@@ -1763,7 +1773,7 @@ function hikayeCiz(v){
   if(!k.length) kap.appendChild(dom('p','not','Kuyruk boş. Yukarıdan fotoğraf ekle ya da yapay zekâ üretimini aç.'));
   // sağlık
   var s=$('#hSaglik'); s.textContent='';
-  if(v.saglik&&v.saglik.kontroller){ s.appendChild(dom('div','not','Son denetim: '+fmt(v.saglik.tarih))); v.saglik.kontroller.forEach(function(c){ var d=dom('div',c.durum); d.appendChild(document.createElement('i')); d.appendChild(document.createTextNode(c.ad+': '+c.not)); s.appendChild(d); }); }
+  if(v.saglik&&v.saglik.kontroller){ s.appendChild(dom('div','not','Son denetim: '+fmt(v.saglik.tarih)+' (kuyruk satırı anlıktır)')); sagKontrolleri(v).forEach(function(c){ var d=dom('div',c.durum); d.appendChild(document.createElement('i')); d.appendChild(document.createTextNode(c.ad+': '+c.not)); s.appendChild(d); }); }
   // ofisteki Hikaye ajanı masası
   var aj=BY.hikaye; if(aj){
     aj.durum=a.aktif?(aj.sonSonuc==='failure'?'hata':'calisiyor'):'hazir';
@@ -2070,7 +2080,7 @@ function bugunTR(){ return trGun(new Date().toISOString()); }
 function sayilar(){
   var hk=OZ.hk||{}, k=hk.kuyruk||[], a=hk.ayar||{}, u=hk.uretim||{}, bg=bugunTR();
   var yay=k.filter(function(o){return (o.durum==='yayinda'||o.durum==='yayinlaniyor')&&o.yayin&&o.yayin.tarih&&trGun(o.yayin.tarih)===bg;}).length;
-  var sag=(hk.saglik&&hk.saglik.kontroller)||[];
+  var sag=sagKontrolleri(hk);
   return {hk:hk,k:k,a:a,u:u,yay:yay,planli:k.filter(function(o){return o.durum==='planli';}).length,
     onay:k.filter(function(o){return o.durum==='onay_bekliyor';}).length, hata:k.filter(function(o){return o.durum==='hata';}).length,
     sagSorun:sag.filter(function(c){return c.durum==='sorun'||c.durum==='kt';}).length,
@@ -2124,7 +2134,7 @@ function ozetCiz(){
   sat(oh,'Yapay zekâ üretimi',s.u.aktif?('açık ('+(s.u.mod==='onay'?'onaylı':'otomatik')+(s.u.muzik!==false?', müzikli':'')+')'):'kapalı',s.u.aktif?'iyi':'');
   // sistem
   var os=$('#ozSistem'); os.textContent='';
-  var sag=(OZ.hk&&OZ.hk.saglik&&OZ.hk.saglik.kontroller)||[];
+  var sag=sagKontrolleri(OZ.hk);
   sat(os,'Servis sağlığı',sag.length?(s.sagSorun?(s.sagSorun+' sorun'):'sorun yok'):'denetim yok',s.sagSorun?'sorun':(sag.length?'iyi':''));
   var z=OZ.zam; sat(os,'Zamanlayıcı',z?(z.acik===false?'kapalı':'açık'):'okunuyor…',z&&z.acik===false?'sorun':(z?'iyi':''));
   if(z&&z.son&&z.son.yayin) sat(os,'Son yayın kontrolü',fmt(z.son.yayin));
