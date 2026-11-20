@@ -19,7 +19,8 @@ const CSS = { turuncu: '#ff7a1a', cyan: '#22d3ee', yesil: '#34d399', kirmizi: '#
 const FANLAR = [];
 let P, W, H, OL, renderer, scene3, kam, glc, c2, ctx, GLOW, sahneler = [], isiklar = {};
 const OFS = 70;               // sahneler arası dünya uzaklığı
-const UZAK = { gercekci: 1.0, baski: 1.65, temizlik: 1.6, sicaklik: 1.6, hiz: 1.55, yapistirici: 1.6, ozet: 1.25, ilk_katman: 1.0, sayi: 1.2, karsilastir: 1.2, cta: 1.45 };
+const FOV0 = 30, DAR = Math.tan(23 * Math.PI / 180) / Math.tan(FOV0 / 2 * Math.PI / 180);   // 46° yerine 30° (ürün çekimi); uzaklıklar oranla büyür
+const UZAK = { gercekci: 1.0, baski: 1.65 * DAR, temizlik: 1.6 * DAR, sicaklik: 1.6 * DAR, hiz: 1.55 * DAR, yapistirici: 1.6 * DAR, ozet: 1.25 * DAR, ilk_katman: DAR, sayi: 1.2 * DAR, karsilastir: 1.2 * DAR, cta: 1.45 * DAR };
 const GECIS = 0.55;           // geçiş penceresi (sn)
 
 /* ---------- yardımcılar ---------- */
@@ -49,6 +50,21 @@ function lcdTex() {
   x.fillText('Nozzle 205/205C', 10, 30); x.fillText('Bed    60/ 60C', 10, 58); x.fillText('Speed 100%  Z 0.20', 10, 86);
   x.fillStyle = '#0b4f63'; x.fillRect(10, 98, 236, 12); x.fillStyle = '#ff9a3d'; x.fillRect(10, 98, 150, 12);
   const t = new T.CanvasTexture(c); return t;
+}
+function katmanTex(tekrarY, tekrarX) {   // baskı katman çizgileri (kabartma): ince, düşük kontrast
+  const c = document.createElement('canvas'); c.width = 8; c.height = 64; const x = c.getContext('2d'), g = x.createLinearGradient(0, 0, 0, 64);
+  g.addColorStop(0, '#9a9a9a'); g.addColorStop(.45, '#f0f0f0'); g.addColorStop(.55, '#f0f0f0'); g.addColorStop(1, '#9a9a9a'); x.fillStyle = g; x.fillRect(0, 0, 8, 64);
+  const t = new T.CanvasTexture(c); t.wrapS = t.wrapT = T.RepeatWrapping; t.repeat.set(tekrarX || 1, tekrarY); t.anisotropy = 16; return t;
+}
+function filament(renk, katman, o) {   // katman çizgili parlak PLA
+  return fiz(renk, Object.assign({ bumpMap: katmanTex(katman || 40), bumpScale: .13, roughness: .46, clearcoat: .25, clearcoatRoughness: .45, sheen: new T.Color(0x703818) }, o || {}));
+}
+function temas(g, r, x, z, guc) {   // nesnenin altına yumuşak temas gölgesi (ortam kapanması hissi)
+  const m = new T.Mesh(new T.CircleGeometry(r, 40), new T.MeshBasicMaterial({ map: havuzTex(`rgba(0,0,0,${guc || .6})`), transparent: true, depthWrite: false }));
+  m.rotation.x = -Math.PI / 2; m.position.set(x || 0, .015, z || 0); g.add(m); return m;
+}
+function eriyik(g) {   // nozul ucundan inen ışıldayan filament teli
+  const t = silin(.065, .065, 1, 0xff7a20, 8, { emissive: 0xff5a10, emissiveIntensity: .9, flatShading: false }); g.add(t); return t;
 }
 function fiz(renk, o) {   // parlak filament / lake: clearcoat'lı fiziksel malzeme
   return new T.MeshPhysicalMaterial(Object.assign({ color: renk, roughness: .38, metalness: 0, clearcoat: .6, clearcoatRoughness: .25 }, o || {}));
@@ -179,6 +195,7 @@ function hap(s, cx, cy, boyut, renk, metinRenk, alfa, olcek) {   // yuvarlak kö
 const SAHNE = {};
 
 SAHNE.baski = (g, pr) => {
+  if (!pr.nesne || pr.nesne === 'vazo') return SAHNE.gercekci(g, pr);
   yatak(g, 12, 12);
   const nesne = pr.nesne || 'vazo', renk = new T.Color(pr.renk != null ? pr.renk : RENK.turuncu), N = 46, lh = .2, kat = [];
   const noz = nozul(renk.getHex()); g.add(noz);
@@ -187,12 +204,12 @@ SAHNE.baski = (g, pr) => {
   const yaricap = h => 1.5 + .85 * Math.sin(h * Math.PI * 1.2) + .12 * Math.sin(h * 30);
   const warpGeo = nesne === 'warp' ? new T.BoxGeometry(7, 1.2, 7, 18, 3, 18) : null;
   let warpMesh, warpIlk;
-  if (warpGeo) { warpMesh = new T.Mesh(warpGeo, fiz(renk.getHex())); warpMesh.position.y = .6; g.add(warpMesh); warpIlk = warpGeo.attributes.position.array.slice(); }
+  if (warpGeo) { warpMesh = new T.Mesh(warpGeo, filament(renk.getHex(), 8)); temas(g, 5.2, 0, 0, .55); warpMesh.position.y = .6; g.add(warpMesh); warpIlk = warpGeo.attributes.position.array.slice(); }
   else for (let k = 0; k < N; k++) {
     const h0 = k / N, h1 = (k + 1) / N, c = renk.clone().lerp(new T.Color(0xffe2b0), .5 * h0 + .1 * (k % 2));
     let m;
-    if (nesne === 'disli') { m = new T.Mesh(dislGeo, fiz(c.getHex())); m.rotation.x = -Math.PI / 2; m.rotation.z = k * .015; m.position.y = k * lh; }
-    else if (nesne === 'kule') { m = new T.Mesh(new T.BoxGeometry(2.6 - 1.2 * h0, lh, 2.6 - 1.2 * h0), fiz(c.getHex())); m.rotation.y = k * .075; m.position.y = k * lh + lh / 2; }
+    if (nesne === 'disli') { m = new T.Mesh(dislGeo, filament(c.getHex(), 2)); m.rotation.x = -Math.PI / 2; m.rotation.z = k * .015; m.position.y = k * lh; }
+    else if (nesne === 'kule') { m = new T.Mesh(new T.BoxGeometry(2.6 - 1.2 * h0, lh, 2.6 - 1.2 * h0), filament(c.getHex(), 2)); m.rotation.y = k * .075; m.position.y = k * lh + lh / 2; }
     else { m = new T.Mesh(new T.CylinderGeometry(yaricap(h1), yaricap(h0), lh, 30), fiz(c.getHex())); m.position.y = k * lh + lh / 2; }
     m.visible = false; g.add(m); kat.push(m);
   }
@@ -251,8 +268,8 @@ SAHNE.gercekci = (g, pr) => {
   const ao = new T.Mesh(new T.CircleGeometry(3.6, 48), new T.MeshBasicMaterial({ map: havuzTex('rgba(0,0,0,.65)'), transparent: true, depthWrite: false })); ao.rotation.x = -Math.PI / 2; ao.position.y = .02; g.add(ao);   // temas gölgesi (AO)
   const sicak = parilti(0xff7a30, 2.4, .5); g.add(sicak);
   return {
-    fov: 27,
-    cam: p => { const a = .75 + p * .75, r = 30, e = sm(p); return [Math.cos(a) * r, 6.5 + 1.5 * e, Math.sin(a) * r, 0, 1.6 + 3.4 * e, 0]; },
+    fov: 27, uzak: 1,
+    cam: p => { const a = .75 + p * .75, r = 34, e = sm(p); return [Math.cos(a) * r, 7.5 + 2 * e, Math.sin(a) * r, 0, 3.2 + 3.2 * e, 0]; },
     upd: (p, lt2, d) => {
       const q = sm(k01(p, .05, .97)), h = Math.max(.02, q * YUK), r = yaricap(h);
       klip.constant = h; kapak.position.y = h + .005; kapak.scale.set(r, r, 1); ic.position.y = h - .01; ic.scale.set(r * .96, r * .96, 1);
@@ -274,13 +291,13 @@ SAHNE.temizlik = (g, pr) => {
     const s = .06 + i / 11 * .88, [x, z] = yol(s), m = new T.Mesh(new T.CircleGeometry(.75 + R() * .5, 20), new T.MeshBasicMaterial({ color: i % 3 === 0 ? 0xffb066 : 0xffe2bd, transparent: true, opacity: .75, depthWrite: false }));
     m.rotation.x = -Math.PI / 2; m.position.set(x + (R() - .5) * .6, .02 + i * .001, z + (R() - .5) * .8); m.scale.set(1 + R() * .5, 1, 1); g.add(m); lekeler.push({ m, s, x: m.position.x, z: m.position.z });
   }
-  const bez = kutu(3.2, .45, 2.4, 0xcfe8ff, { roughness: .9, flatShading: false }); g.add(bez);
+  const kumas = benekTex(256, 21, '#cfe3f6', '255,255,255', 9000, 2); const bez = new T.Mesh(new T.BoxGeometry(3.2, .45, 2.4, 6, 1, 6), new T.MeshStandardMaterial({ map: kumas, bumpMap: kumas, bumpScale: 1.2, roughness: .95 })); g.add(bez);
   const bezKenar = kutu(3.25, .1, 2.45, 0x22d3ee, { emissive: 0x22d3ee, emissiveIntensity: .6 }); bez.add(bezKenar); bezKenar.position.y = -.15;
-  const sise = new T.Group(); const gov = silin(.9, .9, 2.6, 0xe9f0ff, 24, { flatShading: false }); gov.position.y = 1.3; sise.add(gov);
-  const boyun = silin(.35, .9, .7, 0xe9f0ff, 24, { flatShading: false }); boyun.position.y = 2.9; sise.add(boyun);
+  const sise = new T.Group(); const gov = new T.Mesh(new T.CylinderGeometry(.9, .9, 2.6, 40), fiz(0xeef3ff, { roughness: .3, clearcoat: .8 })); gov.position.y = 1.3; sise.add(gov);
+  const boyun = new T.Mesh(new T.CylinderGeometry(.35, .9, .7, 40), fiz(0xeef3ff, { roughness: .3, clearcoat: .8 })); boyun.position.y = 2.9; sise.add(boyun);
   const kap = silin(.3, .3, .7, 0x22d3ee, 16); kap.position.y = 3.6; sise.add(kap); const ucu = kutu(.9, .35, .45, 0x22d3ee); ucu.position.set(.35, 3.9, 0); sise.add(ucu);
   const etk = kutu(1.8, 1.3, .05, 0x0e1424); etk.position.set(0, 1.3, .91); sise.add(etk); const et2 = kutu(1.4, .5, .06, 0x22d3ee, { emissive: 0x22d3ee, emissiveIntensity: .6 }); et2.position.set(0, 1.45, .93); sise.add(et2);
-  sise.position.set(-6.4, 0, 5.2); sise.rotation.y = .6; g.add(sise);
+  sise.position.set(-6.4, 0, 5.2); sise.rotation.y = .6; g.add(sise); temas(g, 1.8, -6.4, 5.2, .55);
   const sprey = []; for (let i = 0; i < 26; i++) { const s = parilti(0xcfeaff, .7, 0); g.add(s); sprey.push(s); }
   const par = []; for (let i = 0; i < lekeler.length; i++) { const s = parilti(0xffffff, 2.6, 0); g.add(s); par.push(s); }
   const toz1 = toz(g, 50, 40, 5);
@@ -311,9 +328,9 @@ SAHNE.ilk_katman = (g, pr) => {
     const n = nozul(); n.scale.setScalar(.95); n.position.x = x; g.add(n); nz.push(n);
     const hy = [1.55, .34, .08][i];
     let b;
-    if (i === 0) { b = new T.Mesh(new T.CylinderGeometry(.2, .2, 3.4, 14), mat(RENK.turuncu, { flatShading: false })); b.rotation.x = Math.PI / 2; b.position.set(x + 1.1, .78, 0); }
-    else if (i === 1) { b = new T.Mesh(new T.CylinderGeometry(.55, .55, 3.4, 20), mat(RENK.turuncu, { flatShading: false })); b.rotation.x = Math.PI / 2; b.scale.set(1.0, 1, .5); b.position.set(x, .14, 0); }
-    else { b = new T.Group(); const m = kutu(2.5, .08, 3.4, RENK.turuncu, { flatShading: false }); m.position.y = .04; b.add(m); [-1, 1].forEach(sd => { const k = new T.Mesh(new T.CylinderGeometry(.14, .14, 3.4, 12), mat(0xffa050, { flatShading: false })); k.rotation.x = Math.PI / 2; k.position.set(sd * 1.2, .13, 0); b.add(k); }); b.position.set(x, 0, 0); }
+    if (i === 0) { b = new T.Mesh(new T.CylinderGeometry(.2, .2, 3.4, 20), fiz(RENK.turuncu)); b.rotation.x = Math.PI / 2; b.position.set(x + 1.1, .78, 0); }
+    else if (i === 1) { b = new T.Mesh(new T.CylinderGeometry(.55, .55, 3.4, 32), fiz(RENK.turuncu)); b.rotation.x = Math.PI / 2; b.scale.set(1.0, 1, .5); b.position.set(x, .14, 0); }
+    else { b = new T.Group(); const m = new T.Mesh(new T.BoxGeometry(2.5, .08, 3.4), fiz(RENK.turuncu)); m.position.y = .04; b.add(m); [-1, 1].forEach(sd => { const k = new T.Mesh(new T.CylinderGeometry(.14, .14, 3.4, 12), mat(0xffa050, { flatShading: false })); k.rotation.x = Math.PI / 2; k.position.set(sd * 1.2, .13, 0); b.add(k); }); b.position.set(x, 0, 0); }
     b.scale.multiplyScalar(0.001); g.add(b); bn.push(b);
     const ok = new T.Mesh(new T.CylinderGeometry(.05, .05, 1, 8), new T.MeshBasicMaterial({ color: renkS[i] })); g.add(ok); gap.push(ok);
   });
@@ -350,7 +367,7 @@ SAHNE.sicaklik = (g, pr) => {
   const hedef = pr.deger != null ? +pr.deger : 60, birim = pr.birim || '°C', etiket = pr.etiket || 'PLA TABLA';
   const plaka = yatak(g, 11, 11); plaka.material.color.set(0x8a9ad8); plaka.material.emissive = new T.Color(0x2a60ff); plaka.material.emissiveIntensity = .1;
   const th = new T.Group(); th.position.x = -3.4; g.add(th);
-  const tup = new T.Mesh(new T.CylinderGeometry(.5, .5, 6, 24), new T.MeshStandardMaterial({ color: 0xbfe3ff, transparent: true, opacity: .28, roughness: .1, metalness: .2 })); tup.position.set(0, 3.0, 0); th.add(tup);
+  const tup = new T.Mesh(new T.CylinderGeometry(.5, .5, 6, 40), new T.MeshPhysicalMaterial({ clearcoat: 1, clearcoatRoughness: .05, roughness: .05, metalness: 0, color: 0xdff1ff, transparent: true, opacity: .28, roughness: .1, metalness: .2 })); tup.position.set(0, 3.0, 0); th.add(tup);
   const sivi = silin(.34, .34, 1, 0xff4d2d, 20, { emissive: 0xff3a1a, emissiveIntensity: .7, flatShading: false }); th.add(sivi);
   const bulb = new T.Mesh(new T.SphereGeometry(.85, 24, 18), new T.MeshStandardMaterial({ color: 0xff4d2d, emissive: 0xff3a1a, emissiveIntensity: .8 })); bulb.position.y = .55; th.add(bulb);
   const glow = parilti(0xff5a2a, 9, 0); glow.position.y = 1; th.add(glow);
@@ -381,7 +398,8 @@ SAHNE.hiz = (g, pr) => {
   yatak(g, 12, 12);
   const noz = nozul(); g.add(noz);
   const sat = 9, gen = 4.4, sSat = .62, seg = [];
-  for (let r = 0; r < sat; r++) { const m = kutu(1, .16, .38, RENK.turuncu, { flatShading: false }); m.position.set(0, .08, -gen + r * sSat); m.visible = false; g.add(m); seg.push(m); }
+  const telH = eriyik(g);
+  for (let r = 0; r < sat; r++) { const m = new T.Mesh(new T.BoxGeometry(1, .16, .38), fiz(RENK.turuncu)); m.position.set(0, .08, -gen + r * sSat); m.visible = false; g.add(m); seg.push(m); }
   const fan = new T.Group(), govde = kutu(2.2, 2.2, .7, 0x3a4663, { metalness: .5 }); fan.add(govde);
   const kanat = new T.Group(); for (let i = 0; i < 5; i++) { const k = kutu(.22, 1.5, .08, 0xc5d2f0); k.position.y = .75; const kk = new T.Group(); kk.add(k); kk.rotation.z = i * Math.PI * 2 / 5; kanat.add(kk); } kanat.position.z = .4; fan.add(kanat);
   fan.position.set(6.8, 3.4, -1); fan.rotation.y = -.5; g.add(fan);
@@ -394,7 +412,7 @@ SAHNE.hiz = (g, pr) => {
       const q = k01(p, .08, .92) * sat; let yaz;
       seg.forEach((m, r) => { const v = clamp(q - r), yon = r % 2 ? -1 : 1; m.visible = v > .01; m.scale.x = Math.max(v * gen * 2, .01); m.position.x = yon === 1 ? -gen + v * gen : gen - v * gen; });
       const r = Math.min(sat - 1, Math.floor(q)), v = clamp(q - r), yon = r % 2 ? -1 : 1, nx = yon === 1 ? -gen + v * gen * 2 : gen - v * gen * 2;
-      noz.position.set(nx, .0, -gen + r * sSat);
+      noz.position.set(nx, .3, -gen + r * sSat); telH.scale.y = .3; telH.position.set(nx, .15, -gen + r * sSat); telH.visible = p > .08 && p < .92;
       const dur = sm(k01(p, .12, .5)); kanat.rotation.z = lt * 14 * (1 - dur) + 0; kanat.rotation.z = (kanat.rotation.z) % (Math.PI * 2);
       x1.scale.setScalar(outBack(k01(p, .5, .62))); x1.position.y = 3.4;
     },
@@ -410,8 +428,8 @@ SAHNE.yapistirici = (g, pr) => {
   const plaka = yatak(g, 12, 12);
   const film = new T.Mesh(new T.PlaneGeometry(10.6, 10.6), new T.MeshBasicMaterial({ color: 0x9fd8ff, transparent: true, opacity: 0, depthWrite: false })); film.rotation.x = -Math.PI / 2; film.position.y = .03; g.add(film);
   const seritler = []; for (let i = 0; i < 6; i++) { const m = new T.Mesh(new T.PlaneGeometry(1, 1.9), new T.MeshBasicMaterial({ color: 0xbfe6ff, transparent: true, opacity: .0, depthWrite: false })); m.rotation.x = -Math.PI / 2; m.position.set(0, .04 + i * .001, -4.4 + i * 1.75); g.add(m); seritler.push(m); }
-  const stik = new T.Group(); const gv = silin(.85, .85, 3, 0xff4d8d, 24, { flatShading: false }); gv.position.y = 1.5; stik.add(gv); const ic = silin(.62, .62, 1.2, 0xeaf6ff, 24, { flatShading: false }); ic.position.y = 3.4; stik.add(ic); const kp = silin(.9, .9, .3, 0xffffff, 24); kp.position.y = .15; stik.add(kp); g.add(stik);
-  const parca = new T.Mesh(new T.BoxGeometry(3.6, 1.4, 3.6), fiz(0xff7a1a)); parca.position.y = .7; parca.scale.y = 0; g.add(parca);
+  const stik = new T.Group(); const gv = new T.Mesh(new T.CylinderGeometry(.85, .85, 3, 40), fiz(0xff4d8d, { roughness: .35, clearcoat: .7 })); gv.position.y = 1.5; stik.add(gv); const ic = silin(.62, .62, 1.2, 0xeaf6ff, 24, { flatShading: false }); ic.position.y = 3.4; stik.add(ic); const kp = silin(.9, .9, .3, 0xffffff, 24); kp.position.y = .15; stik.add(kp); g.add(stik);
+  const parca = new T.Mesh(new T.BoxGeometry(3.6, 1.4, 3.6), filament(0xff7a1a, 7)); temas(g, 3.4, 0, 0, .5); parca.position.y = .7; parca.scale.y = 0; g.add(parca);
   const brim = []; [[0, -2.9, 8.4, 1.3], [0, 2.9, 8.4, 1.3], [-2.9, 0, 1.3, 4.4], [2.9, 0, 1.3, 4.4]].forEach(a => { const m = kutu(a[2], .12, a[3], 0xffb066, { emissive: 0xff7a1a, emissiveIntensity: .35, flatShading: false }); m.position.set(a[0], .09, a[1]); m.scale.set(0, 1, 0); g.add(m); brim.push([m, a]); });
   const toz1 = toz(g, 40, 30, 21);
   return {
@@ -485,7 +503,7 @@ SAHNE.ozet = (g, pr) => {
 };
 
 SAHNE.cta = (g, pr) => {
-  const yuz = new T.Mesh(new T.IcosahedronGeometry(1.9, 1), mat(RENK.turuncu, { emissive: RENK.turuncu, emissiveIntensity: .35 })); yuz.position.y = 4.6; g.add(yuz);
+  const yuz = new T.Mesh(new T.IcosahedronGeometry(1.9, 1), fiz(RENK.turuncu, { emissive: RENK.turuncu, emissiveIntensity: .25, clearcoat: 1, flatShading: true })); yuz.position.y = 4.6; g.add(yuz);
   const hl = new T.Mesh(new T.TorusGeometry(3.1, .1, 10, 80), mat(RENK.camgobegi, { emissive: RENK.camgobegi, emissiveIntensity: .9, flatShading: false })); hl.position.y = 4.6; g.add(hl);
   const hl2 = hl.clone(); hl2.scale.setScalar(1.25); g.add(hl2);
   const gl = parilti(RENK.turuncu, 12, .55); gl.position.y = 4.6; g.add(gl);
@@ -540,17 +558,18 @@ function kameraSec(t) {
   const s = sahneler[i], d = s.s.t1 - s.s.t0, lp = clamp((t - s.s.t0) / d);
   const cam = (n, p) => { const c = n.cam(p, p * (n.s.t1 - n.s.t0)); return c.map((v, k) => k % 3 === 0 && k < 6 ? v : v); };
   const dunya = (n, idx, c) => [c[0] + idx * OFS, c[1], c[2], c[3] + idx * OFS, c[4], c[5]];
-  const f0 = s.fov || 46; let c = dunya(s, i, cam(s, lp)), fov = f0, u = 0;
+  const f0 = s.fov || FOV0; let c = dunya(s, i, cam(s, lp)), fov = f0, u = 0;
   // geçiş: sahne sonu → sonraki sahne başı
   const sonraki = sahneler[i + 1];
   if (sonraki && t > s.s.t1 - GECIS / 2) {
     u = (t - (s.s.t1 - GECIS / 2)) / GECIS; const e = sm(u), b = dunya(sonraki, i + 1, cam(sonraki, 0)), a = dunya(s, i, cam(s, 1));
-    c = a.map((v, k) => lerp(v, b[k], e)); fov = f0 + 16 * Math.sin(Math.PI * u);
+    c = a.map((v, k) => lerp(v, b[k], e)); fov = f0 + 12 * Math.sin(Math.PI * u);
   } else if (i > 0 && t < s.s.t0 + GECIS / 2) {
     u = .5 + (t - s.s.t0) / GECIS; const e = sm(u), onceki = sahneler[i - 1], a = dunya(onceki, i - 1, cam(onceki, 1)), b = dunya(s, i, cam(s, 0));
-    c = a.map((v, k) => lerp(v, b[k], e)); fov = f0 + 16 * Math.sin(Math.PI * u);
+    c = a.map((v, k) => lerp(v, b[k], e)); fov = f0 + 12 * Math.sin(Math.PI * u);
   }
-  const uz = (sahneler[Math.min(sahneler.length - 1, Math.max(0, Math.round((c[3]) / OFS)))].s.uzak) || UZAK[sahneler[Math.min(sahneler.length - 1, Math.max(0, Math.round((c[3]) / OFS)))].s.tip] || 1.3;
+  const sn = sahneler[Math.min(sahneler.length - 1, Math.max(0, Math.round((c[3]) / OFS)))];
+  const uz = sn.s.uzak || sn.uzak || UZAK[sn.s.tip] || 1.3;
   c = [c[3] + (c[0] - c[3]) * uz, c[4] + (c[1] - c[4]) * uz, c[5] + (c[2] - c[5]) * uz, c[3], c[4], c[5]];
   return { c, fov, u };
 }
@@ -624,7 +643,7 @@ function parlama() {   // bloom: sahneyi küçük bir hedefe ayrıca çizer (ucu
   a3.globalCompositeOperation = 'destination-in'; const gr = a3.createLinearGradient(0, 0, 0, h0); gr.addColorStop(0, 'rgba(0,0,0,.85)'); gr.addColorStop(.17, 'rgba(0,0,0,0)'); gr.addColorStop(.62, 'rgba(0,0,0,0)'); gr.addColorStop(.86, 'rgba(0,0,0,.9)'); gr.addColorStop(1, 'rgba(0,0,0,1)'); a3.fillStyle = gr; a3.fillRect(0, 0, w0, h0); a3.globalCompositeOperation = 'source-over';
   ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.imageSmoothingQuality = 'high'; ctx.drawImage(BK3, 0, 0, c2.width, c2.height);
   // film greni
-  const ox = Math.floor(Math.abs(Math.sin(c2.width + (window.__kareNo = (window.__kareNo || 0) + 1) * 12.9898)) * 256), oy = Math.floor(Math.abs(Math.sin(window.__kareNo * 78.233)) * 256);
+  const kn = Math.round((window.__t || 0) * 30) + 1, ox = Math.floor(Math.abs(Math.sin(kn * 12.9898)) * 256), oy = Math.floor(Math.abs(Math.sin(kn * 78.233)) * 256);
   ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = .12; ctx.translate(-ox, -oy); ctx.fillStyle = ctx.createPattern(GRAIN, 'repeat'); ctx.fillRect(0, 0, c2.width + 256, c2.height + 256); ctx.restore();
 }
 function hud(t, s, lt, d) {   // nesne alanının köşe işaretleri (hareket tasarımı detayı)
@@ -635,6 +654,7 @@ function hud(t, s, lt, d) {   // nesne alanının köşe işaretleri (hareket ta
   ctx.restore();
 }
 window.kare = function (t, kalite) {
+  window.__t = t;
   // geçiş penceresinde hareket bulanıklığı: 4 alt kare ortalaması
   let gecis = false; for (let k = 0; k < sahneler.length - 1; k++) if (Math.abs(t - sahneler[k].s.t1) < GECIS / 2) gecis = true;
   ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, c2.width, c2.height);
