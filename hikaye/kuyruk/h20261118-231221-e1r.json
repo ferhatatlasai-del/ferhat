@@ -1,7 +1,7 @@
 {
   "id": "h20261118-231221-e1r",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-18T23:12:21.000Z",
   "gorsel": "hikaye/gorseller/h20261118-231221-e1r.mp4",
   "baslik": "Rope Bowl",
@@ -21,7 +21,9 @@
     "sorunlar": []
   },
   "yayin": {
-    "tarih": "2026-11-20T08:05:56Z"
+    "tarih": "2026-11-20T08:07:27Z",
+    "medya_kimligi": "18172481827478520",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4034433832938686932"
   },
   "hata": "",
   "deneme": 0,
