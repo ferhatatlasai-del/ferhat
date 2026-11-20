@@ -1,7 +1,7 @@
 {
   "id": "h20261120-052151-b0i",
   "kaynak": "uretim",
-  "durum": "planli",
+  "durum": "yayinlaniyor",
   "olusturma": "2026-11-20T05:21:51.000Z",
   "gorsel": "hikaye/gorseller/h20261120-052151-b0i.mp4",
   "baslik": "Portable drill press/depth stop attachment for hand drill - Open source",
@@ -20,7 +20,9 @@
     "deneme": 1,
     "sorunlar": []
   },
-  "yayin": null,
+  "yayin": {
+    "tarih": "2026-11-20T12:05:59Z"
+  },
   "hata": "",
   "deneme": 0,
   "tur": "video",
