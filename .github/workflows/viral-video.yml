@@ -1,0 +1,50 @@
+name: Viral video üretici (3D animasyonlu Türkçe Shorts/Reels taslağı; yayınlamaz)
+
+on:
+  workflow_dispatch:
+    inputs:
+      konu:
+        description: "İsteğe bağlı konu (boşsa sıradaki hazır senaryo ya da konu listesi kullanılır)"
+        default: ""
+      hemen:
+        description: "EVET yazarsan taslak limiti dolu olsa bile bir kez üretir"
+        default: "HAYIR"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: viral-video
+  cancel-in-progress: false
+
+jobs:
+  uret:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Araçları hazırla (numpy, ffmpeg, playwright-core)
+        run: |
+          python3 -m pip install --quiet numpy
+          if ! command -v ffmpeg >/dev/null 2>&1; then sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg; fi
+          npm install --no-save --prefix "$RUNNER_TEMP/pw" playwright-core
+          echo "NODE_PATH=$RUNNER_TEMP/pw/node_modules" >> "$GITHUB_ENV"
+          CH="$(command -v google-chrome || command -v chromium-browser || command -v chromium || true)"
+          if [ -z "$CH" ]; then echo "Chrome bulunamadı"; exit 1; fi
+          echo "CHROME_YOLU=$CH" >> "$GITHUB_ENV"
+      - name: Viral video taslağı hazırla
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5.4-mini' }}
+          GOOGLE_TTS_API_KEY: ${{ secrets.GOOGLE_TTS_API_KEY }}
+          OFIS_ADRES: "https://gurtechs-ajan-ofisi.fly.dev"
+          BILDIRIM_SIRRI: ${{ secrets.BILDIRIM_SIRRI }}
+          KONU: ${{ inputs.konu }}
+          HEMEN: ${{ inputs.hemen }}
+        run: |
+          ARG=""
+          if [ "$HEMEN" = "EVET" ]; then ARG="$ARG --hemen"; fi
+          if [ -n "$KONU" ]; then python3 ajan/viral_video.py --git $ARG --konu "$KONU"; else python3 ajan/viral_video.py --git $ARG; fi

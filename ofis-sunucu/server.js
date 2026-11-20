@@ -30,6 +30,7 @@ const AKIS_HIKAYE = 'hikaye-yayinla.yml';
 const AKIS_URETIM = 'hikaye-uret.yml';
 const AKIS_AKADEMI = 'akademi.yml';
 const AKIS_KISA = 'kisa-video.yml';
+const AKIS_VIRAL = 'viral-video.yml';
 const AKIS_TREND = 'trend.yml';
 const AKIS_ISTATISTIK = 'istatistik-rapor.yml';
 const SHORTS_RE = /^s\d{8}-\d{6}$/;
@@ -40,7 +41,7 @@ let ajanOnbellek = { t: 0, veri: null };
 let trendOnbellek = { t: 0, veri: null };
 let zincirOnbellek = { t: 0, veri: null };
 let hikayeOnbellek = { t: 0, veri: null };
-const hikayeTetikler = [], uretimTetikler = [], akademiTetikler = [], kisaTetikler = [], trendTetikler = [], istatistikTetikler = [], bildirimler = [];
+const hikayeTetikler = [], uretimTetikler = [], akademiTetikler = [], kisaTetikler = [], viralTetikler = [], trendTetikler = [], istatistikTetikler = [], bildirimler = [];
 const guncellenenler = new Set();
 const GH_API = process.env.GH_API || 'https://api.github.com';
 const MAX_VIDEO = 30 * 1024 * 1024;
@@ -497,6 +498,18 @@ async function api(req, res, url) {
     kisaTetikler.push(simdi);
     return json(res, 200, { ok: true });
   }
+  if (url.pathname === '/api/viral-calistir' && req.method === 'POST') {
+    const simdi = Date.now();
+    while (viralTetikler.length && simdi - viralTetikler[0] > 3600e3) viralTetikler.shift();
+    if (viralTetikler.length >= 2) return json(res, 429, { hata: 'Saatte en fazla 2 elle viral video üretimi.' });
+    let konu = '';
+    try { const b = await govde(req); konu = String(b.konu || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 120); } catch (e) { /* konu isteğe bağlı */ }
+    const dal = await varsayilanDal();
+    const r = await gh(`/repos/${REPO}/actions/workflows/${AKIS_VIRAL}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: { hemen: 'EVET', konu } }) });
+    if (r.status !== 204) return json(res, 502, { hata: 'GitHub kabul etmedi (' + r.status + ').' });
+    viralTetikler.push(simdi);
+    return json(res, 200, { ok: true });
+  }
   if (url.pathname === '/api/trend-calistir' && req.method === 'POST') {
     const simdi = Date.now();
     while (trendTetikler.length && simdi - trendTetikler[0] > 3600e3) trendTetikler.shift();
@@ -790,7 +803,7 @@ http.createServer(async (req, res) => {
 // Türkiye saati (UTC+3). Saat başı :05'te hikaye yayın kontrolü (10:05-22:05), her gün 08:20'de görsel üretimi, pazartesi/perşembe 06:30'da trend ajanı.
 // İş akışları kendi kararını verir (slot, günlük sınır); çift tetik zararsızdır (ortak kilit + "önce talep et" mantığı).
 const ZAM_KAPALI = process.env.ZAMANLAYICI === 'kapali';
-const zamSon = { yayin: null, uretim: null, trend: null, akademi: null, kisa: null, istatistik: null, hata: null };
+const zamSon = { yayin: null, uretim: null, trend: null, akademi: null, kisa: null, viral: null, istatistik: null, hata: null };
 const zamYapilan = new Set();
 function zamSimdiTR() { const z = process.env.ZAM_ZAMAN ? new Date(process.env.ZAM_ZAMAN) : new Date(); return new Date(z.getTime() + 3 * 3600e3); }
 async function zamTetikle(akis, girdi, ad) {
@@ -825,6 +838,11 @@ async function zamKontrol() {
   if ((haftaGunu === 2 || haftaGunu === 5) && saat >= 17 && saat < 22) {
     const anahtar = `k${gun}`;
     if (!zamYapilan.has(anahtar)) { zamYapilan.add(anahtar); await zamTetikle(AKIS_KISA, {}, 'kisa'); }
+  }
+  // viral 3D video (Türkçe seslendirmeli Shorts/Reels taslağı): pazartesi, çarşamba ve cumartesi 14:00'ten sonra bir kez
+  if ([1, 3, 6].includes(haftaGunu) && saat >= 14 && saat < 21) {
+    const anahtar = `v${gun}`;
+    if (!zamYapilan.has(anahtar)) { zamYapilan.add(anahtar); await zamTetikle(AKIS_VIRAL, {}, 'viral'); }
   }
   // istatistikçi: günde 5 izlenme raporu (TR 09, 12, 15, 18, 21; kaçırıldıysa o saat içinde bir kez)
   if ([9, 12, 15, 18, 21].includes(saat)) {

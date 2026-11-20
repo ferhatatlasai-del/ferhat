@@ -385,6 +385,9 @@ body.tam .hint{display:none}
         <p class="alt">Haftada iki kez (salı ve cuma 17:00) hikaye görsellerinden 4 sahneli, müzikli kısa video <b>taslağı</b> hazırlar. <b>Sen onaylamadan hiçbir şey yayınlanmaz.</b> Onaylarsan YouTube Shorts ve Instagram Reels'e birlikte çıkar. Başlık ve açıklamayı yayınlamadan önce düzenleyebilirsin.</p>
         <p class="not" id="skDurum">Yükleniyor…</p>
         <div class="satir"><button type="button" id="skUret">Şimdi bir taslak üret</button></div>
+        <h3 style="margin:14px 0 4px">3D animasyonlu viral video</h3>
+        <p class="alt">Haftada üç kez (pazartesi, çarşamba, cumartesi 14:00) <b>3D animasyonlu, Türkçe seslendirmeli, alt yazılı, ~60 sn</b> bir bilgi videosu taslağı hazırlar (müzik ve ses efektleri kodla sentezlenir). Yine <b>onayını bekler</b>. Hazırlanması ~10-15 dakika sürer.</p>
+        <div class="satir"><input type="text" id="skKonu" maxlength="120" placeholder="İsteğe bağlı konu (boşsa sıradaki konu)" style="flex:1;min-width:160px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px"><button type="button" id="skViral">Şimdi viral video üret</button></div>
         <div id="skListe"></div>
       </div>
       <div class="card pub" id="pub">
@@ -1995,12 +1998,12 @@ akademiCek(); setInterval(akademiCek,300000);
 function shortsCiz(v){
   OZ.sk=v; setTimeout(ozetCiz,0);
   var t=v.taslaklar||[]; var bekleyen=t.filter(function(x){return x.durum==='onay_bekliyor';});
-  $('#skDurum').textContent=bekleyen.length?(bekleyen.length+' taslak onayını bekliyor.'):'Onay bekleyen taslak yok. '+(t.length?'':'Henüz taslak üretilmedi (salı/cuma 17:00 ya da "şimdi üret").');
+  $('#skDurum').textContent=bekleyen.length?(bekleyen.length+' taslak onayını bekliyor.'):'Onay bekleyen taslak yok. '+(t.length?'':'Henüz taslak üretilmedi (salı/cuma 17:00, pazartesi/çarşamba/cumartesi 14:00 ya da "şimdi üret").');
   var kap=$('#skListe'); kap.textContent='';
   t.forEach(function(x){
     var d=dom('div','hoge'); d.style.cssText='margin-top:10px;text-align:left;max-width:360px';
     var vd=document.createElement('video'); vd.controls=true; vd.muted=false; vd.playsInline=true; vd.preload='metadata'; vd.style.cssText='width:100%;max-width:260px;display:block;border-radius:10px;background:#000'; vd.src='https://raw.githubusercontent.com/'+v.depo+'/'+v.dal+'/'+x.video+'#t=0.5'; d.appendChild(vd);
-    d.appendChild(dom('span','rozet '+(x.durum==='yayinlandi'?'iyi':(x.durum==='onay_bekliyor'?'orta':'zayif')),({onay_bekliyor:'Onay bekliyor',yayinlandi:'Yayına gönderildi',reddedildi:'Reddedildi'}[x.durum]||x.durum)+' · '+Math.round(x.sure||0)+' sn · müzik: '+(x.muzik||'-')));
+    d.appendChild(dom('span','rozet '+(x.durum==='yayinlandi'?'iyi':(x.durum==='onay_bekliyor'?'orta':'zayif')),({onay_bekliyor:'Onay bekliyor',yayinlandi:'Yayına gönderildi',reddedildi:'Reddedildi'}[x.durum]||x.durum)+(x.tur==='viral'?' · 3D viral':'')+' · '+Math.round(x.sure||0)+' sn · müzik: '+(x.muzik||'-')));
     if(x.durum==='onay_bekliyor'){
       var bas=document.createElement('input'); bas.type='text'; bas.maxLength=100; bas.value=x.baslik||''; bas.style.cssText='width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-top:6px'; d.appendChild(bas);
       var ac=document.createElement('textarea'); ac.rows=6; ac.maxLength=2000; ac.value=x.aciklama||''; ac.style.cssText='width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-top:6px'; d.appendChild(ac);
@@ -2031,6 +2034,13 @@ $('#skUret').addEventListener('click',function(){
   if(!skOnay){ skOnay=true; btn.textContent='Emin misin? Evet, üret (birkaç sent)'; setTimeout(function(){ skOnay=false; btn.textContent='Şimdi bir taslak üret'; },6000); return; }
   skOnay=false; btn.textContent='Şimdi bir taslak üret'; btn.disabled=true;
   hPost('/api/shorts-calistir',{}).then(function(){ $('#skDurum').textContent='Üretiliyor. Birkaç dakika içinde taslak burada görünür.'; btn.disabled=false; var n=0; var t=setInterval(function(){ shortsCek(); if(++n>16) clearInterval(t); },15000); }).catch(function(e){ $('#skDurum').textContent=String(e.message||e); btn.disabled=false; });
+});
+var skvOnay=false;
+$('#skViral').addEventListener('click',function(){
+  if(!hSifreKontrol()) return; var btn=this, et='Şimdi viral video üret';
+  if(!skvOnay){ skvOnay=true; btn.textContent='Emin misin? Evet, üret'; setTimeout(function(){ skvOnay=false; btn.textContent=et; },6000); return; }
+  skvOnay=false; btn.textContent=et; btn.disabled=true;
+  hPost('/api/viral-calistir',{konu:$('#skKonu').value||''}).then(function(){ $('#skDurum').textContent='3D video hazırlanıyor (10-15 dk). Hazır olunca burada ve bildirimle görünür.'; btn.disabled=false; var n=0; var t=setInterval(function(){ shortsCek(); if(++n>60) clearInterval(t); },30000); }).catch(function(e){ $('#skDurum').textContent=String(e.message||e); btn.disabled=false; });
 });
 shortsCek(); setInterval(shortsCek,300000);
 
@@ -2150,7 +2160,7 @@ function zamanlayiciCek(){
     function sat(ad,deg,sinif){ var d=dom('div',sinif||''); d.appendChild(document.createElement('i')); d.appendChild(document.createTextNode(ad+': '+deg)); k.appendChild(d); }
     sat('Durum',v.acik?'açık':'kapalı',v.acik?'iyi':'sorun');
     var son=v.son||{};
-    [['yayin','Son hikaye yayın tetiği'],['uretim','Son görsel üretimi tetiği'],['trend','Son trend tetiği'],['akademi','Son akademi tetiği'],['kisa','Son Shorts tetiği']].forEach(function(p){ sat(p[1],son[p[0]]?fmt(son[p[0]]):'henüz (sunucu yeniden başladığında sıfırlanır)'); });
+    [['yayin','Son hikaye yayın tetiği'],['uretim','Son görsel üretimi tetiği'],['trend','Son trend tetiği'],['akademi','Son akademi tetiği'],['kisa','Son Shorts tetiği'],['viral','Son viral video tetiği']].forEach(function(p){ sat(p[1],son[p[0]]?fmt(son[p[0]]):'henüz (sunucu yeniden başladığında sıfırlanır)'); });
     if(son.hata) sat('Son hata',son.hata,'sorun');
   }).catch(function(){});
 }

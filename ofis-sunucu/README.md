@@ -106,6 +106,17 @@ Haftada bir (pazar 18:00 TR; sunucu zamanlayıcısı ve GitHub iş akışı) `aj
 - **Hiçbir şeyi yayınlamaz.** Video `videolar/yukleme_<tarih>.mp4`, taslak `shorts/<kimlik>.json` (durum `onay_bekliyor`). Panelde (Shorts / Reels üretici kartı) videoyu izler, başlık ve açıklamayı düzenler, "YouTube Shorts + Reels olarak yayınla" dersin; mevcut yayın akışı (`/api/yayinla`) çalışır.
 - Aynı anda en çok 3 onay bekleyen taslak tutulur; kullanılmamış hikaye görseli 3'ten azsa üretim beklemeye geçer. YouTube yükleme kotası: yükleme başına 1600 birim (günlük 10.000).
 
+### Viral 3D video üretici (Türkçe, seslendirmeli, ~60 sn)
+`ajan/viral_video.py` (iş akışı `viral-video.yml`; pazartesi, çarşamba, cumartesi 14:00 TR sunucu zamanlayıcısıyla ya da panelde Video sekmesi → "Şimdi viral video üret", isteğe bağlı konu yazılabilir). **Tamamen kodla** üretilir, harici video/ses hizmeti yoktur:
+- **Senaryo:** önce `video/senaryolar/*.json` (elle yazılmış hazır senaryolar; ilki "Tablaya yapışma sorununa pratik çözümler"), sonra `video/konular.json` listesinden sıradaki konu için yapay zekâ (`OPENAI_API_KEY`) merak uyandıran bilgi senaryosu yazar. Doğruluk kuralları isteme yazılıdır (uydurma rakam/deneyim/marka yok, "genellikle/civarı"); senaryo 70-190 kelime, geçerli sahne tipleri, son sahne CTA olmadan kabul edilmez.
+- **Seslendirme:** Google Cloud Text-to-Speech (`GOOGLE_TTS_API_KEY`, varsayılan ses `tr-TR-Wavenet-B`). SSML işaretleriyle kelime zamanları alınır; sahne süreleri konuşmaya göre belirlenir, alt yazı kelime kelime vurgulanır. PLA/PETG/ABS gibi kısaltmalar yalnızca sese uygun okunuşla verilir (alt yazıda özgün hali kalır).
+- **3D animasyon:** `video/sahne.js` (three.js) 1080×1920, 30 fps kareleri Chromium ile çizer (`video/render.js`, kareler doğrudan ffmpeg'e akar). Sahne tipleri: `baski`, `temizlik`, `ilk_katman`, `sicaklik`, `hiz`, `yapistirici`, `sayi`, `karsilastir`, `ozet`, `cta`. Sahneler tek bir 3D dünyada yan yana durur; geçişlerde kamera uçar (FOV vurgusu, flaş).
+- **Ses tasarımı:** `ajan/ses_tasarim.py` müziği (Am-F-C-G pad, bas, vuruş, hi-hat, arpej + eko), 3D yazıcı atmosferini (step motor, fan), geçiş "whoosh" + darbe + yükselişi, vurgu "pop", çan, uyarı, tık ve sprey/silme seslerini numpy ile **sentezler**; konuşma varken müzik yan zincirle kısılır; çıktı −14 LUFS'a normalize edilir.
+- **Taslak:** `videolar/yukleme_<tarih>.mp4` + `shorts/<kimlik>.json` (durum `onay_bekliyor`, `tur: "viral"`). **Yayınlamaz**; panelden onaylanınca mevcut YouTube/Instagram akışı yayınlar. Açıklamaya "seslendirme yapay zekâ ile üretilmiştir" notu eklenir.
+- Ayarlar `shorts/viral_ayar.json` (isteğe bağlı: `aktif`, `en_cok_bekleyen`, `ses`, `konusma_hizi`, `perde`). Kullanılan konular `shorts/viral_kullanilan.json`. Üretim runner'da ~10-15 dk sürer.
+- **Gerekli anahtar:** GitHub Secrets → `GOOGLE_TTS_API_KEY` (Google Cloud Console → Text-to-Speech API'yi etkinleştir → Kimlik bilgileri → API anahtarı; anahtarı "Cloud Text-to-Speech API" ile kısıtla). Yoksa üretim açık hata mesajıyla durur.
+- Yerel deneme: `node` + Chromium (`CHROME_YOLU`), `python3 ajan/viral_video.py --senaryo video/senaryolar/tablaya-yapisma.json --sessiz --olcek 0.5 --cikti onizleme.mp4`.
+
 ### Panel düzeni (sekmeler)
 Panel yedi sekmeye ayrıldı; alttaki rozetler o sekmede bekleyen karar/uyarı sayısını gösterir.
 - **Ofis** (açılış): 3 boyutlu ofis, ajan seçimi, üstte "yapılacaklar" şeridi. Ofis yalnızca bu sekmede görünür ve çizilir; diğer sekmelerde durur.

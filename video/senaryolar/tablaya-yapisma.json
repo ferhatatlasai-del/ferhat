@@ -1,0 +1,24 @@
+{
+  "konu": "Tablaya yapışma sorununa pratik çözümler",
+  "baslik": "3D Baskı Tablaya Yapışmıyor mu? 5 Pratik Çözüm",
+  "aciklama": "Baskın tabladan kalkıyor mu? İlk katman yapışmıyorsa çoğu zaman sebep şu beş şeyden biridir: kirli tabla, yanlış ilk katman yüksekliği, düşük tabla sıcaklığı, hızlı ve fanlı ilk katman ya da eksik yapışma yardımcısı.\nHangisini denedin? Yorumlara yaz!",
+  "etiketler": ["3dprinting", "3dbaski", "3dyazici", "filament", "pla"],
+  "sahneler": [
+    {"tip": "baski", "params": {"nesne": "warp"}, "ekran": "BASKI TABLADAN KALKTI!", "rozet": "",
+     "anlati": "Üç saattir basıyorsun, son anda baskı tabladan kalktı! Sebep neredeyse hep aynı: bu beş hatadan biri."},
+    {"tip": "temizlik", "params": {}, "ekran": "TABLAYI TEMİZLE", "rozet": "1",
+     "anlati": "Bir. Tablayı temizle. Parmağındaki yağ görünmez bir tabaka bırakır, filament tutunamaz. İzopropil alkolle sil."},
+    {"tip": "ilk_katman", "params": {}, "ekran": "İLK KATMAN AYARI", "rozet": "2",
+     "anlati": "İki. İlk katman yüksekliği. Nozul çok yukarıdaysa filament tabloya değmez, çok aşağıdaysa sıkışır. Hat hafifçe ezilmiş görünmeli."},
+    {"tip": "sicaklik", "params": {"deger": 60, "birim": "°C", "etiket": "PLA TABLA"}, "ekran": "TABLA SICAKLIĞI", "rozet": "3",
+     "anlati": "Üç. Tabla sıcaklığı. PLA için elli beş ila altmış derece iyi çalışır. PETG daha sıcak ister."},
+    {"tip": "hiz", "params": {"deger": 25}, "ekran": "YAVAŞ VE FANSIZ", "rozet": "4",
+     "anlati": "Dört. İlk katmanı yavaş bas ve fanı kapat. Saniyede yirmi beş milimetre civarı, plastiğe tutunma zamanı verir."},
+    {"tip": "yapistirici", "params": {}, "ekran": "BRIM VE YAPIŞTIRICI", "rozet": "5",
+     "anlati": "Beş. Brim aç, parçanın etrafına geniş bir kenar basılır. Yetmediyse ince bir tabaka çubuk yapıştırıcı sür."},
+    {"tip": "ozet", "params": {"maddeler": ["Temiz tabla", "Doğru ilk katman", "Doğru sıcaklık", "Yavaş, fansız ilk katman"]}, "ekran": "ÖZET", "rozet": "",
+     "anlati": "Özetle: temiz tabla, doğru ilk katman, doğru sıcaklık. Sorunun çoğu ilk katmanda çözülür."},
+    {"tip": "cta", "params": {"ana": "TAKİP ET", "alt": "@gurtechs3d"}, "ekran": "", "rozet": "",
+     "anlati": "Sıradaki baskında hangisini deneyeceksin? Yorumlara yaz, takip et!"}
+  ]
+}
