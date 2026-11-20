@@ -1,0 +1,122 @@
+[
+ {
+  "konu": "Baskı ilk katmanda neden hep bozuluyor",
+  "ipucu": "İlk katman kalitesi: tabla seviyesi, nozul mesafesi, hız, sıcaklık"
+ },
+ {
+  "konu": "Filament nem çekince ne olur",
+  "ipucu": "Nemli filamentin belirtileri (çıtırtı, kabarcık, pürüzlü yüzey) ve kurutma/saklama"
+ },
+ {
+  "konu": "İplik gibi sarkıtmalar (stringing) nasıl biter",
+  "ipucu": "Çekme (retraction), sıcaklık, seyahat hareketi, nem"
+ },
+ {
+  "konu": "Katman kayması neden olur",
+  "ipucu": "Kayış gerginliği, hız/ivme, nozul çarpması, sürücü ısınması"
+ },
+ {
+  "konu": "PLA mı PETG mi: hangisini seçmeli",
+  "ipucu": "Kullanım alanı, yazdırma kolaylığı, sıcaklık dayanımı, esneklik (kesin marka/fiyat yok)"
+ },
+ {
+  "konu": "Nozul tıkanınca ne yapılır",
+  "ipucu": "Soğuk çekme (cold pull), sıcaklık, temizleme iğnesi, nozul değişimi"
+ },
+ {
+  "konu": "Köşeler neden kalkıyor (warping)",
+  "ipucu": "Isı farkı, tabla yapışması, kabin, brim"
+ },
+ {
+  "konu": "Fil ayağı (elephant foot) sorunu",
+  "ipucu": "İlk katman çok ezilmesi, tabla sıcaklığı, chamfer, Z offset"
+ },
+ {
+  "konu": "Dolgu (infill) oranı gerçekten dayanımı artırır mı",
+  "ipucu": "Dolgu yüzdesi, duvar sayısı, dolgu deseni; dayanımda duvarların rolü"
+ },
+ {
+  "konu": "Destek (support) kullanmadan nasıl baskı alınır",
+  "ipucu": "45 derece kuralı, yönlendirme, köprü, parçayı bölme"
+ },
+ {
+  "konu": "Yazıcıyı sessizleştirmenin yolları",
+  "ipucu": "Fan, titreşim yalıtımı, ayak takozları, hız/ivme"
+ },
+ {
+  "konu": "Tabla seviyeleme nasıl yapılır",
+  "ipucu": "Kağıt testi, ısınmış tabla, mesh seviyelendirme"
+ },
+ {
+  "konu": "Yüzeydeki çizgiler (Z-banding) nasıl azalır",
+  "ipucu": "Z ekseni, kayış/vida, sıcaklık dalgalanması, katman yüksekliği"
+ },
+ {
+  "konu": "Baskı hızını artırırken kaliteyi korumak",
+  "ipucu": "İvme, titreşim, soğutma, akış sınırı"
+ },
+ {
+  "konu": "Yeni başlayanlar için 5 altın kural",
+  "ipucu": "Seviyeleme, filament saklama, ilk katman, küçük testler, bakım"
+ },
+ {
+  "konu": "Filament nasıl saklanır",
+  "ipucu": "Nem geçirmez kutu, kurutucu (silika), kurutma"
+ },
+ {
+  "konu": "Esnek filament (TPU) basma ipuçları",
+  "ipucu": "Yavaş hız, direct drive/bowden farkı, çekme ayarı"
+ },
+ {
+  "konu": "Baskı neden eksik dolu (under-extrusion)",
+  "ipucu": "Tıkalı nozul, düşük sıcaklık, akış oranı, nemli filament"
+ },
+ {
+  "konu": "Sıcaklık kulesi ile doğru sıcaklığı bulmak",
+  "ipucu": "Sıcaklık kulesi baskısı ve değerlendirme"
+ },
+ {
+  "konu": "Katmanlar neden ayrılıyor",
+  "ipucu": "Düşük sıcaklık, aşırı soğutma, hava akımı, kabin"
+ },
+ {
+  "konu": "3D yazıcı bakımı: ayda bir yapılacaklar",
+  "ipucu": "Yağlama, kayış, nozul, tabla temizliği, vida kontrolü"
+ },
+ {
+  "konu": "Kalibrasyon küpü ile ayar kontrolü",
+  "ipucu": "20 mm küp ölçüm, e-step/akış, boyut hataları"
+ },
+ {
+  "konu": "Baskının alt yüzeyi neden pürüzlü",
+  "ipucu": "Tabla yüzeyi, ilk katman, soğutma, brim"
+ },
+ {
+  "konu": "Ters çevrilmiş (overhang) kısımlar neden sarkıyor",
+  "ipucu": "Soğutma, açı, hız, destek"
+ },
+ {
+  "konu": "Küçük parçalar neden eriyip şekil bozuyor",
+  "ipucu": "Katman süresi, soğutma, parçaları birlikte basma"
+ },
+ {
+  "konu": "Vazo modu ile hızlı ve güzel baskılar",
+  "ipucu": "Spiral vazo modu, duvar kalınlığı, tasarım ipuçları"
+ },
+ {
+  "konu": "Slicer ayarlarında en çok yanlış anlaşılan 5 ayar",
+  "ipucu": "Duvar sayısı, dolgu, katman yüksekliği, hız, çekme"
+ },
+ {
+  "konu": "Baskıda zamandan kazanmanın yolları",
+  "ipucu": "Katman yüksekliği, nozul çapı, dolgu, yönlendirme"
+ },
+ {
+  "konu": "Parçalar birbirine geçmiyor: tolerans nasıl ayarlanır",
+  "ipucu": "Boşluk (0.2-0.3 mm civarı), yatay delikler, test baskıları"
+ },
+ {
+  "konu": "Ender türü ucuz yazıcıları geliştirmek için ilk 3 şey",
+  "ipucu": "Genel iyileştirmeler: tabla seviyeleme, gerginlik, yağlama (marka iddiası yok)"
+ }
+]
