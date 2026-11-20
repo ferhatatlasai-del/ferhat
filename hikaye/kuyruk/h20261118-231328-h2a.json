@@ -1,7 +1,7 @@
 {
   "id": "h20261118-231328-h2a",
   "kaynak": "uretim",
-  "durum": "planli",
+  "durum": "yayinlaniyor",
   "olusturma": "2026-11-18T23:13:28.000Z",
   "gorsel": "hikaye/gorseller/h20261118-231328-h2a.mp4",
   "baslik": "Clamp /print in place",
@@ -20,7 +20,9 @@
     "deneme": 1,
     "sorunlar": []
   },
-  "yayin": null,
+  "yayin": {
+    "tarih": "2026-11-20T09:36:00Z"
+  },
   "hata": "",
   "deneme": 0,
   "tur": "video",
