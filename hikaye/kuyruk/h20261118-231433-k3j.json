@@ -1,7 +1,7 @@
 {
   "id": "h20261118-231433-k3j",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-18T23:14:33.000Z",
   "gorsel": "hikaye/gorseller/h20261118-231433-k3j.mp4",
   "baslik": "Butterfly Knife - Print in Place - Balisong",
@@ -21,7 +21,9 @@
     "sorunlar": []
   },
   "yayin": {
-    "tarih": "2026-11-20T11:35:59Z"
+    "tarih": "2026-11-20T11:37:19Z",
+    "medya_kimligi": "18649115119011714",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4034539432065755840"
   },
   "hata": "",
   "deneme": 0,
