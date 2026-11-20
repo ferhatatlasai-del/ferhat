@@ -1,6 +1,6 @@
 {
- "tarih": "2026-11-20T09:01:04Z",
- "tr_saat": "20.11.2026 12:01",
+ "tarih": "2026-11-20T12:01:09Z",
+ "tr_saat": "20.11.2026 15:01",
  "toplam": {
   "reels": 0,
   "gonderi": 0,
@@ -241,6 +241,38 @@
  "hikaye_izin": false,
  "hikayeler": [
   {
+   "id": "18649115119011714",
+   "tarih": "2026-11-20T11:37:19Z",
+   "baslik": "Butterfly Knife - Print in Place - Balisong",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
+   "id": "18137973148735007",
+   "tarih": "2026-11-20T10:36:52Z",
+   "baslik": "Build Tray — Modular Organizer for Assembly, Disassembly and",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
+   "id": "18125482561943469",
+   "tarih": "2026-11-20T09:37:48Z",
+   "baslik": "Clamp /print in place",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
+   "id": "18130920760892162",
+   "tarih": "2026-11-20T09:06:52Z",
+   "baslik": "Modern Gridfinity Case",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
    "id": "18172481827478520",
    "tarih": "2026-11-20T08:07:27Z",
    "baslik": "Rope Bowl",
@@ -396,7 +428,7 @@
   "YouTube okunamadı"
  ],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 12:01",
+  "baslik": "📊 İzlenme raporu 15:01",
   "govde": "Toplam 0 (eksik veri) · Reels ? · Short ? · Hikaye ? · Takipçi 417 · Instagram izlenme izni yok; YouTube okunamadı"
  }
 }
