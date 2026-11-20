@@ -56,6 +56,28 @@ OKUNUS = {"PLA": "pe el a", "PETG": "pe e te ge", "ABS": "a be se", "TPU": "te p
 SAYI_BIRIMLERI = {"°C": "derece"}
 
 
+_ILERLEME = {"t": 0.0, "y": -100}
+
+
+def ilerleme(asama, yuzde, mesaj="", zorla=False):
+    """Paneldeki ilerleme göstergesi için ofis sunucusuna aşama/yüzde bildirir (sessizce başarısız olur; üretimi bozmaz)."""
+    print(f"İlerleme: {asama} %{yuzde}" + (f" — {mesaj}" if mesaj else ""), flush=True)
+    ofis, sir = os.environ.get("OFIS_ADRES"), os.environ.get("BILDIRIM_SIRRI")
+    if not (ofis and sir):
+        return
+    simdi = time.time()
+    if not zorla and simdi - _ILERLEME["t"] < 15 and yuzde - _ILERLEME["y"] < 10:
+        return
+    _ILERLEME.update(t=simdi, y=yuzde)
+    try:
+        istek = urllib.request.Request(ofis.rstrip("/") + "/api/viral-ilerleme", method="POST",
+                                       data=json.dumps({"asama": asama, "yuzde": int(yuzde), "mesaj": str(mesaj)[:160]}).encode(),
+                                       headers={"Content-Type": "application/json", "X-Bildirim": sir})
+        urllib.request.urlopen(istek, timeout=10).read()
+    except Exception as e:
+        print(f"(ilerleme bildirilemedi: {type(e).__name__})")
+
+
 def json_oku(yol, varsayilan):
     try:
         return json.loads(pathlib.Path(yol).read_text(encoding="utf-8"))
@@ -409,8 +431,15 @@ def konusma_dosyasi(parcalar_ses, sure, yol):
 def goruntu_ciz(plan_yolu, cikti, olcek=1.0):
     node = os.environ.get("NODE") or "node"
     komut = [node, str(VIDEO / "render.js"), str(plan_yolu), "--cikti", str(cikti), "--olcek", str(olcek)]
-    r = subprocess.run(komut, cwd=str(VIDEO))
-    if r.returncode != 0 or not pathlib.Path(cikti).exists():
+    p = subprocess.Popen(komut, cwd=str(VIDEO), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
+    for satir in p.stdout:
+        print(satir, end="", flush=True)
+        m = re.search(r"Kare (\d+)/(\d+)", satir)
+        if m and int(m.group(2)):
+            oran = int(m.group(1)) / int(m.group(2))
+            ilerleme("3D animasyon çiziliyor", 25 + int(oran * 70), f"kare {m.group(1)}/{m.group(2)}")
+    p.wait()
+    if p.returncode != 0 or not pathlib.Path(cikti).exists():
         raise RuntimeError("3D çizim başarısız (render.js)")
 
 
@@ -427,39 +456,47 @@ def aciklama_olustur(s, tts_gercek):
             "Animasyon ve ses tasarımı yapay zekâ ile kodla üretilmiştir.\n\n" + etiket)
 
 
+def hata(mesaj):
+    print(f"HATA: {mesaj}")
+    ilerleme("Hata", 100, mesaj, zorla=True)
+    return 1
+
+
 def calis(a):
     ayar = dict(VARSAYILAN)
     ayar.update(json_oku(AYAR, {}))
     if not ayar["aktif"] and not (a.hemen or a.senaryo or a.konu):
         print("Karar: bekle (viral video üretimi kapalı)")
+        ilerleme("beklemede", 100, "viral video üretimi kapalı", zorla=True)
         return 0
     bekleyen = sum(1 for f in DIZIN.glob("s*.json") if json_oku(f, {}).get("durum") == "onay_bekliyor")
     if bekleyen >= ayar["en_cok_bekleyen"] and not (a.hemen or a.senaryo or a.konu):
         print(f"Karar: bekle ({bekleyen} taslak onay bekliyor; yenisi üretilmez)")
+        ilerleme("beklemede", 100, f"{bekleyen} taslak onay bekliyor; yenisi üretilmedi", zorla=True)
         return 0
     anahtar = os.environ.get("GOOGLE_TTS_API_KEY")
     gemini = os.environ.get("GEMINI_API_KEY")
     if not (anahtar or gemini) and not (a.tts_dizin or a.sessiz):
-        print("HATA: seslendirme anahtarı yok. İkisinden biri gerekli (GitHub Secrets): 'GEMINI_API_KEY' (aistudio.google.com/apikey, kart gerekmez) ya da 'GOOGLE_TTS_API_KEY' (Google Cloud Text-to-Speech).")
-        return 1
+        return hata("seslendirme anahtarı yok. İkisinden biri gerekli (GitHub Secrets): 'GEMINI_API_KEY' (aistudio.google.com/apikey, kart gerekmez) ya da 'GOOGLE_TTS_API_KEY' (Google Cloud Text-to-Speech).")
     try:
         senaryo, kaynak = senaryo_sec(a, ayar)
     except ValueError as e:
-        print(f"HATA: senaryo geçersiz: {e}")
-        return 1
+        return hata(f"senaryo geçersiz: {e}")
     if not senaryo:
         print(f"Karar: bekle ({kaynak})")
+        ilerleme("beklemede", 100, kaynak, zorla=True)
         return 0
     print(f"Konu: {senaryo['konu']} ({kaynak}); {len(senaryo['sahneler'])} sahne")
+    ilerleme("Senaryo hazır", 5, senaryo["konu"][:100], zorla=True)
     H.ffmpeg_hazir()
     sesler = []
     for i, s in enumerate(senaryo["sahneler"]):
+        ilerleme("Seslendirme", 5 + int(15 * i / len(senaryo["sahneler"])), f"sahne {i + 1}/{len(senaryo['sahneler'])}")
         sesler.append(fixture_seslendir(a.tts_dizin, i, s["anlati"]) if a.tts_dizin else gemini_seslendir(s["anlati"], ayar, gemini) if (gemini and not anahtar and not a.sessiz) else sahne_seslendir(s["anlati"], ayar, None if a.sessiz else anahtar))
     plan, parcalar = cizelge_kur(senaryo, sesler)
     print(f"Süre: {plan['sure']:.1f} sn, {len(plan['altyazi'])} alt yazı parçası")
     if plan["sure"] > 175:
-        print("HATA: video 175 sn'den uzun (Shorts sınırı 3 dk); anlatıyı kısalt.")
-        return 1
+        return hata("video 175 sn'den uzun (Shorts sınırı 3 dk); anlatıyı kısalt.")
     z = H.simdi().astimezone(datetime.timezone.utc)
     damga = z.strftime("%Y%m%d%H%M%S")
     cikti = pathlib.Path(a.cikti) if a.cikti else KOK / f"videolar/yukleme_{damga}.mp4"
@@ -471,9 +508,11 @@ def calis(a):
         if parcalar:
             konusma_dosyasi(parcalar, plan["sure"], g / "konusma.wav")
             konusma = g / "konusma.wav"
+        ilerleme("Müzik ve ses efektleri", 22, "", zorla=True)
         SES.uret(plan, g / "ses_ham.wav", konusma)
         SES.normalize(g / "ses_ham.wav", g / "ses.wav")
         goruntu_ciz(g / "plan.json", g / "sessiz.mp4", a.olcek)
+        ilerleme("Ses ve görüntü birleştiriliyor", 96, "", zorla=True)
         birlestir(g / "sessiz.mp4", g / "ses.wav", cikti)
         if a.plan_kaydet:
             yaz(a.plan_kaydet, plan)
@@ -488,6 +527,7 @@ def calis(a):
         print(f"Taslak hazır: {kimlik}; başlık: {senaryo['baslik']}")
         if a.git:
             H.git_kaydet(f"Viral video: {kimlik} taslağı ({senaryo['konu'][:60]})", [DIZIN, KOK / "videolar"])
+            ilerleme("Hazır", 100, senaryo["baslik"][:100], zorla=True)
             H.bildir("Yeni viral video taslağı hazır", f"{senaryo['baslik']} — panelde onayını bekliyor.", adres="/", etiket="shorts")
     return 0
 
@@ -503,7 +543,12 @@ def main():
     ap.add_argument("--tts-dizin", help="test: önceden üretilmiş konuşma dizini (s0.wav, s0.json…)")
     ap.add_argument("--sessiz", action="store_true", help="test: seslendirme olmadan (tahmini zamanlama)")
     ap.add_argument("--plan-kaydet", help="plan.json'u bu yola da yaz")
-    sys.exit(calis(ap.parse_args()))
+    try:
+        kod = calis(ap.parse_args())
+    except Exception as e:
+        ilerleme("Hata", 100, f"{type(e).__name__}: {str(e)[:140]}", zorla=True)
+        raise
+    sys.exit(kod)
 
 
 if __name__ == "__main__":
