@@ -1,0 +1,55 @@
+{
+  "kimlik": "y20261119-215841",
+  "olusturma": "2026-11-19T21:58:41.695Z",
+  "durum": "yayinda",
+  "kaynak": "bagimsiz",
+  "direktif": "",
+  "konu": "Dr. Filament ile 3D Yazıcılar Nasıl Çalışır? | gurtech3d",
+  "format": "reels",
+  "seri": "",
+  "kanca": "",
+  "video": {
+    "yol": "videolar/yukleme_20261119215755.mp4",
+    "tarih": "2026-11-19T21:58:32.138Z"
+  },
+  "yayinlar": [
+    {
+      "hedef": "instagram",
+      "platform": "instagram",
+      "tur": "reels",
+      "durum": "yayinda",
+      "baslangic": "2026-11-19T21:58:32.138Z",
+      "video": "videolar/yukleme_20261119215755.mp4",
+      "tarih": "2026-11-19T21:59:43Z",
+      "link": "https://www.instagram.com/reel/Df8Gek5DMrG/",
+      "medya_kimligi": "18289759651292671",
+      "adres": "https://github.com/ferhatatlasai-del/ferhat/actions/runs/44624089505"
+    },
+    {
+      "hedef": "youtube",
+      "platform": "youtube",
+      "tur": "shorts",
+      "durum": "yayinda",
+      "baslangic": "2026-11-19T21:58:32.138Z",
+      "video": "videolar/yukleme_20261119215755.mp4",
+      "tarih": "2026-11-19T21:59:07Z",
+      "link": "https://www.youtube.com/shorts/MGVp8xfBUtc",
+      "medya_kimligi": "MGVp8xfBUtc",
+      "adres": "https://github.com/ferhatatlasai-del/ferhat/actions/runs/44624092534"
+    },
+    {
+      "hedef": "hikaye",
+      "platform": "instagram",
+      "tur": "hikaye",
+      "durum": "yayinda",
+      "baslangic": "2026-11-19T21:58:32.138Z",
+      "video": "videolar/yukleme_20261119215755.mp4",
+      "tarih": "2026-11-19T22:00:03Z",
+      "link": "https://www.instagram.com/stories/gurtechs3d/4034128063000043477",
+      "medya_kimligi": "18119590649026120",
+      "adres": "https://github.com/ferhatatlasai-del/ferhat/actions/runs/44624095981"
+    }
+  ],
+  "olcumler": [],
+  "ogrenildi": false
+}

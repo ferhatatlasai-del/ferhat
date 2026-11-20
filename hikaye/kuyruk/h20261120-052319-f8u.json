@@ -1,0 +1,34 @@
+{
+  "id": "h20261120-052319-f8u",
+  "kaynak": "uretim",
+  "durum": "planli",
+  "olusturma": "2026-11-20T05:23:19.000Z",
+  "gorsel": "hikaye/gorseller/h20261120-052319-f8u.mp4",
+  "baslik": "drill press depth stop",
+  "atif": {
+    "ad": "drill press depth stop",
+    "tasarimci": "Nikki81",
+    "lisans": "CC BY",
+    "url": "https://www.printables.com/model/401187-drill-press-depth-stop",
+    "site": "printables.com",
+    "lisans_teyit": true,
+    "referansli": true
+  },
+  "trend": "Ayarlı vida deliği matkap derinlik aparatı",
+  "kontrol": {
+    "puan": 8.0,
+    "deneme": 1,
+    "sorunlar": [
+      "İkinci görselde referans fotoğrafında yazılar görünüyor.",
+      "Üretilen görselde vida/kelepçe formu biraz stilize edilmiş."
+    ]
+  },
+  "yayin": null,
+  "hata": "",
+  "deneme": 0,
+  "tur": "video",
+  "muzik": "Sentezlenmiş müzik: Parlak neşeli (telifsiz, FFmpeg ile üretildi)",
+  "muzik_sira": 20,
+  "muzik_stil": "Parlak neşeli",
+  "muzik_ton": 3
+}

@@ -1,6 +1,6 @@
 {
- "tarih": "2026-11-19T21:33:15Z",
- "tr_saat": "20.11.2026 00:33",
+ "tarih": "2026-11-20T06:01:05Z",
+ "tr_saat": "20.11.2026 09:01",
  "toplam": {
   "reels": 0,
   "gonderi": 0,
@@ -8,7 +8,7 @@
   "youtube_video": 0,
   "hikaye": 0,
   "toplam": 0,
-  "begeni": 96,
+  "begeni": 98,
   "yorum": 4
  },
  "fark": 0,
@@ -18,6 +18,17 @@
   "takipci": 417,
   "hata": "HTTP 400 kod=10 tür=OAuthException: (#10) Application does not have permission for this action",
   "gonderiler": [
+   {
+    "id": "18289759651292671",
+    "tur": "Reels",
+    "tarih": "2026-11-19T21:59:31",
+    "baslik": "Dijital tasarımların katman katman gerçeğe dönüştüğü 3D bask",
+    "begeni": 2,
+    "yorum": 0,
+    "link": "https://www.instagram.com/reel/Df8Gek5DMrG/",
+    "izlenme": null,
+    "erisim": null
+   },
    {
     "id": "18132390508855696",
     "tur": "Reels",
@@ -230,6 +241,14 @@
  "hikaye_izin": false,
  "hikayeler": [
   {
+   "id": "18119590649026120",
+   "tarih": "2026-11-19T21:59:58Z",
+   "baslik": "Dr. Filament ile 3D Yazıcılar Nasıl Çalışır? | gurtech3d",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
    "id": "17937205662142257",
    "tarih": "2026-11-19T16:26:01Z",
    "baslik": "Precision Tweezers v2 - 3D Folding",
@@ -369,7 +388,7 @@
   "YouTube okunamadı"
  ],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 00:33",
+  "baslik": "📊 İzlenme raporu 09:01",
   "govde": "Toplam 0 (eksik veri) · Reels ? · Short ? · Hikaye ? · Takipçi 417 · Instagram izlenme izni yok; YouTube okunamadı"
  }
 }
