@@ -386,7 +386,7 @@ body.tam .hint{display:none}
         <p class="not" id="skDurum">Yükleniyor…</p>
         <div class="satir"><button type="button" id="skUret">Şimdi bir taslak üret</button></div>
         <h3 style="margin:14px 0 4px">3D animasyonlu viral video</h3>
-        <p class="alt">Haftada üç kez (pazartesi, çarşamba, cumartesi 14:00) <b>3D animasyonlu, Türkçe seslendirmeli, alt yazılı, ~60 sn</b> bir bilgi videosu taslağı hazırlar (müzik ve ses efektleri kodla sentezlenir). Yine <b>onayını bekler</b>. Hazırlanması ~25 dakika sürer; ilerlemeyi aşağıdaki kutudan izleyebilirsin.</p>
+        <p class="alt">Haftada üç kez (pazartesi, çarşamba, cumartesi 14:00) <b>3D animasyonlu, Türkçe seslendirmeli, alt yazılı, ~60 sn</b> bir bilgi videosu taslağı hazırlar (müzik ve ses efektleri kodla sentezlenir). Yine <b>onayını bekler</b>. Hazırlanması ~40 dakika sürer; ilerlemeyi aşağıdaki kutudan izleyebilirsin.</p>
         <div class="satir"><input type="text" id="skKonu" maxlength="120" placeholder="İsteğe bağlı konu (boşsa sıradaki konu)" style="flex:1;min-width:160px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px"><button type="button" id="skViral">Şimdi viral video üret</button></div>
         <div id="skViralDurum" hidden style="margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg)"></div>
         <div id="skListe"></div>
@@ -2102,7 +2102,7 @@ $('#skViral').addEventListener('click',function(){
   if(!hSifreKontrol()) return; var btn=this, et='Şimdi viral video üret';
   if(!skvOnay){ skvOnay=true; btn.textContent='Emin misin? Evet, üret'; setTimeout(function(){ skvOnay=false; btn.textContent=et; },6000); return; }
   skvOnay=false; btn.textContent=et; btn.disabled=true;
-  hPost('/api/viral-calistir',{konu:$('#skKonu').value||''}).then(function(){ $('#skDurum').textContent='3D video üretimi başlatıldı (yaklaşık 25 dk). İlerlemeyi aşağıdaki kutudan izleyebilirsin; sayfayı kapatsan da devam eder.'; btn.disabled=false; viralDurumCiz({var:true,calisiyor:true,durum:'queued',baslangic:new Date().toISOString()}); VD.onceki=true; clearTimeout(VD.zam); VD.zam=setTimeout(viralDurumCek,6000); }).catch(function(e){ $('#skDurum').textContent=String(e.message||e); btn.disabled=false; });
+  hPost('/api/viral-calistir',{konu:$('#skKonu').value||''}).then(function(){ $('#skDurum').textContent='3D video üretimi başlatıldı (yaklaşık 40 dk). İlerlemeyi aşağıdaki kutudan izleyebilirsin; sayfayı kapatsan da devam eder.'; btn.disabled=false; viralDurumCiz({var:true,calisiyor:true,durum:'queued',baslangic:new Date().toISOString()}); VD.onceki=true; clearTimeout(VD.zam); VD.zam=setTimeout(viralDurumCek,6000); }).catch(function(e){ $('#skDurum').textContent=String(e.message||e); btn.disabled=false; });
 });
 shortsCek(); setInterval(shortsCek,300000);
 
