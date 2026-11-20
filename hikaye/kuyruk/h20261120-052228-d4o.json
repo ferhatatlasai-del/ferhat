@@ -1,7 +1,7 @@
 {
   "id": "h20261120-052228-d4o",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-20T05:22:29.000Z",
   "gorsel": "hikaye/gorseller/h20261120-052228-d4o.mp4",
   "baslik": "Drill Press Depth Stop Mount for el-cheapo Harbor Freight Central Machinery tool",
@@ -25,9 +25,11 @@
     ]
   },
   "yayin": {
-    "tarih": "2026-11-20T23:27:16Z"
+    "tarih": "2026-11-20T23:28:11Z",
+    "medya_kimligi": "18154348378555017",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4034897251016464578"
   },
-  "hata": "HTTP 400 kod=200 alt=5258005: API access blocked.",
+  "hata": "",
   "deneme": 3,
   "tur": "video",
   "muzik": "Sentezlenmiş müzik: Pop enerjik (telifsiz, FFmpeg ile üretildi)",
