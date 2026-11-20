@@ -1,6 +1,6 @@
 {
- "tarih": "2026-11-20T06:52:16Z",
- "tr_saat": "20.11.2026 09:52",
+ "tarih": "2026-11-20T09:01:04Z",
+ "tr_saat": "20.11.2026 12:01",
  "toplam": {
   "reels": 0,
   "gonderi": 0,
@@ -241,6 +241,14 @@
  "hikaye_izin": false,
  "hikayeler": [
   {
+   "id": "18172481827478520",
+   "tarih": "2026-11-20T08:07:27Z",
+   "baslik": "Rope Bowl",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
    "id": "18119590649026120",
    "tarih": "2026-11-19T21:59:58Z",
    "baslik": "Dr. Filament ile 3D Yazıcılar Nasıl Çalışır? | gurtech3d",
@@ -388,7 +396,7 @@
   "YouTube okunamadı"
  ],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 09:52",
+  "baslik": "📊 İzlenme raporu 12:01",
   "govde": "Toplam 0 (eksik veri) · Reels ? · Short ? · Hikaye ? · Takipçi 417 · Instagram izlenme izni yok; YouTube okunamadı"
  }
 }
