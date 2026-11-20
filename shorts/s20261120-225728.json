@@ -1,7 +1,7 @@
 {
   "id": "s20261120-225728",
   "olusturma": "2026-11-20T22:57:28Z",
-  "durum": "onay_bekliyor",
+  "durum": "yayinlandi",
   "tur": "viral",
   "video": "videolar/yukleme_20261120225728.mp4",
   "sure": 60.1,
@@ -10,5 +10,10 @@
   "muzik": "Sentez (kodla üretildi)",
   "konu": "Baskı ilk katmanda neden hep bozuluyor",
   "tasarimlar": [],
-  "hikayeler": []
+  "hikayeler": [],
+  "yayinlanan": [
+    "youtube",
+    "instagram"
+  ],
+  "yayin_tarihi": "2026-11-20T23:22:22.231Z"
 }
