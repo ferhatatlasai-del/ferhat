@@ -1,0 +1,35 @@
+{
+  "kimlik": "y20261120-232220",
+  "olusturma": "2026-11-20T23:22:20.166Z",
+  "durum": "video",
+  "kaynak": "bagimsiz",
+  "direktif": "",
+  "konu": "İlk katman neden bozuluyor? 5 hızlı kontrol",
+  "format": "reels",
+  "seri": "",
+  "kanca": "",
+  "video": {
+    "yol": "videolar/yukleme_20261120225728.mp4",
+    "tarih": "2026-11-20T23:22:12.236Z"
+  },
+  "yayinlar": [
+    {
+      "hedef": "youtube",
+      "platform": "youtube",
+      "tur": "shorts",
+      "durum": "basladi",
+      "baslangic": "2026-11-20T23:22:12.236Z",
+      "video": "videolar/yukleme_20261120225728.mp4"
+    },
+    {
+      "hedef": "instagram",
+      "platform": "instagram",
+      "tur": "reels",
+      "durum": "basladi",
+      "baslangic": "2026-11-20T23:22:12.236Z",
+      "video": "videolar/yukleme_20261120225728.mp4"
+    }
+  ],
+  "olcumler": [],
+  "ogrenildi": false
+}
