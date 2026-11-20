@@ -279,6 +279,23 @@ async function direktifBaslat(metin, format) {
 
 async function varsayilanDal() { const r = await gh(`/repos/${REPO}`); const j = await r.json(); return j.default_branch; }
 
+let viralIlerleme = null, viralOnbellek = { t: 0, veri: null };
+async function viralDurum() {
+  // Son viral video çalışması (GitHub) + iş akışının bildirdiği aşama. Sayfa kapanıp açılsa da durum buradan okunur.
+  if (Date.now() - viralOnbellek.t < 12e3 && viralOnbellek.veri) return viralOnbellek.veri;
+  const r = await gh(`/repos/${REPO}/actions/workflows/${AKIS_VIRAL}/runs?per_page=1`);
+  const run = r.ok ? ((await r.json()).workflow_runs || [])[0] : null;
+  const veri = { var: !!run };
+  if (run) {
+    const bas = run.run_started_at || run.created_at;
+    Object.assign(veri, { calisiyor: ['queued', 'in_progress', 'waiting', 'requested', 'pending'].includes(run.status), durum: run.status, sonuc: run.conclusion,
+      baslangic: bas, bitis: run.status === 'completed' ? run.updated_at : null, adres: run.html_url, olay: run.event });
+    if (viralIlerleme && Date.parse(viralIlerleme.t) >= Date.parse(bas) - 60e3) Object.assign(veri, { asama: viralIlerleme.asama, yuzde: viralIlerleme.yuzde, mesaj: viralIlerleme.mesaj, ilerleme_t: viralIlerleme.t });
+  }
+  viralOnbellek = { t: Date.now(), veri };
+  return veri;
+}
+
 async function ajanDurumlari() {
   if (Date.now() - ajanOnbellek.t < 60e3 && ajanOnbellek.veri) return ajanOnbellek.veri;
   const dosyalar = [...new Set(Object.values(AJAN_AKISLARI).flat())];
@@ -376,6 +393,22 @@ async function api(req, res, url) {
       trendOnbellek = { t: Date.now(), veri };
       return json(res, 200, veri);
     } catch (e) { return json(res, 502, { hata: 'Trendler okunamadı.' }); }
+  }
+  if (url.pathname === '/api/viral-ilerleme' && req.method === 'POST') {
+    // Sunucudan sunucuya: viral video iş akışı aşama/yüzde bildirir (BILDIRIM_SIRRI ile)
+    if (!BILDIRIM_SIRRI) return json(res, 503, { hata: 'BILDIRIM_SIRRI tanımlı değil.' });
+    if (kilitliMi(req)) return json(res, 429, { hata: 'Çok fazla yanlış deneme.' });
+    const gelen = String(req.headers['x-bildirim'] || '');
+    const a = crypto.createHash('sha256').update(gelen).digest(), b2 = crypto.createHash('sha256').update(BILDIRIM_SIRRI).digest();
+    if (!crypto.timingSafeEqual(a, b2)) { yanlisKaydet(req); return json(res, 401, { hata: 'Yetkisiz.' }); }
+    let b; try { b = await govde(req); } catch (e) { return json(res, 400, { hata: 'Geçersiz istek.' }); }
+    viralIlerleme = { asama: temiz(b.asama, 60), yuzde: Math.max(0, Math.min(100, Math.round(+b.yuzde || 0))), mesaj: temiz(b.mesaj, 160), t: new Date().toISOString() };
+    viralOnbellek.t = 0;
+    return json(res, 200, { ok: true });
+  }
+  if (url.pathname === '/api/viral-durum') {
+    if (!TOKEN) return json(res, 503, { hata: 'Sunucuda GITHUB_TOKEN tanımlı değil.' });
+    try { return json(res, 200, await viralDurum()); } catch (e) { return json(res, 502, { hata: 'Durum okunamadı.' }); }
   }
   if (!TOKEN || !SIFRE) return json(res, 503, { hata: 'Sunucuda GITHUB_TOKEN ya da PANEL_SIFRE tanımlı değil.' });
   if (kilitliMi(req)) return json(res, 429, { hata: 'Çok fazla yanlış deneme. 15 dakika sonra tekrar dene.' });
@@ -513,7 +546,7 @@ async function api(req, res, url) {
     const dal = await varsayilanDal();
     const r = await gh(`/repos/${REPO}/actions/workflows/${AKIS_VIRAL}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: { hemen: 'EVET', konu } }) });
     if (r.status !== 204) return json(res, 502, { hata: 'GitHub kabul etmedi (' + r.status + ').' });
-    viralTetikler.push(simdi);
+    viralTetikler.push(simdi); viralOnbellek.t = 0;
     return json(res, 200, { ok: true });
   }
   if (url.pathname === '/api/trend-calistir' && req.method === 'POST') {

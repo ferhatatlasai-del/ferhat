@@ -386,8 +386,9 @@ body.tam .hint{display:none}
         <p class="not" id="skDurum">Yükleniyor…</p>
         <div class="satir"><button type="button" id="skUret">Şimdi bir taslak üret</button></div>
         <h3 style="margin:14px 0 4px">3D animasyonlu viral video</h3>
-        <p class="alt">Haftada üç kez (pazartesi, çarşamba, cumartesi 14:00) <b>3D animasyonlu, Türkçe seslendirmeli, alt yazılı, ~60 sn</b> bir bilgi videosu taslağı hazırlar (müzik ve ses efektleri kodla sentezlenir). Yine <b>onayını bekler</b>. Hazırlanması ~10-15 dakika sürer.</p>
+        <p class="alt">Haftada üç kez (pazartesi, çarşamba, cumartesi 14:00) <b>3D animasyonlu, Türkçe seslendirmeli, alt yazılı, ~60 sn</b> bir bilgi videosu taslağı hazırlar (müzik ve ses efektleri kodla sentezlenir). Yine <b>onayını bekler</b>. Hazırlanması ~25 dakika sürer; ilerlemeyi aşağıdaki kutudan izleyebilirsin.</p>
         <div class="satir"><input type="text" id="skKonu" maxlength="120" placeholder="İsteğe bağlı konu (boşsa sıradaki konu)" style="flex:1;min-width:160px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px"><button type="button" id="skViral">Şimdi viral video üret</button></div>
+        <div id="skViralDurum" hidden style="margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg)"></div>
         <div id="skListe"></div>
       </div>
       <div class="card pub" id="pub">
@@ -2056,12 +2057,48 @@ $('#skUret').addEventListener('click',function(){
   skOnay=false; btn.textContent='Şimdi bir taslak üret'; btn.disabled=true;
   hPost('/api/shorts-calistir',{}).then(function(){ $('#skDurum').textContent='Üretiliyor. Birkaç dakika içinde taslak burada görünür.'; btn.disabled=false; var n=0; var t=setInterval(function(){ shortsCek(); if(++n>16) clearInterval(t); },15000); }).catch(function(e){ $('#skDurum').textContent=String(e.message||e); btn.disabled=false; });
 });
+var VD={zam:null,onceki:false};
+function vdSaat(t){ try{ return new Date(t).toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}); }catch(e){ return ''; } }
+function viralDurumCiz(v){
+  var el=$('#skViralDurum'); if(!el) return; el.textContent='';
+  if(!v||!v.var){ el.hidden=true; return; }
+  var simdi=Date.now(), bitis=v.bitis?Date.parse(v.bitis):simdi, gecen=Math.max(0,Math.round((bitis-Date.parse(v.baslangic))/60000));
+  if(!v.calisiyor && simdi-bitis>24*3600e3){ el.hidden=true; return; }
+  el.hidden=false;
+  var bas=dom('b'), alt=dom('div','not'), cubuk=null;
+  if(v.calisiyor){
+    var y=(v.yuzde!=null&&v.asama!=='Hazır')?v.yuzde:(v.durum==='queued'?0:2);
+    bas.textContent='⏳ 3D video hazırlanıyor · '+gecen+' dk geçti';
+    var as=v.asama||(v.durum==='queued'?'Sırada bekliyor (GitHub makinesi bekleniyor)':'Başlatılıyor');
+    var kalan=(y>=25&&y<96&&gecen>2)?Math.max(1,Math.round(gecen/y*(100-y))):null;
+    alt.textContent=as+(v.mesaj?' — '+v.mesaj:'')+' · %'+y+(kalan?' · tahmini '+kalan+' dk kaldı':'');
+    cubuk=dom('div'); cubuk.style.cssText='height:8px;border-radius:6px;background:var(--line);margin-top:8px;overflow:hidden';
+    var dol=dom('div'); dol.style.cssText='height:100%;width:'+Math.max(2,y)+'%;background:#ff7a1a;transition:width .6s'; cubuk.appendChild(dol);
+  } else if(v.sonuc==='success' && v.asama==='beklemede'){
+    bas.textContent='ℹ️ Son çalışma video üretmedi ('+vdSaat(v.bitis)+')'; alt.textContent=v.mesaj||'Bekleme kararı verildi.';
+  } else if(v.sonuc==='success'){
+    bas.textContent='✅ Son viral video hazırlandı ('+vdSaat(v.bitis)+', '+gecen+' dk sürdü)'; alt.textContent=(v.asama==='Hazır'&&v.mesaj?v.mesaj+' — ':'')+'taslak aşağıda.';
+  } else {
+    bas.textContent='❌ Son viral video üretimi '+(v.sonuc==='cancelled'?'iptal edildi':'başarısız')+' ('+vdSaat(v.bitis)+')';
+    alt.textContent=(v.asama==='Hata'&&v.mesaj)?v.mesaj:'Ayrıntı için GitHub kaydına bak.';
+  }
+  el.appendChild(bas); el.appendChild(alt); if(cubuk) el.appendChild(cubuk);
+  if(v.adres){ var a=document.createElement('a'); a.href=v.adres; a.target='_blank'; a.rel='noopener'; a.textContent='GitHub kaydı'; a.style.cssText='display:inline-block;margin-top:6px;font-size:13px'; el.appendChild(a); }
+}
+function viralDurumCek(){
+  fetch('/api/viral-durum?t='+Date.now()).then(function(r){return r.ok?r.json():null;}).then(function(v){
+    viralDurumCiz(v); var cal=!!(v&&v.calisiyor);
+    if(VD.onceki&&!cal) shortsCek();   // yeni bitti: taslak listesini tazele
+    VD.onceki=cal; clearTimeout(VD.zam); VD.zam=setTimeout(viralDurumCek, cal?15000:120000);
+  }).catch(function(){ clearTimeout(VD.zam); VD.zam=setTimeout(viralDurumCek,60000); });
+}
+viralDurumCek();
 var skvOnay=false;
 $('#skViral').addEventListener('click',function(){
   if(!hSifreKontrol()) return; var btn=this, et='Şimdi viral video üret';
   if(!skvOnay){ skvOnay=true; btn.textContent='Emin misin? Evet, üret'; setTimeout(function(){ skvOnay=false; btn.textContent=et; },6000); return; }
   skvOnay=false; btn.textContent=et; btn.disabled=true;
-  hPost('/api/viral-calistir',{konu:$('#skKonu').value||''}).then(function(){ $('#skDurum').textContent='3D video hazırlanıyor (10-15 dk). Hazır olunca burada ve bildirimle görünür.'; btn.disabled=false; var n=0; var t=setInterval(function(){ shortsCek(); if(++n>60) clearInterval(t); },30000); }).catch(function(e){ $('#skDurum').textContent=String(e.message||e); btn.disabled=false; });
+  hPost('/api/viral-calistir',{konu:$('#skKonu').value||''}).then(function(){ $('#skDurum').textContent='3D video üretimi başlatıldı (yaklaşık 25 dk). İlerlemeyi aşağıdaki kutudan izleyebilirsin; sayfayı kapatsan da devam eder.'; btn.disabled=false; viralDurumCiz({var:true,calisiyor:true,durum:'queued',baslangic:new Date().toISOString()}); VD.onceki=true; clearTimeout(VD.zam); VD.zam=setTimeout(viralDurumCek,6000); }).catch(function(e){ $('#skDurum').textContent=String(e.message||e); btn.disabled=false; });
 });
 shortsCek(); setInterval(shortsCek,300000);
 
