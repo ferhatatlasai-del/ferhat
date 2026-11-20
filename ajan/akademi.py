@@ -99,12 +99,29 @@ def olaylar(gun=GUN):
     return cikti
 
 
+def arsiv_kayitlari():
+    """hikaye/arsiv.jsonl: silinen eski biten hikayelerin kısa özetleri; kuyruk kaydı gibi biçimlenir (haftalık sayılar eksilmesin)."""
+    yol = KOK / "hikaye" / "arsiv.jsonl"
+    cikti = []
+    if not yol.exists():
+        return cikti
+    for satir in yol.read_text(encoding="utf-8").splitlines():
+        try:
+            j = json.loads(satir)
+        except ValueError:
+            continue
+        cikti.append({"olusturma": j.get("olusturma"), "durum": j.get("durum"), "kaynak": j.get("kaynak"),
+                      "kontrol": ({"puan": j.get("puan"), "deneme": j.get("deneme")} if j.get("puan") is not None else None),
+                      "atif": {"referansli": j.get("referansli")}, "trend": j.get("trend"), "muzik": j.get("muzik"),
+                      "yayin": {"tarih": j.get("yayin_tarih")}})
+    return cikti
+
+
 def hikaye_ozeti(gun=GUN):
     sinir = simdi() - datetime.timedelta(days=gun)
     durum, kaynak, puanlar, denemeler, yayin_gun = collections.Counter(), collections.Counter(), [], [], collections.Counter()
     referansli = trendli = muzikli = 0
-    for f in glob.glob(str(KOK / "hikaye" / "kuyruk" / "h*.json")):
-        o = json_oku(f, None)
+    for o in [json_oku(f, None) for f in glob.glob(str(KOK / "hikaye" / "kuyruk" / "h*.json"))] + arsiv_kayitlari():
         if not o:
             continue
         z = zaman(o.get("olusturma"))

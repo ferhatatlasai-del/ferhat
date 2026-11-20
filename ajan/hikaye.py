@@ -38,9 +38,12 @@ import ig_ortak  # noqa: E402  (anahtar türüne göre adres ve hesap)
 AYAR = KOK / "hikaye" / "ayar.json"
 KUYRUK = KOK / "hikaye" / "kuyruk"
 GORSELLER = KOK / "hikaye" / "gorseller"
+ARSIV = KOK / "hikaye" / "arsiv.jsonl"
+MEDYA_RE = re.compile(r"^hikaye/gorseller/h[\w.-]+\.(jpg|mp4)$")
 MAKS_VIDEO_SN, MIN_VIDEO_SN = 60, 3
 VARSAYILAN = {"aktif": False, "mod": "otomatik", "gunluk_sayi": 4, "baslangic_saat": 10, "bitis_saat": 22,
-              "gunler": [1, 2, 3, 4, 5, 6, 7], "min_aralik_dk": 60, "ardisik_hata": 0, "hata_siniri": 3, "son_not": ""}
+              "gunler": [1, 2, 3, 4, 5, 6, 7], "min_aralik_dk": 60, "ardisik_hata": 0, "hata_siniri": 3, "son_not": "",
+              "saklama_gun": 3}
 TR = datetime.timezone(datetime.timedelta(hours=3))   # Türkiye sabit UTC+3
 
 
@@ -71,6 +74,51 @@ def kuyruk_oku():
         except Exception:
             pass
     return ogeler
+
+
+def arsiv_satiri(o):
+    """Silinen kaydın istatistik için gereken kısa özeti (Akademi haftalık raporu bunu okur)."""
+    y = o.get("yayin") or {}
+    k = o.get("kontrol") or {}
+    return {"id": o.get("id"), "olusturma": o.get("olusturma"), "durum": o.get("durum"), "kaynak": o.get("kaynak"),
+            "puan": k.get("puan"), "deneme": k.get("deneme"), "referansli": bool((o.get("atif") or {}).get("referansli")),
+            "trend": bool(o.get("trend")), "muzik": bool(o.get("muzik")), "yayin_tarih": y.get("tarih"),
+            "medya_kimligi": y.get("medya_kimligi"), "baslik": (o.get("baslik") or (o.get("atif") or {}).get("ad") or "")[:80]}
+
+
+def temizle(ayar, ogeler, an):
+    """Yayınlanıp biten (yayinda, reddedildi, hata) hikayelerden saklama süresini aşanları eskiden yeniye siler.
+    Kaydın kısa özeti hikaye/arsiv.jsonl'e yazılır; hikaye/gorseller altındaki medya dosyaları da silinir (depo şişmesin).
+    Planlı/onay bekleyen/yayınlanıyor kayıtlara ve videolar/ klasöründeki ortak dosyalara dokunulmaz. Silinen sayısını döndürür."""
+    gun = float(ayar.get("saklama_gun") or 0)
+    if gun <= 0:
+        return 0
+    sinir = an - datetime.timedelta(days=gun)
+    silinecek = []
+    for o in ogeler:
+        if o.get("durum") not in ("yayinda", "reddedildi", "hata"):
+            continue
+        t = (o.get("yayin") or {}).get("tarih") or o.get("olusturma")
+        try:
+            tz = tr_zaman(t)
+        except Exception:
+            continue
+        if tz < sinir:
+            silinecek.append((tz, o))
+    silinecek.sort(key=lambda x: x[0])
+    if not silinecek:
+        return 0
+    ARSIV.parent.mkdir(parents=True, exist_ok=True)
+    with ARSIV.open("a", encoding="utf-8") as f:
+        for _, o in silinecek:
+            f.write(json.dumps(arsiv_satiri(o), ensure_ascii=False) + "\n")
+    for _, o in silinecek:
+        for alan in ("gorsel", "hazir"):
+            yol = o.get(alan)
+            if yol and MEDYA_RE.match(yol):
+                (KOK / yol).unlink(missing_ok=True)
+        o["_yol"].unlink(missing_ok=True)
+    return len(silinecek)
 
 
 def oge_yaz(o):
@@ -325,6 +373,13 @@ def yayinla_komutu(a):
     ayar = ayar_oku()
     ogeler = kuyruk_oku()
     an = simdi()
+    if not a.kuru:
+        silinen = temizle(ayar, ogeler, an)
+        if silinen:
+            print(f"Eski biten kayıtlar temizlendi: {silinen} hikaye (saklama {ayar.get('saklama_gun')} gün; özetleri hikaye/arsiv.jsonl'de).")
+            if a.git:
+                git_kaydet(f"Hikaye: {silinen} eski biten kayıt temizlendi", [KUYRUK, GORSELLER, ARSIV])
+            ogeler = kuyruk_oku()
     yay, neden, oge = karar(ayar, ogeler, an, a.hemen, a.kimlik)
     print(f"Karar: {'YAYINLA' if yay else 'bekle'} ({neden})")
     if not yay or a.kuru:
