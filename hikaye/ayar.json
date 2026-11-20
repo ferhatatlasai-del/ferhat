@@ -1,5 +1,5 @@
 {
-  "aktif": true,
+  "aktif": false,
   "mod": "otomatik",
   "gunluk_sayi": 12,
   "baslangic_saat": 10,
@@ -14,8 +14,8 @@
     7
   ],
   "min_aralik_dk": 60,
-  "ardisik_hata": 2,
+  "ardisik_hata": 3,
   "hata_siniri": 3,
-  "son_not": "",
+  "son_not": "3 ardışık hata nedeniyle otomatik duraklatıldı",
   "saklama_gun": 3
 }
