@@ -166,9 +166,10 @@ def karar(ayar, ogeler, an, hemen=False, kimlik=None):
         son = max(tr_zaman(o["yayin"]["tarih"]) for o in bugun)
         gecen = (yerel - son).total_seconds() / 60
         # Alt sınır slot aralığından büyük olamaz: yoksa kontrol saatindeki küçük gecikmeler bir sonraki slotu kaçırtır
-        # ve gün sonunda ayarlanan sayıya ulaşılamaz. Slot aralığının %60'ı ile ayardaki en düşük değer kullanılır.
+        # ve gün sonunda ayarlanan sayıya ulaşılamaz. Slot aralığının %40'ı ile ayardaki en düşük değer kullanılır
+        # (yayın işlemi ~2 dk sürüp tarih sonunda yazıldığı için %60 bazı günlerde bir kontrolü atlatıyordu).
         slot_dk = (bit - bas) * 60 / n
-        alt_sinir = min(float(ayar["min_aralik_dk"]), 0.6 * slot_dk)
+        alt_sinir = min(float(ayar["min_aralik_dk"]), 0.4 * slot_dk)
         if gecen < alt_sinir:
             return False, f"son hikayeden {gecen:.0f} dk geçti, en az {alt_sinir:.0f} dk gerekir", None
     if not sirada:
