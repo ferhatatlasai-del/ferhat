@@ -93,7 +93,12 @@ function govdeIkili(req, limit) {
 }
 
 async function dosyaYaz(yol, icerik, mesaj, dal) {
-  const r = await gh(`/repos/${REPO}/contents/${yol}`, { method: 'PUT', body: JSON.stringify({ message: mesaj, content: Buffer.from(icerik).toString('base64'), branch: dal }) });
+  // Dosya zaten varsa (ör. aynı video için daha önce denenmiş yayın) GitHub güncellemede mevcut sha ister
+  let sha;
+  try { const g = await gh(`/repos/${REPO}/contents/${yol}?ref=${encodeURIComponent(dal)}`); if (g.ok) sha = (await g.json()).sha; } catch (e) { /* yoksa yeni dosya */ }
+  const govde = { message: mesaj, content: Buffer.from(icerik).toString('base64'), branch: dal };
+  if (sha) govde.sha = sha;
+  const r = await gh(`/repos/${REPO}/contents/${yol}`, { method: 'PUT', body: JSON.stringify(govde) });
   if (!r.ok) { const t = await r.text(); const e = new Error('GitHub dosyayı kaydetmedi (' + r.status + '). ' + t.slice(0, 120)); e.kullanici = true; throw e; }
 }
 
