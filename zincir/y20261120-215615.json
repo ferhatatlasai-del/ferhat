@@ -1,0 +1,35 @@
+{
+  "kimlik": "y20261120-215615",
+  "olusturma": "2026-11-20T21:56:15.504Z",
+  "durum": "video",
+  "kaynak": "bagimsiz",
+  "direktif": "",
+  "konu": "3D Baskı ile Araba İçi Pratik Aksesuarlar",
+  "format": "reels",
+  "seri": "",
+  "kanca": "",
+  "video": {
+    "yol": "videolar/yukleme_20261120140200.mp4",
+    "tarih": "2026-11-20T21:56:07.505Z"
+  },
+  "yayinlar": [
+    {
+      "hedef": "youtube",
+      "platform": "youtube",
+      "tur": "shorts",
+      "durum": "basladi",
+      "baslangic": "2026-11-20T21:56:07.505Z",
+      "video": "videolar/yukleme_20261120140200.mp4"
+    },
+    {
+      "hedef": "instagram",
+      "platform": "instagram",
+      "tur": "reels",
+      "durum": "basladi",
+      "baslangic": "2026-11-20T21:56:07.505Z",
+      "video": "videolar/yukleme_20261120140200.mp4"
+    }
+  ],
+  "olcumler": [],
+  "ogrenildi": false
+}
