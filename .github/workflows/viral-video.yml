@@ -40,6 +40,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5.4-mini' }}
           GOOGLE_TTS_API_KEY: ${{ secrets.GOOGLE_TTS_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OFIS_ADRES: "https://gurtechs-ajan-ofisi.fly.dev"
           BILDIRIM_SIRRI: ${{ secrets.BILDIRIM_SIRRI }}
           KONU: ${{ inputs.konu }}

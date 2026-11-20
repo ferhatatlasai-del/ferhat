@@ -114,7 +114,7 @@ Haftada bir (pazar 18:00 TR; sunucu zamanlayıcısı ve GitHub iş akışı) `aj
 - **Ses tasarımı:** `ajan/ses_tasarim.py` müziği (Am-F-C-G pad, bas, vuruş, hi-hat, arpej + eko), 3D yazıcı atmosferini (step motor, fan), geçiş "whoosh" + darbe + yükselişi, vurgu "pop", çan, uyarı, tık ve sprey/silme seslerini numpy ile **sentezler**; konuşma varken müzik yan zincirle kısılır; çıktı −14 LUFS'a normalize edilir.
 - **Taslak:** `videolar/yukleme_<tarih>.mp4` + `shorts/<kimlik>.json` (durum `onay_bekliyor`, `tur: "viral"`). **Yayınlamaz**; panelden onaylanınca mevcut YouTube/Instagram akışı yayınlar. Açıklamaya "seslendirme yapay zekâ ile üretilmiştir" notu eklenir.
 - Ayarlar `shorts/viral_ayar.json` (isteğe bağlı: `aktif`, `en_cok_bekleyen`, `ses`, `konusma_hizi`, `perde`). Kullanılan konular `shorts/viral_kullanilan.json`. Üretim runner'da ~10-15 dk sürer.
-- **Gerekli anahtar:** GitHub Secrets → `GOOGLE_TTS_API_KEY` (Google Cloud Console → Text-to-Speech API'yi etkinleştir → Kimlik bilgileri → API anahtarı; anahtarı "Cloud Text-to-Speech API" ile kısıtla). Yoksa üretim açık hata mesajıyla durur.
+- **Gerekli anahtar (ikisinden biri):** GitHub Secrets → `GEMINI_API_KEY` (aistudio.google.com/apikey, **kart gerekmez**; Gemini TTS, ses `Orus`, kelime zamanları konuşmadaki duraklamalardan çıkarılır, ücretsiz katman dakika sınırında otomatik yeniden dener) ya da `GOOGLE_TTS_API_KEY` (Google Cloud Console → Text-to-Speech API'yi etkinleştir → Kimlik bilgileri → API anahtarı; anahtarı "Cloud Text-to-Speech API" ile kısıtla). Yoksa üretim açık hata mesajıyla durur.
 - Yerel deneme: `node` + Chromium (`CHROME_YOLU`), `python3 ajan/viral_video.py --senaryo video/senaryolar/tablaya-yapisma.json --sessiz --olcek 0.5 --cikti onizleme.mp4`.
 
 ### Panel düzeni (sekmeler)
