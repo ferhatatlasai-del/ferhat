@@ -468,7 +468,7 @@ async function api(req, res, url) {
   if (url.pathname === '/api/shorts-karar' && req.method === 'POST') {
     let b; try { b = await govde(req); } catch (e) { return json(res, 400, { hata: 'Geçersiz istek.' }); }
     if (!SHORTS_RE.test(String(b.id || ''))) return json(res, 400, { hata: 'Geçersiz kimlik.' });
-    if (!['reddet', 'sil', 'yayinlandi'].includes(b.karar)) return json(res, 400, { hata: 'Geçersiz karar.' });
+    if (!['reddet', 'sil', 'yayinlandi', 'hikaye', 'geri_al'].includes(b.karar)) return json(res, 400, { hata: 'Geçersiz karar.' });
     const yol = `shorts/${b.id}.json`;
     const k = await depoOku(yol);
     if (!k) return json(res, 404, { hata: 'Taslak bulunamadı.' });
@@ -479,7 +479,13 @@ async function api(req, res, url) {
       const r = await depoSil(yol, k.sha, 'Panel: Shorts taslağı silindi');
       return r.ok ? json(res, 200, { ok: true }) : json(res, 502, { hata: 'Silinemedi.' });
     }
-    if (b.karar === 'reddet') t.durum = 'reddedildi';
+    if (b.karar === 'hikaye') t.hikaye_tarihi = new Date().toISOString();   // aynı video Instagram hikayesi olarak gönderildi
+    else if (b.karar === 'geri_al') {   // yayın gerçekte başarısız olduysa (ör. Instagram engeli) o platformu yeniden denemek için açar
+      if (!['youtube', 'instagram'].includes(b.hedef)) return json(res, 400, { hata: 'Geçersiz platform.' });
+      t.yayinlanan = (t.yayinlanan || []).filter(h => h !== b.hedef);
+      t.durum = 'onay_bekliyor';
+    }
+    else if (b.karar === 'reddet') t.durum = 'reddedildi';
     else if (['youtube', 'instagram'].includes(b.hedef)) {   // tek platform yayınlandı: diğeri için taslak beklemeye devam eder
       t.yayinlanan = [...new Set([...(t.yayinlanan || []), b.hedef])];
       t.yayin_tarihi = new Date().toISOString();
