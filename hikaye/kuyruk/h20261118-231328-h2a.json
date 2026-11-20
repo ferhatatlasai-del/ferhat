@@ -1,7 +1,7 @@
 {
   "id": "h20261118-231328-h2a",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-18T23:13:28.000Z",
   "gorsel": "hikaye/gorseller/h20261118-231328-h2a.mp4",
   "baslik": "Clamp /print in place",
@@ -21,7 +21,9 @@
     "sorunlar": []
   },
   "yayin": {
-    "tarih": "2026-11-20T09:36:00Z"
+    "tarih": "2026-11-20T09:37:48Z",
+    "medya_kimligi": "18125482561943469",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4034479369958317947"
   },
   "hata": "",
   "deneme": 0,
