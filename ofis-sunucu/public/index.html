@@ -1996,25 +1996,29 @@ $('#akCalistir').addEventListener('click',function(){
 });
 akademiCek(); setInterval(akademiCek,300000);
 // Shorts / Reels üretici
+function skMesaj(d,metin,hata){
+  $('#skDurum').textContent=metin;
+  if(d){ if(!d._m){ d._m=dom('div','not'); d._m.style.cssText='margin-top:8px;font-weight:600'; d.appendChild(d._m); } d._m.textContent=metin; d._m.style.color=hata?'#f43f5e':'#34d399'; }
+}
 function shortsHikayeDugmesi(x,d){
   if(!x.video) return;
   var yaz=x.hikaye_tarihi?'Hikaye olarak tekrar paylaş':'Instagram hikayesi olarak paylaş', onay=false, b=dom('button',null,yaz); b.type='button'; b.style.marginTop='6px';
   b.addEventListener('click',function(){
     if(!hSifreKontrol()) return;
-    if((x.sure||0)>60.5){ $('#skDurum').textContent='Bu video '+Math.round(x.sure)+' sn; hikaye videosu en fazla 60 sn olabilir.'; return; }
+    if((x.sure||0)>60.5){ skMesaj(d,'Bu video '+Math.round(x.sure)+' sn; hikaye videosu en fazla 60 sn olabilir.',true); return; }
     if(!onay){ onay=true; b.textContent=x.hikaye_tarihi?'Zaten paylaşılmıştı. Yine de paylaş?':'Emin misin? Evet, hikayede paylaş'; setTimeout(function(){ onay=false; b.textContent=yaz; },6000); return; }
     onay=false; b.disabled=true;
     hPost('/api/yayinla',{yol:x.video,hedefler:['hikaye'],onay:true})
       .then(function(){ return hPost('/api/shorts-karar',{id:x.id,karar:'hikaye'}); })
-      .then(function(){ $('#skDurum').textContent='Hikaye yayını başlatıldı; bir iki dakikada çıkar (Instagram engeli varsa başarısız olur).'; shortsCek(); })
-      .catch(function(e){ $('#skDurum').textContent=String(e.message||e); b.disabled=false; });
+      .then(function(){ skMesaj(d,'Hikaye yayını başlatıldı; bir iki dakikada çıkar (Instagram engeli varsa başarısız olur).'); setTimeout(shortsCek,4000); })
+      .catch(function(e){ skMesaj(d,String(e.message||e),true); b.disabled=false; });
   });
   d.appendChild(b);
 }
 function shortsGeriAl(x,d){
   if(x.durum!=='yayinlandi'||(x.yayinlanan||[]).indexOf('instagram')<0) return;
   var b=dom('button',null,'Instagram\'a çıkmadı, tekrar dene'); b.type='button'; b.style.marginTop='6px';
-  b.addEventListener('click',function(){ if(!hSifreKontrol()) return; b.disabled=true; hPost('/api/shorts-karar',{id:x.id,karar:'geri_al',hedef:'instagram'}).then(function(){ shortsCek(); }).catch(function(e){ $('#skDurum').textContent=String(e.message||e); b.disabled=false; }); });
+  b.addEventListener('click',function(){ if(!hSifreKontrol()) return; b.disabled=true; hPost('/api/shorts-karar',{id:x.id,karar:'geri_al',hedef:'instagram'}).then(function(){ shortsCek(); }).catch(function(e){ skMesaj(d,String(e.message||e),true); b.disabled=false; }); });
   d.appendChild(b);
 }
 function shortsCiz(v){
@@ -2037,8 +2041,8 @@ function shortsCiz(v){
         onay=false; yb.disabled=true;
         hPost('/api/yayinla',{yol:x.video,baslik:bas.value,aciklama:ac.value,hedefler:kalan,onay:true})
           .then(function(){ return hPost('/api/shorts-karar',{id:x.id,karar:'yayinlandi'}); })
-          .then(function(){ $('#skDurum').textContent='Yayın başlatıldı. Birkaç dakika içinde yayında olur.'; shortsCek(); })
-          .catch(function(e){ $('#skDurum').textContent=String(e.message||e); yb.disabled=false; });
+          .then(function(){ skMesaj(d,'Yayın başlatıldı. Birkaç dakika içinde yayında olur.'); setTimeout(shortsCek,4000); })
+          .catch(function(e){ skMesaj(d,String(e.message||e),true); yb.disabled=false; });
       });
       d.appendChild(yb); shortsHikayeDugmesi(x,d);
       [['Reddet','reddet'],['Sil','sil']].forEach(function(p){ var b=dom('button',null,p[0]); b.type='button'; b.addEventListener('click',function(){ if(!hSifreKontrol()) return; b.disabled=true; hPost('/api/shorts-karar',{id:x.id,karar:p[1]}).then(function(){ shortsCek(); }).catch(function(e){ $('#skDurum').textContent=String(e.message||e); b.disabled=false; }); }); d.appendChild(b); });

@@ -299,13 +299,16 @@ def gemini_zamanla(x, kel):
     return x, tamamla(bas, sure, kel)
 
 
-def gemini_seslendir(metin, ayar, anahtar):
-    """Google Gemini TTS (AI Studio anahtarı, kart gerekmez). Kelime zamanı vermez; gemini_zamanla ile çıkarılır."""
-    okunacak = metin
+def okunus_uygula(metin):
     for k, v in sorted(OKUNUS.items(), key=lambda kv: -len(kv[0])):
-        okunacak = re.sub(r"(?<![\wİıÇçĞğÖöŞşÜü])" + re.escape(k) + r"(?![\wİıÇçĞğÖöŞşÜü])", v, okunacak)
+        metin = re.sub(r"(?<![\wİıÇçĞğÖöŞşÜü])" + re.escape(k) + r"(?![\wİıÇçĞğÖöŞşÜü])", v, metin)
+    return metin
+
+
+def gemini_istegi(okunacak, ayar, anahtar):
+    """Gemini TTS'ten konuşma ister. Dönen: np.array (SES.SR, mono). Günlük kota dolduysa beklemeden hata verir."""
     istem = ("Aşağıdaki metni Türkçe olarak, güven veren, enerjik ve akıcı bir bilgi videosu anlatıcısı gibi, biraz hızlı tempoda, doğal vurgu ve kısa duraklamalarla oku. "
-             "Yalnızca metni oku, başka bir şey ekleme:\n\n" + okunacak)
+             "Boş satırlarda biraz daha uzun dur. Yalnızca metni oku, başka bir şey ekleme:\n\n" + okunacak)
     govde = {"contents": [{"parts": [{"text": istem}]}],
              "generationConfig": {"responseModalities": ["AUDIO"], "speechConfig": {"voiceConfig": {"prebuiltVoiceConfig": {"voiceName": ayar.get("gemini_ses") or "Orus"}}}}}
     son = None
@@ -313,7 +316,7 @@ def gemini_seslendir(metin, ayar, anahtar):
         try:
             r = urllib.request.Request(f"{GEMINI_ADRES}/{GEMINI_MODEL}:generateContent", data=json.dumps(govde).encode(), method="POST",
                                        headers={"Content-Type": "application/json", "x-goog-api-key": anahtar})
-            with urllib.request.urlopen(r, timeout=120) as y:
+            with urllib.request.urlopen(r, timeout=180) as y:
                 j = json.load(y)
             parca = j["candidates"][0]["content"]["parts"][0]["inlineData"]
             ham = base64.b64decode(parca["data"])
@@ -323,17 +326,49 @@ def gemini_seslendir(metin, ayar, anahtar):
             x = np.interp(np.arange(int(len(x) * SES.SR / sr)) / SES.SR, np.arange(len(x)) / sr, x)
             if len(x) < SES.SR * 0.8:
                 raise ValueError("ses çok kısa")
-            x, bas = gemini_zamanla(x, metin.split())
-            return {"ses": x, "sure": len(x) / SES.SR, "baslangic": bas}
+            return x
         except urllib.error.HTTPError as e:
-            son = f"HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:300]}"
+            son = f"HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:600]}"
             if e.code in (400, 401, 403):
                 break
-            time.sleep(15 * (deneme + 1))   # 429 / 5xx: ücretsiz katman dakika sınırı
+            if e.code == 429 and re.search(r"PerDay|per day|daily", son, re.I):
+                raise RuntimeError("Gemini TTS günlük ücretsiz kotası doldu (yaklaşık yarın tekrar denenebilir ya da Google Cloud TTS/ücretli plan gerekir). " + son[:200])
+            time.sleep(20 * (deneme + 1))   # dakika sınırı: bekleyip yeniden dene
         except Exception as e:
             son = f"{type(e).__name__}: {e}"
             time.sleep(4)
     raise RuntimeError(f"Gemini TTS başarısız: {son}")
+
+
+def gemini_seslendir(metin, ayar, anahtar):
+    """Tek sahne için Gemini TTS. Kelime zamanı vermez; gemini_zamanla ile çıkarılır."""
+    x, bas = gemini_zamanla(gemini_istegi(okunus_uygula(metin), ayar, anahtar), metin.split())
+    return {"ses": x, "sure": len(x) / SES.SR, "baslangic": bas}
+
+
+def gemini_hepsi(sahneler, ayar, anahtar):
+    """Tüm anlatıyı TEK istekte seslendirir (ücretsiz katman günlük istek sınırı düşük), sahnelere duraklamalardan böler.
+    Dönen: sahne başına {'ses','sure','baslangic'} listesi."""
+    metinler = [s["anlati"] for s in sahneler]
+    x = gemini_istegi("\n\n".join(okunus_uygula(m) for m in metinler), ayar, anahtar)
+    kelimeler = [w for m in metinler for w in m.split()]
+    x, bas = gemini_zamanla(x, kelimeler)
+    sure = len(x) / SES.SR
+    ilk, n = [], 0
+    for m in metinler:
+        ilk.append(n)
+        n += len(m.split())
+    kes = [0.0]
+    for k in range(1, len(metinler)):
+        kes.append(max(kes[-1] + 0.6, bas[ilk[k]] - 0.14))   # sahne başlangıcından hemen önce, duraklamanın içinde
+    kes.append(sure)
+    sonuc = []
+    for k, m in enumerate(metinler):
+        a, b = int(kes[k] * SES.SR), int(kes[k + 1] * SES.SR)
+        parca = x[a:b]
+        n_k = len(m.split())
+        sonuc.append({"ses": parca, "sure": len(parca) / SES.SR, "baslangic": [max(0.0, t - kes[k]) for t in bas[ilk[k]:ilk[k] + n_k]]})
+    return sonuc
 
 
 def tamamla(bas, sure, kel):
@@ -490,7 +525,13 @@ def calis(a):
     ilerleme("Senaryo hazır", 5, senaryo["konu"][:100], zorla=True)
     H.ffmpeg_hazir()
     sesler = []
-    for i, s in enumerate(senaryo["sahneler"]):
+    if gemini and not anahtar and not a.sessiz and not a.tts_dizin:
+        try:
+            ilerleme("Seslendirme (Gemini, tek istek)", 8, "", zorla=True)
+            sesler = gemini_hepsi(senaryo["sahneler"], ayar, gemini)
+        except RuntimeError as e:
+            return hata(str(e))
+    for i, s in enumerate(senaryo["sahneler"] if not sesler else []):
         ilerleme("Seslendirme", 5 + int(15 * i / len(senaryo["sahneler"])), f"sahne {i + 1}/{len(senaryo['sahneler'])}")
         sesler.append(fixture_seslendir(a.tts_dizin, i, s["anlati"]) if a.tts_dizin else gemini_seslendir(s["anlati"], ayar, gemini) if (gemini and not anahtar and not a.sessiz) else sahne_seslendir(s["anlati"], ayar, None if a.sessiz else anahtar))
     plan, parcalar = cizelge_kur(senaryo, sesler)
