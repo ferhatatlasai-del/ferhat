@@ -36,3 +36,35 @@
 {"t": "2026-11-18T23:14:53Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 7.0, "site": "printables.com", "sorunlar": ["Kartlarda okunabilir yazılar var", "Önde görünen kartta marka/ürün ibaresi benzeri yazı bulunuyor", "Arka planda referansla birebir aynı olmayan stil farkları var"]}
 {"t": "2026-11-18T23:15:03Z", "tur": "denetim", "gecti": true, "deneme": 2, "puan": 9.0, "site": "printables.com"}
 {"t": "2026-11-18T23:15:12Z", "tur": "uretildi", "site": "printables.com", "trend": false, "deneme": 2, "puan": 9.0}
+{"t": "2026-11-20T05:21:36Z", "tur": "referans_yok", "site": "printables.com", "uygunsuz": 1, "neden": "uygun değil (Görselin üst kısmında büyük ve baskın başlık yazısı var; bu nedenle referans için uygun değil.)"}
+{"t": "2026-11-20T05:21:51Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-20T05:21:58Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-20T05:22:08Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-20T05:22:16Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-20T05:22:17Z", "tur": "referans_yok", "site": "printables.com", "uygunsuz": 1, "neden": "uygun değil (Ana nesneler görünür olsa da karede baskın şekilde Ender logosu ve bir QR etiket var.)"}
+{"t": "2026-11-20T05:22:28Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com", "sorunlar": ["Belirgin yazı, logo veya filigran yok.", "Görselde insan/karakter bulunmuyor.", "Nesne 3D baskı olarak fiziksel açıdan makul ve açıklamaya uyuyor."]}
+{"t": "2026-11-20T05:22:36Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-20T05:22:49Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 8.0, "site": "printables.com", "sorunlar": ["Arka planda referans görseldeki gibi yazılı ölçü etiketleri görünmüyor.", "Nesne genel olarak uygun; ancak referansla birebir aynı düzen ve etiketler yok."]}
+{"t": "2026-11-20T05:22:59Z", "tur": "denetim", "gecti": true, "deneme": 2, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-20T05:23:06Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 2, "puan": 9.0}
+{"t": "2026-11-20T05:23:19Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 8.0, "site": "printables.com", "sorunlar": ["İkinci görselde referans fotoğrafında yazılar görünüyor.", "Üretilen görselde vida/kelepçe formu biraz stilize edilmiş."]}
+{"t": "2026-11-20T05:23:27Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 8.0}
+{"t": "2026-11-20T05:23:39Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 8.0, "site": "printables.com", "sorunlar": ["Üzerinde okunabilir yazılar ve marka ibaresi var.", "Referans fotoğrafa göre ekran üstündeki marka/etiket düzeni farklı görünüyor.", "Fotoğrafın alt kısmı kadrajda biraz eksik ama nesne genel olarak doğru."]}
+{"t": "2026-11-20T05:23:51Z", "tur": "denetim", "gecti": false, "deneme": 2, "puan": 8.0, "site": "printables.com", "sorunlar": ["Görünür marka/logolar ve yazılar var", "Ekran üzerindeki marka referanstan farklı", "Arka planda dikkat dağıtan detaylar var"]}
+{"t": "2026-11-20T05:24:01Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-20T05:24:09Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-20T05:24:21Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 9.0, "site": "printables.com", "sorunlar": ["Arka planda referans fotoğrafta marka/yazı görünüyor.", "İlk görselde ürün tek başına ve referans konumuna göre daha temiz sunulmuş."]}
+{"t": "2026-11-20T05:24:32Z", "tur": "denetim", "gecti": true, "deneme": 2, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-20T05:24:40Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 2, "puan": 9.0}
+{"t": "2026-11-20T05:24:51Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 8.0, "site": "printables.com", "sorunlar": ["Üzerinde küçük bir logo/işaret var", "Arka planda bulanık ve dikkat dağıtan objeler mevcut"]}
+{"t": "2026-11-20T05:25:00Z", "tur": "denetim", "gecti": false, "deneme": 2, "puan": 8.0, "site": "printables.com", "sorunlar": ["Görselde küçük bir logo/işaret var", "Arka plan referansa göre değişik ve stilize"]}
+{"t": "2026-11-20T05:25:13Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-20T05:25:20Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-20T05:25:32Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-20T05:25:40Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-20T05:25:54Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-20T05:26:02Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-20T05:26:14Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-20T05:26:22Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-20T05:26:35Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-20T05:26:42Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}

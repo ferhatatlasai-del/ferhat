@@ -1,0 +1,31 @@
+{
+  "id": "h20261120-052432-i9d",
+  "kaynak": "uretim",
+  "durum": "planli",
+  "olusturma": "2026-11-20T05:24:32.000Z",
+  "gorsel": "hikaye/gorseller/h20261120-052432-i9d.mp4",
+  "baslik": "Otizo Drill Press Depth Stop",
+  "atif": {
+    "ad": "Otizo Drill Press Depth Stop",
+    "tasarimci": "Quark",
+    "lisans": "CC0",
+    "url": "https://www.printables.com/model/622702-otizo-drill-press-depth-stop",
+    "site": "printables.com",
+    "lisans_teyit": true,
+    "referansli": true
+  },
+  "trend": "Ayarlı vida deliği matkap derinlik aparatı",
+  "kontrol": {
+    "puan": 9.0,
+    "deneme": 2,
+    "sorunlar": []
+  },
+  "yayin": null,
+  "hata": "",
+  "deneme": 0,
+  "tur": "video",
+  "muzik": "Sentezlenmiş müzik: Dans ritmi (telifsiz, FFmpeg ile üretildi)",
+  "muzik_sira": 22,
+  "muzik_stil": "Dans ritmi",
+  "muzik_ton": 3
+}
