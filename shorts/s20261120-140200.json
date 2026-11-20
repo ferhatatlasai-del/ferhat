@@ -1,7 +1,7 @@
 {
   "id": "s20261120-140200",
   "olusturma": "2026-11-20T14:02:00Z",
-  "durum": "onay_bekliyor",
+  "durum": "yayinlandi",
   "video": "videolar/yukleme_20261120140200.mp4",
   "sure": 18.2,
   "baslik": "3D Baskı ile Araba İçi Pratik Aksesuarlar",
@@ -38,5 +38,10 @@
     "h20261120-052614-n4s",
     "h20261120-052554-m7p",
     "h20261120-052532-l0m"
-  ]
+  ],
+  "yayinlanan": [
+    "youtube",
+    "instagram"
+  ],
+  "yayin_tarihi": "2026-11-20T21:56:17.713Z"
 }
