@@ -1,7 +1,7 @@
 {
   "id": "h20261118-231243-f8u",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-18T23:12:43.000Z",
   "gorsel": "hikaye/gorseller/h20261118-231243-f8u.mp4",
   "baslik": "Modern Gridfinity Case",
@@ -21,7 +21,9 @@
     "sorunlar": []
   },
   "yayin": {
-    "tarih": "2026-11-20T09:05:55Z"
+    "tarih": "2026-11-20T09:06:52Z",
+    "medya_kimligi": "18130920760892162",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4034463725767311601"
   },
   "hata": "",
   "deneme": 0,
