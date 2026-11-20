@@ -19,7 +19,7 @@ const CSS = { turuncu: '#ff7a1a', cyan: '#22d3ee', yesil: '#34d399', kirmizi: '#
 const FANLAR = [];
 let P, W, H, OL, renderer, scene3, kam, glc, c2, ctx, GLOW, sahneler = [], isiklar = {};
 const OFS = 70;               // sahneler arası dünya uzaklığı
-const UZAK = { baski: 1.65, temizlik: 1.6, sicaklik: 1.6, hiz: 1.55, yapistirici: 1.6, ozet: 1.25, ilk_katman: 1.0, sayi: 1.2, karsilastir: 1.2, cta: 1.45 };
+const UZAK = { gercekci: 1.0, baski: 1.65, temizlik: 1.6, sicaklik: 1.6, hiz: 1.55, yapistirici: 1.6, ozet: 1.25, ilk_katman: 1.0, sayi: 1.2, karsilastir: 1.2, cta: 1.45 };
 const GECIS = 0.55;           // geçiş penceresi (sn)
 
 /* ---------- yardımcılar ---------- */
@@ -76,7 +76,7 @@ function nozul(renk) {   // sıcak uç grubu: kökü (uç) y=0
   const uc = new T.Mesh(new T.ConeGeometry(.3, .55, 24), pirinc); uc.rotation.x = Math.PI; uc.position.y = .275; g.add(uc);
   const hex = new T.Mesh(new T.CylinderGeometry(.36, .36, .3, 6), pirinc); hex.position.y = .7; g.add(hex);
   const blok = kutu(1.25, .85, 1.05, 0x9aa3b5, { metalness: .9, roughness: .3 }); blok.position.y = 1.3; g.add(blok);
-  const sock = kutu(1.4, .95, 1.2, 0xe0521d, { roughness: .8, metalness: 0 }); sock.position.set(0, 1.32, 0); sock.scale.set(1, 1, 1); g.add(sock);   // silikon çorap
+  const sock = kutu(1.34, .9, 1.12, 0x7a2210, { roughness: .85, metalness: 0 }); sock.position.set(0, 1.32, 0); g.add(sock);   // silikon çorap
   const kirik = silin(.2, .2, .55, 0xc9d1e0, 14, { metalness: .95, roughness: .2 }); kirik.position.y = 1.97; g.add(kirik);   // ısı kırıcı
   for (let i = 0; i < 8; i++) { const f = new T.Mesh(new T.CylinderGeometry(.72, .72, .07, 28), celik); f.position.y = 2.35 + i * .16; g.add(f); }   // soğutma kanatları
   const govde = kutu(1.4, 1.3, .9, 0x1a2540, { roughness: .6 }); govde.position.set(0, 1.55, -.95); g.add(govde);   // fan kanalı (shroud)
@@ -225,6 +225,44 @@ SAHNE.baski = (g, pr) => {
       if (nesne === 'warp') { const kal = sm(k01(p, .22, .85)); if (kal > .25) hap('⚠ KÖŞELER KALKIYOR', W / 2, 1010, 54, '#f43f5e', '#fff', outCubic(k01(kal, .25, .45)), 1 + .04 * Math.sin(lt * 10)); return; }
       const n = Math.floor(sm(k01(p, .04, .96)) * N); hap('KATMAN ' + n + ' / ' + N, W / 2, 1010, 48, 'rgba(255,255,255,.14)', '#fff', .95);
     },
+  };
+};
+
+
+SAHNE.gercekci = (g, pr) => {
+  // Kahraman sahne: katman çizgileri kabartmalı (bump) gerçek bir baskı parçası, nozuldan inen filament teli, temas gölgesi, ürün çekimi kamerası
+  yatak(g, 12, 12);
+  const renk = pr.renk != null ? pr.renk : 0xff6a10, YUK = 8.2, N = 60;
+  const prof = [];   // vazo profili: y düzgün aralıklı (bump dokusu katmanlarla hizalı kalsın)
+  for (let i = 0; i <= N; i++) { const h = i / N, r = 1.45 + .8 * Math.sin(h * Math.PI * 1.15) * (1 - .25 * h) + .1 * Math.sin(h * 24); prof.push(new T.Vector2(Math.max(.2, r), h * YUK)); }
+  const yaricap = y => { const h = clamp(y / YUK); const i = Math.min(N - 1, Math.floor(h * N)), f = h * N - i; return lerp(prof[i].x, prof[i + 1].x, f); };
+  const kat = cizgiTex(16, 256, 1, '#202020'); kat.repeat.set(1, 1); kat.wrapT = T.RepeatWrapping; kat.repeat.set(4, 1);
+  // katman çizgisi dokusu: dikey yönde LAYER sayısı kadar tekrar (UV v: 0..1 boyunca)
+  const lc = document.createElement('canvas'); lc.width = 8; lc.height = 64; const lx = lc.getContext('2d'); const lg = lx.createLinearGradient(0, 0, 0, 64); lg.addColorStop(0, '#9a9a9a'); lg.addColorStop(.45, '#f0f0f0'); lg.addColorStop(.55, '#f0f0f0'); lg.addColorStop(1, '#9a9a9a'); lx.fillStyle = lg; lx.fillRect(0, 0, 8, 64);
+  const lt = new T.CanvasTexture(lc); lt.wrapS = lt.wrapT = T.RepeatWrapping; lt.repeat.set(1, 96); lt.anisotropy = 16;
+  const klip = new T.Plane(new T.Vector3(0, -1, 0), 0);
+  const mal = new T.MeshPhysicalMaterial({ color: renk, roughness: .46, metalness: 0, clearcoat: .25, clearcoatRoughness: .45, sheen: new T.Color(0x703818), bumpMap: lt, bumpScale: .13, side: T.DoubleSide, clippingPlanes: [klip] });
+  const parca = new T.Mesh(new T.LatheGeometry(prof, 96), mal); g.add(parca);
+  const kapakMal = new T.MeshPhysicalMaterial({ color: new T.Color(renk).lerp(new T.Color(0xffffff), .12), roughness: .5, clearcoat: .2 });
+  const kapak = new T.Mesh(new T.RingGeometry(0, 1, 96), kapakMal); kapak.rotation.x = -Math.PI / 2; g.add(kapak);   // üst yüzey (dolgu)
+  const ic = new T.Mesh(new T.RingGeometry(.0, .97, 96), new T.MeshBasicMaterial({ color: 0x20120a })); ic.rotation.x = -Math.PI / 2; g.add(ic); ic.visible = false;
+  const noz = nozul(0xff8a3a); g.add(noz);
+  const tel = silin(.07, .07, 1, 0xff7a20, 8, { emissive: 0xff5a10, emissiveIntensity: .9, flatShading: false }); g.add(tel);   // eriyik filament teli
+  const ao = new T.Mesh(new T.CircleGeometry(3.6, 48), new T.MeshBasicMaterial({ map: havuzTex('rgba(0,0,0,.65)'), transparent: true, depthWrite: false })); ao.rotation.x = -Math.PI / 2; ao.position.y = .02; g.add(ao);   // temas gölgesi (AO)
+  const sicak = parilti(0xff7a30, 2.4, .5); g.add(sicak);
+  return {
+    fov: 27,
+    cam: p => { const a = .75 + p * .75, r = 30, e = sm(p); return [Math.cos(a) * r, 6.5 + 1.5 * e, Math.sin(a) * r, 0, 1.6 + 3.4 * e, 0]; },
+    upd: (p, lt2, d) => {
+      const q = sm(k01(p, .05, .97)), h = Math.max(.02, q * YUK), r = yaricap(h);
+      klip.constant = h; kapak.position.y = h + .005; kapak.scale.set(r, r, 1); ic.position.y = h - .01; ic.scale.set(r * .96, r * .96, 1);
+      const an = lt2 * 7.5, x = Math.cos(an) * r, z = Math.sin(an) * r;
+      noz.position.set(x, h + .55, z);
+      tel.scale.y = .5; tel.position.set(x, h + .27, z);
+      sicak.position.set(x, h + .3, z);
+      ao.scale.setScalar(1 + .06 * Math.sin(lt2));
+    },
+    ek: () => {},
   };
 };
 
@@ -470,7 +508,7 @@ window.hazirla = async function (plan, olcek) {
   glc = document.getElementById('gl'); c2 = document.getElementById('c2');
   renderer = new T.WebGLRenderer({ canvas: glc, antialias: true, preserveDrawingBuffer: true });
   renderer.setPixelRatio(1); renderer.setSize(W * OL, H * OL, false);
-  renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap;
+  renderer.localClippingEnabled = true; renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap;
   renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = .95;
   c2.width = W * OL; c2.height = H * OL; ctx = c2.getContext('2d');
   await document.fonts.load('800 80px IB'); await document.fonts.load('600 40px IS');
@@ -502,15 +540,15 @@ function kameraSec(t) {
   const s = sahneler[i], d = s.s.t1 - s.s.t0, lp = clamp((t - s.s.t0) / d);
   const cam = (n, p) => { const c = n.cam(p, p * (n.s.t1 - n.s.t0)); return c.map((v, k) => k % 3 === 0 && k < 6 ? v : v); };
   const dunya = (n, idx, c) => [c[0] + idx * OFS, c[1], c[2], c[3] + idx * OFS, c[4], c[5]];
-  let c = dunya(s, i, cam(s, lp)), fov = 46, u = 0;
+  const f0 = s.fov || 46; let c = dunya(s, i, cam(s, lp)), fov = f0, u = 0;
   // geçiş: sahne sonu → sonraki sahne başı
   const sonraki = sahneler[i + 1];
   if (sonraki && t > s.s.t1 - GECIS / 2) {
     u = (t - (s.s.t1 - GECIS / 2)) / GECIS; const e = sm(u), b = dunya(sonraki, i + 1, cam(sonraki, 0)), a = dunya(s, i, cam(s, 1));
-    c = a.map((v, k) => lerp(v, b[k], e)); fov = 46 + 16 * Math.sin(Math.PI * u);
+    c = a.map((v, k) => lerp(v, b[k], e)); fov = f0 + 16 * Math.sin(Math.PI * u);
   } else if (i > 0 && t < s.s.t0 + GECIS / 2) {
     u = .5 + (t - s.s.t0) / GECIS; const e = sm(u), onceki = sahneler[i - 1], a = dunya(onceki, i - 1, cam(onceki, 1)), b = dunya(s, i, cam(s, 0));
-    c = a.map((v, k) => lerp(v, b[k], e)); fov = 46 + 16 * Math.sin(Math.PI * u);
+    c = a.map((v, k) => lerp(v, b[k], e)); fov = f0 + 16 * Math.sin(Math.PI * u);
   }
   const uz = (sahneler[Math.min(sahneler.length - 1, Math.max(0, Math.round((c[3]) / OFS)))].s.uzak) || UZAK[sahneler[Math.min(sahneler.length - 1, Math.max(0, Math.round((c[3]) / OFS)))].s.tip] || 1.3;
   c = [c[3] + (c[0] - c[3]) * uz, c[4] + (c[1] - c[4]) * uz, c[5] + (c[2] - c[5]) * uz, c[3], c[4], c[5]];
