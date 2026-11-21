@@ -1,0 +1,31 @@
+{
+  "id": "h20261121-052114-b0i",
+  "kaynak": "uretim",
+  "durum": "planli",
+  "olusturma": "2026-11-21T05:21:14.000Z",
+  "gorsel": "hikaye/gorseller/h20261121-052114-b0i.mp4",
+  "baslik": "Desk Bag Hook without the hole.",
+  "atif": {
+    "ad": "Desk Bag Hook without the hole.",
+    "tasarimci": "TimberlineFPV",
+    "lisans": "CC BY",
+    "url": "https://www.printables.com/model/307270-desk-bag-hook-without-the-hole",
+    "site": "printables.com",
+    "lisans_teyit": true,
+    "referansli": true
+  },
+  "trend": "Mutfak poşeti için kanca tipi askı",
+  "kontrol": {
+    "puan": 9.0,
+    "deneme": 1,
+    "sorunlar": []
+  },
+  "yayin": null,
+  "hata": "",
+  "deneme": 0,
+  "tur": "video",
+  "muzik": "Sentezlenmiş müzik: Chill gece (telifsiz, FFmpeg ile üretildi)",
+  "muzik_sira": 23,
+  "muzik_stil": "Chill gece",
+  "muzik_ton": 3
+}
