@@ -1,6 +1,6 @@
 {
- "tarih": "2026-11-21T12:01:07Z",
- "tr_saat": "21.11.2026 15:01",
+ "tarih": "2026-11-21T12:13:36Z",
+ "tr_saat": "21.11.2026 15:13",
  "toplam": {
   "reels": 0,
   "gonderi": 0,
@@ -8,7 +8,7 @@
   "youtube_video": 0,
   "hikaye": 0,
   "toplam": 0,
-  "begeni": 126,
+  "begeni": 127,
   "yorum": 5
  },
  "fark": 0,
@@ -23,7 +23,7 @@
     "tur": "Reels",
     "tarih": "2026-11-21T09:56:40",
     "baslik": "Nemli filament baskıyı sessizce bozar.",
-    "begeni": 4,
+    "begeni": 5,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df_9WXhAUi5/",
     "izlenme": null,
@@ -274,6 +274,14 @@
  "hikaye_izin": false,
  "hikayeler": [
   {
+   "id": "18130975696857932",
+   "tarih": "2026-11-21T12:06:27Z",
+   "baslik": "drill press depth stop",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
    "id": "17880984465567168",
    "tarih": "2026-11-21T11:36:39Z",
    "baslik": "Drill Bit Depth Stop w/ Spacers",
@@ -509,7 +517,7 @@
   "YouTube okunamadı"
  ],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 15:01",
+  "baslik": "📊 İzlenme raporu 15:13",
   "govde": "Toplam 0 (eksik veri) · Reels ? · Short ? · Hikaye ? · Takipçi 418 · Instagram izlenme izni yok; YouTube okunamadı"
  }
 }
