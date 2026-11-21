@@ -1,22 +1,22 @@
 {
- "tarih": "2026-11-21T19:52:39Z",
- "tr_saat": "21.11.2026 22:52",
+ "tarih": "2026-11-21T19:59:51Z",
+ "tr_saat": "21.11.2026 22:59",
  "toplam": {
-  "reels": 0,
+  "reels": 13069,
   "gonderi": 0,
   "short": 0,
   "youtube_video": 0,
-  "hikaye": 0,
-  "toplam": 0,
+  "hikaye": 447,
+  "toplam": 13516,
   "begeni": 155,
   "yorum": 5
  },
- "fark": 0,
+ "fark": 13516,
  "instagram": {
   "durum": "tamam",
-  "izin": false,
+  "izin": true,
   "takipci": 429,
-  "hata": "HTTP 400 kod=10 tür=OAuthException: (#10) Application does not have permission for this action",
+  "hata": "graph.instagram.com profil: HTTP 400 kod=190 tür=OAuthException: Invalid OAuth access token - Cannot parse access token",
   "gonderiler": [
    {
     "id": "17945283843388099",
@@ -26,8 +26,8 @@
     "begeni": 9,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgAjP11DCGR/",
-    "izlenme": null,
-    "erisim": null
+    "izlenme": 1448,
+    "erisim": 1355
    },
    {
     "id": "17941420377402019",
@@ -37,8 +37,8 @@
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgAjINVCTkY/",
-    "izlenme": null,
-    "erisim": null
+    "izlenme": 241,
+    "erisim": 215
    },
    {
     "id": "17956070562049609",
@@ -48,8 +48,8 @@
     "begeni": 9,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgAaonlkhF3/",
-    "izlenme": null,
-    "erisim": null
+    "izlenme": 1577,
+    "erisim": 1422
    },
    {
     "id": "18193230361409051",
@@ -59,8 +59,8 @@
     "begeni": 5,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df_9WXhAUi5/",
-    "izlenme": null,
-    "erisim": null
+    "izlenme": 1559,
+    "erisim": 1444
    },
    {
     "id": "17916096111516478",
@@ -70,8 +70,8 @@
     "begeni": 9,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df-02JrFMVG/",
-    "izlenme": null,
-    "erisim": null
+    "izlenme": 1717,
+    "erisim": 1556
    },
    {
     "id": "18037926155853133",
@@ -81,8 +81,8 @@
     "begeni": 23,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": null,
-    "erisim": null
+    "izlenme": 3168,
+    "erisim": 2815
    },
    {
     "id": "18289759651292671",
@@ -92,8 +92,8 @@
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df8Gek5DMrG/",
-    "izlenme": null,
-    "erisim": null
+    "izlenme": 294,
+    "erisim": 245
    },
    {
     "id": "18132390508855696",
@@ -103,8 +103,8 @@
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df67FfFgMHC/",
-    "izlenme": null,
-    "erisim": null
+    "izlenme": 171,
+    "erisim": 157
    },
    {
     "id": "18655251088021009",
@@ -114,8 +114,8 @@
     "begeni": 3,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df5dfOAjiMp/",
-    "izlenme": null,
-    "erisim": null
+    "izlenme": 186,
+    "erisim": 166
    },
    {
     "id": "18140690902641017",
@@ -125,8 +125,8 @@
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df4j3AnDmy-/",
-    "izlenme": null,
-    "erisim": null
+    "izlenme": 208,
+    "erisim": 178
    },
    {
     "id": "17925649080445339",
@@ -136,8 +136,8 @@
     "begeni": 5,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df0SY8TGKVZ/",
-    "izlenme": null,
-    "erisim": null
+    "izlenme": 2168,
+    "erisim": 1832
    },
    {
     "id": "18121842679765284",
@@ -147,8 +147,8 @@
     "begeni": 3,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Dfxy_-8Ekyj/",
-    "izlenme": null,
-    "erisim": null
+    "izlenme": 332,
+    "erisim": 236
    },
    {
     "id": "18077982347330509",
@@ -300,171 +300,192 @@
    "instagram_basic",
    "instagram_content_publish",
    "instagram_manage_comments",
+   "instagram_manage_insights",
    "instagram_manage_messages",
    "public_profile"
   ]
  },
- "hikaye_izin": false,
+ "hikaye_izin": true,
  "hikayeler": [
   {
    "id": "18456328711123952",
    "tarih": "2026-11-21T18:26:46Z",
    "baslik": "Under-mount handled bag hook",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 10,
+   "erisim": 9,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "18119094625827736",
    "tarih": "2026-11-21T17:46:39Z",
    "baslik": "VAUDE  bicycle bag hook shark tooth spare part",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 13,
+   "erisim": 10,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "18081372350749410",
    "tarih": "2026-11-21T17:06:42Z",
    "baslik": "Table bag hook",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 13,
+   "erisim": 11,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "18025038785955858",
    "tarih": "2026-11-21T16:26:39Z",
    "baslik": "Bag hook for car trunk",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 16,
+   "erisim": 12,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "18078108707591628",
    "tarih": "2026-11-21T15:46:41Z",
    "baslik": "VW Hook for shopping bags in trunk, Haken für VW Passat Koff",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 15,
+   "erisim": 13,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "18138218831507788",
    "tarih": "2026-11-21T15:26:43Z",
    "baslik": "IV bag hook",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 14,
+   "erisim": 13,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "18132820246889835",
    "tarih": "2026-11-21T15:06:51Z",
    "baslik": "Universal Pannier Bag Hook - turn any backpack into a pannie",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 16,
+   "erisim": 12,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "17972032542195687",
    "tarih": "2026-11-21T14:46:57Z",
    "baslik": "Grocery store bag hooks for using as a trash bin",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 16,
+   "erisim": 13,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "18116034896149730",
    "tarih": "2026-11-21T14:14:57Z",
    "baslik": "Video hikayesi",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 17,
+   "erisim": 16,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "18070147136790450",
    "tarih": "2026-11-21T14:07:31Z",
    "baslik": "Larger Hooks for the Ortlieb QL2.1 Bike Bags. If your bike h",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 19,
+   "erisim": 16,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "18109250996197034",
    "tarih": "2026-11-21T13:46:56Z",
    "baslik": "Hook for Bike Helmet / Bag (adhesive",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 21,
+   "erisim": 19,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "17890900209689564",
    "tarih": "2026-11-21T13:27:07Z",
    "baslik": "Prius Gen 3 Car Trashcan Bag Clip/hook for Center Console",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 20,
+   "erisim": 19,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "18110376599347393",
    "tarih": "2026-11-21T13:06:44Z",
    "baslik": "Nissan Leaf bag hook",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 20,
+   "erisim": 19,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "18133803535685269",
    "tarih": "2026-11-21T12:47:23Z",
    "baslik": "Desk Bag Hook without the hole.",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 22,
+   "erisim": 21,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "18140981413729268",
    "tarih": "2026-11-21T12:27:08Z",
    "baslik": "Otizo Drill Press Depth Stop",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 24,
+   "erisim": 21,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "18130975696857932",
    "tarih": "2026-11-21T12:06:27Z",
    "baslik": "drill press depth stop",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 28,
+   "erisim": 24,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "17880984465567168",
    "tarih": "2026-11-21T11:36:39Z",
    "baslik": "Drill Bit Depth Stop w/ Spacers",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 31,
+   "erisim": 25,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "18119683825820465",
    "tarih": "2026-11-21T10:21:05Z",
    "baslik": "Video hikayesi",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 33,
+   "erisim": 27,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "18154348378555017",
    "tarih": "2026-11-20T23:28:11Z",
    "baslik": "Drill Press Depth Stop Mount for el-cheapo Harbor Freight Ce",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 50,
+   "erisim": 38,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "18428349931158850",
    "tarih": "2026-11-20T22:44:41Z",
    "baslik": "Video hikayesi",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 49,
+   "erisim": 39,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "18203822248383065",
@@ -634,11 +655,10 @@
   "hata": "YouTube okuma izni yok (HTTP 403): YT_OKU_REFRESH_TOKEN gerekir. Request had insufficient authentication scopes."
  },
  "eksikler": [
-  "Instagram izlenme izni yok",
   "YouTube okunamadı"
  ],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 22:52",
-  "govde": "Toplam 0 (eksik veri) · Reels ? · Short ? · Hikaye ? · Takipçi 429 · Instagram izlenme izni yok; YouTube okunamadı"
+  "baslik": "📊 İzlenme raporu 22:59",
+  "govde": "Toplam 13.516 (eksik veri) · Reels 13.069 · Short ? · Hikaye 447 (18 bugün) · Takipçi 429 · En iyi Reels: Baskın tabladan kalkı 3.168 · YouTube okunamadı"
  }
 }
