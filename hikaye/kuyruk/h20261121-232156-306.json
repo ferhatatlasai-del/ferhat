@@ -2,13 +2,15 @@
   "id": "h20261121-232156-306",
   "kaynak": "yayin",
   "tur": "video",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-21T23:21:56.305Z",
   "gorsel": "videolar/yukleme_20261121150805.mp4",
   "baslik": "Video hikayesi",
   "atif": null,
   "yayin": {
-    "tarih": "2026-11-21T23:22:20Z"
+    "tarih": "2026-11-21T23:23:26Z",
+    "medya_kimligi": "18164781550503882",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4035619616785011699"
   },
   "hata": "",
   "deneme": 0
