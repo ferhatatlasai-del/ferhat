@@ -1,17 +1,17 @@
 {
- "tarih": "2026-11-21T19:59:51Z",
- "tr_saat": "21.11.2026 22:59",
+ "tarih": "2026-11-21T20:25:58Z",
+ "tr_saat": "21.11.2026 23:25",
  "toplam": {
-  "reels": 13069,
+  "reels": 13157,
   "gonderi": 0,
-  "short": 0,
+  "short": 7910,
   "youtube_video": 0,
-  "hikaye": 447,
-  "toplam": 13516,
-  "begeni": 155,
-  "yorum": 5
+  "hikaye": 456,
+  "toplam": 21523,
+  "begeni": 235,
+  "yorum": 20
  },
- "fark": 13516,
+ "fark": 8007,
  "instagram": {
   "durum": "tamam",
   "izin": true,
@@ -26,19 +26,19 @@
     "begeni": 9,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgAjP11DCGR/",
-    "izlenme": 1448,
-    "erisim": 1355
+    "izlenme": 1453,
+    "erisim": 1360
    },
    {
     "id": "17941420377402019",
     "tur": "Reels",
     "tarih": "2026-11-21T15:27:00",
     "baslik": "Hangi filament sıcağa daha çok dayanır?",
-    "begeni": 2,
+    "begeni": 5,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgAjINVCTkY/",
-    "izlenme": 241,
-    "erisim": 215
+    "izlenme": 269,
+    "erisim": 235
    },
    {
     "id": "17956070562049609",
@@ -48,8 +48,8 @@
     "begeni": 9,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgAaonlkhF3/",
-    "izlenme": 1577,
-    "erisim": 1422
+    "izlenme": 1581,
+    "erisim": 1434
    },
    {
     "id": "18193230361409051",
@@ -70,8 +70,8 @@
     "begeni": 9,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df-02JrFMVG/",
-    "izlenme": 1717,
-    "erisim": 1556
+    "izlenme": 1718,
+    "erisim": 1560
    },
    {
     "id": "18037926155853133",
@@ -81,8 +81,8 @@
     "begeni": 23,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": 3168,
-    "erisim": 2815
+    "izlenme": 3218,
+    "erisim": 2851
    },
    {
     "id": "18289759651292671",
@@ -93,7 +93,7 @@
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df8Gek5DMrG/",
     "izlenme": 294,
-    "erisim": 245
+    "erisim": 246
    },
    {
     "id": "18132390508855696",
@@ -115,7 +115,7 @@
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df5dfOAjiMp/",
     "izlenme": 186,
-    "erisim": 166
+    "erisim": 167
    },
    {
     "id": "18140690902641017",
@@ -311,8 +311,8 @@
    "id": "18456328711123952",
    "tarih": "2026-11-21T18:26:46Z",
    "baslik": "Under-mount handled bag hook",
-   "izlenme": 10,
-   "erisim": 9,
+   "izlenme": 11,
+   "erisim": 10,
    "okundu": true,
    "yanit": 0
   },
@@ -320,7 +320,7 @@
    "id": "18119094625827736",
    "tarih": "2026-11-21T17:46:39Z",
    "baslik": "VAUDE  bicycle bag hook shark tooth spare part",
-   "izlenme": 13,
+   "izlenme": 14,
    "erisim": 10,
    "okundu": true,
    "yanit": 0
@@ -329,8 +329,8 @@
    "id": "18081372350749410",
    "tarih": "2026-11-21T17:06:42Z",
    "baslik": "Table bag hook",
-   "izlenme": 13,
-   "erisim": 11,
+   "izlenme": 14,
+   "erisim": 12,
    "okundu": true,
    "yanit": 0
   },
@@ -455,8 +455,8 @@
    "id": "17880984465567168",
    "tarih": "2026-11-21T11:36:39Z",
    "baslik": "Drill Bit Depth Stop w/ Spacers",
-   "izlenme": 31,
-   "erisim": 25,
+   "izlenme": 32,
+   "erisim": 26,
    "okundu": true,
    "yanit": 0
   },
@@ -464,8 +464,8 @@
    "id": "18119683825820465",
    "tarih": "2026-11-21T10:21:05Z",
    "baslik": "Video hikayesi",
-   "izlenme": 33,
-   "erisim": 27,
+   "izlenme": 35,
+   "erisim": 30,
    "okundu": true,
    "yanit": 0
   },
@@ -474,7 +474,7 @@
    "tarih": "2026-11-20T23:28:11Z",
    "baslik": "Drill Press Depth Stop Mount for el-cheapo Harbor Freight Ce",
    "izlenme": 50,
-   "erisim": 38,
+   "erisim": 39,
    "okundu": true,
    "yanit": 0
   },
@@ -482,8 +482,8 @@
    "id": "18428349931158850",
    "tarih": "2026-11-20T22:44:41Z",
    "baslik": "Video hikayesi",
-   "izlenme": 49,
-   "erisim": 39,
+   "izlenme": 52,
+   "erisim": 40,
    "okundu": true,
    "yanit": 0
   },
@@ -649,16 +649,145 @@
   }
  ],
  "youtube": {
-  "durum": "atlandi",
-  "izin": false,
-  "videolar": [],
-  "hata": "YouTube okuma izni yok (HTTP 403): YT_OKU_REFRESH_TOKEN gerekir. Request had insufficient authentication scopes."
+  "durum": "tamam",
+  "izin": true,
+  "videolar": [
+   {
+    "id": "yGVzYJN-m6o",
+    "tur": "Short",
+    "tarih": "2026-11-21T19:16:49",
+    "baslik": "3D baskıda katman kayması neden olur?",
+    "izlenme": 111,
+    "begeni": 2,
+    "yorum": 0,
+    "link": "https://www.youtube.com/watch?v=yGVzYJN-m6o"
+   },
+   {
+    "id": "TXcpwaFMx1U",
+    "tur": "Short",
+    "tarih": "2026-11-21T15:26:52",
+    "baslik": "Isıya en dayanıklı 5 filament | 3D baskı",
+    "izlenme": 135,
+    "begeni": 1,
+    "yorum": 0,
+    "link": "https://www.youtube.com/watch?v=TXcpwaFMx1U"
+   },
+   {
+    "id": "ZzZkzgV1eL4",
+    "tur": "Short",
+    "tarih": "2026-11-21T14:12:38",
+    "baslik": "3D baskıda stringing nasıl azalır?",
+    "izlenme": 550,
+    "begeni": 5,
+    "yorum": 0,
+    "link": "https://www.youtube.com/watch?v=ZzZkzgV1eL4"
+   },
+   {
+    "id": "M9tyEIjEeH8",
+    "tur": "Short",
+    "tarih": "2026-11-21T09:57:09",
+    "baslik": "Filament nem çekerse ne olur? Belirtiler ve çözüm",
+    "izlenme": 905,
+    "begeni": 7,
+    "yorum": 0,
+    "link": "https://www.youtube.com/watch?v=M9tyEIjEeH8"
+   },
+   {
+    "id": "JFRO2uhYfwQ",
+    "tur": "Short",
+    "tarih": "2026-11-20T23:23:12",
+    "baslik": "İlk katman neden bozuluyor? 5 hızlı kontrol",
+    "izlenme": 641,
+    "begeni": 10,
+    "yorum": 0,
+    "link": "https://www.youtube.com/watch?v=JFRO2uhYfwQ"
+   },
+   {
+    "id": "qcWHhTeaEHs",
+    "tur": "Short",
+    "tarih": "2026-11-20T22:17:19",
+    "baslik": "3D Baskı Tablaya Yapışmıyor mu? 5 Pratik Çözüm",
+    "izlenme": 1163,
+    "begeni": 18,
+    "yorum": 0,
+    "link": "https://www.youtube.com/watch?v=qcWHhTeaEHs"
+   },
+   {
+    "id": "DevZ1m13Ku4",
+    "tur": "Short",
+    "tarih": "2026-11-20T21:56:57",
+    "baslik": "3D Baskı ile Araba İçi Pratik Aksesuarlar",
+    "izlenme": 151,
+    "begeni": 0,
+    "yorum": 0,
+    "link": "https://www.youtube.com/watch?v=DevZ1m13Ku4"
+   },
+   {
+    "id": "MGVp8xfBUtc",
+    "tur": "Short",
+    "tarih": "2026-11-19T21:59:26",
+    "baslik": "Dr. Filament ile 3D Yazıcılar Nasıl Çalışır? | gurtech3d",
+    "izlenme": 1106,
+    "begeni": 5,
+    "yorum": 1,
+    "link": "https://www.youtube.com/watch?v=MGVp8xfBUtc"
+   },
+   {
+    "id": "8g5NkhSeonc",
+    "tur": "Short",
+    "tarih": "2026-11-19T11:00:30",
+    "baslik": "Işıltılı detaylar",
+    "izlenme": 13,
+    "begeni": 1,
+    "yorum": 3,
+    "link": "https://www.youtube.com/watch?v=8g5NkhSeonc"
+   },
+   {
+    "id": "2BtcYB5RagM",
+    "tur": "Short",
+    "tarih": "2026-11-18T21:22:35",
+    "baslik": "GURTECH 3D",
+    "izlenme": 16,
+    "begeni": 3,
+    "yorum": 3,
+    "link": "https://www.youtube.com/watch?v=2BtcYB5RagM"
+   },
+   {
+    "id": "Z3j4VTqgSFM",
+    "tur": "Short",
+    "tarih": "2026-11-18T12:58:52",
+    "baslik": "3D baskı ile pratik tasarımlar",
+    "izlenme": 1029,
+    "begeni": 7,
+    "yorum": 1,
+    "link": "https://www.youtube.com/watch?v=Z3j4VTqgSFM"
+   },
+   {
+    "id": "aM1LRQ48pSQ",
+    "tur": "Short",
+    "tarih": "2026-11-16T21:09:30",
+    "baslik": "Kablolar neden karışıyor. Dr Filament çözüm bulsun",
+    "izlenme": 693,
+    "begeni": 7,
+    "yorum": 6,
+    "link": "https://www.youtube.com/watch?v=aM1LRQ48pSQ"
+   },
+   {
+    "id": "q3Un0K1sjbE",
+    "tur": "Short",
+    "tarih": "2026-11-16T07:00:16",
+    "baslik": "Doktor Filament ile Tanışın: 3D Baskıyı Katman Katman Anlatı",
+    "izlenme": 1397,
+    "begeni": 11,
+    "yorum": 1,
+    "link": "https://www.youtube.com/watch?v=q3Un0K1sjbE"
+   }
+  ],
+  "hata": ""
  },
- "eksikler": [
-  "YouTube okunamadı"
- ],
+ "eksikler": [],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 22:59",
-  "govde": "Toplam 13.516 (eksik veri) · Reels 13.069 · Short ? · Hikaye 447 (18 bugün) · Takipçi 429 · En iyi Reels: Baskın tabladan kalkı 3.168 · YouTube okunamadı"
+  "baslik": "📊 İzlenme raporu 23:25",
+  "govde": "Toplam 21.523 (+8.007) · Reels 13.157 · Short 7.910 · Hikaye 456 (18 bugün) · Takipçi 429 · En iyi Reels: Baskın tabladan kalkı 3.218"
  }
 }
