@@ -1,7 +1,7 @@
 {
   "id": "s20261121-150805",
   "olusturma": "2026-11-21T15:08:05Z",
-  "durum": "onay_bekliyor",
+  "durum": "yayinlandi",
   "tur": "viral",
   "video": "videolar/yukleme_20261121150805.mp4",
   "sure": 47.3,
@@ -10,5 +10,10 @@
   "muzik": "Sentez (kodla üretildi)",
   "konu": "Isıya en dayanıklı filamentler",
   "tasarimlar": [],
-  "hikayeler": []
+  "hikayeler": [],
+  "yayinlanan": [
+    "youtube",
+    "instagram"
+  ],
+  "yayin_tarihi": "2026-11-21T15:25:56.010Z"
 }
