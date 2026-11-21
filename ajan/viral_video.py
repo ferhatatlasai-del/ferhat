@@ -215,6 +215,8 @@ def liste_dogrula(s):
     m = sorted(m, key=lambda x: -int(x.get("sira") or 0))
     n = len(m)
     temiz = lambda v, k: U.yazi_temizle(str(v or ""))[:k].strip()
+    # birim ve değer yazısında ölçü işaretleri korunur (°, ≈, %, ³, /, ±); yazı tipinde bulunan karakterler
+    isaretli = lambda v, k: "".join(c for c in str(v or "") if c.isalnum() or c in "°≈%³²/±.,-+ ")[:k].strip()
     olcu = s.get("olcu") if isinstance(s.get("olcu"), dict) else {}
     maddeler = []
     for i, x in enumerate(m):
@@ -227,7 +229,7 @@ def liste_dogrula(s):
         except (TypeError, ValueError):
             deger = None
         maddeler.append({"sira": n - i, "ad": temiz(x.get("ad"), 18), "alt": temiz(x.get("alt"), 30), "deger": deger,
-                         "deger_yazi": temiz(x.get("deger_yazi"), 10) or None, "anlati": anlati, "gorsel": str(x.get("gorsel") or x.get("ad") or "3D printed part")[:300]})
+                         "deger_yazi": isaretli(x.get("deger_yazi"), 10) or None, "anlati": anlati, "gorsel": str(x.get("gorsel") or x.get("ad") or "3D printed part")[:300]})
     giris = s.get("giris") or {}
     kapanis = s.get("kapanis") or {}
     if len(str(giris.get("anlati") or "").split()) < 5:
@@ -239,7 +241,7 @@ def liste_dogrula(s):
     olcu_temiz = None
     if degerler and olcu.get("ad"):
         en = max(maddeler, key=lambda x: x["deger"] if x["deger"] is not None else -1e9)
-        olcu_temiz = {"ad": buyuk(temiz(olcu.get("ad"), 18)), "birim": temiz(olcu.get("birim"), 8), "ondalik": 1 if olcu.get("ondalik") else 0,
+        olcu_temiz = {"ad": buyuk(temiz(olcu.get("ad"), 18)), "birim": isaretli(olcu.get("birim"), 8), "ondalik": 1 if olcu.get("ondalik") else 0,
                       "en_buyuk": en["deger"], "en_buyuk_ad": en["ad"]}
     return {"bicim": "liste", "konu": str(s.get("konu") or "")[:140], "baslik": temiz(s.get("baslik"), 90), "aciklama": str(s.get("aciklama") or "")[:900].replace("http", ""),
             "etiketler": [re.sub(r"[^a-z0-9ığüşöç]", "", str(e).lower()) for e in (s.get("etiketler") or [])][:8],
