@@ -385,7 +385,7 @@ def _atmosfer(rng, sure):
 
 # ---------- olay listesi (plan → sesler) ----------
 
-def olaylar_uret(plan):
+def _olaylar_ham(plan):
     """Renderer ile aynı zaman çizelgesinden efekt olayları: [(zaman, ad)]"""
     ol = [(0.06, 'darbe')]
     sahneler = plan['sahneler']
@@ -397,7 +397,7 @@ def olaylar_uret(plan):
         if i < len(sahneler) - 1:
             son = s.get('ses_son', t1 - 0.5)   # konuşmanın bittiği an: geçiş efektleri ondan SONRA başlar
             ol.append((t1, 'gecis'))
-            ol.append((t1, 'yukselis', max(0.15, min(0.5, t1 - son - 0.03))))
+            ol.append((t1, 'yukselis', max(0.15, min(0.5, t1 - son - 0.06))))
         if s.get('ekran') and i > 0:
             ol.append((t0 + 0.34, 'pop'))
         if s.get('rozet'):
@@ -450,6 +450,61 @@ def olaylar_uret(plan):
             ol.append((t0 + d * 0.1, 'parilti'))
             ol.append((t0 + d * 0.1, 'darbe'))
     return sorted(ol)
+
+
+def konusma_araliklari(plan, on_pay=0.04, son_pay=0.06):
+    """Anlatının konuşulduğu zaman aralıkları [(baş, son)]: kelime zamanlarından, birleştirilmiş. Efektler bu aralıklara BAŞLAMAZ."""
+    a = sorted((k['t0'] - on_pay, k['t1'] + son_pay) for p in plan.get('altyazi', []) for k in p.get('kelimeler', []))
+    birlesik = []
+    for b, e in a:
+        if birlesik and b <= birlesik[-1][1] + 0.06:   # 60 ms'den kısa boşluklar nefes sayılmaz
+            birlesik[-1][1] = max(birlesik[-1][1], e)
+        else:
+            birlesik.append([b, e])
+    return birlesik
+
+
+def olaylar_uret(plan):
+    """Efekt olayları: konuşma varken (cümle sonu dahil) HİÇBİR efekt başlamaz.
+    Konuşma aralığına düşen olay, ±0,7 sn içindeki en yakın sessiz boşluğa kaydırılır; yoksa sayaç tıkları (tik) düşürülür, diğerleri de atlanır."""
+    ol = _olaylar_ham(plan)
+    ar = konusma_araliklari(plan)
+    if not ar:
+        return ol
+    sonuc = []
+    for ev in ol:
+        t, ad = ev[0], ev[1]
+        # geçiş efektlerinin BAŞLANGICI da konuşmaya binmesin: gerekirse biraz geciktirilir (yükseliş kısalır)
+        if ad in ('gecis', 'yukselis'):
+            sure = ev[2] if (ad == 'yukselis' and len(ev) > 2) else TEPE.get(ad, 0.0)
+            ic0 = next((a for a in ar if a[0] <= t - sure < a[1]), None)
+            if ic0 is not None:
+                if ad == 'gecis':
+                    t = ic0[1] + 0.02 + sure
+                    ev = (t, ad)
+                else:
+                    kalan = t - (ic0[1] + 0.02)
+                    if kalan < 0.1:
+                        continue
+                    ev = (t, ad, kalan)
+        ic = next((a for a in ar if a[0] <= t < a[1]), None)
+        if ic is None:
+            sonuc.append(ev)
+            continue
+        if ad == 'tik':
+            continue   # sayaç yalnız görsel kalır; konuşmanın üstüne tık sesi binmez
+        # en yakın boşluk: konuşma aralığının hemen öncesi ya da sonrası
+        adaylar = []
+        if ic[0] - 0.05 >= 0 and t - ic[0] <= 0.7:
+            adaylar.append(ic[0] - 0.05)
+        i = ar.index(ic)
+        sonraki = ic[1] + 0.02
+        if (i + 1 >= len(ar) or sonraki < ar[i + 1][0] - 0.1) and sonraki - t <= 0.7:
+            adaylar.append(sonraki)
+        if adaylar:
+            yeni = min(adaylar, key=lambda x: abs(x - t))
+            sonuc.append((yeni, ad) + tuple(ev[2:]))
+    return sorted(sonuc)
 
 
 # ---------- ana üretim ----------
