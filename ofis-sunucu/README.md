@@ -193,3 +193,10 @@ Silinen her kaydın kısa özeti `hikaye/arsiv.jsonl` dosyasına yazılır; Akad
 - **Kurtarma düğmeleri:** "Şimdi denetle" (Nöbetçi'yi hemen çalıştırır), "Hikaye ajanını devam ettir", "Hatalı hikayeleri sıraya geri al" (altyapı/anahtar hatasıyla `hata` olanları `planli`ya alır, eski hata notlarını temizler; uzun/bozuk video gibi içerik hataları bırakılır), "Engel kalkınca otomatik devam" (açıkken Nöbetçi Instagram'ın yeniden çalıştığını görünce ajanı kendisi başlatır; varsayılan açık). Özet → Yapılacaklar'da ajan hata ile durduysa uyarı çıkar.
 - Uç noktalar: `POST /api/nobetci-calistir` (saatte 6), `POST /api/hikaye-kurtar` `{islem: devam | geri_al | otomatik, deger}`.
 
+### Viral video: "geri sayım listesi" biçimi (varsayılan)
+Örnek alınan tasarım dili: üstte liste başlığı ve "N … 1" sıra göstergesi (o anki madde altın renkte), her maddede konuya özel **gerçekçi yapay zekâ görseli** üzerinde yavaş kamera hareketi, nesneyi gösteren **iğne + zemin halkası** (konumu görselden yapay zekâ ile bulunur), altta **sayaçlı bilgi kartı** (büyük sıra numarası, ad, kısa açıklama, ölçü adı, 0'dan yükselen değer, en yükseğe göre oran çubuğu), kartın üstünde **kelime kelime aydınlanan alt yazı**, maddeler arası yakınlaşma + bulanıklık geçişi.
+- Senaryo: `video/liste_konulari.json` (20 konu) → yapay zekâ `LISTE_ISTEMI` ile 4-8 maddelik liste yazar; tüm maddeler aynı ölçüyü kullanır (ör. ısı dayanımı °C), değerler "tipik" ve "≈" ile, emin değilse değer yok. `liste_dogrula` biçimi denetler.
+- Görseller: bölüm başına bir görsel (`hikaye_uret.gorsel_uret`, 1024×1536, kalite `shorts/viral_ayar.json` → `gorsel_kalitesi`, varsayılan medium); video başına ~7 görsel.
+- Çizim: `video/liste.html` + `liste.js` (2D tuval) — 3D'den çok daha hızlı (60 sn video birkaç dakika). Müzik her videoda konuya göre farklı akor dizisi, ton ve tempo (`ses_tasarim.muzik_ayarla`).
+- Biçim seçimi: `viral_ayar.json` → `bicim` ("liste" varsayılan, "3d" eski 3D sahneler); iş akışı girişi `bicim`; komut satırı `--bicim`. Test: `--gorsel-dizin` ile hazır görseller.
+

@@ -18,7 +18,7 @@ async function sayfaAc() {
   const b = await pw.chromium.launch({ executablePath: process.env.CHROME_YOLU || undefined, args: TARAYICI_ARG });
   const sayfa = await b.newPage({ viewport: { width: Math.round(plan.genislik * olcek), height: Math.round(plan.yukseklik * olcek) } });
   const hatalar = []; sayfa.on('pageerror', e => hatalar.push(e.message)); sayfa.on('console', m => { if (m.type() === 'error') hatalar.push(m.text()); });
-  await sayfa.goto('file://' + path.join(__dirname, 'sahne.html'), { waitUntil: 'load' });
+  await sayfa.goto('file://' + path.join(__dirname, /^[a-z]+\.html$/.test(plan.sayfa || '') ? plan.sayfa : 'sahne.html'), { waitUntil: 'load' });
   await sayfa.evaluate(async ([p, o]) => window.hazirla(p, o), [plan, olcek]);
   if (hatalar.length) throw new Error('Sayfa hatası: ' + hatalar.slice(0, 3).join(' | '));
   return { b, sayfa, hatalar };

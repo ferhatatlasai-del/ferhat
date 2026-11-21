@@ -227,6 +227,26 @@ AKORLAR = [  # (bas MIDI, pad sesleri)
     (43, [55, 59, 62, 66]),   # G
 ]
 AKOR_SURESI = 8 * BEAT   # 2 ölçü
+# Her videoda farklı müzik: konuya göre seçilen akor dizisi, ton ve tempo (bkz. muzik_ayarla)
+DIZI_SECENEKLERI = [
+    [(45, [57, 60, 64, 67]), (41, [53, 57, 60, 64]), (48, [55, 60, 64, 67]), (43, [55, 59, 62, 66])],   # Am7 F C G
+    [(48, [55, 60, 64, 71]), (45, [57, 60, 64, 67]), (41, [53, 57, 60, 65]), (43, [55, 59, 62, 67])],   # Cmaj7 Am7 F G
+    [(50, [57, 62, 65, 69]), (46, [58, 62, 65, 69]), (41, [53, 57, 60, 65]), (48, [55, 60, 64, 67])],   # Dm Bb F C
+    [(40, [55, 59, 64, 67]), (48, [55, 60, 64, 67]), (43, [55, 59, 62, 67]), (50, [57, 62, 66, 69])],   # Em C G D
+    [(41, [57, 60, 64, 65]), (43, [55, 59, 62, 67]), (45, [57, 60, 64, 69]), (40, [55, 59, 64, 67])],   # Fmaj7 G Am Em
+]
+
+
+def muzik_ayarla(tohum):
+    """Akor dizisini, tonu ve tempoyu tohuma göre seçer (aynı konu aynı müziği, farklı konular farklı müziği verir)."""
+    global AKORLAR, BPM, BEAT, AKOR_SURESI
+    r = np.random.default_rng(int(tohum))
+    dizi = DIZI_SECENEKLERI[int(r.integers(0, len(DIZI_SECENEKLERI)))]
+    kay = int(r.integers(-3, 4))
+    AKORLAR = [(b + kay, [n + kay for n in ns]) for b, ns in dizi]
+    BPM = float(r.uniform(88, 106))
+    BEAT = 60.0 / BPM
+    AKOR_SURESI = 8 * BEAT
 
 
 def _pad(rng, sure):
@@ -415,6 +435,16 @@ def olaylar_uret(plan):
             m = len(pr.get('maddeler') or [])
             for k in range(m):
                 ol.append((t0 + d * (0.08 + k * 0.55 / max(m, 1)) + 0.1, 'ding' if k % 2 == 0 else 'ding_alt'))
+        elif tip == 'liste_giris':
+            ol.append((t0 + 0.45, 'pop'))
+        elif tip == 'liste_madde':
+            ol.append((t0 + 0.32, 'pop'))
+            if pr.get('deger') is not None:
+                for k in range(14):
+                    ol.append((t0 + 0.58 + k * 0.09, 'tik'))
+                ol.append((t0 + 1.92, 'ding'))
+        elif tip == 'liste_kapanis':
+            ol += [(t0 + 0.15, 'darbe'), (t0 + 0.15, 'parilti')]
         elif tip == 'cta':
             ol.append((t0 + d * 0.1, 'parilti'))
             ol.append((t0 + d * 0.1, 'darbe'))
@@ -471,6 +501,8 @@ def yan_zincir(ses, sure, derinlik=0.62, atak=0.02, birak=0.38):
 
 def uret(plan, cikti, ses_yolu=None, tohum=7):
     """plan: sahneler/sure. ses_yolu: konuşma (mono/stereo wav, SR'ye dönüştürülür) ya da None. cikti: stereo wav (limitlenmemiş; ffmpeg loudnorm sonrası)."""
+    if plan.get('tohum') is not None:
+        muzik_ayarla(plan['tohum'])
     rng = np.random.default_rng(tohum)
     sure = float(plan['sure'])
     n = int(sure * SR)
