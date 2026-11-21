@@ -1,7 +1,7 @@
 {
   "id": "h20261121-052131-c7l",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-21T05:21:32.000Z",
   "gorsel": "hikaye/gorseller/h20261121-052131-c7l.mp4",
   "baslik": "Nissan Leaf bag hook",
@@ -21,7 +21,9 @@
     "sorunlar": []
   },
   "yayin": {
-    "tarih": "2026-11-21T13:05:34Z"
+    "tarih": "2026-11-21T13:06:44Z",
+    "medya_kimligi": "18110376599347393",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4035309186196299178"
   },
   "hata": "",
   "deneme": 0,
