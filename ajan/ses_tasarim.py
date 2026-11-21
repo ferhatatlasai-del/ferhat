@@ -68,7 +68,7 @@ def _nota(m):
 
 # ---------- efektler (stereo parça döndürür; sıfır an = olayın tepe noktasından "ONCE" kadar önce DEĞİL, parçanın başı) ----------
 
-def fx_whoosh(rng, sure=1.2, tepe=0.55, yon=1):
+def fx_whoosh(rng, sure=0.9, tepe=0.5, yon=1):
     n = int(sure * SR)
     t = _zaman(n) / sure
     K = 12
@@ -199,7 +199,7 @@ def fx_yukselen_ton(rng, sure=1.4, guc=1.0):
 
 
 FX = {
-    'gecis': lambda r: fx_whoosh(r),
+    'gecis': lambda r: fx_whoosh(r, 0.9, 0.5),
     'darbe': lambda r: fx_darbe(r),
     'yukselis': lambda r: fx_yukselis(r),
     'pop': lambda r: fx_pop(r),
@@ -215,7 +215,7 @@ FX = {
     'yukselen_ton': lambda r: fx_yukselen_ton(r),
 }
 # bir efektin "tepe noktası" parçanın başından kaç saniye sonra? (olay zamanı tepe noktasına hizalanır)
-TEPE = {'gecis': 0.55 * 1.2, 'yukselis': 0.9}
+TEPE = {'gecis': 0.5 * 0.9, 'yukselis': 0.9}   # yükseliş süresi olaydan gelir (3. eleman)
 
 
 # ---------- müzik ----------
@@ -395,8 +395,9 @@ def olaylar_uret(plan):
         pr = s.get('params') or {}
         tip = s['tip']
         if i < len(sahneler) - 1:
+            son = s.get('ses_son', t1 - 0.5)   # konuşmanın bittiği an: geçiş efektleri ondan SONRA başlar
             ol.append((t1, 'gecis'))
-            ol.append((t1 - 0.85, 'yukselis'))
+            ol.append((t1, 'yukselis', max(0.15, min(0.5, t1 - son - 0.03))))
         if s.get('ekran') and i > 0:
             ol.append((t0 + 0.34, 'pop'))
         if s.get('rozet'):
@@ -478,7 +479,7 @@ def oku_wav(yol):
     return mono
 
 
-def yan_zincir(ses, sure, derinlik=0.62, atak=0.02, birak=0.38):
+def yan_zincir(ses, sure, derinlik=0.5, atak=0.02, birak=0.75):   # müzik konuşma bitince YAVAŞÇA geri gelir (ani ses düşmesi/yükselmesi olmaz)
     """Konuşma zarfından müzik kazancı (1 = kısılmamış). 200 Hz ızgarada hesaplanır."""
     n = int(sure * SR)
     v = np.zeros(n)
@@ -514,10 +515,14 @@ def uret(plan, cikti, ses_yolu=None, tohum=7):
 
     # efektler
     fx = np.zeros((n, 2))
-    for zaman, ad in olaylar_uret(plan):
-        rr = np.random.default_rng(abs(hash((ad, round(zaman, 2)))) % (2 ** 32) if False else int(zaman * 1000) + len(ad))
-        parca = FX[ad](rr)
-        _yerlestir(fx, parca, zaman - TEPE.get(ad, 0.0))
+    for ev in olaylar_uret(plan):
+        zaman, ad = ev[0], ev[1]
+        rr = np.random.default_rng(int(zaman * 1000) + len(ad))
+        if ad == 'yukselis' and len(ev) > 2:
+            parca, tepe = fx_yukselis(rr, ev[2]), ev[2]   # kısa yükseliş: konuşma bittikten sonra başlar, sahne sınırında zirve yapar
+        else:
+            parca, tepe = FX[ad](rr), TEPE.get(ad, 0.0)
+        _yerlestir(fx, parca, zaman - tepe)
     fx = _yanki(fx, rng, 0.35, 0.8, 0.12)
 
     ses = oku_wav(ses_yolu)[:n] if ses_yolu else None
@@ -533,6 +538,7 @@ def uret(plan, cikti, ses_yolu=None, tohum=7):
         hedef = r_s * 10 ** (-13 / 20)
     kar *= hedef / r_m
     fx *= hedef / r_m * 1.9
+    fx *= (0.5 + 0.5 * muzik_g)[:, None]   # konuşma sırasında efektler de (yarı derinlikte) kısılır
     karisim = kar * muzik_g[:, None] + fx
     # giriş / çıkış yumuşatma
     t = np.arange(n) / SR

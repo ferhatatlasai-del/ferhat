@@ -200,3 +200,7 @@ Silinen her kaydın kısa özeti `hikaye/arsiv.jsonl` dosyasına yazılır; Akad
 - Çizim: `video/liste.html` + `liste.js` (2D tuval) — 3D'den çok daha hızlı (60 sn video birkaç dakika). Müzik her videoda konuya göre farklı akor dizisi, ton ve tempo (`ses_tasarim.muzik_ayarla`).
 - Biçim seçimi: `viral_ayar.json` → `bicim` ("liste" varsayılan, "3d" eski 3D sahneler); iş akışı girişi `bicim`; komut satırı `--bicim`. Test: `--gorsel-dizin` ile hazır görseller.
 
+### Ses zamanlaması düzeltmesi (efekt konuşmayı kesmesin)
+- Sahne süreleri artık konuşmanın **gerçek bitişine** (sesten ölçülen son kelime sonu) göre belirlenir; sahne sınırı son kelimeden 0,5 sn sonradır (`plan.sahneler[].ses_son`). Geçiş "whoosh" ve "yükseliş" efektleri bu aralıkta (konuşma bittikten sonra) çalar; yükselişin süresi aralığa göre kısalır. Eskiden yükseliş sahne sınırından 1,75 sn önce başlayıp son kelimelerin üstüne biniyordu.
+- Konuşma sırasında müzik %50 (eskiden %62) kısılır ve konuşma bitince 0,75 sn'de (eskiden 0,38) geri gelir; pop/tık/çan efektleri de konuşma sırasında yarı derinlikte kısılır. Sahne sonlarındaki ani ses düşüşü ~12 dB'den ~2-4 dB'ye indi. Videonun son kelimesinden sonra müziğe 2,4 sn kuyruk bırakılır (konuşma bitmeden sönmez).
+
