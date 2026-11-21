@@ -1,7 +1,7 @@
 {
   "id": "h20261121-052228-f8u",
   "kaynak": "uretim",
-  "durum": "planli",
+  "durum": "yayinlaniyor",
   "olusturma": "2026-11-21T05:22:28.000Z",
   "gorsel": "hikaye/gorseller/h20261121-052228-f8u.mp4",
   "baslik": "Larger Hooks for the Ortlieb QL2.1 Bike Bags. If your bike has thicker bike rack",
@@ -20,7 +20,9 @@
     "deneme": 1,
     "sorunlar": []
   },
-  "yayin": null,
+  "yayin": {
+    "tarih": "2026-11-21T14:05:38Z"
+  },
   "hata": "",
   "deneme": 0,
   "tur": "video",
