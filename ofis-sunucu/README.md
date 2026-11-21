@@ -235,3 +235,5 @@ Kaldırılan kullanılmayan iş akışları: `gorsel.yml` (+`ajan/gorsel.py`) ve
 - **Anahtar:** sırayla `IG_YORUM_TOKEN`, `IG_ISTATISTIK_TOKEN`, `IG_ACCESS_TOKEN`. Yorum okuma/yanıtlama için anahtarın `instagram_business_manage_comments` izni olmalı (Meta uygulaması → Instagram → izinler; sonra anahtarı yeniden üret). İzin yoksa panelde kırmızı "Gönderilemedi: kod=10" görünür.
 - **Veri:** `yorum/kuyruk.json` (son 250 kayıt) ve `yorum/ayar.json` — panel ve ajan aynı dosyaları sha kontrollü yazar.
 - **YouTube yorumları:** henüz yok; yanıt yazmak için `youtube.force-ssl` kapsamlı yeni bir yenileme anahtarı gerekir.
+
+**Yeniden yaz:** onay bekleyen ya da gönderilemeyen her yorum kartında "Yeniden yaz" düğmesi vardır; ajan o yanıtı güncel üslup kurallarıyla baştan yazar (birkaç dakika sürer, kart "Yeniden yazılıyor…" der, sonra yeniden onay bekler).
