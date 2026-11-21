@@ -587,6 +587,8 @@ async function api(req, res, url) {
     const simdi = Date.now();
     while (viralTetikler.length && simdi - viralTetikler[0] > 3600e3) viralTetikler.shift();
     if (viralTetikler.length >= 2) return json(res, 429, { hata: 'Saatte en fazla 2 elle viral video üretimi.' });
+    viralOnbellek.t = 0;
+    try { const d = await viralDurum(); if (d.calisiyor) return json(res, 409, { hata: 'Zaten bir viral video üretiliyor (ilerleme kutusundan izle). İkincisi, aynı anda başlayıp aynı konuyu seçmesin diye engellendi.' }); } catch (e) { /* durum okunamazsa devam */ }
     let konu = '';
     try { const b = await govde(req); konu = String(b.konu || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 120); } catch (e) { /* konu isteğe bağlı */ }
     const dal = await varsayilanDal();
@@ -929,7 +931,14 @@ async function zamKontrol() {
   // viral 3D video (Türkçe seslendirmeli Shorts/Reels taslağı): pazartesi, çarşamba ve cumartesi 14:00'ten sonra bir kez
   if ([1, 3, 6].includes(haftaGunu) && saat >= 14 && saat < 21) {
     const anahtar = `v${gun}`;
-    if (!zamYapilan.has(anahtar)) { zamYapilan.add(anahtar); await zamTetikle(AKIS_VIRAL, {}, 'viral'); }
+    if (!zamYapilan.has(anahtar)) {
+      zamYapilan.add(anahtar);
+      // Sunucu yeniden başladığında (ör. Fly yüklemesi) bellek sıfırlanır ve aynı gün tekrar tetiklenirdi. Bu yüzden önce GitHub'daki son çalışmaya bakılır:
+      // zaten çalışıyorsa ya da bugün (TR) başlamışsa yeniden tetiklenmez.
+      let atla = false;
+      try { viralOnbellek.t = 0; const d = await viralDurum(); atla = !!(d.calisiyor || (d.baslangic && new Date(Date.parse(d.baslangic) + 3 * 3600e3).toISOString().slice(0, 10) === gun)); } catch (e) { /* okunamazsa tetikle: iş akışındaki günlük koruma da vardır */ }
+      if (!atla) await zamTetikle(AKIS_VIRAL, {}, 'viral');
+    }
   }
   // nöbetçi (anahtar/servis sağlığı + hikaye ajanı kurtarma): günde 4 kez (TR 08, 12, 16, 20; :10'dan sonra)
   if ([8, 12, 16, 20].includes(saat) && dk >= 10) {

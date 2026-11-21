@@ -500,6 +500,33 @@ def gemini_seslendir(metin, ayar, anahtar):
     return {"ses": x, "sure": len(x) / SES.SR, "baslangic": bas}
 
 
+def sessiz_kesim(x, hedef, yaricap=0.7):
+    """Tahmini sahne sınırı (hedef, sn) çevresinde konuşmanın en sessiz noktasını bulur: kesim kelimenin ortasına denk gelmesin (son söz bölünmesin).
+    Eşik altı sessizlik varsa hedefe en yakın olanın ortasını, yoksa en sessiz 80 ms'yi seçer."""
+    blok = SES.SR // 50                       # 20 ms
+    n = len(x) // blok
+    r = np.sqrt((x[:n * blok].reshape(n, blok) ** 2).mean(axis=1))
+    pen = np.convolve(r, np.ones(4) / 4, mode="same")   # 80 ms kayan ortalama
+    h = hedef * 50
+    a, b = int(max(0, h - yaricap * 50)), int(min(n - 1, h + yaricap * 50))
+    if b <= a:
+        return float(min(max(hedef, 0.0), len(x) / SES.SR))
+    esik = max(r.max() * 0.04, 1e-4)
+    aday = [i for i in range(a, b + 1) if pen[i] < esik]
+    if aday:
+        # hedefe en yakın sessiz bölge; o bölgenin (bitişik kareler) ortası
+        en_yakin = min(aday, key=lambda i: abs(i - h))
+        sol = en_yakin
+        while sol - 1 >= 0 and pen[sol - 1] < esik:
+            sol -= 1
+        sag = en_yakin
+        while sag + 1 < n and pen[sag + 1] < esik:
+            sag += 1
+        return float((sol + sag + 1) / 2 * 0.02)
+    i = a + int(np.argmin(pen[a:b + 1]))
+    return float((i + 0.5) * 0.02)
+
+
 def gemini_hepsi(sahneler, ayar, anahtar):
     """Tüm anlatıyı TEK istekte seslendirir (ücretsiz katman günlük istek sınırı düşük), sahnelere duraklamalardan böler.
     Dönen: sahne başına {'ses','sure','baslangic'} listesi."""
@@ -514,7 +541,7 @@ def gemini_hepsi(sahneler, ayar, anahtar):
         n += len(m.split())
     kes = [0.0]
     for k in range(1, len(metinler)):
-        kes.append(max(kes[-1] + 0.6, bas[ilk[k]] - 0.14))   # sahne başlangıcından hemen önce, duraklamanın içinde
+        kes.append(max(kes[-1] + 0.6, sessiz_kesim(x, bas[ilk[k]])))   # tahmini sahne başlangıcı çevresindeki en sessiz nokta (kelime ortasında kesilmez)
     kes.append(sure)
     sonuc = []
     for k, m in enumerate(metinler):
@@ -588,10 +615,10 @@ def konusma_sonu(v, kel):
         blok = SES.SR // 100
         n = len(x) // blok
         r = x[:n * blok].reshape(n, blok).max(axis=1)
-        esik = max(r.max() * 0.05, 1e-4)
+        esik = max(r.max() * 0.02, 1e-4)   # -34 dB: son hecenin sönen kuyruğu da konuşma sayılır
         idx = np.nonzero(r > esik)[0]
         if len(idx):
-            return float((idx[-1] + 1) * 0.01)
+            return float(min(v["sure"], (idx[-1] + 1) * 0.01 + 0.12))   # +0,12 sn güvenlik payı
     son = v["baslangic"][-1] + 0.1 + 0.058 * len(kel[-1])
     return float(min(v["sure"], son))
 
@@ -601,11 +628,12 @@ def cizelge_kur(senaryo, sesler, alt_kelime=5, alt_harf=30):
     n = len(senaryo["sahneler"])
     for i, (s, v) in enumerate(zip(senaryo["sahneler"], sesler)):
         kel = s["anlati"].split()
-        v0 = t + (0.6 if i == 0 else 0.0)   # sahne dilimi zaten ~0,14 sn nefes payıyla başlar
+        v0 = t + (0.6 if i == 0 else 0.25)   # sonraki sahnenin konuşması sınırdan 0,25 sn sonra başlar: geçiş efektinin zirvesi konuşmanın üstüne binmesin
         ses_son = v0 + konusma_sonu(v, kel)
         t1 = ses_son + (KAPANIS_KUYRUGU if i == n - 1 else GECIS_ARASI)
+        son_rel = konusma_sonu(v, kel)
         for k, (w, b) in enumerate(zip(kel, v["baslangic"])):
-            bitis = v["baslangic"][k + 1] if k + 1 < len(kel) else v["sure"]
+            bitis = v["baslangic"][k + 1] if k + 1 < len(kel) else son_rel   # son kelime: gerçek konuşma sonu (dilimin sessiz kuyruğu değil)
             kelimeler.append({"k": w, "t0": v0 + b, "t1": v0 + max(bitis - 0.02, b + 0.08), "sahne": i})
         if v["ses"] is not None:
             parcalar_ses.append((v0, v["ses"]))
@@ -676,6 +704,19 @@ def calis(a):
         print("Karar: bekle (viral video üretimi kapalı)")
         ilerleme("beklemede", 100, "viral video üretimi kapalı", zorla=True)
         return 0
+    if not (a.hemen or a.senaryo or a.konu):
+        # zamanlanmış çalışma: sunucu yeniden başlayınca tetik tekrarlanabilir; bugün (TR) zaten bir viral video üretildiyse üretme
+        bugun = H.simdi().astimezone(H.TR).strftime("%Y-%m-%d")
+        for f in DIZIN.glob("s*.json"):
+            o = json_oku(f, {})
+            try:
+                gun = datetime.datetime.fromisoformat(str(o.get("olusturma", "")).replace("Z", "+00:00")).astimezone(H.TR).strftime("%Y-%m-%d")
+            except Exception:
+                continue
+            if o.get("tur") == "viral" and gun == bugun:
+                print(f"Karar: bekle (bugün zaten bir viral video üretildi: {o.get('id')}; zamanlanmış çalışma ikinciyi üretmez)")
+                ilerleme("beklemede", 100, "bugün zaten bir viral video üretildi", zorla=True)
+                return 0
     bekleyen = sum(1 for f in DIZIN.glob("s*.json") if json_oku(f, {}).get("durum") == "onay_bekliyor")
     if bekleyen >= ayar["en_cok_bekleyen"] and not (a.hemen or a.senaryo or a.konu):
         print(f"Karar: bekle ({bekleyen} taslak onay bekliyor; yenisi üretilmez)")
@@ -752,7 +793,8 @@ def calis(a):
         kimlik = f"s{z.strftime('%Y%m%d-%H%M%S')}"
         gercek = bool(anahtar or gemini) and not a.tts_dizin and not a.sessiz
         taslak = {"id": kimlik, "olusturma": z.strftime("%Y-%m-%dT%H:%M:%SZ"), "durum": "onay_bekliyor", "tur": "viral", "video": f"videolar/{cikti.name}", "sure": round(plan["sure"], 1),
-                  "baslik": senaryo["baslik"], "aciklama": aciklama_olustur(senaryo, gercek), "muzik": "Sentez (kodla üretildi)", "konu": senaryo["konu"], "tasarimlar": [], "hikayeler": []}
+                  "baslik": senaryo["baslik"], "aciklama": aciklama_olustur(senaryo, gercek), "muzik": "Sentez (kodla üretildi)", "konu": senaryo["konu"], "tasarimlar": [], "hikayeler": [],
+                  "zamanlama": [{"tip": x["tip"], "t0": x["t0"], "t1": x["t1"], "ses_son": x.get("ses_son")} for x in plan["sahneler"]]}   # sahne/konuşma zamanları: ses sorunlarını sonradan ayıklamak için
         yaz(DIZIN / f"{kimlik}.json", taslak)
         yaz(KULLANILAN, sorted(set(json_oku(KULLANILAN, [])) | {kaynak}))
         print(f"Taslak hazır: {kimlik}; başlık: {senaryo['baslik']}")

@@ -26,6 +26,9 @@ jobs:
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Kuyrukta bekleyen çalışma, tetiklendiği andaki ESKİ kayıtla başlamasın (öncekinin seçtiği konuyu görsün): dalın şu anki ucu
+          ref: ${{ github.ref_name }}
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
