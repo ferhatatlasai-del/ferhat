@@ -1,7 +1,7 @@
 {
   "id": "h20261121-114129-e1r",
   "kaynak": "uretim",
-  "durum": "planli",
+  "durum": "yayinlaniyor",
   "olusturma": "2026-11-21T11:41:29.000Z",
   "gorsel": "hikaye/gorseller/h20261121-114129-e1r.mp4",
   "baslik": "Table bag hook",
@@ -20,7 +20,9 @@
     "deneme": 1,
     "sorunlar": []
   },
-  "yayin": null,
+  "yayin": {
+    "tarih": "2026-11-21T17:05:34Z"
+  },
   "hata": "",
   "deneme": 0,
   "tur": "video",
