@@ -41,6 +41,12 @@ SAKLA = 250          # kuyrukta tutulan en çok kayıt
 BOT_SORUSU = re.compile(r"\bbot\b|robot|yapay\s*zek|\bai\b|gerçek\s*(bir\s*)?(kişi|insan)|insan\s*m[ıi]s[ıi]n|otomatik\s*(mi|cevap|yanıt)|kimle\s*konuşuyorum", re.I)
 YASAK_YANIT = re.compile(r"https?://|www\.|@\w|\b\d{7,}\b|\.com\b", re.I)
 DURUM_TAM = ("gonderildi", "reddedildi", "atlandi")
+ROBOT_EMOJI = re.compile("[\U0001F916\U0001F47E\U0001F9BE\U0001F9BF\U0001F97D\u2699\U0001F50C]\ufe0f?")   # robot, uzaylı oyun, mekanik kol/bacak, VR gözlüğü, dişli, fiş
+
+
+def emoji_temizle(metin):
+    """Robot/yapay zekâ temalı emojileri kaldırır (kanalın ortak kararı: yanıtlarda robot resmi olmaz)."""
+    return " ".join(ROBOT_EMOJI.sub("", str(metin or "")).split())
 
 
 def tr_bugun():
@@ -144,7 +150,7 @@ Bir izleyicinin yorumu: «{yorum}»
 Görev: yorumu değerlendir.
 karar = "yanit": nazik ve konuyla ilgili yanıt verilebilir (teşekkür, övgü, emoji, 3D baskıyla ilgili genel soru, öneri, eleştiri).
 karar = "atla": yanıtlama; hakaret/küfür, siyaset/din, spam/reklam/link/takip dilenme, sağlık-hukuk-finans tavsiyesi, şikâyet/iade/sipariş/kargo, başkasına yönelik yorum, anlamsız tek karakter ya da kullanıcının kendi yazıcı/kurulumuna özel, bilemeyeceğimiz ayrıntılı sorun giderme sorusu.
-YANIT KURALLARI: Türkçe; 1-2 kısa cümle, en çok 220 karakter; yorumun içeriğine ÖZGÜ (kalıp cümle değil); sıcak ve nazik; "sen" hitabı; en çok bir emoji; kullanıcıyı @ ile etiketleme; link, telefon, e-posta, fiyat yok; kişisel deneyim UYDURMA ("ben denedim", "yazıcımda" yok) ve insan olduğunu ima etme; emin olmadığın teknik bilgiyi kesin söyleme ("genellikle", "çoğu zaman" kullan). Soru sorulmuşsa kısa ve işe yarar cevapla. Biri bot/yapay zekâ/gerçek kişi mi diye sorarsa dürüstçe yapay zekâ asistanı olduğunu söyle.
+YANIT KURALLARI: Türkçe; 1-2 kısa cümle, en çok 220 karakter; yorumun içeriğine ÖZGÜ (kalıp cümle değil); sıcak ve nazik; "sen" hitabı; en çok bir emoji (robot, yapay zekâ, gözlük ya da makine emojisi KULLANMA: 🤖 🥽 👾 ⚙️ yasak); kullanıcıyı @ ile etiketleme; link, telefon, e-posta, fiyat yok; kişisel deneyim UYDURMA ("ben denedim", "yazıcımda" yok) ve insan olduğunu ima etme; emin olmadığın teknik bilgiyi kesin söyleme ("genellikle", "çoğu zaman" kullan). Soru sorulmuşsa kısa ve işe yarar cevapla. Biri bot/yapay zekâ/gerçek kişi mi diye sorarsa dürüstçe yapay zekâ asistanı olduğunu söyle.
 YALNIZCA JSON: {"karar":"yanit|atla","kategori":"övgü|teşekkür|soru|öneri|eleştiri|emoji|hakaret|spam|şikâyet|özel soru|diğer","yanit":"...","neden":"atla ise kısa sebep"}"""
 
 DURUM_YANITI = "Ben Doktor Filament, kanalın yapay zekâ asistanıyım 🙂 3D baskıyla ilgili sorularını memnuniyetle yanıtlarım!"
@@ -174,7 +180,7 @@ def karar_son(yorum, j):
     """Yapay zekâ kararını kurallarla denetler: (durum_onerisi, kategori, yanit, neden)"""
     if not j:
         return "atlandi", "diğer", "", "yapay zekâ kararı alınamadı"
-    yanit = " ".join(str(j.get("yanit") or "").split())
+    yanit = emoji_temizle(j.get("yanit"))
     kategori = str(j.get("kategori") or "diğer")[:30]
     if BOT_SORUSU.search(yorum):
         # dürüstlük kuralı: yanıt yapay zekâ olduğumuzu açıkça söylemeli
@@ -231,7 +237,7 @@ def gonder(ayar, bekle=True):
     print(f"Gönderilecek onaylı yanıt: {len(hazir)} (bugün {gonderilen_bugun}/{ayar['gunluk_sinir']} gönderildi, bu turda en çok {kota})")
     sonuc = {}
     for o in hazir[:kota]:
-        yanit = " ".join(str(o.get("yanit") or "").split())
+        yanit = emoji_temizle(o.get("yanit"))   # panelde elle yazılmış ya da eski taslakta kalmış robot emojisi de gönderimde temizlenir
         if not yanit or len(yanit) > 300 or YASAK_YANIT.search(yanit):
             sonuc[o["id"]] = ("hata", "Yanıt boş/uzun ya da bağlantı içeriyor; düzenleyip yeniden onayla.")
             continue
