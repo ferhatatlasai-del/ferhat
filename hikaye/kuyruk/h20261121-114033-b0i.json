@@ -1,7 +1,7 @@
 {
   "id": "h20261121-114033-b0i",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-21T11:40:33.000Z",
   "gorsel": "hikaye/gorseller/h20261121-114033-b0i.mp4",
   "baslik": "IV bag hook",
@@ -23,7 +23,9 @@
     ]
   },
   "yayin": {
-    "tarih": "2026-11-21T15:25:33Z"
+    "tarih": "2026-11-21T15:26:43Z",
+    "medya_kimligi": "18138218831507788",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4035379674644301479"
   },
   "hata": "",
   "deneme": 0,
