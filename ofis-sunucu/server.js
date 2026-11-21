@@ -545,6 +545,73 @@ async function api(req, res, url) {
     const r = await depoYaz(yol, JSON.stringify(t, null, 2), k.sha, 'Panel: Shorts taslağı ' + t.durum);
     return r.ok ? json(res, 200, { ok: true, durum: t.durum }) : json(res, 502, { hata: 'Kaydedilemedi.' });
   }
+  if (url.pathname === '/api/yorum') {
+    if (!TOKEN) return json(res, 503, { hata: 'Sunucuda GITHUB_TOKEN tanımlı değil.' });
+    try {
+      const sessiz = e => { if (e && e.kullanici) throw e; return null; };   // GitHub anahtarı/sınır sorunu gizlenmesin; dosya yoksa boş say
+      const k = await depoOku('yorum/kuyruk.json').catch(sessiz);
+      const a = await depoOku('yorum/ayar.json').catch(sessiz);
+      const ogeler = k ? (JSON.parse(k.metin).ogeler || []) : [];
+      return json(res, 200, { ogeler: ogeler.slice(-80).reverse(), ayar: Object.assign({ aktif: true, mod: 'onay', gunluk_sinir: 30 }, a ? JSON.parse(a.metin) : {}) });
+    } catch (e) { return json(res, 502, { hata: e && e.kullanici ? e.message : 'Yorum verisi okunamadı.' }); }
+  }
+  if (url.pathname === '/api/yorum-karar' && req.method === 'POST') {
+    let b; try { b = await govde(req); } catch (e) { return json(res, 400, { hata: 'Geçersiz istek.' }); }
+    if (!YORUM_RE.test(String(b.id || ''))) return json(res, 400, { hata: 'Geçersiz kimlik.' });
+    if (!['onayla', 'reddet', 'duzenle', 'tekrar', 'yeniden'].includes(b.karar)) return json(res, 400, { hata: 'Geçersiz karar.' });
+    const yanit = temiz(b.yanit || '', 300).replace(/\s+/g, ' ').trim();
+    if ((b.karar === 'onayla' || b.karar === 'duzenle') && b.yanit !== undefined) {
+      if (!yanit) return json(res, 400, { hata: 'Yanıt boş olamaz.' });
+      if (/https?:\/\/|www\.|@\w/i.test(yanit)) return json(res, 400, { hata: 'Yanıtta bağlantı ya da @etiket olamaz.' });
+    }
+    let bulundu = false, gecersiz = '';
+    const ok = await jsonGuncelle('yorum/kuyruk.json', v => {
+      const o = (v.ogeler || []).find(x => x.id === b.id);
+      if (!o) return false;
+      bulundu = true;
+      if (o.durum === 'gonderildi') { gecersiz = 'Bu yanıt zaten gönderildi.'; return false; }
+      if (b.yanit !== undefined && b.karar !== 'reddet') o.yanit = yanit;
+      if (b.karar === 'onayla') { if (!o.yanit) { gecersiz = 'Bu yorum için yanıt yok.'; return false; } o.durum = 'onaylandi'; o.hata = ''; }
+      else if (b.karar === 'reddet') o.durum = 'reddedildi';
+      else if (b.karar === 'tekrar') { o.durum = 'onay_bekliyor'; o.hata = ''; }
+      else if (b.karar === 'yeniden') { if (!['onay_bekliyor', 'hata', 'atlandi', 'reddedildi'].includes(o.durum)) { gecersiz = 'Bu yanıt şu an yeniden yazılamaz.'; return false; } o.durum = 'yeniden_yaz'; o.hata = ''; }
+    }, 'Panel: yorum yanıtı ' + b.karar, { ogeler: [] });
+    if (gecersiz) return json(res, 409, { hata: gecersiz });
+    if (!ok) return json(res, bulundu ? 502 : 404, { hata: bulundu ? 'Kaydedilemedi.' : 'Yorum bulunamadı.' });
+    if (b.karar === 'yeniden' && Date.now() - yorumYenidenTetik > 20e3) {   // yeniden yazma hemen başlasın; art arda basışlarda tek tetik (ajan bekleyenlerin hepsini yazar)
+      yorumYenidenTetik = Date.now();
+      const dal = await varsayilanDal();
+      await gh(`/repos/${REPO}/actions/workflows/${AKIS_YORUM}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: { elle: 'EVET' } }) }).catch(() => {});
+    }
+    if (b.karar === 'onayla' && Date.now() - yorumSonTetik > 3 * 60e3) {   // onaylanan yanıtlar kısa sürede gitsin; art arda onaylarda tek tetik
+      yorumSonTetik = Date.now();
+      const dal = await varsayilanDal();
+      await gh(`/repos/${REPO}/actions/workflows/${AKIS_YORUM}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: { sadece_gonder: 'EVET' } }) }).catch(() => {});
+    }
+    return json(res, 200, { ok: true });
+  }
+  if (url.pathname === '/api/yorum-ayar' && req.method === 'POST') {
+    let b; try { b = await govde(req); } catch (e) { return json(res, 400, { hata: 'Geçersiz istek.' }); }
+    const tam = (v, lo, hi) => Number.isInteger(v) && v >= lo && v <= hi;
+    const yeni = {};
+    if (typeof b.aktif === 'boolean') yeni.aktif = b.aktif;
+    if (b.mod !== undefined) { if (!['onay', 'otomatik'].includes(b.mod)) return json(res, 400, { hata: 'Geçersiz mod.' }); yeni.mod = b.mod; }
+    if (b.gunluk_sinir !== undefined) { if (!tam(b.gunluk_sinir, 1, 60)) return json(res, 400, { hata: 'Günlük sınır 1-60 olmalı.' }); yeni.gunluk_sinir = b.gunluk_sinir; }
+    if (!Object.keys(yeni).length) return json(res, 400, { hata: 'Değişiklik yok.' });
+    let sonuc;
+    const ok = await jsonGuncelle('yorum/ayar.json', v => { Object.assign(v, Object.assign({ aktif: true, mod: 'onay', gunluk_sinir: 30 }, v, yeni)); sonuc = Object.assign({}, v); }, 'Panel: yorum ajanı ayarı', {});
+    return ok ? json(res, 200, { ok: true, ayar: sonuc }) : json(res, 502, { hata: 'Ayar kaydedilemedi.' });
+  }
+  if (url.pathname === '/api/yorum-calistir' && req.method === 'POST') {
+    const simdi = Date.now();
+    while (yorumTetikler.length && simdi - yorumTetikler[0] > 3600e3) yorumTetikler.shift();
+    if (yorumTetikler.length >= 6) return json(res, 429, { hata: 'Saatte en fazla 6 elle yorum taraması.' });
+    const dal = await varsayilanDal();
+    const r = await gh(`/repos/${REPO}/actions/workflows/${AKIS_YORUM}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: { elle: 'EVET' } }) });
+    if (r.status !== 204) return json(res, 502, { hata: 'GitHub kabul etmedi (' + r.status + ').' });
+    yorumTetikler.push(simdi);
+    return json(res, 200, { ok: true });
+  }
   if (url.pathname === '/api/nobetci-calistir' && req.method === 'POST') {
     const simdi = Date.now();
     while (nobetciTetikler.length && simdi - nobetciTetikler[0] > 3600e3) nobetciTetikler.shift();

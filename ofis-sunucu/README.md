@@ -227,7 +227,7 @@ Kaldırılan kullanılmayan iş akışları: `gorsel.yml` (+`ajan/gorsel.py`) ve
 
 `ajan/yorum_ajani.py` + `.github/workflows/yorum-ajani.yml` (sunucu 08–22 arası 30 dakikada bir tetikler; panelden "Şimdi tara" ile de çalışır).
 
-- **Akış:** son gönderilerin yeni yorumlarını okur (kendi yorumlarımız ve zaten yanıtlanmışlar atlanır) → yapay zekâ her yorum için `yanit` ya da `atla` kararı verir ve gönderi metnini bağlam alarak 1-2 cümlelik nazik yanıt yazar → **onay modunda** yanıtlar panelde (İçerik → Yorum ajanı) onay bekler; düzenleyip "Onayla ve gönder" dersin, gönderim birkaç dakika içinde yapılır.
+- **Akış:** son gönderilerin yeni yorumlarını okur (kendi yorumlarımız ve zaten yanıtlanmışlar atlanır) → yapay zekâ her yorum için `yanit` ya da `atla` kararı verir ve gönderi metnini bağlam alarak 1-2 cümlelik nazik yanıt yazar → **onay modunda** yanıtlar panelde (Yorumlar bölümü) onay bekler; düzenleyip "Onayla ve gönder" dersin, gönderim birkaç dakika içinde yapılır.
 - **Atlananlar:** hakaret/küfür, siyaset/din, spam ve bağlantılı yorumlar, sağlık-hukuk-finans, şikâyet/iade/kargo, çok özel sorun giderme soruları. Geçmiş bölümünde görünür.
 - **Dürüstlük:** biri bot/yapay zekâ/gerçek kişi mi diye sorarsa yanıt, yapay zekâ asistanı olduğunu açıkça söyler (model söylemese bile kodda zorlanır). Yanıtlara link, @etiket, telefon konmaz; kişisel deneyim uydurulmaz.
 - **Sınırlar:** günde en çok 30 (panelden 1-60), turda en çok 6 gönderim, gönderimler arası 20-60 sn rastgele bekleme, turda en çok 15 taslak.

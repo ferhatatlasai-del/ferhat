@@ -287,6 +287,7 @@ body.tam .hint{display:none}
   <nav class="nav" id="nav" aria-label="Bölümler">
     <button type="button" data-v="ofis"><span class="ik">🏠</span><span class="et">Ana ekran</span><span class="rz" hidden></span></button>
     <button type="button" data-v="yayin"><span class="ik">📤</span><span class="et">Yayın</span><span class="rz" hidden></span></button>
+    <button type="button" data-v="yorum"><span class="ik">💬</span><span class="et">Yorumlar</span><span class="rz" hidden></span></button>
     <button type="button" data-v="uret"><span class="ik">✨</span><span class="et">Üret</span><span class="rz" hidden></span></button>
     <button type="button" data-v="istatistik"><span class="ik">📊</span><span class="et">İstatistik</span><span class="rz" hidden></span></button>
     <button type="button" data-v="ayarlar"><span class="ik">⚙️</span><span class="et">Ayarlar</span><span class="rz" hidden></span></button>
@@ -340,14 +341,6 @@ body.tam .hint{display:none}
         <p class="not" id="skDurum">Yükleniyor…</p>
         <div id="skListe"></div>
       </div>
-      <div class="card pub" id="yoKart">
-        <h2>Yorum ajanı (Instagram)</h2>
-        <p class="alt">Yeni yorumları okur, yorumun bağlamına uygun nazik bir yanıt <b>taslağı</b> yazar. <b>Onay modunda sen onaylamadan hiçbir yanıt gönderilmez.</b> Biri bot olup olmadığını sorarsa yanıt yapay zekâ asistanı olduğunu dürüstçe söyler. Hakaret, spam, siyaset, şikâyet ve çok özel sorular yanıtlanmaz.</p>
-        <p class="not" id="yoDurum">Yükleniyor…</p>
-        <div class="satir"><button type="button" id="yoAktif">…</button><button type="button" id="yoMod">…</button><button type="button" id="yoCalistir">Şimdi tara</button></div>
-        <div id="yoListe"></div>
-        <details class="tr"><summary>Yanıtlanmayanlar ve geçmiş</summary><div class="gov" id="yoGecmis">—</div></details>
-      </div>
       <div class="card pub" id="hKart">
         <h2>Hikaye ajanı</h2>
         <p class="alt">Kuyruktaki fotoğraf ve videoları senin ayarladığın aralıkta Instagram hikayesi olarak yayınlar. <b>Fotoğrafı kuyruğa koymak, yayın onayı sayılır.</b> Hikaye API’si yazı eklemez, yalnızca görsel gider. Yayınlanan hikaye API ile silinemez, Instagram uygulamasından silersin.</p>
@@ -392,6 +385,20 @@ body.tam .hint{display:none}
         </div>
         <div class="sonuc" id="pSonuc"></div>
         <p class="hata" id="pHata" hidden></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="gorunum" id="v-yorum" data-v="yorum" hidden>
+    <h2 class="baslik">Yorumlar</h2>
+    <div class="kolon">
+      <div class="card pub" id="yoKart">
+        <h2>Yorum ajanı (Instagram)</h2>
+        <p class="alt">Yeni yorumları okur, yorumun bağlamına uygun nazik bir yanıt <b>taslağı</b> yazar. <b>Onay modunda sen onaylamadan hiçbir yanıt gönderilmez.</b> Biri bot olup olmadığını sorarsa yanıt yapay zekâ asistanı olduğunu dürüstçe söyler. Hakaret, spam, siyaset, şikâyet ve çok özel sorular yanıtlanmaz.</p>
+        <p class="not" id="yoDurum">Yükleniyor…</p>
+        <div class="satir"><button type="button" id="yoAktif">…</button><button type="button" id="yoMod">…</button><button type="button" id="yoCalistir">Şimdi tara</button></div>
+        <div id="yoListe"></div>
+        <details class="tr"><summary>Yanıtlanmayanlar ve geçmiş</summary><div class="gov" id="yoGecmis">—</div></details>
       </div>
     </div>
   </section>
@@ -2164,7 +2171,7 @@ document.addEventListener('click',function(e){
 
 
 // ---- Sekmeler, özet panosu, bildirim şeridi ----
-var SEKMELER=['ofis','yayin','uret','istatistik','ayarlar'];
+var SEKMELER=['ofis','yayin','yorum','uret','istatistik','ayarlar'];
 var ESKI_SEKME={ozet:'istatistik',hikaye:'yayin',video:'yayin',icerik:'uret',akademi:'ayarlar',sistem:'ayarlar'};   // eski adlarla çağıran kodlar yeni bölüme gider
 function toastGoster(t){ var e=$('#toast'); if(!e) return; e.textContent=t; e.hidden=false; clearTimeout(toastGoster.z); toastGoster.z=setTimeout(function(){ e.hidden=true; },4500); }
 function sekme(ad,kaydirma){
@@ -2177,7 +2184,7 @@ function sekme(ad,kaydirma){
   try{ localStorage.setItem('ofisSekme',ad); }catch(e){}
   if(ad==='ofis'){ need=true; setTimeout(function(){ layout(); need=true; },30); }
   if(ad==='ayarlar') zamanlayiciCek();
-  if(ad==='yayin') yorumCek();
+  if(ad==='yorum') yorumCek();
   if(kaydirma!==false) window.scrollTo({top:0,behavior:'auto'});
 }
 document.querySelector('#nav').addEventListener('click',function(e){ var b=e.target.closest('button[data-v]'); if(b) sekme(b.dataset.v); });
@@ -2210,7 +2217,7 @@ function yapilacaklar(){
   if(s.onay) l.push({n:s.onay,t:'Hikaye onay bekliyor',e:'Yayın',v:'yayin'});
   if(s.shorts) l.push({n:s.shorts,t:'Video yayınını bekliyor',e:'Yayın',v:'yayin'});
   if(s.ders) l.push({n:s.ders,t:'Akademi dersi onay bekliyor',e:'Ayarlar',v:'ayarlar'});
-  if(s.yorum) l.push({n:s.yorum,t:'Yorum yanıtı onay bekliyor',e:'Yayın',v:'yayin'});
+  if(s.yorum) l.push({n:s.yorum,t:'Yorum yanıtı onay bekliyor',e:'Yorumlar',v:'yorum'});
   if(s.hata) l.push({n:s.hata,t:'Hatalı hikaye var',e:'Yayın',v:'yayin',kt:1});
   if(s.sagSorun) l.push({n:s.sagSorun,t:'Servis sağlığında sorun',e:'Ayarlar',v:'ayarlar',kt:1});
   if(OZ.hk&&s.hk.ayar&&!s.hk.ayar.aktif&&/ardışık hata/.test(s.hk.ayar.son_not||'')) l.push({n:'!',t:'Hikaye ajanı hatalar yüzünden durdu: Sistem → Kurtarma',e:'Ayarlar',v:'ayarlar',kt:1});
@@ -2222,7 +2229,7 @@ function yapBtn(o){ var b=dom('button','yap'+(o.kt?' kt':'')); b.type='button'; 
 function ozetCiz(){
   var s=sayilar(), l=yapilacaklar();
   // sekme rozetleri
-  var rz={ofis:l.length,yayin:s.onay+s.hata+s.shorts+s.yorum,ayarlar:s.ders+s.sagSorun+(s.zamKapali?1:0)};
+  var rz={ofis:l.length,yayin:s.onay+s.hata+s.shorts,yorum:s.yorum,ayarlar:s.ders+s.sagSorun+(s.zamKapali?1:0)};
   document.querySelectorAll('#nav button').forEach(function(b){ var e=b.querySelector('.rz'); var n=rz[b.dataset.v]||0; if(e){ e.hidden=!n; e.textContent=n; } });
   // ofis şeridi
   var se=$('#serit'); if(se){ se.textContent=''; l.slice(0,4).forEach(function(o){ se.appendChild(yapBtn(o)); }); se.hidden=!l.length; }
