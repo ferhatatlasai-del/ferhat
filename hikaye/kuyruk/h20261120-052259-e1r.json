@@ -1,7 +1,7 @@
 {
   "id": "h20261120-052259-e1r",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-20T05:22:59.000Z",
   "gorsel": "hikaye/gorseller/h20261120-052259-e1r.mp4",
   "baslik": "Drill Bit Depth Stop w/ Spacers",
@@ -21,7 +21,9 @@
     "sorunlar": []
   },
   "yayin": {
-    "tarih": "2026-11-21T11:35:32Z"
+    "tarih": "2026-11-21T11:36:39Z",
+    "medya_kimligi": "17880984465567168",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4035263858050169994"
   },
   "hata": "",
   "deneme": 0,
