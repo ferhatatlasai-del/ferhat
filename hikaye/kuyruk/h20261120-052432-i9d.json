@@ -1,7 +1,7 @@
 {
   "id": "h20261120-052432-i9d",
   "kaynak": "uretim",
-  "durum": "planli",
+  "durum": "yayinlaniyor",
   "olusturma": "2026-11-20T05:24:32.000Z",
   "gorsel": "hikaye/gorseller/h20261120-052432-i9d.mp4",
   "baslik": "Otizo Drill Press Depth Stop",
@@ -20,7 +20,9 @@
     "deneme": 2,
     "sorunlar": []
   },
-  "yayin": null,
+  "yayin": {
+    "tarih": "2026-11-21T12:25:29Z"
+  },
   "hata": "",
   "deneme": 0,
   "tur": "video",
