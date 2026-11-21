@@ -1,0 +1,31 @@
+{
+  "id": "h20261121-203748-f8u",
+  "kaynak": "uretim",
+  "durum": "planli",
+  "olusturma": "2026-11-21T20:37:48.000Z",
+  "gorsel": "hikaye/gorseller/h20261121-203748-f8u.mp4",
+  "baslik": "Bag hook for IKEA Bekant",
+  "atif": {
+    "ad": "Bag hook for IKEA Bekant",
+    "tasarimci": "JNev",
+    "lisans": "CC0",
+    "url": "https://www.printables.com/model/550190-bag-hook-for-ikea-bekant",
+    "site": "printables.com",
+    "lisans_teyit": true,
+    "referansli": true
+  },
+  "trend": "Mutfak poşeti için kanca tipi askı",
+  "kontrol": {
+    "puan": 9.0,
+    "deneme": 1,
+    "sorunlar": []
+  },
+  "yayin": null,
+  "hata": "",
+  "deneme": 0,
+  "tur": "video",
+  "muzik": "Sentezlenmiş müzik: Flüt meditasyon (telifsiz, kodla üretildi)",
+  "muzik_sira": 44,
+  "muzik_stil": "Flüt meditasyon",
+  "muzik_ton": 2
+}

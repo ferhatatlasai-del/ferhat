@@ -1,0 +1,31 @@
+{
+  "id": "h20261121-203846-h2a",
+  "kaynak": "uretim",
+  "durum": "planli",
+  "olusturma": "2026-11-21T20:38:47.000Z",
+  "gorsel": "hikaye/gorseller/h20261121-203846-h2a.mp4",
+  "baslik": "Bar handle hook",
+  "atif": {
+    "ad": "Bar handle hook",
+    "tasarimci": "steffanders",
+    "lisans": "CC BY",
+    "url": "https://www.printables.com/model/691483-bar-handle-hook",
+    "site": "printables.com",
+    "lisans_teyit": true,
+    "referansli": true
+  },
+  "trend": "Mutfak poşeti için kanca tipi askı",
+  "kontrol": {
+    "puan": 9.0,
+    "deneme": 1,
+    "sorunlar": []
+  },
+  "yayin": null,
+  "hata": "",
+  "deneme": 0,
+  "tur": "video",
+  "muzik": "Sentezlenmiş müzik: Yaylı ve celesta (telifsiz, kodla üretildi)",
+  "muzik_sira": 46,
+  "muzik_stil": "Yaylı ve celesta",
+  "muzik_ton": 2
+}

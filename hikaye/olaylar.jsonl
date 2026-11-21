@@ -114,3 +114,24 @@
 {"t": "2026-11-21T11:44:20Z", "tur": "referans_yok", "site": "printables.com", "uygunsuz": 1, "neden": "uygun değil (Görsel kolaj ve üzerinde sayfa arayüzü/çevresel öğeler var; ana nesne net olsa da tek, temiz bir ana fotoğraf değil.)"}
 {"t": "2026-11-21T11:44:29Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
 {"t": "2026-11-21T11:44:35Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-21T20:36:15Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 8.0, "site": "printables.com", "sorunlar": ["Görselde sırt çantası üzerinde marka/logolar görünüyor.", "İkinci görselde elde tutulan çanta ve ortam objeleri ana ürünü kısmen gölgeliyor."]}
+{"t": "2026-11-21T20:36:26Z", "tur": "denetim", "gecti": false, "deneme": 2, "puan": 8.0, "site": "printables.com", "sorunlar": ["Referans görselde çanta üzerinde marka logosu ve yazı var.", "Bir elde görüntüde yazı/marka unsuru bulunuyor.", "Nesne makul görünüyor ve 3D baskı gibi duruyor."]}
+{"t": "2026-11-21T20:36:37Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-21T20:36:49Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-21T20:37:01Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 8.0, "site": "printables.com", "sorunlar": ["Çöp kovası üzerinde soluk ve ters okunabilen yazı var", "Referans görselle genel şekil ve detaylar uyumlu"]}
+{"t": "2026-11-21T20:37:12Z", "tur": "denetim", "gecti": false, "deneme": 2, "puan": 2.0, "site": "printables.com", "sorunlar": ["Görselde 3D baskı ürün yerine çöp kutuları görülüyor.", "İstenen nesne olan bag hook yok.", "Referans nesneyle şekil ve parça yapısı uyuşmuyor."]}
+{"t": "2026-11-21T20:37:24Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 8.0, "site": "printables.com", "sorunlar": ["Referans fotoğraftaki askı çubuğu ve kullanım bağlamı görseldeki temiz tekil ürün sunumund", "İkinci görselde ürünün pratik kullanım halinde çoklu kanca/askı düzeni görülüyor, ilk görs"]}
+{"t": "2026-11-21T20:37:35Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 8.0}
+{"t": "2026-11-21T20:37:48Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-21T20:38:00Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-21T20:38:12Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 9.0, "site": "printables.com", "sorunlar": ["Üzerinde Volvo logosu benzeri bir kabartma var.", "Referansla genel şekil ve montaj biçimi uyumlu."]}
+{"t": "2026-11-21T20:38:22Z", "tur": "denetim", "gecti": true, "deneme": 2, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-21T20:38:35Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 2, "puan": 9.0}
+{"t": "2026-11-21T20:38:46Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-21T20:38:58Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-21T20:39:08Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-21T20:39:19Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-21T20:39:33Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 8.0, "site": "printables.com", "sorunlar": ["İkinci görselde torba üzerinde mağaza yazısı ve logo var.", "İkinci görsel referans amaçlı; ana nesne doğru ama kullanım sahnesi farklı."]}
+{"t": "2026-11-21T20:39:43Z", "tur": "denetim", "gecti": false, "deneme": 2, "puan": 8.0, "site": "printables.com", "sorunlar": ["Görselde mağaza logosu ve yazı var.", "Referans görselde çanta ve içindekiler nedeniyle kompozisyon kalabalık."]}
+{"t": "2026-11-21T20:39:52Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-21T20:40:04Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
