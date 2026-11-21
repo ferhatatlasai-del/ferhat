@@ -44,6 +44,9 @@ def kontrol_instagram():
         return "iyi", "Instagram anahtarı çalışıyor" + (" (Instagram girişli)" if tur == "instagram" else "")
     try:
         h = json.loads(govde).get("error", {})
+        if h.get("error_subcode") == 5258005 or "access blocked" in str(h.get("message", "")).lower() or h.get("code") == 200:
+            return "sorun", ("Meta, Instagram erişimini geçici olarak engelledi (API access blocked). Anahtar bozuk değil; genelde birkaç saat içinde kalkar. "
+                             "Kalkınca panelde 'Şimdi denetle' ve 'Hikaye ajanını devam ettir' düğmelerine bas (ya da otomatik devamı aç).")
         return "sorun", f"Instagram anahtarı reddedildi (kod {h.get('code')}): {str(h.get('message'))[:140]}. Anahtarı yenilemek gerekebilir."
     except Exception:
         return "sorun", f"Instagram yanıtı beklenmedik (HTTP {kod})"
@@ -98,6 +101,32 @@ def kontrol_kuyruk():
     return "iyi", f"Kuyrukta {planli} planlı hikaye var"
 
 
+AYAR = KOK / "hikaye" / "ayar.json"
+
+
+def hata_ile_durdu(ayar):
+    return (not ayar.get("aktif")) and "ardışık hata" in str(ayar.get("son_not") or "")
+
+
+def kontrol_hikaye_ajani(instagram_iyi):
+    """Hikaye ajanı ardışık hatalar yüzünden kendini durdurduysa bildirir; 'otomatik_devam' açıksa ve Instagram yeniden çalışıyorsa devam ettirir."""
+    try:
+        ayar = json.loads(AYAR.read_text(encoding="utf-8"))
+    except Exception:
+        return "atlandi", "Hikaye ayarı yok"
+    if ayar.get("aktif"):
+        return "iyi", "Hikaye ajanı çalışıyor"
+    if not hata_ile_durdu(ayar):
+        return "iyi", "Hikaye ajanı elle duraklatılmış"
+    if instagram_iyi and ayar.get("otomatik_devam"):
+        ayar.update(aktif=True, ardisik_hata=0, son_not="Nöbetçi: Instagram yeniden çalışıyor, otomatik devam ettirildi (" + datetime.datetime.now(datetime.timezone.utc).strftime("%d.%m %H:%M") + " UTC)")
+        AYAR.write_text(json.dumps(ayar, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        bildir("Hikaye ajanı yeniden başladı", "Instagram erişimi düzeldi; hikaye ajanı otomatik olarak devam ettirildi.")
+        return "iyi", "Hikaye ajanı hatalar yüzünden durmuştu; Instagram düzeldiği için otomatik devam ettirildi"
+    ek = " Instagram şu an çalışıyor: panelden 'Hikaye ajanını devam ettir'e basabilirsin." if instagram_iyi else " Önce Instagram sorununun kalkması gerekiyor."
+    return "sorun", f"Hikaye ajanı hatalar yüzünden durdu ({ayar.get('son_not')}).{ek}"
+
+
 def bildir(baslik, govde):
     ofis, sir = os.environ.get("OFIS_ADRES"), os.environ.get("BILDIRIM_SIRRI")
     if not (ofis and sir):
@@ -123,6 +152,9 @@ def main():
         d, n = f()
         sonuclar.append({"ad": ad, "durum": d, "not": n})
         print(f"{ad}: {d} - {n}")
+    d, n = kontrol_hikaye_ajani(sonuclar[0]["durum"] == "iyi")
+    sonuclar.append({"ad": "Hikaye ajanı", "durum": d, "not": n})
+    print(f"Hikaye ajanı: {d} - {n}")
     SAGLIK.parent.mkdir(parents=True, exist_ok=True)
     SAGLIK.write_text(json.dumps({"tarih": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "kontroller": sonuclar}, ensure_ascii=False, indent=2), encoding="utf-8")
     yeni_sorun = [s for s in sonuclar if s["durum"] == "sorun" and oncekiler.get(s["ad"]) != "sorun"]

@@ -34,7 +34,7 @@ jobs:
         run: |
           git config user.name "nobetci"
           git config user.email "nobetci@users.noreply.github.com"
-          git add hikaye/saglik.json
+          git add hikaye/saglik.json hikaye/ayar.json
           git diff --cached --quiet || git commit -m "Nöbetçi: sağlık durumu"
           git pull --rebase -q || true
           git push

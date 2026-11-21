@@ -31,6 +31,7 @@ const AKIS_URETIM = 'hikaye-uret.yml';
 const AKIS_AKADEMI = 'akademi.yml';
 const AKIS_KISA = 'kisa-video.yml';
 const AKIS_VIRAL = 'viral-video.yml';
+const AKIS_NOBETCI = 'nobetci.yml';
 const AKIS_TREND = 'trend.yml';
 const AKIS_ISTATISTIK = 'istatistik-rapor.yml';
 const SHORTS_RE = /^s\d{8}-\d{6}$/;
@@ -41,7 +42,7 @@ let ajanOnbellek = { t: 0, veri: null };
 let trendOnbellek = { t: 0, veri: null };
 let zincirOnbellek = { t: 0, veri: null };
 let hikayeOnbellek = { t: 0, veri: null };
-const hikayeTetikler = [], uretimTetikler = [], akademiTetikler = [], kisaTetikler = [], viralTetikler = [], trendTetikler = [], istatistikTetikler = [], bildirimler = [];
+const hikayeTetikler = [], uretimTetikler = [], akademiTetikler = [], kisaTetikler = [], viralTetikler = [], nobetciTetikler = [], trendTetikler = [], istatistikTetikler = [], bildirimler = [];
 const guncellenenler = new Set();
 const GH_API = process.env.GH_API || 'https://api.github.com';
 const MAX_VIDEO = 30 * 1024 * 1024;
@@ -542,6 +543,46 @@ async function api(req, res, url) {
     kisaTetikler.push(simdi);
     return json(res, 200, { ok: true });
   }
+  if (url.pathname === '/api/nobetci-calistir' && req.method === 'POST') {
+    const simdi = Date.now();
+    while (nobetciTetikler.length && simdi - nobetciTetikler[0] > 3600e3) nobetciTetikler.shift();
+    if (nobetciTetikler.length >= 6) return json(res, 429, { hata: 'Saatte en fazla 6 elle denetim.' });
+    const dal = await varsayilanDal();
+    const r = await gh(`/repos/${REPO}/actions/workflows/${AKIS_NOBETCI}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: {} }) });
+    if (r.status !== 204) return json(res, 502, { hata: 'GitHub kabul etmedi (' + r.status + ').' });
+    nobetciTetikler.push(simdi);
+    return json(res, 200, { ok: true });
+  }
+  if (url.pathname === '/api/hikaye-kurtar' && req.method === 'POST') {
+    // Kopma sonrası tek tıkla kurtarma: ajanı devam ettir, hata durumundaki hikayeleri sıraya geri al, otomatik devamı aç/kapat
+    let b; try { b = await govde(req); } catch (e) { return json(res, 400, { hata: 'Geçersiz istek.' }); }
+    if (b.islem === 'devam' || b.islem === 'otomatik') {
+      const ok = await jsonGuncelle('hikaye/ayar.json', v => {
+        if (b.islem === 'devam') { v.aktif = true; v.ardisik_hata = 0; v.son_not = 'Panelden devam ettirildi'; }
+        else v.otomatik_devam = b.deger === true;
+      }, 'Panel: hikaye kurtarma (' + b.islem + ')', { aktif: false });
+      hikayeIptal();
+      return ok ? json(res, 200, { ok: true }) : json(res, 502, { hata: 'Ayar kaydedilemedi.' });
+    }
+    if (b.islem === 'geri_al') {
+      const ICERIK = /^video |hikaye videosu|görsel dosyası|desteklenmeyen|dönüştürülemedi|okunamadı \(bozuk/i;   // içerik sorunları: yeniden denemek işe yaramaz
+      const dal = await varsayilanDal();
+      const r = await gh(`/repos/${REPO}/contents/hikaye/kuyruk?ref=${encodeURIComponent(dal)}`);
+      const adlar = r.ok ? (await r.json()).map(f => f.name).filter(n => /^h\d{8}-\d{6}-[a-z0-9]{3}\.json$/.test(n)).sort().reverse().slice(0, 80) : [];
+      let alinan = 0, temizlenen = 0, atlanan = 0;
+      for (const a of adlar) {
+        const k = await depoOku('hikaye/kuyruk/' + a).catch(() => null); if (!k) continue;
+        let o; try { o = JSON.parse(k.metin); } catch (e) { continue; }
+        if (o.durum === 'hata' && !ICERIK.test(o.hata || '')) { o.durum = 'planli'; o.deneme = 0; o.hata = ''; o.yayin = null; alinan++; }
+        else if (o.durum === 'planli' && o.hata) { o.hata = ''; o.deneme = 0; temizlenen++; }
+        else { if (o.durum === 'hata') atlanan++; continue; }
+        await depoYaz('hikaye/kuyruk/' + a, JSON.stringify(o, null, 2), k.sha, 'Panel: hikaye sıraya geri alındı');
+      }
+      hikayeIptal();
+      return json(res, 200, { ok: true, alinan, temizlenen, atlanan });
+    }
+    return json(res, 400, { hata: 'Geçersiz işlem.' });
+  }
   if (url.pathname === '/api/viral-calistir' && req.method === 'POST') {
     const simdi = Date.now();
     while (viralTetikler.length && simdi - viralTetikler[0] > 3600e3) viralTetikler.shift();
@@ -847,7 +888,7 @@ http.createServer(async (req, res) => {
 // Türkiye saati (UTC+3). 20 dakikada bir hikaye yayın kontrolü (08:05-22:45), günde üç kez (08:20, 13:20, 17:20) görsel üretimi, pazartesi/perşembe 06:30'da trend ajanı.
 // İş akışları kendi kararını verir (slot, günlük sınır); çift tetik zararsızdır (ortak kilit + "önce talep et" mantığı).
 const ZAM_KAPALI = process.env.ZAMANLAYICI === 'kapali';
-const zamSon = { yayin: null, uretim: null, trend: null, akademi: null, kisa: null, viral: null, istatistik: null, hata: null };
+const zamSon = { yayin: null, uretim: null, trend: null, akademi: null, kisa: null, viral: null, nobetci: null, istatistik: null, hata: null };
 const zamYapilan = new Set();
 function zamSimdiTR() { const z = process.env.ZAM_ZAMAN ? new Date(process.env.ZAM_ZAMAN) : new Date(); return new Date(z.getTime() + 3 * 3600e3); }
 async function zamTetikle(akis, girdi, ad) {
@@ -889,6 +930,11 @@ async function zamKontrol() {
   if ([1, 3, 6].includes(haftaGunu) && saat >= 14 && saat < 21) {
     const anahtar = `v${gun}`;
     if (!zamYapilan.has(anahtar)) { zamYapilan.add(anahtar); await zamTetikle(AKIS_VIRAL, {}, 'viral'); }
+  }
+  // nöbetçi (anahtar/servis sağlığı + hikaye ajanı kurtarma): günde 4 kez (TR 08, 12, 16, 20; :10'dan sonra)
+  if ([8, 12, 16, 20].includes(saat) && dk >= 10) {
+    const anahtar = `n${gun}-${saat}`;
+    if (!zamYapilan.has(anahtar)) { zamYapilan.add(anahtar); await zamTetikle(AKIS_NOBETCI, {}, 'nobetci'); }
   }
   // istatistikçi: günde 5 izlenme raporu (TR 09, 12, 15, 18, 21; kaçırıldıysa o saat içinde bir kez)
   if ([9, 12, 15, 18, 21].includes(saat)) {
