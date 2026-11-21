@@ -343,10 +343,10 @@ body.tam .hint{display:none}
       </div>
       <div class="card pub" id="hKart">
         <h2>Hikaye ajanı</h2>
-        <p class="alt">Kuyruktaki fotoğraf ve videoları senin ayarladığın aralıkta Instagram hikayesi olarak yayınlar. <b>Fotoğrafı kuyruğa koymak, yayın onayı sayılır.</b> Hikaye API’si yazı eklemez, yalnızca görsel gider. Yayınlanan hikaye API ile silinemez, Instagram uygulamasından silersin.</p>
+        <p class="alt">Kuyruktaki hikâyeler belirlediğin saatlerde Instagram’a çıkar. Günde kaç hikâye, saat ve bütçe: <b>Ayarlar → Hikâye ayarları</b>. Yayınlananlar 1 gün sonra kuyruktan kalkar.</p>
         <div class="uretkutu">
           <button type="button" class="ana buyuk" id="hUret">✨ Hikaye üret ve sıraya koy</button>
-          <p class="not" id="hUretNot">Yapay zekâ trend ve Printables’tan tasarım seçer, görseli hazırlar, müzikli videoya çevirir ve sıraya koyar. Birkaç dakika sürer, günlük görsel sınırı geçerlidir. Mod “Onaylı” ise hikayeler önce senden onay bekler.</p>
+          <p class="not" id="hUretNot">Yapay zekâ bir tasarım seçip görseli hazırlar ve sıraya koyar. Bütçe tavanı geçerlidir.</p>
         </div>
         <p class="not" id="hDurum">Yükleniyor…</p>
         <input type="password" id="hSifre" autocomplete="current-password" placeholder="Ofis şifresi" hidden style="margin-top:8px;width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px">
@@ -449,7 +449,29 @@ body.tam .hint{display:none}
   <section class="gorunum" id="v-ayarlar" data-v="ayarlar" hidden>
     <h2 class="baslik">Ayarlar</h2>
     <div class="kolon">
-      <div class="card pub"><h2>Hikaye zamanlaması</h2><p class="alt">Hikaye ajanının günde kaç hikaye, hangi saatler arasında ve hangi günlerde yayınlayacağı.</p>        
+      <div class="card pub" id="planKart">
+        <h2>Hikâye ayarları</h2>
+        <p class="alt">Üç şey yeter: günde kaç hikâye, hangi saatler, ne kadar bütçe. Sınırları ve üretim sayısını sistem kendisi hesaplar.</p>
+        <p class="not" id="planDurum">Yükleniyor…</p>
+        <div class="satir"><button type="button" class="ana" id="planAktif">…</button></div>
+        <label class="k" for="planSayi">Günde kaç hikâye yayınlansın?</label>
+        <input type="number" id="planSayi" min="1" max="24" style="width:100px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px">
+        <label class="k">Hangi saatler arasında? (Türkiye saati)</label>
+        <div class="satir"><input type="number" id="planBas" min="0" max="23" style="width:80px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px"> :00 ile <input type="number" id="planBit" min="1" max="24" style="width:80px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px"> :00 arası</div>
+        <label class="k" for="planProfil">Görsel kalitesi</label>
+        <select id="planProfil"><option value="ekonomik">Ekonomik (düşük kalite, en ucuz)</option><option value="kaliteli">Kaliteli (orta kalite, yaklaşık 3 kat pahalı)</option></select>
+        <label class="k" for="planButce">Aylık bütçe tavanı ($)</label>
+        <input type="number" id="planButce" min="2" max="200" step="0.5" style="width:100px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px">
+        <div id="planHesap" style="margin-top:12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);font-size:14px"></div>
+        <details class="tr"><summary>Gelişmiş: görsel başına maliyet</summary>
+          <label class="k" for="planBirim">Düşük kalite bir görselin yaklaşık maliyeti ($)</label>
+          <input type="number" id="planBirim" min="0.002" max="0.5" step="0.001" style="width:110px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px">
+          <p class="not">Bu sayı tahmindir. OpenAI hesabında <b>Usage</b> sayfasında bir günün görsel harcamasını görüp görsel sayısına bölersen gerçek değeri bulursun; buraya yazarsan hesap ve bütçe sınırı doğrulaşır.</p>
+        </details>
+        <div class="satir"><button type="button" class="ana" id="planKaydet">Kaydet</button></div>
+        <p class="not" id="planMesaj"></p>
+      </div>
+      <div class="card pub" style="display:none"><h2>Hikaye zamanlaması</h2><p class="alt">Hikaye ajanının günde kaç hikaye, hangi saatler arasında ve hangi günlerde yayınlayacağı.</p>        
           <div class="gov">
             <div class="ayarsat"><label>Günde <input type="number" id="hSayi" min="1" max="24"> hikaye</label><label>Saat <input type="number" id="hBas" min="0" max="23">:00 ile <input type="number" id="hBit" min="1" max="24">:00 arası (Türkiye saati)</label></div>
             <div class="gunler" id="hGunler"></div>
@@ -458,7 +480,7 @@ body.tam .hint{display:none}
           </div>
         
 </div>
-      <div class="card pub" id="uDetay"><h2>Yapay zekâ görsel üretimi</h2>        
+      <div class="card pub" id="uDetay" style="display:none"><h2>Yapay zekâ görsel üretimi</h2>        
           <div class="gov">
             <p class="not">Ajan Printables'ın lisans filtreli aramasından (yalnızca <b>CC0 ve CC BY</b>) ve Thingiverse'ten popüler tasarımları seçer, tasarımcının fotoğrafını referans alıp <b>aynı nesneyi kendi sahnesinde yeniden çizer</b>. Görsele "Yapay zekâ görseli (temsili)" etiketi ve atıf yazılır, yapay zekâ kendi kalite kontrolünü yapar. Üretilen hikayeler isteğe bağlı olarak müzikli videoya çevrilir.</p>
             <p class="not" id="uDurum">Yükleniyor…</p>
@@ -1734,10 +1756,11 @@ function hikayeCiz(v){
   $('#hBas').value=a.baslangic_saat!=null?a.baslangic_saat:10; $('#hBit').value=a.bitis_saat!=null?a.bitis_saat:22;
   var g=$('#hGunler'); if(!g.children.length){ GUN_AD.forEach(function(ad,i){ var l=dom('label'); var c=document.createElement('input'); c.type='checkbox'; c.value=i+1; l.appendChild(c); l.appendChild(document.createTextNode(ad)); g.appendChild(l); }); }
   Array.prototype.forEach.call(g.querySelectorAll('input'),function(c){ c.checked=(a.gunler||[1,2,3,4,5,6,7]).indexOf(+c.value)>=0; });
-  uretimCiz(v);
+  uretimCiz(v); planCiz(v);
   // kuyruk
   var kap=$('#hListe'); kap.textContent='';
   k.forEach(function(o){
+    if(o.durum==='yayinda'&&o.yayin&&o.yayin.tarih&&Date.now()-Date.parse(o.yayin.tarih)>24*3600e3) return;   // yayınlanan hikâye 1 gün sonra listeden kalkar
     var b=dom('div','hoge');
     if(o.gorsel&&o.tur==='video'){ var vd=document.createElement('video'); vd.muted=true; vd.playsInline=true; vd.controls=true; vd.preload='metadata'; vd.src='https://raw.githubusercontent.com/'+v.depo+'/'+v.dal+'/'+(o.hazir||o.gorsel)+'#t=0.5'; b.appendChild(vd); }
     else if(o.gorsel){ var im=document.createElement('img'); im.loading='lazy'; im.alt='Hikaye önizleme'; im.src='https://raw.githubusercontent.com/'+v.depo+'/'+v.dal+'/'+o.gorsel; b.appendChild(im); }
@@ -1829,9 +1852,47 @@ function hikayeBalon(){
   setTimeout(function(){ st.busy=st.busyRing.visible=false; konus('hk',''); },6000);
 }
 function hikayeCek(taze){ fetch('/api/hikaye'+(taze?'?taze=1':'')).then(function(r){return r.ok?r.json():null;}).then(function(v){ if(v) hikayeCiz(v); else $('#hDurum').textContent='Hikaye verisi okunamadı.'; }).catch(function(){ $('#hDurum').textContent='Hikaye verisi okunamadı.'; }); }
+// Hikâye ayarları (basit kart): günde kaç hikâye, saat aralığı, kalite, aylık bütçe; maliyet canlı hesaplanır
+var PLAN={kirli:false};
+var GORSEL_PER_HIKAYE=1.5, DIGER_GIDER=1.0, KALITE_CARPAN={ekonomik:1,kaliteli:3};
+function planDegerler(){ return {sayi:+$('#planSayi').value||0, bas:+$('#planBas').value, bit:+$('#planBit').value, profil:$('#planProfil').value, butce:+$('#planButce').value||0, birim:+$('#planBirim').value||0.02}; }
+function usd(x){ return x.toFixed(2).replace('.',',')+' $'; }
+function planHesapla(){
+  var d=planDegerler(), birim=d.birim*KALITE_CARPAN[d.profil]; if(!(birim>0)||!(d.butce>0)) return;
+  var aylikGorsel=Math.max(1,Math.floor((d.butce-DIGER_GIDER)/birim)), kapasite=aylikGorsel/30/GORSEL_PER_HIKAYE;
+  var tahmin=d.sayi*GORSEL_PER_HIKAYE*birim*30+DIGER_GIDER;
+  var h=(HK&&HK.harcama)||{ay:0}, kayitliProfil=(HK&&HK.uretim&&HK.uretim.profil==='kaliteli')?'kaliteli':'ekonomik', buAy=h.ay*d.birim*KALITE_CARPAN[kayitliProfil];   // geçmiş görseller kayıtlı kaliteyle üretildi
+  var e=$('#planHesap'); e.textContent='';
+  function sat(b,t){ var p=dom('div'); var bb=document.createElement('b'); bb.textContent=b; p.appendChild(bb); p.appendChild(document.createTextNode(t)); p.style.margin='3px 0'; e.appendChild(p); }
+  sat('Tahmini aylık maliyet: ','≈ '+usd(tahmin)+' (günde '+d.sayi+' hikâye × ~'+GORSEL_PER_HIKAYE+' görsel × '+usd(birim).replace(' $','')+' $ × 30 gün + ~1 $ metin/arama)');
+  var sig=tahmin<=d.butce;
+  var m=dom('div',null,sig?'✓ Bütçene sığıyor.':'⚠ Bütçeyi aşıyor: bu bütçeyle günde en çok ~'+(Math.floor(kapasite*10)/10).toString().replace('.',',')+' hikâye üretilebilir. Üretim, bütçe dolunca kendiliğinden durur; kalan günlerde kuyruk boşalır.');
+  m.style.cssText='margin:6px 0;font-weight:600;color:'+(sig?'var(--ok)':'var(--err)'); e.appendChild(m);
+  sat('Bu ay şimdiye kadar: ',h.ay+' görsel ≈ '+usd(buAy)+' (bütçenin %'+Math.round(100*buAy/d.butce)+'’i)');
+}
+function planCiz(v){
+  if(PLAN.kirli) return;   // kullanıcı yazarken üzerine yazma
+  var a=v.ayar||{}, u=v.uretim||{};
+  $('#planSayi').value=a.gunluk_sayi||10; $('#planBas').value=a.baslangic_saat!=null?a.baslangic_saat:8; $('#planBit').value=a.bitis_saat!=null?a.bitis_saat:22;
+  $('#planProfil').value=(u.profil==='kaliteli'?'kaliteli':'ekonomik'); $('#planButce').value=u.aylik_butce_usd||7; $('#planBirim').value=u.birim_maliyet_usd||0.02;
+  var acik=!!a.aktif; $('#planAktif').textContent=acik?'Hikâye ajanı açık · duraklat':'Hikâye ajanı kapalı · aç';
+  $('#planDurum').textContent=(acik?'Çalışıyor':'Duraklatılmış')+((a.son_not&&!/^Program:/.test(a.son_not))?'. '+a.son_not:'.');
+  planHesapla();
+}
+['planSayi','planBas','planBit','planProfil','planButce','planBirim'].forEach(function(id){ $('#'+id).addEventListener('input',function(){ PLAN.kirli=true; planHesapla(); }); });
+$('#planAktif').addEventListener('click',function(){
+  if(!hSifreKontrol()||!HK) return; var yeni=!(HK.ayar&&HK.ayar.aktif), btn=this; btn.disabled=true;
+  hPost('/api/hikaye-plan',{aktif:yeni}).then(function(){ btn.disabled=false; hikayeCek(true); }).catch(function(e){ $('#planMesaj').textContent=String(e.message||e); btn.disabled=false; });
+});
+$('#planKaydet').addEventListener('click',function(){
+  if(!hSifreKontrol()) return; var d=planDegerler(), btn=this; btn.disabled=true; $('#planMesaj').textContent='';
+  hPost('/api/hikaye-plan',{gunluk_sayi:d.sayi,baslangic_saat:d.bas,bitis_saat:d.bit,profil:d.profil,aylik_butce_usd:d.butce,birim_maliyet_usd:d.birim})
+    .then(function(){ PLAN.kirli=false; btn.disabled=false; $('#planMesaj').textContent='Kaydedildi. Yeni ayar bir sonraki üretim ve yayın turundan itibaren geçerli.'; hikayeCek(true); })
+    .catch(function(e){ $('#planMesaj').textContent=String(e.message||e); btn.disabled=false; });
+});
 $('#hAktif').addEventListener('click',function(){
   if(!hSifreKontrol()||!HK) return; var yeni=!(HK.ayar&&HK.ayar.aktif), btn=this; btn.disabled=true;
-  hPost('/api/hikaye-ayar',{aktif:yeni}).then(function(){ btn.disabled=false; hikayeCek(true); }).catch(function(e){ $('#hDurum').textContent=String(e.message||e); btn.disabled=false; });
+  hPost('/api/hikaye-plan',{aktif:yeni}).then(function(){ btn.disabled=false; hikayeCek(true); }).catch(function(e){ $('#hDurum').textContent=String(e.message||e); btn.disabled=false; });
 });
 $('#hKaydet').addEventListener('click',function(){
   if(!hSifreKontrol()) return;
