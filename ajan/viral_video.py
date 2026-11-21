@@ -15,6 +15,7 @@ Kullanım:
 import argparse
 import base64
 import datetime
+import hashlib
 import io
 import json
 import os
@@ -47,7 +48,7 @@ MODEL = os.environ.get("OPENAI_MODEL") or "gpt-4o-mini"
 TTS_ADRES = os.environ.get("TTS_ADRES") or "https://texttospeech.googleapis.com/v1beta1/text:synthesize"
 GEMINI_ADRES = os.environ.get("GEMINI_ADRES") or "https://generativelanguage.googleapis.com/v1beta/models"
 GEMINI_MODEL = os.environ.get("GEMINI_TTS_MODEL") or "gemini-2.5-flash-preview-tts"
-VARSAYILAN = {"gemini_ses": "Orus", "aktif": True, "en_cok_bekleyen": 3, "ses": "tr-TR-Wavenet-B", "konusma_hizi": 1.06, "perde": -1.5}
+VARSAYILAN = {"bicim": "liste", "gorsel_kalitesi": "medium", "gemini_ses": "Orus", "aktif": True, "en_cok_bekleyen": 3, "ses": "tr-TR-Wavenet-B", "konusma_hizi": 1.06, "perde": -1.5}
 GENISLIK, YUKSEKLIK, FPS = 1080, 1920, 30
 SAHNE_TIPLERI = ["baski", "temizlik", "ilk_katman", "sicaklik", "hiz", "yapistirici", "sayi", "karsilastir", "ozet", "cta"]
 # Türkçe konuşmada yanlış okunan kısaltmalar: yalnızca SESE uygulanır, alt yazıda özgün yazı kalır.
@@ -184,6 +185,159 @@ def senaryo_sec(a, ayar):
         return None, f"'{k['konu']}' için senaryo üretilemedi"
     return None, "kullanılmamış konu kalmadı (video/konular.json'a yeni konu ekle)"
 
+
+
+# ======================= LİSTE BİÇİMİ (geri sayım, konuya özel gerçekçi görseller) =======================
+LISTE_ISTEMI = """3D yazıcı ve 3D baskı hakkında "geri sayım listesi" biçiminde, merak uyandıran TÜRKÇE bir YouTube Shorts / Instagram Reels senaryosu yaz.
+Konu: {konu}
+İpucu: {ipucu}
+
+BİÇİM: Kısa bir kanca (giriş), sonra sondan başa {n} madde (sira: {n} … 1; 1 en iyisi/en yükseği), sonunda kısa kapanış. Toplam anlatı 120-160 kelime.
+Her maddenin kartında bir SAYAÇ gösterilecek: tüm maddeler AYNI ölçüyü kullansın (ör. ısı dayanımı °C, tipik baskı sıcaklığı °C, yoğunluk g/cm³, Shore sertliği). Ölçü konuya uymuyorsa deger null olsun.
+DOĞRULUK: Sayısal değerler 3D baskı topluluğunda ve üretici tablolarında yaygın kabul gören TİPİK değerler olsun; aralık varsa orta değeri yaz ve deger_yazi'da "≈" kullan. Emin değilsen deger null. Marka, fiyat, uydurma istatistik, kişisel deneyim yok. Yasak sözcükler: mükemmel, harika, muhteşem, inanılmaz. Sayıları anlatıda yazıyla yaz (ör. "altmış derece").
+Anlatıda her madde sırasıyla başlasın ("Beşinci sırada …", "Ve birinci sırada …"). Giriş merak uyandırsın (ör. "birincisi seni şaşırtabilir"). Kapanış yoruma davet + takip etsin.
+GÖRSEL: her bölüm için İngilizce, gerçekçi bir fotoğraf sahnesi tarifi yaz (konuyla doğrudan ilgili nesne: filament makarası, basılmış parça, nozul, yazıcı tablası…). Metin, logo, marka, insan yüzü YOK.
+YALNIZCA JSON: {{"konu":"...","baslik":"arama odaklı en çok 70 karakter","aciklama":"2-3 kısa satır, son satır yorum daveti","etiketler":["3dprinting","..."],
+"liste_basligi":"EN ÇOK 32 KARAKTER BÜYÜK HARF","olcu":{{"ad":"EN ÇOK 16 KARAKTER BÜYÜK HARF","birim":"°C","ondalik":0}},
+"giris":{{"anlati":"15-25 kelime","baslik":"ekranda iki satır büyük başlık; satırları \\n ile ayır","gorsel":"..."}},
+"maddeler":[{{"sira":{n},"ad":"en çok 16 karakter","alt":"en çok 28 karakterlik kısa açıklama","deger":60,"deger_yazi":"≈60","anlati":"14-24 kelime","gorsel":"..."}}],
+"kapanis":{{"anlati":"8-14 kelime","gorsel":"..."}}}}"""
+
+GORSEL_SABLONU = ("Photorealistic professional product photograph, {sahne}. Cozy maker workshop background softly out of focus, shallow depth of field, "
+                  "soft cinematic lighting with warm highlights, high detail, vertical 9:16 composition, main subject centered slightly above the middle of the frame, "
+                  "empty darker area in the lower third. No text, no letters, no logos, no brand names, no watermark, no human faces.")
+
+
+def liste_dogrula(s):
+    m = [x for x in (s.get("maddeler") or []) if isinstance(x, dict)]
+    if not 4 <= len(m) <= 8:
+        raise ValueError(f"madde sayısı 4-8 olmalı ({len(m)})")
+    m = sorted(m, key=lambda x: -int(x.get("sira") or 0))
+    n = len(m)
+    temiz = lambda v, k: U.yazi_temizle(str(v or ""))[:k].strip()
+    # birim ve değer yazısında ölçü işaretleri korunur (°, ≈, %, ³, /, ±); yazı tipinde bulunan karakterler
+    isaretli = lambda v, k: "".join(c for c in str(v or "") if c.isalnum() or c in "°≈%³²/±.,-+ ")[:k].strip()
+    olcu = s.get("olcu") if isinstance(s.get("olcu"), dict) else {}
+    maddeler = []
+    for i, x in enumerate(m):
+        anlati = " ".join(str(x.get("anlati") or "").split())
+        if len(anlati.split()) < 5:
+            raise ValueError(f"{i + 1}. maddede anlatı yok")
+        deger = x.get("deger")
+        try:
+            deger = None if deger in (None, "", "null") else float(deger)
+        except (TypeError, ValueError):
+            deger = None
+        maddeler.append({"sira": n - i, "ad": temiz(x.get("ad"), 18), "alt": temiz(x.get("alt"), 30), "deger": deger,
+                         "deger_yazi": isaretli(x.get("deger_yazi"), 10) or None, "anlati": anlati, "gorsel": str(x.get("gorsel") or x.get("ad") or "3D printed part")[:300]})
+    giris = s.get("giris") or {}
+    kapanis = s.get("kapanis") or {}
+    if len(str(giris.get("anlati") or "").split()) < 5:
+        raise ValueError("giriş anlatısı yok")
+    kelime = sum(len(x["anlati"].split()) for x in maddeler) + len(str(giris.get("anlati")).split()) + len(str(kapanis.get("anlati") or "").split())
+    if not 70 <= kelime <= 200:
+        raise ValueError(f"anlatı {kelime} kelime; 70-200 olmalı")
+    degerler = [x["deger"] for x in maddeler if x["deger"] is not None]
+    olcu_temiz = None
+    if degerler and olcu.get("ad"):
+        en = max(maddeler, key=lambda x: x["deger"] if x["deger"] is not None else -1e9)
+        olcu_temiz = {"ad": buyuk(temiz(olcu.get("ad"), 18)), "birim": isaretli(olcu.get("birim"), 8), "ondalik": 1 if olcu.get("ondalik") else 0,
+                      "en_buyuk": en["deger"], "en_buyuk_ad": en["ad"]}
+    return {"bicim": "liste", "konu": str(s.get("konu") or "")[:140], "baslik": temiz(s.get("baslik"), 90), "aciklama": str(s.get("aciklama") or "")[:900].replace("http", ""),
+            "etiketler": [re.sub(r"[^a-z0-9ığüşöç]", "", str(e).lower()) for e in (s.get("etiketler") or [])][:8],
+            "liste_basligi": buyuk(temiz(s.get("liste_basligi"), 34)) or buyuk(temiz(s.get("konu"), 34)), "olcu": olcu_temiz,
+            "giris": {"anlati": " ".join(str(giris.get("anlati")).split()), "baslik": buyuk(str(giris.get("baslik") or s.get("liste_basligi") or "")[:60]), "gorsel": str(giris.get("gorsel") or "3D printer workshop")[:300]},
+            "maddeler": maddeler,
+            "kapanis": {"anlati": " ".join(str(kapanis.get("anlati") or "Hangisini kullanıyorsun? Yorumlara yaz, takip et!").split()), "gorsel": str(kapanis.get("gorsel") or "colorful 3D printed parts on a workbench")[:300]}}
+
+
+def liste_senaryo_uret(konu, ipucu, n=5):
+    anahtar = os.environ.get("OPENAI_API_KEY")
+    if not anahtar:
+        return None
+    govde = {"model": MODEL, "response_format": {"type": "json_object"}, "temperature": 0.7,
+             "messages": [{"role": "system", "content": "Sen Türkçe 3D baskı eğitim videoları yazan, doğruluğa önem veren bir içerik editörüsün. Yalnızca geçerli JSON döndür."},
+                          {"role": "user", "content": LISTE_ISTEMI.format(konu=konu, ipucu=ipucu or "-", n=n)}]}
+    for deneme in range(2):
+        try:
+            r = urllib.request.Request(f"{OPENAI}/chat/completions", data=json.dumps(govde).encode(), method="POST",
+                                       headers={"Content-Type": "application/json", "Authorization": f"Bearer {anahtar}"})
+            with urllib.request.urlopen(r, timeout=150) as y:
+                s = json.loads(json.load(y)["choices"][0]["message"]["content"])
+            s["konu"] = s.get("konu") or konu
+            return liste_dogrula(s)
+        except Exception as e:
+            print(f"UYARI: liste senaryosu üretimi/doğrulaması başarısız ({deneme + 1}/2): {type(e).__name__}: {str(e)[:160]}")
+    return None
+
+
+def liste_senaryo_sec(a):
+    kullanilan = set(json_oku(KULLANILAN, []))
+    if a.senaryo:
+        return liste_dogrula(json_oku(a.senaryo, {})), pathlib.Path(a.senaryo).stem
+    if a.konu:
+        s = liste_senaryo_uret(a.konu, "")
+        return (s, "liste-" + slug(a.konu)) if s else (None, "liste senaryosu üretilemedi (OPENAI_API_KEY yok ya da yanıt geçersiz)")
+    for k in json_oku(VIDEO / "liste_konulari.json", []):
+        kim = "liste-" + slug(k["konu"])
+        if kim in kullanilan:
+            continue
+        s = liste_senaryo_uret(k["konu"], k.get("ipucu"), int(k.get("n") or 5))
+        return (s, kim) if s else (None, f"'{k['konu']}' için liste senaryosu üretilemedi")
+    return None, "kullanılmamış liste konusu kalmadı (video/liste_konulari.json'a yeni konu ekle)"
+
+
+def liste_bolumleri(ls):
+    """Seslendirme ve zaman çizelgesi için bölümler: giriş, maddeler, kapanış."""
+    b = [{"tip": "liste_giris", "anlati": ls["giris"]["anlati"], "ekran": "", "rozet": "", "params": {"baslik": ls["giris"]["baslik"]}, "gorsel": ls["giris"]["gorsel"]}]
+    for m in ls["maddeler"]:
+        b.append({"tip": "liste_madde", "anlati": m["anlati"], "ekran": "", "rozet": "", "gorsel": m["gorsel"],
+                  "params": {k: m[k] for k in ("sira", "ad", "alt", "deger", "deger_yazi")}})
+    b.append({"tip": "liste_kapanis", "anlati": ls["kapanis"]["anlati"], "ekran": "", "rozet": "", "params": {"ana": "TAKİP ET", "alt": "@gurtechs3d"}, "gorsel": ls["kapanis"]["gorsel"]})
+    return b
+
+
+def odak_bul(yol, ad):
+    """Görseldeki ana nesnenin üst-orta noktasını (iğnenin halkası için) yapay zekâya sorar; olmazsa orta nokta."""
+    anahtar = os.environ.get("OPENAI_API_KEY")
+    if not anahtar:
+        return [.5, .45]
+    try:
+        kucuk = pathlib.Path(str(yol) + ".k.jpg")
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(yol), "-vf", "scale=384:-1", "-q:v", "4", str(kucuk)], check=True)
+        b64 = base64.b64encode(kucuk.read_bytes()).decode()
+        govde = {"model": MODEL, "response_format": {"type": "json_object"},
+                 "messages": [{"role": "user", "content": [
+                     {"type": "text", "text": f"Bu fotoğraftaki ana nesnenin ({ad}) en üst orta noktasının konumunu ver. Yalnızca JSON: {{\"x\": 0-1 arası yatay oran, \"y\": 0-1 arası dikey oran}}"},
+                     {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{b64}"}}]}]}
+        r = urllib.request.Request(f"{OPENAI}/chat/completions", data=json.dumps(govde).encode(), method="POST",
+                                   headers={"Content-Type": "application/json", "Authorization": f"Bearer {anahtar}"})
+        with urllib.request.urlopen(r, timeout=90) as y:
+            j = json.loads(json.load(y)["choices"][0]["message"]["content"])
+        return [min(.85, max(.15, float(j["x"]))), min(.62, max(.22, float(j["y"])))]
+    except Exception as e:
+        print(f"  (odak bulunamadı: {type(e).__name__}; orta nokta kullanılıyor)")
+        return [.5, .45]
+
+
+def liste_gorselleri(bolumler, dizin, kalite, hazir_dizin=None):
+    """Her bölüm için konuya özel gerçekçi görsel üretir (ya da test için hazır dizinden alır). Dönen: [(yol, odak)]"""
+    dizin = pathlib.Path(dizin)
+    sonuc = []
+    for i, b in enumerate(bolumler):
+        ilerleme("Görseller üretiliyor", 10 + int(14 * i / len(bolumler)), f"{i + 1}/{len(bolumler)}")
+        if hazir_dizin:
+            adaylar = sorted(pathlib.Path(hazir_dizin).glob("*.jpg")) + sorted(pathlib.Path(hazir_dizin).glob("*.png"))
+            yol = adaylar[i % len(adaylar)]
+            sonuc.append((str(yol.resolve()), [.5, .45]))
+            continue
+        yol = dizin / f"g{i}.png"
+        b64 = U.gorsel_uret(GORSEL_SABLONU.format(sahne=b["gorsel"]), kalite)
+        yol.write_bytes(base64.b64decode(b64))
+        ad = (b["params"].get("ad") if b["tip"] == "liste_madde" else "") or b["gorsel"][:60]
+        sonuc.append((str(yol.resolve()), odak_bul(yol, ad) if b["tip"] == "liste_madde" else [.5, .45]))
+    return sonuc
+# =====================================================================================================
 
 # ---------- seslendirme ----------
 
@@ -423,7 +577,7 @@ def parcala_altyazi(kelimeler, en_cok_kelime=5, en_cok_harf=30):
     return cikti
 
 
-def cizelge_kur(senaryo, sesler):
+def cizelge_kur(senaryo, sesler, alt_kelime=5, alt_harf=30):
     t, sahneler, kelimeler, parcalar_ses = 0.0, [], [], []
     n = len(senaryo["sahneler"])
     for i, (s, v) in enumerate(zip(senaryo["sahneler"], sesler)):
@@ -437,9 +591,9 @@ def cizelge_kur(senaryo, sesler):
             kelimeler.append({"k": w, "t0": v0 + b, "t1": v0 + max(bitis - 0.02, b + 0.08), "sahne": i})
         if v["ses"] is not None:
             parcalar_ses.append((v0, v["ses"]))
-        sahneler.append({"tip": s["tip"], "t0": round(t, 3), "t1": round(t1, 3), "ekran": s["ekran"], "rozet": s["rozet"], "params": s["params"]})
+        sahneler.append({"tip": s["tip"], "t0": round(t, 3), "t1": round(t1, 3), "ekran": s.get("ekran", ""), "rozet": s.get("rozet", ""), "params": dict(s.get("params") or {})})
         t = t1
-    plan = {"genislik": GENISLIK, "yukseklik": YUKSEKLIK, "fps": FPS, "sure": round(t, 3), "sahneler": sahneler, "altyazi": parcala_altyazi(kelimeler)}
+    plan = {"genislik": GENISLIK, "yukseklik": YUKSEKLIK, "fps": FPS, "sure": round(t, 3), "sahneler": sahneler, "altyazi": parcala_altyazi(kelimeler, alt_kelime, alt_harf)}
     return plan, parcalar_ses
 
 
@@ -513,8 +667,17 @@ def calis(a):
     gemini = os.environ.get("GEMINI_API_KEY")
     if not (anahtar or gemini) and not (a.tts_dizin or a.sessiz):
         return hata("seslendirme anahtarı yok. İkisinden biri gerekli (GitHub Secrets): 'GEMINI_API_KEY' (aistudio.google.com/apikey, kart gerekmez) ya da 'GOOGLE_TTS_API_KEY' (Google Cloud Text-to-Speech).")
+    bicim = a.bicim or ayar.get("bicim") or "liste"
+    if a.senaryo and "maddeler" in json_oku(a.senaryo, {}):
+        bicim = "liste"
     try:
-        senaryo, kaynak = senaryo_sec(a, ayar)
+        if bicim == "liste":
+            ls, kaynak = liste_senaryo_sec(a)
+            senaryo = None
+            if ls:
+                senaryo = {"bicim": "liste", "konu": ls["konu"], "baslik": ls["baslik"], "aciklama": ls["aciklama"], "etiketler": ls["etiketler"], "sahneler": liste_bolumleri(ls), "liste": ls}
+        else:
+            senaryo, kaynak = senaryo_sec(a, ayar)
     except ValueError as e:
         return hata(f"senaryo geçersiz: {e}")
     if not senaryo:
@@ -534,7 +697,12 @@ def calis(a):
     for i, s in enumerate(senaryo["sahneler"] if not sesler else []):
         ilerleme("Seslendirme", 5 + int(15 * i / len(senaryo["sahneler"])), f"sahne {i + 1}/{len(senaryo['sahneler'])}")
         sesler.append(fixture_seslendir(a.tts_dizin, i, s["anlati"]) if a.tts_dizin else gemini_seslendir(s["anlati"], ayar, gemini) if (gemini and not anahtar and not a.sessiz) else sahne_seslendir(s["anlati"], ayar, None if a.sessiz else anahtar))
-    plan, parcalar = cizelge_kur(senaryo, sesler)
+    if senaryo.get("bicim") == "liste":
+        ls = senaryo["liste"]
+        plan, parcalar = cizelge_kur(senaryo, sesler, 11, 64)
+        plan.update(sayfa="liste.html", bicim="liste", baslik_ust=ls["liste_basligi"], toplam=len(ls["maddeler"]), olcu=ls["olcu"], tohum=int(hashlib.md5(ls["konu"].encode()).hexdigest()[:6], 16))
+    else:
+        plan, parcalar = cizelge_kur(senaryo, sesler)
     print(f"Süre: {plan['sure']:.1f} sn, {len(plan['altyazi'])} alt yazı parçası")
     if plan["sure"] > 175:
         return hata("video 175 sn'den uzun (Shorts sınırı 3 dk); anlatıyı kısalt.")
@@ -544,6 +712,10 @@ def calis(a):
     cikti.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory() as g:
         g = pathlib.Path(g)
+        if plan.get("bicim") == "liste":
+            gorseller = liste_gorselleri(senaryo["sahneler"], g, ayar.get("gorsel_kalitesi") or "medium", a.gorsel_dizin)
+            for sh, (yol, odak) in zip(plan["sahneler"], gorseller):
+                sh["params"]["gorsel"], sh["params"]["odak"] = "file://" + yol, odak
         yaz(g / "plan.json", plan)
         konusma = None
         if parcalar:
@@ -584,6 +756,8 @@ def main():
     ap.add_argument("--tts-dizin", help="test: önceden üretilmiş konuşma dizini (s0.wav, s0.json…)")
     ap.add_argument("--sessiz", action="store_true", help="test: seslendirme olmadan (tahmini zamanlama)")
     ap.add_argument("--plan-kaydet", help="plan.json'u bu yola da yaz")
+    ap.add_argument("--bicim", choices=["liste", "3d"], help="video biçimi: liste (geri sayım + gerçekçi görseller, varsayılan) ya da 3d")
+    ap.add_argument("--gorsel-dizin", help="test: görsel üretmek yerine bu dizindeki görselleri kullan")
     try:
         kod = calis(ap.parse_args())
     except Exception as e:

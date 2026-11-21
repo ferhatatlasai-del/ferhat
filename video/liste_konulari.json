@@ -1,0 +1,102 @@
+[
+ {
+  "konu": "Isıya en dayanıklı filamentler",
+  "ipucu": "Isıl bükülme sıcaklığı (HDT) tipik değerleri, °C",
+  "n": 5
+ },
+ {
+  "konu": "Baskısı en kolaydan zora filamentler",
+  "ipucu": "Zorluk puanı 1-10 (topluluk deneyimi), PLA en kolay",
+  "n": 5
+ },
+ {
+  "konu": "Tipik nozul sıcaklığına göre filamentler",
+  "ipucu": "Tipik baskı sıcaklığı °C (PLA, PETG, ABS, ASA, Naylon, PC)",
+  "n": 6
+ },
+ {
+  "konu": "En hafif filamentler",
+  "ipucu": "Yoğunluk g/cm³ (tipik), en hafif 1. sırada",
+  "n": 5
+ },
+ {
+  "konu": "En esnek filamentler",
+  "ipucu": "Shore sertliği ya da esneklik; TPU türleri",
+  "n": 5
+ },
+ {
+  "konu": "Nem çekmeye en hassas filamentler",
+  "ipucu": "Kurutma ihtiyacı ve nem hassasiyeti, ölçü yoksa deger null",
+  "n": 5
+ },
+ {
+  "konu": "En sık görülen 3D baskı hataları",
+  "ipucu": "Hata türleri ve kısa çözüm; ölçü yok (deger null)",
+  "n": 6
+ },
+ {
+  "konu": "En kullanışlı yazıcı yükseltmeleri",
+  "ipucu": "Genel yükseltmeler (marka yok), ölçü yok",
+  "n": 5
+ },
+ {
+  "konu": "Katman yüksekliğine göre baskı süresi",
+  "ipucu": "Aynı parça için tipik göreli süre (%), 0.08-0.32 mm",
+  "n": 5
+ },
+ {
+  "konu": "Dolgu desenlerinin dayanımı",
+  "ipucu": "Desen türleri ve göreli dayanım (yaklaşık), ölçü puan",
+  "n": 5
+ },
+ {
+  "konu": "Tabla yüzeyleri karşılaştırması",
+  "ipucu": "PEI, cam, BuildTak, yay çeliği... yapışma puanı (yaklaşık)",
+  "n": 5
+ },
+ {
+  "konu": "En hızlı baskı için ayarlar",
+  "ipucu": "Hız, ivme, katman, nozul; ölçü yoksa null",
+  "n": 5
+ },
+ {
+  "konu": "Nozul malzemeleri ve ömürleri",
+  "ipucu": "Pirinç, sertleştirilmiş çelik, paslanmaz, yakut uçlu; göreli aşınma dayanımı",
+  "n": 5
+ },
+ {
+  "konu": "Güneşe ve UV'ye en dayanıklı filamentler",
+  "ipucu": "ASA, PETG, ABS, PLA... UV dayanımı puanı (yaklaşık)",
+  "n": 5
+ },
+ {
+  "konu": "Gıda ile temasta dikkat edilecek filamentler",
+  "ipucu": "Genel güvenlik bilgisi, sağlık iddiası yok, ölçü yok",
+  "n": 5
+ },
+ {
+  "konu": "En dayanıklı (çekme mukavemeti) filamentler",
+  "ipucu": "Çekme dayanımı MPa tipik değerleri",
+  "n": 5
+ },
+ {
+  "konu": "Baskı sonrası işlemler",
+  "ipucu": "Zımpara, astar, boya, buharla pürüzsüzleştirme (güvenlik notu), ölçü yok",
+  "n": 5
+ },
+ {
+  "konu": "Yeni başlayanların en çok bastığı modeller",
+  "ipucu": "Genel model türleri (kalibrasyon küpü, Benchy...), ölçü yok",
+  "n": 5
+ },
+ {
+  "konu": "Filament çapı toleransı neden önemli",
+  "ipucu": "Tolerans ±mm ve etkisi",
+  "n": 5
+ },
+ {
+  "konu": "Destek türleri karşılaştırması",
+  "ipucu": "Normal, ağaç, çözünür destek; temizleme kolaylığı puanı",
+  "n": 5
+ }
+]
