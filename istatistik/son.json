@@ -1,6 +1,6 @@
 {
- "tarih": "2026-11-21T09:00:31Z",
- "tr_saat": "21.11.2026 12:00",
+ "tarih": "2026-11-21T12:00:25Z",
+ "tr_saat": "21.11.2026 15:00",
  "toplam": {
   "reels": 0,
   "gonderi": 0,
@@ -8,16 +8,27 @@
   "youtube_video": 0,
   "hikaye": 0,
   "toplam": 0,
-  "begeni": 120,
+  "begeni": 126,
   "yorum": 5
  },
  "fark": 0,
  "instagram": {
   "durum": "tamam",
   "izin": false,
-  "takipci": 417,
+  "takipci": 418,
   "hata": "HTTP 400 kod=10 tür=OAuthException: (#10) Application does not have permission for this action",
   "gonderiler": [
+   {
+    "id": "18193230361409051",
+    "tur": "Reels",
+    "tarih": "2026-11-21T09:56:40",
+    "baslik": "Nemli filament baskıyı sessizce bozar.",
+    "begeni": 4,
+    "yorum": 0,
+    "link": "https://www.instagram.com/reel/Df_9WXhAUi5/",
+    "izlenme": null,
+    "erisim": null
+   },
    {
     "id": "17916096111516478",
     "tur": "Reels",
@@ -34,7 +45,7 @@
     "tur": "Reels",
     "tarih": "2026-11-20T23:05:39",
     "baslik": "Baskın tabladan kalkıyor mu? İlk katman yapışmıyorsa çoğu za",
-    "begeni": 13,
+    "begeni": 15,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
     "izlenme": null,
@@ -263,6 +274,22 @@
  "hikaye_izin": false,
  "hikayeler": [
   {
+   "id": "17880984465567168",
+   "tarih": "2026-11-21T11:36:39Z",
+   "baslik": "Drill Bit Depth Stop w/ Spacers",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
+   "id": "18119683825820465",
+   "tarih": "2026-11-21T10:21:05Z",
+   "baslik": "Video hikayesi",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
    "id": "18154348378555017",
    "tarih": "2026-11-20T23:28:11Z",
    "baslik": "Drill Press Depth Stop Mount for el-cheapo Harbor Freight Ce",
@@ -482,7 +509,7 @@
   "YouTube okunamadı"
  ],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 12:00",
-  "govde": "Toplam 0 (eksik veri) · Reels ? · Short ? · Hikaye ? · Takipçi 417 · Instagram izlenme izni yok; YouTube okunamadı"
+  "baslik": "📊 İzlenme raporu 15:00",
+  "govde": "Toplam 0 (eksik veri) · Reels ? · Short ? · Hikaye ? · Takipçi 418 (+1) · Instagram izlenme izni yok; YouTube okunamadı"
  }
 }
