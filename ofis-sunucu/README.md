@@ -248,3 +248,12 @@ Kaldırılan kullanılmayan iş akışları: `gorsel.yml` (+`ajan/gorsel.py`) ve
 - Panel her zaman açık temadır (telefonun koyu modunu izlemez). Eski bölüm adları (`#video`, `#sistem`…) yeni bölümlere yönlendirilir.
 - **Temizlik:** yayınlanan videolar ve hikâye/yorum kayıtları 24 saat sonra panelden kalkar; sunucu her saat yayından 24 saat geçmiş (ve 1 saatten eski reddedilmiş) video taslaklarını ve `videolar/` dosyalarını depodan siler.
 - Eski "Shorts üretici" (`kisa-video.yml`, `ajan/kisa_video.py`) kaldırıldı; ofisteki YouTube/Instagram masalarının "video üret" düğmesi artık viral video üretimini başlatır.
+
+## Hikâye ayarları sadeleşti (bütçe tavanı)
+
+Ayarlar → **Hikâye ayarları** tek karttır: açık/kapalı, günde kaç hikâye, saat aralığı, görsel kalitesi (ekonomik = düşük kalite, kaliteli = orta, ~3× pahalı) ve **aylık bütçe tavanı ($)**. Eski "Hikaye zamanlaması" ve "Yapay zekâ görsel üretimi" kartları gizlendi (dosya alanları yerinde, ajan geriye uyumlu).
+
+- Üretim ajanı (`hikaye_uret.py`, `turet_ayar`) `hikaye/uretim.json` içindeki `profil`, `aylik_butce_usd`, `birim_maliyet_usd` ile `hikaye/ayar.json`'daki `gunluk_sayi`'dan günlük/aylık görsel sınırını, tur başına üretimi ve kuyruk hedefini kendisi türetir. Aylık görsel sınırı = (bütçe − 1 $ metin/arama payı) ÷ görsel maliyeti; günlük sınır bütçeyi aya yayar.
+- Panel kartı tahmini aylık maliyeti canlı gösterir (günde N hikâye × ~1,5 görsel [denetimden geçmeyenler dahil, gözlenen] × görsel maliyeti × 30 + ~1 $). Bütçe yetmiyorsa "bu bütçeyle günde en çok ~K hikâye" uyarısı çıkar; bütçe dolunca üretim kendiliğinden durur.
+- **Görsel maliyeti tahmindir** (varsayılan 0,02 $, düşük kalite). Hesapta daha ucuz "mini" görsel modeli yoktur ve sistem zaten en ucuz kaliteyi (düşük) kullanır. OpenAI → Usage sayfasındaki gerçek harcamaya göre "Gelişmiş" alanından düzeltilir.
+- Tek anahtar hem üretimi hem yayını açar/kapatır (`/api/hikaye-plan`). Yayınlanan hikâyeler 1 gün (`saklama_gun: 1`) sonra kuyruktan temizlenir, panel de 24 saatten eskileri göstermez.

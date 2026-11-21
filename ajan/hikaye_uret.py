@@ -57,6 +57,31 @@ ADAY_OMRU_GUN = 4   # aynı arama sonucu bu kadar gün yeniden kullanılır (her
 IZINLI_SITELER = ("printables.com", "makerworld.com", "thingiverse.com")
 VARSAYILAN = {"aktif": False, "mod": "otomatik", "gunluk_uretim": 3, "gunluk_gorsel_siniri": 6,
               "aylik_gorsel_siniri": 90, "kalite": "low", "kuyruk_hedefi": 6, "referans": "zorunlu", "muzik": True}
+# Basit ayar: panel yalnızca günde kaç hikâye, görsel kalitesi ve aylık bütçeyi (USD) yazar; sınırlar buradan türetilir.
+KALITE_PROFILI = {"ekonomik": "low", "kaliteli": "medium"}
+KALITE_CARPANI = {"low": 1.0, "medium": 3.0}    # düşük kaliteye göre yaklaşık göreli görsel fiyatı
+GORSEL_PER_HIKAYE = 1.5                           # gözlenen: denetimden geçemeyen görseller dahil kabul edilen hikâye başına ~1,5 görsel
+DIGER_GIDER_USD = 1.0                             # sohbet, arama ve denetim çağrıları için ayrılan aylık pay
+
+
+def turet_ayar(a, gunluk_sayi):
+    """profil varsa (panelin yeni basit ayarı) kalite ve tüm sayısal sınırları günlük hikâye sayısı ile bütçeden türetir.
+    birim_maliyet_usd = DÜŞÜK kalite bir görselin yaklaşık maliyetidir (OpenAI kullanım sayfasına bakıp panelden düzeltilir)."""
+    if a.get("profil") not in KALITE_PROFILI:
+        return a
+    kalite = KALITE_PROFILI[a["profil"]]
+    birim = max(0.001, float(a.get("birim_maliyet_usd") or 0.02)) * KALITE_CARPANI[kalite]
+    butce = max(1.0, float(a.get("aylik_butce_usd") or 7))
+    aylik = max(1, int((butce - DIGER_GIDER_USD) / birim))
+    hedef = max(1, int(gunluk_sayi or 1))
+    a["kalite"] = kalite
+    a["aylik_gorsel_siniri"] = aylik
+    a["gunluk_uretim"] = min(12, -(-hedef // 3) + 1)                   # 3 tur/gün
+    a["kuyruk_hedefi"] = min(40, hedef + 3)
+    a["gunluk_gorsel_siniri"] = max(2, min(40, int(hedef * GORSEL_PER_HIKAYE) + 3, -(-aylik // 30) + 1))   # bütçeyi aya yay: ilk günlerde harcanıp bitmesin
+    return a
+
+
 ARAC_TURLERI = ["web_search", "web_search_preview"]
 BOT_ADI = "Mozilla/5.0 (compatible; DoktorFilamentBot/1.0; tasarim atfi icin tek sayfa onizleme)"
 REFERANS_EN_BUYUK = 8 * 1024 * 1024
@@ -918,7 +943,7 @@ def json_oku(yol, varsayilan):
 def ayar_oku():
     a = dict(VARSAYILAN)
     a.update(json_oku(URETIM, {}))
-    return a
+    return turet_ayar(a, H.ayar_oku().get("gunluk_sayi"))
 
 
 def yaz(yol, veri):

@@ -217,9 +217,9 @@ function jpegBoyut(b) {
   }
   return null;
 }
-const URETIM_VARSAYILAN = { aktif: false, mod: 'otomatik', gunluk_uretim: 3, gunluk_gorsel_siniri: 6, aylik_gorsel_siniri: 90, kalite: 'low', kuyruk_hedefi: 6, referans: 'zorunlu', muzik: true };
+const URETIM_VARSAYILAN = { aktif: false, mod: 'otomatik', gunluk_uretim: 3, gunluk_gorsel_siniri: 6, aylik_gorsel_siniri: 90, kalite: 'low', kuyruk_hedefi: 6, referans: 'zorunlu', muzik: true, profil: 'ekonomik', aylik_butce_usd: 7, birim_maliyet_usd: 0.02 };
 async function hikayeListesi() {
-  if (Date.now() - hikayeOnbellek.t < 20e3 && hikayeOnbellek.veri) return hikayeOnbellek.veri;
+  if (Date.now() - hikayeOnbellek.t < 45e3 && hikayeOnbellek.veri) return hikayeOnbellek.veri;
   const dal = await varsayilanDal();
   const ayarK = await depoOku('hikaye/ayar.json');
   const saglikK = await depoOku('hikaye/saglik.json').catch(() => null);
@@ -447,6 +447,31 @@ async function api(req, res, url) {
     if (!BILDIRIM_ACIK) return json(res, 503, { hata: 'Bildirim kapalı.' });
     try { return json(res, 200, await bildirimGonder({ baslik: 'Deneme bildirimi', govde: 'Ajan ofisinden bildirim alıyorsun. Hikaye yayınlanınca böyle haber gelecek.', adres: '/', etiket: 'deneme' })); }
     catch (e) { return json(res, 502, { hata: 'Bildirim gönderilemedi.' }); }
+  }
+  if (url.pathname === '/api/hikaye-plan' && req.method === 'POST') {
+    // Basit hikâye ayarı: günde kaç hikâye, saat aralığı, görsel kalitesi, aylık bütçe (USD). Ayrıntılı sınırlar üretim ajanında bu değerlerden türetilir.
+    let b; try { b = await govde(req); } catch (e) { return json(res, 400, { hata: 'Geçersiz istek.' }); }
+    const tam = (v, lo, hi) => Number.isInteger(v) && v >= lo && v <= hi;
+    const say = (v, lo, hi) => typeof v === 'number' && isFinite(v) && v >= lo && v <= hi;
+    const ay = {}, ur = {};
+    if ('aktif' in b) { ay.aktif = b.aktif === true; ur.aktif = b.aktif === true; }   // tek anahtar: hem üretim hem yayın
+    if ('gunluk_sayi' in b) { if (!tam(b.gunluk_sayi, 1, 24)) return json(res, 400, { hata: 'Günde 1-24 hikâye olabilir.' }); ay.gunluk_sayi = b.gunluk_sayi; }
+    if ('baslangic_saat' in b) { if (!tam(b.baslangic_saat, 0, 23)) return json(res, 400, { hata: 'Başlangıç saati 0-23 olmalı.' }); ay.baslangic_saat = b.baslangic_saat; }
+    if ('bitis_saat' in b) { if (!tam(b.bitis_saat, 1, 24)) return json(res, 400, { hata: 'Bitiş saati 1-24 olmalı.' }); ay.bitis_saat = b.bitis_saat; }
+    if ('profil' in b) { if (!['ekonomik', 'kaliteli'].includes(b.profil)) return json(res, 400, { hata: 'Geçersiz görsel kalitesi.' }); ur.profil = b.profil; }
+    if ('aylik_butce_usd' in b) { if (!say(b.aylik_butce_usd, 2, 200)) return json(res, 400, { hata: 'Aylık bütçe 2-200 $ arasında olmalı.' }); ur.aylik_butce_usd = Math.round(b.aylik_butce_usd * 100) / 100; }
+    if ('birim_maliyet_usd' in b) { if (!say(b.birim_maliyet_usd, 0.002, 0.5)) return json(res, 400, { hata: 'Görsel başına maliyet 0,002-0,5 $ arasında olmalı.' }); ur.birim_maliyet_usd = Math.round(b.birim_maliyet_usd * 10000) / 10000; }
+    if (!Object.keys(ay).length && !Object.keys(ur).length) return json(res, 400, { hata: 'Değişiklik yok.' });
+    ay.saklama_gun = 1;   // yayınlanan hikâyeler 1 gün sonra kuyruktan temizlenir
+    const ok1 = await jsonGuncelle('hikaye/ayar.json', v => {
+      Object.assign(v, ay);
+      if (v.bitis_saat <= v.baslangic_saat) return false;
+      if (ay.aktif === true) { v.ardisik_hata = 0; v.son_not = ''; }
+    }, 'Panel: hikâye ayarı', { aktif: false, mod: 'otomatik', gunluk_sayi: 10, baslangic_saat: 8, bitis_saat: 22, gunler: [1, 2, 3, 4, 5, 6, 7], min_aralik_dk: 30, ardisik_hata: 0, hata_siniri: 3, son_not: '' });
+    if (!ok1) return json(res, 400, { hata: 'Ayar kaydedilemedi (bitiş saati başlangıçtan büyük olmalı).' });
+    const ok2 = Object.keys(ur).length ? await jsonGuncelle('hikaye/uretim.json', v => { Object.assign(v, ur); }, 'Panel: hikâye bütçe ve kalite ayarı', URETIM_VARSAYILAN) : true;
+    hikayeIptal();
+    return ok2 ? json(res, 200, { ok: true }) : json(res, 502, { hata: 'Bütçe ayarı kaydedilemedi.' });
   }
   if (url.pathname === '/api/hikaye-ayar' && req.method === 'POST') {
     let b; try { b = await govde(req); } catch (e) { return json(res, 400, { hata: 'Geçersiz istek.' }); }
