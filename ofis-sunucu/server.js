@@ -569,7 +569,7 @@ async function api(req, res, url) {
   if (url.pathname === '/api/yorum-karar' && req.method === 'POST') {
     let b; try { b = await govde(req); } catch (e) { return json(res, 400, { hata: 'Geçersiz istek.' }); }
     if (!YORUM_RE.test(String(b.id || ''))) return json(res, 400, { hata: 'Geçersiz kimlik.' });
-    if (!['onayla', 'reddet', 'duzenle', 'tekrar'].includes(b.karar)) return json(res, 400, { hata: 'Geçersiz karar.' });
+    if (!['onayla', 'reddet', 'duzenle', 'tekrar', 'yeniden'].includes(b.karar)) return json(res, 400, { hata: 'Geçersiz karar.' });
     const yanit = temiz(b.yanit || '', 300).replace(/\s+/g, ' ').trim();
     if ((b.karar === 'onayla' || b.karar === 'duzenle') && b.yanit !== undefined) {
       if (!yanit) return json(res, 400, { hata: 'Yanıt boş olamaz.' });
@@ -585,9 +585,15 @@ async function api(req, res, url) {
       if (b.karar === 'onayla') { if (!o.yanit) { gecersiz = 'Bu yorum için yanıt yok.'; return false; } o.durum = 'onaylandi'; o.hata = ''; }
       else if (b.karar === 'reddet') o.durum = 'reddedildi';
       else if (b.karar === 'tekrar') { o.durum = 'onay_bekliyor'; o.hata = ''; }
+      else if (b.karar === 'yeniden') { if (!['onay_bekliyor', 'hata', 'atlandi', 'reddedildi'].includes(o.durum)) { gecersiz = 'Bu yanıt şu an yeniden yazılamaz.'; return false; } o.durum = 'yeniden_yaz'; o.hata = ''; }
     }, 'Panel: yorum yanıtı ' + b.karar, { ogeler: [] });
     if (gecersiz) return json(res, 409, { hata: gecersiz });
     if (!ok) return json(res, bulundu ? 502 : 404, { hata: bulundu ? 'Kaydedilemedi.' : 'Yorum bulunamadı.' });
+    if (b.karar === 'yeniden' && Date.now() - yorumYenidenTetik > 20e3) {   // yeniden yazma hemen başlasın; art arda basışlarda tek tetik (ajan bekleyenlerin hepsini yazar)
+      yorumYenidenTetik = Date.now();
+      const dal = await varsayilanDal();
+      await gh(`/repos/${REPO}/actions/workflows/${AKIS_YORUM}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: { elle: 'EVET' } }) }).catch(() => {});
+    }
     if (b.karar === 'onayla' && Date.now() - yorumSonTetik > 3 * 60e3) {   // onaylanan yanıtlar kısa sürede gitsin; art arda onaylarda tek tetik
       yorumSonTetik = Date.now();
       const dal = await varsayilanDal();
@@ -964,7 +970,7 @@ http.createServer(async (req, res) => {
 // Türkiye saati (UTC+3). 20 dakikada bir hikaye yayın kontrolü (08:05-22:45), günde üç kez (08:20, 13:20, 17:20) görsel üretimi, pazartesi/perşembe 06:30'da trend ajanı.
 // İş akışları kendi kararını verir (slot, günlük sınır); çift tetik zararsızdır (ortak kilit + "önce talep et" mantığı).
 const ZAM_KAPALI = process.env.ZAMANLAYICI === 'kapali';
-let yorumSonTetik = 0;
+let yorumSonTetik = 0, yorumYenidenTetik = 0;
 const zamSon = { yorum: null, yayin: null, uretim: null, trend: null, akademi: null, kisa: null, viral: null, nobetci: null, istatistik: null, hata: null };
 const zamYapilan = new Set();
 function zamSimdiTR() { const z = process.env.ZAM_ZAMAN ? new Date(process.env.ZAM_ZAMAN) : new Date(); return new Date(z.getTime() + 3 * 3600e3); }

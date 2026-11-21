@@ -237,6 +237,37 @@ def taslak_uret(ayar, ben):
     return len(yeni)
 
 
+def yeniden_yaz():
+    """Panelde 'Yeniden yaz'a basılan taslakları güncel üslup kurallarıyla baştan yazar (durum: yeniden_yaz → onay_bekliyor)."""
+    kuyruk, _ = dosya_oku(KUYRUK)
+    ogeler = (kuyruk or {}).get("ogeler", [])
+    hedef = [o for o in ogeler if o.get("durum") == "yeniden_yaz"]
+    if not hedef:
+        return 0
+    onceki = [o.get("yanit") for o in ogeler if o.get("yanit") and o.get("durum") != "yeniden_yaz"]
+    sonuc = {}
+    for o in hedef[:10]:
+        durum, kat, yanit, neden = karar_son(o.get("yorum", ""), yz_karar(o.get("medya_baslik"), o.get("yorum", ""), onceki))
+        sonuc[o["id"]] = (durum, kat, yanit, neden)
+        if yanit:
+            onceki.append(yanit)
+        print(f"  yeniden yazıldı: {o['id']} → {durum}")
+
+    def isle(v):
+        for o in v.get("ogeler", []):
+            x = sonuc.get(o["id"])
+            if x and o.get("durum") == "yeniden_yaz":
+                o["kategori"], o["hata"] = x[1], ""
+                if x[0] == "yanit":
+                    o["yanit"], o["durum"], o["neden"] = x[2], "onay_bekliyor", ""
+                else:
+                    o["durum"], o["neden"] = "atlandi", x[3]
+            elif o.get("durum") == "yeniden_yaz" and o["id"] not in sonuc:
+                pass   # bu turda sıra gelmedi; bir sonraki turda yazılır
+    json_guncelle(KUYRUK, isle, {"ogeler": []}, f"Yorum ajanı: {len(sonuc)} yanıt yeniden yazıldı")
+    return len(sonuc)
+
+
 def gonder(ayar, bekle=True):
     kuyruk, _ = dosya_oku(KUYRUK)
     ogeler = (kuyruk or {}).get("ogeler", [])
@@ -303,6 +334,7 @@ def main():
     bekle = not os.environ.get("YORUM_BEKLEME_YOK")
     try:
         ben = (ig("GET", ig_ortak.kimlik(), fields="username").get("username") or "").lower()
+        yeniden_yaz()
         if not a.sadece_gonder:
             taslak_uret(ayar, ben)
         gonder(ayar, bekle)
