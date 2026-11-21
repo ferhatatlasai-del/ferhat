@@ -1,6 +1,6 @@
 {
- "tarih": "2026-11-20T22:41:26Z",
- "tr_saat": "21.11.2026 01:41",
+ "tarih": "2026-11-21T06:00:23Z",
+ "tr_saat": "21.11.2026 09:00",
  "toplam": {
   "reels": 0,
   "gonderi": 0,
@@ -8,7 +8,7 @@
   "youtube_video": 0,
   "hikaye": 0,
   "toplam": 0,
-  "begeni": 98,
+  "begeni": 115,
   "yorum": 4
  },
  "fark": 0,
@@ -18,6 +18,28 @@
   "takipci": 417,
   "hata": "HTTP 400 kod=10 tür=OAuthException: (#10) Application does not have permission for this action",
   "gonderiler": [
+   {
+    "id": "17916096111516478",
+    "tur": "Reels",
+    "tarih": "2026-11-20T23:23:19",
+    "baslik": "İlk katman sorunlarını çoğu zaman dört şey bozar: tabla sevi",
+    "begeni": 9,
+    "yorum": 0,
+    "link": "https://www.instagram.com/reel/Df-02JrFMVG/",
+    "izlenme": null,
+    "erisim": null
+   },
+   {
+    "id": "18037926155853133",
+    "tur": "Reels",
+    "tarih": "2026-11-20T23:05:39",
+    "baslik": "Baskın tabladan kalkıyor mu? İlk katman yapışmıyorsa çoğu za",
+    "begeni": 8,
+    "yorum": 0,
+    "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
+    "izlenme": null,
+    "erisim": null
+   },
    {
     "id": "18289759651292671",
     "tur": "Reels",
@@ -241,6 +263,22 @@
  "hikaye_izin": false,
  "hikayeler": [
   {
+   "id": "18154348378555017",
+   "tarih": "2026-11-20T23:28:11Z",
+   "baslik": "Drill Press Depth Stop Mount for el-cheapo Harbor Freight Ce",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
+   "id": "18428349931158850",
+   "tarih": "2026-11-20T22:44:41Z",
+   "baslik": "Video hikayesi",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
    "id": "18203822248383065",
    "tarih": "2026-11-20T13:07:42Z",
    "baslik": "Parametric drill depth stop",
@@ -444,7 +482,7 @@
   "YouTube okunamadı"
  ],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 01:41",
+  "baslik": "📊 İzlenme raporu 09:00",
   "govde": "Toplam 0 (eksik veri) · Reels ? · Short ? · Hikaye ? · Takipçi 417 · Instagram izlenme izni yok; YouTube okunamadı"
  }
 }
