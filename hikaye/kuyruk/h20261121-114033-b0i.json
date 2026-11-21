@@ -1,7 +1,7 @@
 {
   "id": "h20261121-114033-b0i",
   "kaynak": "uretim",
-  "durum": "planli",
+  "durum": "yayinlaniyor",
   "olusturma": "2026-11-21T11:40:33.000Z",
   "gorsel": "hikaye/gorseller/h20261121-114033-b0i.mp4",
   "baslik": "IV bag hook",
@@ -22,7 +22,9 @@
       "Görselde belirgin bir sorun yok"
     ]
   },
-  "yayin": null,
+  "yayin": {
+    "tarih": "2026-11-21T15:25:33Z"
+  },
   "hata": "",
   "deneme": 0,
   "tur": "video",
