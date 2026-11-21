@@ -34,6 +34,10 @@ import numpy as np
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import hikaye as H  # noqa: E402
+try:
+    import basari as B  # noqa: E402
+except Exception:   # başarı hafızası yoksa eski davranış (konu listesi)
+    B = None
 import hikaye_uret as U  # noqa: E402
 import ses_tasarim as SES  # noqa: E402
 
@@ -128,6 +132,44 @@ def senaryo_dogrula(s):
             "aciklama": str(s.get("aciklama") or "")[:900].replace("http", ""), "etiketler": [re.sub(r"[^a-z0-9ığüşöç]", "", str(e).lower()) for e in (s.get("etiketler") or [])][:8], "sahneler": temiz}
 
 
+SECIM = {}      # bu çalışmanın konu kararı (taslağa yazılır): tur = turev | kesif | liste | elle
+ILHAM = ""      # geçmiş performanstan çıkan örnek başlıklar (komuta eklenir); keşif/elle seçimde boş
+
+
+def ilham_ekle(istem):
+    """Örnek başlıkları, komutun 'YALNIZCA JSON' satırından hemen önce ekler (ilham yoksa komut aynen kalır)."""
+    if not ILHAM:
+        return istem
+    i = istem.rfind("YALNIZCA JSON")
+    return istem[:i] + ILHAM.strip() + "\n\n" + istem[i:] if i >= 0 else istem + "\n" + ILHAM
+
+
+def turev_sec():
+    """Her 4 videonun 3'ü en çok izlenenlerin kalıbını izleyen YENİ konu, her 4.'sü 'keşif' (listeden yeni alan). (konu, ipucu) ya da None."""
+    global ILHAM
+    ILHAM = ""
+    if B is None:
+        SECIM.update(tur="liste")
+        return None
+    if len(json_oku(KULLANILAN, [])) % 4 == 3:
+        SECIM.update(tur="kesif")
+        print("Konu seçimi: keşif sırası (listeden yeni bir alan; geçmiş performans komuta eklenmez)")
+        return None
+    try:
+        ILHAM = B.ilham_metni()
+        t = B.turev_konu()
+    except Exception as e:
+        print(f"UYARI: başarı hafızası kullanılamadı ({type(e).__name__}); konu listesi kullanılacak.")
+        SECIM.update(tur="liste")
+        return None
+    if not t:
+        SECIM.update(tur="liste", ilham=bool(ILHAM))
+        return None
+    SECIM.update(tur="turev", ilham=t[2])
+    print(f"Konu seçimi: en çok izlenenlerden türetildi → {t[0]}")
+    return t[0], t[1]
+
+
 SENARYO_ISTEMI = """3D yazıcı ve 3D baskı konusunda, YouTube Shorts / Instagram Reels için ~60 saniyelik, merak uyandıran, bilgi veren TÜRKÇE bir video senaryosu yaz.
 Konu: {konu}
 İpucu: {ipucu}
@@ -147,7 +189,7 @@ def senaryo_uret_yz(konu, ipucu):
         return None
     govde = {"model": MODEL, "response_format": {"type": "json_object"}, "temperature": 0.7,
              "messages": [{"role": "system", "content": "Sen Türkçe 3D baskı eğitim videoları yazan, doğruluğa önem veren bir içerik editörüsün. Yalnızca geçerli JSON döndür."},
-                          {"role": "user", "content": SENARYO_ISTEMI.format(konu=konu, ipucu=ipucu or "-")}]}
+                          {"role": "user", "content": ilham_ekle(SENARYO_ISTEMI.format(konu=konu, ipucu=ipucu or "-"))}]}
     for deneme in range(2):
         try:
             r = urllib.request.Request(f"{OPENAI}/chat/completions", data=json.dumps(govde).encode(), method="POST",
@@ -165,13 +207,21 @@ def senaryo_sec(a, ayar):
     """(senaryo, kaynak_adi) ya da (None, neden)"""
     kullanilan = set(json_oku(KULLANILAN, []))
     if a.senaryo:
+        SECIM.update(tur="elle")
         return senaryo_dogrula(json_oku(a.senaryo, {})), pathlib.Path(a.senaryo).stem
     if a.konu:
+        SECIM.update(tur="elle")
         kutuphane = SENARYOLAR / f"{slug(a.konu)}.json"
         if kutuphane.exists():
             return senaryo_dogrula(json_oku(kutuphane, {})), kutuphane.stem
         s = senaryo_uret_yz(a.konu, "")
         return (s, slug(a.konu)) if s else (None, "konu için senaryo üretilemedi (OPENAI_API_KEY yok ya da yanıt geçersiz)")
+    t = turev_sec()
+    if t:
+        s = senaryo_uret_yz(t[0], t[1])
+        if s:
+            return s, "turev-" + slug(t[0])
+        SECIM.update(tur="liste")   # türev konu yazılamadı: listeden devam
     # sırayla: kullanılmamış hazır senaryo, sonra konu listesi + yapay zekâ
     for f in sorted(SENARYOLAR.glob("*.json")):
         if f.stem not in kullanilan:
@@ -194,7 +244,7 @@ Konu: {konu}
 
 BİÇİM: Kısa bir kanca (giriş), sonra sondan başa {n} madde (sira: {n} … 1; 1 en iyisi/en yükseği), sonunda kısa kapanış. Toplam anlatı 120-160 kelime.
 Her maddenin kartında bir SAYAÇ gösterilecek: tüm maddeler AYNI ölçüyü kullansın (ör. ısı dayanımı °C, tipik baskı sıcaklığı °C, yoğunluk g/cm³, Shore sertliği). Ölçü konuya uymuyorsa deger null olsun.
-DOĞRULUK: Sayısal değerler 3D baskı topluluğunda ve üretici tablolarında yaygın kabul gören TİPİK değerler olsun; aralık varsa orta değeri yaz ve deger_yazi'da "≈" kullan. Emin değilsen deger null. Marka, fiyat, uydurma istatistik, kişisel deneyim yok. Yasak sözcükler: mükemmel, harika, muhteşem, inanılmaz. Sayıları anlatıda yazıyla yaz (ör. "altmış derece").
+DOĞRULUK: Yalnızca sıradan bir masaüstü 3D yazıcıyla (ısıtmalı tabla, en çok yaklaşık 300 °C nozul) basılabilen malzemeleri/ürünleri listele; endüstriyel ya da özel donanım isteyen malzemeyi (ör. yüksek sıcaklık polimerleri) listeye koyma. Tüm maddelerin değeri aynı birimde ve aynı ölçüde (aynı tür ölçüm) olsun; sıralama bu değerlerle tutarlı olsun. Sayısal değerler 3D baskı topluluğunda ve üretici tablolarında yaygın kabul gören TİPİK değerler olsun; aralık varsa orta değeri yaz ve deger_yazi'da "≈" kullan. Emin değilsen deger null. Marka, fiyat, uydurma istatistik, kişisel deneyim yok. Yasak sözcükler: mükemmel, harika, muhteşem, inanılmaz. Sayıları anlatıda yazıyla yaz (ör. "altmış derece").
 Anlatıda her madde sırasıyla başlasın ("Beşinci sırada …", "Ve birinci sırada …"). Giriş merak uyandırsın (ör. "birincisi seni şaşırtabilir"). Kapanış yoruma davet + takip etsin.
 GÖRSEL: her bölüm için İngilizce, gerçekçi bir fotoğraf sahnesi tarifi yaz (konuyla doğrudan ilgili nesne: filament makarası, basılmış parça, nozul, yazıcı tablası…). Metin, logo, marka, insan yüzü YOK.
 YALNIZCA JSON: {{"konu":"...","baslik":"arama odaklı en çok 70 karakter","aciklama":"2-3 kısa satır, son satır yorum daveti","etiketler":["3dprinting","..."],
@@ -257,7 +307,7 @@ def liste_senaryo_uret(konu, ipucu, n=5):
         return None
     govde = {"model": MODEL, "response_format": {"type": "json_object"}, "temperature": 0.7,
              "messages": [{"role": "system", "content": "Sen Türkçe 3D baskı eğitim videoları yazan, doğruluğa önem veren bir içerik editörüsün. Yalnızca geçerli JSON döndür."},
-                          {"role": "user", "content": LISTE_ISTEMI.format(konu=konu, ipucu=ipucu or "-", n=n)}]}
+                          {"role": "user", "content": ilham_ekle(LISTE_ISTEMI.format(konu=konu, ipucu=ipucu or "-", n=n))}]}
     for deneme in range(2):
         try:
             r = urllib.request.Request(f"{OPENAI}/chat/completions", data=json.dumps(govde).encode(), method="POST",
@@ -274,10 +324,18 @@ def liste_senaryo_uret(konu, ipucu, n=5):
 def liste_senaryo_sec(a):
     kullanilan = set(json_oku(KULLANILAN, []))
     if a.senaryo:
+        SECIM.update(tur="elle")
         return liste_dogrula(json_oku(a.senaryo, {})), pathlib.Path(a.senaryo).stem
     if a.konu:
+        SECIM.update(tur="elle")
         s = liste_senaryo_uret(a.konu, "")
         return (s, "liste-" + slug(a.konu)) if s else (None, "liste senaryosu üretilemedi (OPENAI_API_KEY yok ya da yanıt geçersiz)")
+    t = turev_sec()
+    if t:
+        s = liste_senaryo_uret(t[0], t[1])
+        if s:
+            return s, "turev-" + slug(t[0])
+        SECIM.update(tur="liste")   # türev konu yazılamadı: listeden devam
     for k in json_oku(VIDEO / "liste_konulari.json", []):
         kim = "liste-" + slug(k["konu"])
         if kim in kullanilan:
@@ -793,7 +851,7 @@ def calis(a):
         kimlik = f"s{z.strftime('%Y%m%d-%H%M%S')}"
         gercek = bool(anahtar or gemini) and not a.tts_dizin and not a.sessiz
         taslak = {"id": kimlik, "olusturma": z.strftime("%Y-%m-%dT%H:%M:%SZ"), "durum": "onay_bekliyor", "tur": "viral", "video": f"videolar/{cikti.name}", "sure": round(plan["sure"], 1),
-                  "baslik": senaryo["baslik"], "aciklama": aciklama_olustur(senaryo, gercek), "muzik": "Sentez (kodla üretildi)", "konu": senaryo["konu"], "tasarimlar": [], "hikayeler": [],
+                  "baslik": senaryo["baslik"], "aciklama": aciklama_olustur(senaryo, gercek), "muzik": "Sentez (kodla üretildi)", "konu": senaryo["konu"], "tasarimlar": [], "hikayeler": [], "secim": dict(SECIM),
                   "zamanlama": [{"tip": x["tip"], "t0": x["t0"], "t1": x["t1"], "ses_son": x.get("ses_son")} for x in plan["sahneler"]]}   # sahne/konuşma zamanları: ses sorunlarını sonradan ayıklamak için
         yaz(DIZIN / f"{kimlik}.json", taslak)
         yaz(KULLANILAN, sorted(set(json_oku(KULLANILAN, [])) | {kaynak}))
