@@ -257,3 +257,10 @@ Ayarlar → **Hikâye ayarları** tek karttır: açık/kapalı, günde kaç hik�
 - Panel kartı tahmini aylık maliyeti canlı gösterir (günde N hikâye × ~1,5 görsel [denetimden geçmeyenler dahil, gözlenen] × görsel maliyeti × 30 + ~1 $). Bütçe yetmiyorsa "bu bütçeyle günde en çok ~K hikâye" uyarısı çıkar; bütçe dolunca üretim kendiliğinden durur.
 - **Görsel maliyeti tahmindir** (varsayılan 0,02 $, düşük kalite). Hesapta daha ucuz "mini" görsel modeli yoktur ve sistem zaten en ucuz kaliteyi (düşük) kullanır. OpenAI → Usage sayfasındaki gerçek harcamaya göre "Gelişmiş" alanından düzeltilir.
 - Tek anahtar hem üretimi hem yayını açar/kapatır (`/api/hikaye-plan`). Yayınlanan hikâyeler 1 gün (`saklama_gun: 1`) sonra kuyruktan temizlenir, panel de 24 saatten eskileri göstermez.
+
+## 3D ofis yenilendi
+
+- **Oda büyütüldü** (26 × 18 birim; sağa ve öne genişledi), açılışta tamamı görünür; dar telefon ekranında yakın başlar, kaydırarak gezilir ("Tüm ofis" düğmesi başlangıç görünümüne döner). Görünüm alanı da büyütüldü.
+- **Ajan kadrosu gerçeğe uyduruldu:** kurulmamış *Facebook* masası kaldırıldı; çalışan ama ofiste görünmeyen **Video üretici**, **Yorum ajanı** ve **Nöbetçi** masaları eklendi (her birinin ekran animasyonu ve menü düğmeleri var: video üret, yorumlara bak / şimdi tara, şimdi denetle). Kahve köşesi, su sebili ve yeni pencereler/bitkiler eklendi.
+- **Avatarlar:** yumuşak gölgelendirme, yuvarlak gövde ve uzuvlar, kulak-burun-göz akı ve bebeği, kaş, gülümseme, yanak; 5 saç stili (kısa, yan, uzun, topuz, kıvırcık) ve ajana özel aksesuarlar.
+- **Hareket:** göz kırpma ve nefes alma (herkeste), boşta oturanlar arada kahve yudumlar, ve 35-60 sn'de bir Instagram/YouTube/Yorum/Video üretici ajanlarından biri masadan kalkıp kahve köşesine yürür, bekler, döner (bir sahne/yayın animasyonu başlarsa mola yarıda kesilip masasına döner).
