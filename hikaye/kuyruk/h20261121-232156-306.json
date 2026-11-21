@@ -2,12 +2,14 @@
   "id": "h20261121-232156-306",
   "kaynak": "yayin",
   "tur": "video",
-  "durum": "planli",
+  "durum": "yayinlaniyor",
   "olusturma": "2026-11-21T23:21:56.305Z",
   "gorsel": "videolar/yukleme_20261121150805.mp4",
   "baslik": "Video hikayesi",
   "atif": null,
-  "yayin": null,
+  "yayin": {
+    "tarih": "2026-11-21T23:22:20Z"
+  },
   "hata": "",
   "deneme": 0
 }
