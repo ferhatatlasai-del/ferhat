@@ -1,0 +1,35 @@
+{
+  "id": "h20261121-114218-h2a",
+  "kaynak": "uretim",
+  "durum": "planli",
+  "olusturma": "2026-11-21T11:42:18.000Z",
+  "gorsel": "hikaye/gorseller/h20261121-114218-h2a.mp4",
+  "baslik": "Grocery Bag Hook for Toyota Corolla TS XII E210 (v 02)",
+  "atif": {
+    "ad": "Grocery Bag Hook for Toyota Corolla TS XII E210 (v 02)",
+    "tasarimci": "Pavel Berka",
+    "lisans": "CC BY",
+    "url": "https://www.printables.com/model/1263011-grocery-bag-hook-for-toyota-corolla-ts-xii-e210-v",
+    "site": "printables.com",
+    "lisans_teyit": true,
+    "referansli": true
+  },
+  "trend": "Mutfak poşeti için kanca tipi askı",
+  "kontrol": {
+    "puan": 8.0,
+    "deneme": 1,
+    "sorunlar": [
+      "Görselde yazı/logo yok.",
+      "Üretim görseli referansa göre biraz daha temiz/stüdyo tarzı.",
+      "İkinci görsel referans olarak kullanılmış; üretim nesnesiyle genel şekil ve parça düzeni uyumlu."
+    ]
+  },
+  "yayin": null,
+  "hata": "",
+  "deneme": 0,
+  "tur": "video",
+  "muzik": "Sentezlenmiş müzik: Kalimba sabahı (telifsiz, kodla üretildi)",
+  "muzik_sira": 37,
+  "muzik_stil": "Kalimba sabahı",
+  "muzik_ton": 2
+}
