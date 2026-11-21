@@ -1,6 +1,6 @@
 {
- "tarih": "2026-11-21T15:00:31Z",
- "tr_saat": "21.11.2026 18:00",
+ "tarih": "2026-11-21T18:00:32Z",
+ "tr_saat": "21.11.2026 21:00",
  "toplam": {
   "reels": 0,
   "gonderi": 0,
@@ -8,22 +8,44 @@
   "youtube_video": 0,
   "hikaye": 0,
   "toplam": 0,
-  "begeni": 134,
+  "begeni": 150,
   "yorum": 5
  },
  "fark": 0,
  "instagram": {
   "durum": "tamam",
   "izin": false,
-  "takipci": 419,
+  "takipci": 430,
   "hata": "HTTP 400 kod=10 tür=OAuthException: (#10) Application does not have permission for this action",
   "gonderiler": [
+   {
+    "id": "17945283843388099",
+    "tur": "Reels",
+    "tarih": "2026-11-21T15:28:13",
+    "baslik": "Katman kayması genelde mekanik bir sorundur.",
+    "begeni": 6,
+    "yorum": 0,
+    "link": "https://www.instagram.com/reel/DgAjP11DCGR/",
+    "izlenme": null,
+    "erisim": null
+   },
+   {
+    "id": "17941420377402019",
+    "tur": "Reels",
+    "tarih": "2026-11-21T15:27:00",
+    "baslik": "Hangi filament sıcağa daha çok dayanır?",
+    "begeni": 1,
+    "yorum": 0,
+    "link": "https://www.instagram.com/reel/DgAjINVCTkY/",
+    "izlenme": null,
+    "erisim": null
+   },
    {
     "id": "17956070562049609",
     "tur": "Reels",
     "tarih": "2026-11-21T14:12:58",
     "baslik": "İplik gibi sarkıtmalar neden olur, nasıl azalır?",
-    "begeni": 1,
+    "begeni": 8,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgAaonlkhF3/",
     "izlenme": null,
@@ -56,7 +78,7 @@
     "tur": "Reels",
     "tarih": "2026-11-20T23:05:39",
     "baslik": "Baskın tabladan kalkıyor mu? İlk katman yapışmıyorsa çoğu za",
-    "begeni": 21,
+    "begeni": 23,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
     "izlenme": null,
@@ -284,6 +306,54 @@
  },
  "hikaye_izin": false,
  "hikayeler": [
+  {
+   "id": "18119094625827736",
+   "tarih": "2026-11-21T17:46:39Z",
+   "baslik": "VAUDE  bicycle bag hook shark tooth spare part",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
+   "id": "18081372350749410",
+   "tarih": "2026-11-21T17:06:42Z",
+   "baslik": "Table bag hook",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
+   "id": "18025038785955858",
+   "tarih": "2026-11-21T16:26:39Z",
+   "baslik": "Bag hook for car trunk",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
+   "id": "18078108707591628",
+   "tarih": "2026-11-21T15:46:41Z",
+   "baslik": "VW Hook for shopping bags in trunk, Haken für VW Passat Koff",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
+   "id": "18138218831507788",
+   "tarih": "2026-11-21T15:26:43Z",
+   "baslik": "IV bag hook",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
+   "id": "18132820246889835",
+   "tarih": "2026-11-21T15:06:51Z",
+   "baslik": "Universal Pannier Bag Hook - turn any backpack into a pannie",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
   {
    "id": "17972032542195687",
    "tarih": "2026-11-21T14:46:57Z",
@@ -555,30 +625,6 @@
    "izlenme": 0,
    "erisim": 0,
    "okundu": false
-  },
-  {
-   "id": "17948136738363409",
-   "tarih": "2026-11-17T19:36:23Z",
-   "baslik": "Mini Clamp Print-in-place",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
-  },
-  {
-   "id": "18026215241945756",
-   "tarih": "2026-11-17T12:51:06Z",
-   "baslik": "Hikaye",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
-  },
-  {
-   "id": "18065779874555894",
-   "tarih": "2026-11-17T12:13:10Z",
-   "baslik": "Hikaye",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
   }
  ],
  "youtube": {
@@ -592,7 +638,7 @@
   "YouTube okunamadı"
  ],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 18:00",
-  "govde": "Toplam 0 (eksik veri) · Reels ? · Short ? · Hikaye ? · Takipçi 419 (+1) · Instagram izlenme izni yok; YouTube okunamadı"
+  "baslik": "📊 İzlenme raporu 21:00",
+  "govde": "Toplam 0 (eksik veri) · Reels ? · Short ? · Hikaye ? · Takipçi 430 (+11) · Instagram izlenme izni yok; YouTube okunamadı"
  }
 }
