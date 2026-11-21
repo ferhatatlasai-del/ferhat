@@ -88,9 +88,9 @@ Fotoğraf alınamazsa (site engellerse) "zorunlu" modda o tasarım atlanır; "te
 - Hikaye üreticisi Trend ajanının konularını ve İngilizce arama terimlerini kullanır; adayların yarısı trend konularına uyar.
 
 ### Zamanlayıcı (Fly sunucusunda)
-GitHub'ın zamanlayıcısı çalışmaları atlayabildiği için sunucu tetikleri kendisi verir (Türkiye saati): yarım saatte bir (:05 ve :35) hikaye yayın kontrolü (10:05–22:35), her gün 08:20'de görsel üretimi, pazartesi/perşembe 06:30'da trend ajanı.
+GitHub'ın zamanlayıcısı çalışmaları atlayabildiği için sunucu tetikleri kendisi verir (Türkiye saati): 20 dakikada bir (:05, :25, :45) hikaye yayın kontrolü (08:05–22:45), günde üç kez (08:20, 13:20, 17:20) görsel üretimi, pazartesi/perşembe 06:30'da trend ajanı.
 Sunucunun sürekli açık olması gerekir (`fly.toml`: `auto_stop_machines = "off"`, `min_machines_running = 1`). Durum: `/api/zamanlayici`. Kapatmak için `ZAMANLAYICI=kapali` ortam değişkeni.
-GitHub'ın kendi zamanlayıcısı yedek olarak durur; çift tetik zararsızdır (yayın: ortak kilit + slot mantığı; üretim: günde bir kez).
+GitHub'ın kendi zamanlayıcısı yedek olarak durur; çift tetik zararsızdır (yayın: ortak kilit + slot mantığı; üretim: turlar arası en az 3 saat).
 
 ### Akademi ajanı (V1)
 Haftada bir (pazar 18:00 TR; sunucu zamanlayıcısı ve GitHub iş akışı) `ajan/akademi.py` çalışır:
@@ -179,3 +179,12 @@ Her kontrol en çok bir hikaye yayınlar. Eskiden kontrol saat başıydı ve iki
 ### Biten hikaye kayıtlarının otomatik temizlenmesi
 Yayınlanıp biten (yayında, reddedildi, hata) hikayelerden `saklama_gun` (varsayılan 3, `hikaye/ayar.json`) günden eski olanlar, her yayın kontrolünde eskiden yeniye silinir: kayıt dosyası ve `hikaye/gorseller/` altındaki görsel/video. Depo şişmesin diye (günde 12 hikaye ≈ 18 MB). Planlı, onay bekleyen ve yayınlanan kayıtlara, ayrıca `videolar/` klasöründeki ortak dosyalara dokunulmaz.
 Silinen her kaydın kısa özeti `hikaye/arsiv.jsonl` dosyasına yazılır; Akademi'nin haftalık sayıları bunu da okur, yani silme istatistiği bozmaz. İstatistikçi hikaye izlenmelerini `istatistik/hikayeler.json` içinde ayrıca saklar. `saklama_gun` 0 yapılırsa temizleme kapanır. Kullanılmış tasarım listesi (`hikaye/kullanilan.json`) silinmez, aynı tasarım yeniden üretilmez.
+
+### Günde 20 hikaye: 08:00-22:00 programı (üretimden yayına)
+- **Yayın:** `hikaye/ayar.json` → günde 20 hikaye, 08:00-22:00, en az 30 dk aralık. Sunucu zamanlayıcısı 08:05-22:45 arası **20 dakikada bir** kontrol eder (her kontrol en çok bir hikaye yayınlar; GitHub cron `5,25,45 5-19 * * *` yedek). Simülasyon (200 gün, rastgele 0-7 dk gecikme, %5 kaçan kontrol): her gün 20 hikaye; yarım saatlik kontrolde günlerin ~%1,5'inde 19 kalıyordu.
+- **Üretim:** `hikaye/uretim.json` → tur başına en çok 12 görsel, günde üç tur (08:20, 13:20, 17:20; iki tur arası en az 3 saat, `harcama.json` → `son_tur`), kuyruk hedefi 26, günlük görsel sınırı 40, aylık 1000. Denetimden geçemeyen görseller de sayıldığı için 20 hikaye için günde ~30-35 görsel üretilir.
+- Panel sınırları: günlük hikaye 1-24, aylık görsel 1-1200, kuyruk hedefi 1-40.
+
+### Hikaye müzikleri: 12 dinlendirici stil
+`ajan/hikaye_muzik.py` müziği artık numpy ile sentezler (telifsiz, örnek dosya yok): keçe piyano, kalimba, Rhodes, müzik kutusu, naylon gitar, marimba, celesta, vibrafon, flüt, arp, yaylılar ve pad tınıları; yağmur, okyanus, rüzgâr, uzak kuş ve plak cızırtısı dokuları; yumuşak lo-fi/fırça ritimleri. Her hikaye sıradaki stili alır ve ayrıca 7 akor dizisi, 12 ton, ±%6 tempo ve melodi tohumu değişir; art arda aynı müzik çıkmaz. Ses −16 LUFS'a normalize edilir. Kullanan iş akışlarına numpy kurulumu eklendi (`hikaye-uret`, `kisa-video`, `printables-teshis`).
+

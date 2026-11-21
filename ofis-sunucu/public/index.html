@@ -465,7 +465,7 @@ body.tam .hint{display:none}
     <div class="kolon">
       <div class="card pub"><h2>Hikaye zamanlaması</h2><p class="alt">Hikaye ajanının günde kaç hikaye, hangi saatler arasında ve hangi günlerde yayınlayacağı.</p>        
           <div class="gov">
-            <div class="ayarsat"><label>Günde <input type="number" id="hSayi" min="1" max="12"> hikaye</label><label>Saat <input type="number" id="hBas" min="0" max="23">:00 ile <input type="number" id="hBit" min="1" max="24">:00 arası (Türkiye saati)</label></div>
+            <div class="ayarsat"><label>Günde <input type="number" id="hSayi" min="1" max="24"> hikaye</label><label>Saat <input type="number" id="hBas" min="0" max="23">:00 ile <input type="number" id="hBit" min="1" max="24">:00 arası (Türkiye saati)</label></div>
             <div class="gunler" id="hGunler"></div>
             <div class="satir"><button type="button" id="hKaydet">Ayarı kaydet</button></div>
             <p class="not">GitHub’ın saatlik kontrolü bazen saatlerce gecikebilir; hikayeler belirlediğin aralığa yayılır ama tam saatinde çıkmayabilir.</p>
@@ -478,8 +478,8 @@ body.tam .hint{display:none}
             <p class="not" id="uDurum">Yükleniyor…</p>
             <div class="satir"><button type="button" class="ana" id="uAktif">Üretimi aç</button><button type="button" id="uHemen">Şimdi üret</button></div>
             <div class="ayarsat"><label>Mod <select id="uMod"><option value="otomatik">Otomatik (kuyruğa girer, yayınlanır)</option><option value="onay">Onaylı (ben onaylarım)</option></select></label></div>
-            <div class="ayarsat"><label>Günde en çok <input type="number" id="uGun" min="1" max="12"> hikaye üret</label><label>Günlük görsel sınırı <input type="number" id="uGSin" min="1" max="40"></label><label>Aylık görsel sınırı <input type="number" id="uASin" min="1" max="600"></label></div>
-            <div class="ayarsat"><label>Kuyruk hedefi <input type="number" id="uHed" min="1" max="30"></label><label>Kalite <select id="uKal"><option value="low">Düşük (ucuz)</option><option value="medium">Orta</option><option value="high">Yüksek (pahalı)</option></select></label><label>Referans fotoğraf <select id="uRef"><option value="zorunlu">Zorunlu (fotoğraf alınamazsa üretme)</option><option value="tercih">Tercih (yoksa metinden çiz, daha az benzer)</option></select></label></div>
+            <div class="ayarsat"><label>Her üretim turunda en çok <input type="number" id="uGun" min="1" max="12"> hikaye üret (günde 3 tur)</label><label>Günlük görsel sınırı <input type="number" id="uGSin" min="1" max="40"></label><label>Aylık görsel sınırı <input type="number" id="uASin" min="1" max="1200"></label></div>
+            <div class="ayarsat"><label>Kuyruk hedefi <input type="number" id="uHed" min="1" max="40"></label><label>Kalite <select id="uKal"><option value="low">Düşük (ucuz)</option><option value="medium">Orta</option><option value="high">Yüksek (pahalı)</option></select></label><label>Referans fotoğraf <select id="uRef"><option value="zorunlu">Zorunlu (fotoğraf alınamazsa üretme)</option><option value="tercih">Tercih (yoksa metinden çiz, daha az benzer)</option></select></label></div>
             <div class="ayarsat"><label><input type="checkbox" id="uMuzik"> Müzikli video yap (12 sn, Instagram tarzı tempolu müzik; müzik telifsiz ve kendimiz üretiriz)</label></div>
             <div class="satir"><button type="button" id="uKaydet">Üretim ayarını kaydet</button></div>
             <p class="not">Görsel başına maliyet seçtiğin kaliteye göre değişir; günlük ve aylık görsel sınırları harcamayı üstten kapatır. İlk günlerde sınırları düşük tut, OpenAI panelinden harcamayı da izle.</p>

@@ -440,7 +440,7 @@ async function api(req, res, url) {
     const tam = (v, lo, hi) => Number.isInteger(v) && v >= lo && v <= hi;
     const guncel = {};
     if ('aktif' in b) guncel.aktif = b.aktif === true;
-    if ('gunluk_sayi' in b) { if (!tam(b.gunluk_sayi, 1, 12)) return json(res, 400, { hata: 'Günlük sayı 1 ile 12 arasında olmalı.' }); guncel.gunluk_sayi = b.gunluk_sayi; }
+    if ('gunluk_sayi' in b) { if (!tam(b.gunluk_sayi, 1, 24)) return json(res, 400, { hata: 'Günlük sayı 1 ile 24 arasında olmalı.' }); guncel.gunluk_sayi = b.gunluk_sayi; }
     if ('baslangic_saat' in b) { if (!tam(b.baslangic_saat, 0, 23)) return json(res, 400, { hata: 'Başlangıç saati 0-23 olmalı.' }); guncel.baslangic_saat = b.baslangic_saat; }
     if ('bitis_saat' in b) { if (!tam(b.bitis_saat, 1, 24)) return json(res, 400, { hata: 'Bitiş saati 1-24 olmalı.' }); guncel.bitis_saat = b.bitis_saat; }
     if ('min_aralik_dk' in b) { if (!tam(b.min_aralik_dk, 15, 240)) return json(res, 400, { hata: 'Asgari aralık 15-240 dakika olmalı.' }); guncel.min_aralik_dk = b.min_aralik_dk; }
@@ -572,8 +572,8 @@ async function api(req, res, url) {
     if ('mod' in b) { if (!['otomatik', 'onay'].includes(b.mod)) return json(res, 400, { hata: 'Geçersiz mod.' }); guncel.mod = b.mod; }
     if ('gunluk_uretim' in b) { if (!tam(b.gunluk_uretim, 1, 12)) return json(res, 400, { hata: 'Günlük üretim 1-12 olmalı.' }); guncel.gunluk_uretim = b.gunluk_uretim; }
     if ('gunluk_gorsel_siniri' in b) { if (!tam(b.gunluk_gorsel_siniri, 1, 40)) return json(res, 400, { hata: 'Günlük görsel sınırı 1-40 olmalı.' }); guncel.gunluk_gorsel_siniri = b.gunluk_gorsel_siniri; }
-    if ('aylik_gorsel_siniri' in b) { if (!tam(b.aylik_gorsel_siniri, 1, 600)) return json(res, 400, { hata: 'Aylık görsel sınırı 1-600 olmalı.' }); guncel.aylik_gorsel_siniri = b.aylik_gorsel_siniri; }
-    if ('kuyruk_hedefi' in b) { if (!tam(b.kuyruk_hedefi, 1, 30)) return json(res, 400, { hata: 'Kuyruk hedefi 1-30 olmalı.' }); guncel.kuyruk_hedefi = b.kuyruk_hedefi; }
+    if ('aylik_gorsel_siniri' in b) { if (!tam(b.aylik_gorsel_siniri, 1, 1200)) return json(res, 400, { hata: 'Aylık görsel sınırı 1-1200 olmalı.' }); guncel.aylik_gorsel_siniri = b.aylik_gorsel_siniri; }
+    if ('kuyruk_hedefi' in b) { if (!tam(b.kuyruk_hedefi, 1, 40)) return json(res, 400, { hata: 'Kuyruk hedefi 1-40 olmalı.' }); guncel.kuyruk_hedefi = b.kuyruk_hedefi; }
     if ('muzik' in b) guncel.muzik = b.muzik === true;
     if ('referans' in b) { if (!['zorunlu', 'tercih'].includes(b.referans)) return json(res, 400, { hata: 'Geçersiz referans ayarı.' }); guncel.referans = b.referans; }
     if ('kalite' in b) { if (!['low', 'medium', 'high'].includes(b.kalite)) return json(res, 400, { hata: 'Geçersiz kalite.' }); guncel.kalite = b.kalite; }
@@ -844,7 +844,7 @@ http.createServer(async (req, res) => {
 }).listen(PORT, () => console.log('Ajan ofisi dinliyor: ' + PORT));
 
 // ---- Zamanlayıcı: GitHub'ın zamanlayıcısı çalışmaları atlayabildiği için tetikleri sunucu kendisi verir ----
-// Türkiye saati (UTC+3). Saat başı :05'te hikaye yayın kontrolü (10:05-22:05), her gün 08:20'de görsel üretimi, pazartesi/perşembe 06:30'da trend ajanı.
+// Türkiye saati (UTC+3). 20 dakikada bir hikaye yayın kontrolü (08:05-22:45), günde üç kez (08:20, 13:20, 17:20) görsel üretimi, pazartesi/perşembe 06:30'da trend ajanı.
 // İş akışları kendi kararını verir (slot, günlük sınır); çift tetik zararsızdır (ortak kilit + "önce talep et" mantığı).
 const ZAM_KAPALI = process.env.ZAMANLAYICI === 'kapali';
 const zamSon = { yayin: null, uretim: null, trend: null, akademi: null, kisa: null, viral: null, istatistik: null, hata: null };
@@ -862,16 +862,18 @@ async function zamTetikle(akis, girdi, ad) {
 async function zamKontrol() {
   if (ZAM_KAPALI || !TOKEN) return;
   const t = zamSimdiTR(), gun = t.toISOString().slice(0, 10), saat = t.getUTCHours(), dk = t.getUTCMinutes(), haftaGunu = t.getUTCDay();
-  // hikaye yayın kontrolü: 10:05-22:35, yarım saatte bir (:05 ve :35; kaçırıldıysa o yarım saat içinde bir kez).
-  // Her kontrol en çok bir hikaye yayınlar; yarım saatlik kontrol, günde 12-20 hikayeye ulaşmayı mümkün kılar.
-  if (saat >= 10 && saat <= 22 && dk >= 5) {
-    const anahtar = `y${gun}-${saat}-${dk >= 35 ? 'b' : 'a'}`;
+  // hikaye yayın kontrolü: 08:05-22:45, 20 dakikada bir (:05, :25, :45; kaçırıldıysa o 20 dakika içinde bir kez).
+  // Her kontrol en çok bir hikaye yayınlar; 20 dakikalık kontrol 08:00-22:00 arası günde 20 hikayeye ulaşır (simülasyonla doğrulandı).
+  if (saat >= 8 && saat <= 22 && dk >= 5) {
+    const anahtar = `y${gun}-${saat}-${Math.floor((dk - 5) / 20)}`;
     if (!zamYapilan.has(anahtar)) { zamYapilan.add(anahtar); await zamTetikle(AKIS_HIKAYE, {}, 'yayin'); }
   }
-  // görsel üretimi: her gün 08:20'den sonra bir kez (pazar dahil)
-  if (saat > 8 || (saat === 8 && dk >= 20)) {
-    const anahtar = `u${gun}`;
-    if (saat < 12 && !zamYapilan.has(anahtar)) { zamYapilan.add(anahtar); await zamTetikle(AKIS_URETIM, {}, 'uretim'); }
+  // görsel üretimi: günde üç tur (08:20, 13:20, 17:20'den sonra birer kez). Ajan kuyruk hedefi doluysa ya da günlük sınır geldiyse kendisi bekler.
+  for (const [k, us] of [[0, 8], [1, 13], [2, 17]]) {
+    if ((saat > us || (saat === us && dk >= 20)) && saat < us + 3) {
+      const anahtar = `u${gun}-${k}`;
+      if (!zamYapilan.has(anahtar)) { zamYapilan.add(anahtar); await zamTetikle(AKIS_URETIM, {}, 'uretim'); }
+    }
   }
   // trend ajanı: pazartesi ve perşembe 06:30'dan sonra bir kez
   if ((haftaGunu === 1 || haftaGunu === 4) && (saat > 6 || (saat === 6 && dk >= 30)) && saat < 12) {

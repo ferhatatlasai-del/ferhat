@@ -20,6 +20,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+      - name: numpy (müzik sentezi)
+        run: python3 -m pip install --quiet numpy
       - name: 4 sahneli müzikli kısa video taslağı hazırla
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
