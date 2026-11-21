@@ -210,3 +210,15 @@ Silinen her kaydın kısa özeti `hikaye/arsiv.jsonl` dosyasına yazılır; Akad
 - **Aynı konudan iki video:** (1) Fly yeniden başlayınca sunucunun bellekteki "bugün tetiklendi" kaydı sıfırlanıp zamanlayıcı aynı gün viral videoyu yeniden tetikliyordu; şimdi önce GitHub'daki son çalışmaya bakılır (çalışıyorsa ya da bugün başladıysa tetiklenmez) ve ajan da zamanlanmış çalışmada "bugün zaten üretildi" ise bekler. (2) Elle düğmeye iki kez/zamanlayıcıyla aynı anda basılırsa ikinci çalışma, tetiklendiği andaki eski kayıtla başlayıp ilkinin seçtiği konuyu görmüyordu; iş akışı artık dalın güncel ucunu çeker (`checkout ref`) ve panel, bir video üretilirken yenisini başlatmaz (409).
 - Taslak JSON'una `zamanlama` (sahne başı/sonu ve konuşma sonu) eklenir.
 
+
+## Başarı hafızası (içerik ajanı izlenmelerden öğrenir)
+
+`ajan/basari.py`, istatistikçinin raporundan (`istatistik/son.json`) Instagram ve YouTube'da **en çok izlenen** içerikleri çıkarır (kanal tanıtımı gibi konu olmayanlar hariç; iki platformda da tutanlar öne geçer).
+Viral video üreticisi (`ajan/viral_video.py`) bunu iki yerde kullanır:
+
+- **Örnek başlıklar:** senaryo komutuna "geçmiş performans" bloğu eklenir; yapay zekâ ortak kalıbı (günlük sorun + pratik çözüm, kanca, tempo) örnek alır ama başlıkları/cümleleri kopyalamaz.
+- **Konu seçimi:** her 4 videonun **3'ü** en çok izlenenlerin kalıbını izleyen, daha önce yapılmamış *türev konu*dur; her **4.'sü keşif**tir (konu listesinden yeni bir alan, komuta örnek eklenmez) — böylece kanal tek konuya sıkışmaz. Veri ya da yapay zekâ yoksa eski davranış (konu listesi sırası) sürer.
+- Taslak JSON'una `secim` alanı yazılır (`turev` / `kesif` / `liste` / `elle`, türevse hangi başlıklardan ilham alındığı).
+- Liste senaryosu komutuna iki kural eklendi: yalnızca sıradan masaüstü yazıcıyla basılabilen malzemeler, tüm maddelerde aynı ölçü/birim.
+
+Kaldırılan kullanılmayan iş akışları: `gorsel.yml` (+`ajan/gorsel.py`) ve eski `shorts-uret.yml`. (`ajan/shorts_uret.py` yazı tipi bulma işlevi için duruyor; "Video paketi ajanı" = `zincir.yml`/`paket.py` kullanımda, durmalı.)
