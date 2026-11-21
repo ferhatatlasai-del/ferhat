@@ -1,7 +1,7 @@
 {
   "id": "h20261121-052300-h2a",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-21T05:23:00.000Z",
   "gorsel": "hikaye/gorseller/h20261121-052300-h2a.mp4",
   "baslik": "Universal Pannier Bag Hook - turn any backpack into a pannier bag",
@@ -25,7 +25,9 @@
     ]
   },
   "yayin": {
-    "tarih": "2026-11-21T15:05:39Z"
+    "tarih": "2026-11-21T15:06:51Z",
+    "medya_kimligi": "18132820246889835",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4035369633254551106"
   },
   "hata": "",
   "deneme": 0,
