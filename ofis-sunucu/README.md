@@ -237,3 +237,14 @@ Kaldırılan kullanılmayan iş akışları: `gorsel.yml` (+`ajan/gorsel.py`) ve
 - **YouTube yorumları:** henüz yok; yanıt yazmak için `youtube.force-ssl` kapsamlı yeni bir yenileme anahtarı gerekir.
 
 **Yeniden yaz:** onay bekleyen ya da gönderilemeyen her yorum kartında "Yeniden yaz" düğmesi vardır; ajan o yanıtı güncel üslup kurallarıyla baştan yazar (birkaç dakika sürer, kart "Yeniden yazılıyor…" der, sonra yeniden onay bekler).
+
+
+## Panel yeniden düzenlendi (5 bölüm, açık tema)
+
+- **Ana ekran:** 3D ofis + "Onayını bekleyenler" listesi (dokununca ilgili bölüme gider) + hikâye ve sistem durumu.
+- **Yayın:** hazır videolar (her biri için ayrı düğmeler: 📸 Instagram Reels, 📱 Instagram Hikâye, ▶️ YouTube Shorts; yayınlanan yeşil olur), yorum ajanı, hikâye kuyruğu, "Dışarıdan video yükle".
+- **Üret:** "Video üret" (viral video), "Senaryo hazırla" (eski "Zincir"), trend fikirleri.
+- **İstatistik:** izlenme raporu. **Ayarlar:** hikâye/görsel ayarları, bildirimler, Nöbetçi, zamanlayıcı, akademi.
+- Panel her zaman açık temadır (telefonun koyu modunu izlemez). Eski bölüm adları (`#video`, `#sistem`…) yeni bölümlere yönlendirilir.
+- **Temizlik:** yayınlanan videolar ve hikâye/yorum kayıtları 24 saat sonra panelden kalkar; sunucu her saat yayından 24 saat geçmiş (ve 1 saatten eski reddedilmiş) video taslaklarını ve `videolar/` dosyalarını depodan siler.
+- Eski "Shorts üretici" (`kisa-video.yml`, `ajan/kisa_video.py`) kaldırıldı; ofisteki YouTube/Instagram masalarının "video üret" düğmesi artık viral video üretimini başlatır.
