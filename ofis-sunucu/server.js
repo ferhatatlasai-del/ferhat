@@ -34,6 +34,8 @@ const AKIS_VIRAL = 'viral-video.yml';
 const AKIS_NOBETCI = 'nobetci.yml';
 const AKIS_TREND = 'trend.yml';
 const AKIS_ISTATISTIK = 'istatistik-rapor.yml';
+const AKIS_YORUM = 'yorum-ajani.yml';
+const YORUM_RE = /^ig-\d{5,30}$/;
 const SHORTS_RE = /^s\d{8}-\d{6}$/;
 const AKADEMI_RE = /^o\d{8}-\d+$/;
 const HIKAYE_RE = /^h\d{8}-\d{6}-[a-z0-9]{3}$/;
@@ -42,7 +44,7 @@ let ajanOnbellek = { t: 0, veri: null };
 let trendOnbellek = { t: 0, veri: null };
 let zincirOnbellek = { t: 0, veri: null };
 let hikayeOnbellek = { t: 0, veri: null };
-const hikayeTetikler = [], uretimTetikler = [], akademiTetikler = [], kisaTetikler = [], viralTetikler = [], nobetciTetikler = [], trendTetikler = [], istatistikTetikler = [], bildirimler = [];
+const hikayeTetikler = [], uretimTetikler = [], akademiTetikler = [], kisaTetikler = [], viralTetikler = [], nobetciTetikler = [], yorumTetikler = [], trendTetikler = [], istatistikTetikler = [], bildirimler = [];
 const guncellenenler = new Set();
 const GH_API = process.env.GH_API || 'https://api.github.com';
 const MAX_VIDEO = 30 * 1024 * 1024;
@@ -543,6 +545,66 @@ async function api(req, res, url) {
     kisaTetikler.push(simdi);
     return json(res, 200, { ok: true });
   }
+  if (url.pathname === '/api/yorum') {
+    if (!TOKEN) return json(res, 503, { hata: 'Sunucuda GITHUB_TOKEN tanımlı değil.' });
+    try {
+      const k = await depoOku('yorum/kuyruk.json').catch(() => null);
+      const a = await depoOku('yorum/ayar.json').catch(() => null);
+      const ogeler = k ? (JSON.parse(k.metin).ogeler || []) : [];
+      return json(res, 200, { ogeler: ogeler.slice(-80).reverse(), ayar: Object.assign({ aktif: true, mod: 'onay', gunluk_sinir: 30 }, a ? JSON.parse(a.metin) : {}) });
+    } catch (e) { return json(res, 502, { hata: 'Yorum verisi okunamadı.' }); }
+  }
+  if (url.pathname === '/api/yorum-karar' && req.method === 'POST') {
+    let b; try { b = await govde(req); } catch (e) { return json(res, 400, { hata: 'Geçersiz istek.' }); }
+    if (!YORUM_RE.test(String(b.id || ''))) return json(res, 400, { hata: 'Geçersiz kimlik.' });
+    if (!['onayla', 'reddet', 'duzenle', 'tekrar'].includes(b.karar)) return json(res, 400, { hata: 'Geçersiz karar.' });
+    const yanit = temiz(b.yanit || '', 300).replace(/\s+/g, ' ').trim();
+    if ((b.karar === 'onayla' || b.karar === 'duzenle') && b.yanit !== undefined) {
+      if (!yanit) return json(res, 400, { hata: 'Yanıt boş olamaz.' });
+      if (/https?:\/\/|www\.|@\w/i.test(yanit)) return json(res, 400, { hata: 'Yanıtta bağlantı ya da @etiket olamaz.' });
+    }
+    let bulundu = false, gecersiz = '';
+    const ok = await jsonGuncelle('yorum/kuyruk.json', v => {
+      const o = (v.ogeler || []).find(x => x.id === b.id);
+      if (!o) return false;
+      bulundu = true;
+      if (o.durum === 'gonderildi') { gecersiz = 'Bu yanıt zaten gönderildi.'; return false; }
+      if (b.yanit !== undefined && b.karar !== 'reddet') o.yanit = yanit;
+      if (b.karar === 'onayla') { if (!o.yanit) { gecersiz = 'Bu yorum için yanıt yok.'; return false; } o.durum = 'onaylandi'; o.hata = ''; }
+      else if (b.karar === 'reddet') o.durum = 'reddedildi';
+      else if (b.karar === 'tekrar') { o.durum = 'onay_bekliyor'; o.hata = ''; }
+    }, 'Panel: yorum yanıtı ' + b.karar, { ogeler: [] });
+    if (gecersiz) return json(res, 409, { hata: gecersiz });
+    if (!ok) return json(res, bulundu ? 502 : 404, { hata: bulundu ? 'Kaydedilemedi.' : 'Yorum bulunamadı.' });
+    if (b.karar === 'onayla' && Date.now() - yorumSonTetik > 3 * 60e3) {   // onaylanan yanıtlar kısa sürede gitsin; art arda onaylarda tek tetik
+      yorumSonTetik = Date.now();
+      const dal = await varsayilanDal();
+      await gh(`/repos/${REPO}/actions/workflows/${AKIS_YORUM}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: { sadece_gonder: 'EVET' } }) }).catch(() => {});
+    }
+    return json(res, 200, { ok: true });
+  }
+  if (url.pathname === '/api/yorum-ayar' && req.method === 'POST') {
+    let b; try { b = await govde(req); } catch (e) { return json(res, 400, { hata: 'Geçersiz istek.' }); }
+    const tam = (v, lo, hi) => Number.isInteger(v) && v >= lo && v <= hi;
+    const yeni = {};
+    if (typeof b.aktif === 'boolean') yeni.aktif = b.aktif;
+    if (b.mod !== undefined) { if (!['onay', 'otomatik'].includes(b.mod)) return json(res, 400, { hata: 'Geçersiz mod.' }); yeni.mod = b.mod; }
+    if (b.gunluk_sinir !== undefined) { if (!tam(b.gunluk_sinir, 1, 60)) return json(res, 400, { hata: 'Günlük sınır 1-60 olmalı.' }); yeni.gunluk_sinir = b.gunluk_sinir; }
+    if (!Object.keys(yeni).length) return json(res, 400, { hata: 'Değişiklik yok.' });
+    let sonuc;
+    const ok = await jsonGuncelle('yorum/ayar.json', v => { Object.assign(v, Object.assign({ aktif: true, mod: 'onay', gunluk_sinir: 30 }, v, yeni)); sonuc = Object.assign({}, v); }, 'Panel: yorum ajanı ayarı', {});
+    return ok ? json(res, 200, { ok: true, ayar: sonuc }) : json(res, 502, { hata: 'Ayar kaydedilemedi.' });
+  }
+  if (url.pathname === '/api/yorum-calistir' && req.method === 'POST') {
+    const simdi = Date.now();
+    while (yorumTetikler.length && simdi - yorumTetikler[0] > 3600e3) yorumTetikler.shift();
+    if (yorumTetikler.length >= 6) return json(res, 429, { hata: 'Saatte en fazla 6 elle yorum taraması.' });
+    const dal = await varsayilanDal();
+    const r = await gh(`/repos/${REPO}/actions/workflows/${AKIS_YORUM}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: { elle: 'EVET' } }) });
+    if (r.status !== 204) return json(res, 502, { hata: 'GitHub kabul etmedi (' + r.status + ').' });
+    yorumTetikler.push(simdi);
+    return json(res, 200, { ok: true });
+  }
   if (url.pathname === '/api/nobetci-calistir' && req.method === 'POST') {
     const simdi = Date.now();
     while (nobetciTetikler.length && simdi - nobetciTetikler[0] > 3600e3) nobetciTetikler.shift();
@@ -890,7 +952,8 @@ http.createServer(async (req, res) => {
 // Türkiye saati (UTC+3). 20 dakikada bir hikaye yayın kontrolü (08:05-22:45), günde üç kez (08:20, 13:20, 17:20) görsel üretimi, pazartesi/perşembe 06:30'da trend ajanı.
 // İş akışları kendi kararını verir (slot, günlük sınır); çift tetik zararsızdır (ortak kilit + "önce talep et" mantığı).
 const ZAM_KAPALI = process.env.ZAMANLAYICI === 'kapali';
-const zamSon = { yayin: null, uretim: null, trend: null, akademi: null, kisa: null, viral: null, nobetci: null, istatistik: null, hata: null };
+let yorumSonTetik = 0;
+const zamSon = { yorum: null, yayin: null, uretim: null, trend: null, akademi: null, kisa: null, viral: null, nobetci: null, istatistik: null, hata: null };
 const zamYapilan = new Set();
 function zamSimdiTR() { const z = process.env.ZAM_ZAMAN ? new Date(process.env.ZAM_ZAMAN) : new Date(); return new Date(z.getTime() + 3 * 3600e3); }
 async function zamTetikle(akis, girdi, ad) {
@@ -949,6 +1012,11 @@ async function zamKontrol() {
   if ([9, 12, 15, 18, 21].includes(saat)) {
     const anahtar = `i${gun}-${saat}`;
     if (!zamYapilan.has(anahtar)) { zamYapilan.add(anahtar); await zamTetikle(AKIS_ISTATISTIK, {}, 'istatistik'); }
+  }
+  // yorum ajanı: 08:00-23:00 arası 30 dakikada bir (kapalıysa ya da yeni yorum yoksa iş akışı kendisi hemen çıkar)
+  if (saat >= 8 && saat <= 22) {
+    const anahtar = `c${gun}-${saat}-${dk >= 30 ? 1 : 0}`;
+    if (!zamYapilan.has(anahtar)) { zamYapilan.add(anahtar); await zamTetikle(AKIS_YORUM, {}, 'yorum'); }
   }
   // akademi ajanı: pazar 18:00'den sonra bir kez
   if (haftaGunu === 0 && saat >= 18 && saat < 23) {
