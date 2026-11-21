@@ -577,21 +577,39 @@ def parcala_altyazi(kelimeler, en_cok_kelime=5, en_cok_harf=30):
     return cikti
 
 
+GECIS_ARASI = 0.5      # son kelimeden sahne sınırına kadar (geçiş efektleri bu aralıkta, konuşmadan SONRA çalar)
+KAPANIS_KUYRUGU = 2.4  # son kelimeden videonun sonuna (müzik konuşma bitince yavaşça söner)
+
+
+def konusma_sonu(v, kel):
+    """Sahne konuşmasının bittiği an (sahne dilimi başına göre sn): sesten ölçülür, ses yoksa kelime uzunluğundan tahmin edilir."""
+    if v.get("ses") is not None and len(v["ses"]) > SES.SR * 0.5:
+        x = np.abs(v["ses"])
+        blok = SES.SR // 100
+        n = len(x) // blok
+        r = x[:n * blok].reshape(n, blok).max(axis=1)
+        esik = max(r.max() * 0.05, 1e-4)
+        idx = np.nonzero(r > esik)[0]
+        if len(idx):
+            return float((idx[-1] + 1) * 0.01)
+    son = v["baslangic"][-1] + 0.1 + 0.058 * len(kel[-1])
+    return float(min(v["sure"], son))
+
+
 def cizelge_kur(senaryo, sesler, alt_kelime=5, alt_harf=30):
     t, sahneler, kelimeler, parcalar_ses = 0.0, [], [], []
     n = len(senaryo["sahneler"])
     for i, (s, v) in enumerate(zip(senaryo["sahneler"], sesler)):
-        on = 0.6 if i == 0 else 0.42
-        son = 1.1 if i == n - 1 else 0.38
-        v0 = t + on
-        t1 = v0 + v["sure"] + son
         kel = s["anlati"].split()
+        v0 = t + (0.6 if i == 0 else 0.0)   # sahne dilimi zaten ~0,14 sn nefes payıyla başlar
+        ses_son = v0 + konusma_sonu(v, kel)
+        t1 = ses_son + (KAPANIS_KUYRUGU if i == n - 1 else GECIS_ARASI)
         for k, (w, b) in enumerate(zip(kel, v["baslangic"])):
             bitis = v["baslangic"][k + 1] if k + 1 < len(kel) else v["sure"]
             kelimeler.append({"k": w, "t0": v0 + b, "t1": v0 + max(bitis - 0.02, b + 0.08), "sahne": i})
         if v["ses"] is not None:
             parcalar_ses.append((v0, v["ses"]))
-        sahneler.append({"tip": s["tip"], "t0": round(t, 3), "t1": round(t1, 3), "ekran": s.get("ekran", ""), "rozet": s.get("rozet", ""), "params": dict(s.get("params") or {})})
+        sahneler.append({"tip": s["tip"], "t0": round(t, 3), "t1": round(t1, 3), "ekran": s.get("ekran", ""), "rozet": s.get("rozet", ""), "params": dict(s.get("params") or {}), "ses_son": round(ses_son, 3)})
         t = t1
     plan = {"genislik": GENISLIK, "yukseklik": YUKSEKLIK, "fps": FPS, "sure": round(t, 3), "sahneler": sahneler, "altyazi": parcala_altyazi(kelimeler, alt_kelime, alt_harf)}
     return plan, parcalar_ses
