@@ -1,0 +1,27 @@
+{
+  "kimlik": "y20261121-233050",
+  "olusturma": "2026-11-21T23:30:50.606Z",
+  "durum": "video",
+  "kaynak": "bagimsiz",
+  "direktif": "",
+  "konu": "Video hikayesi",
+  "format": "reels",
+  "seri": "",
+  "kanca": "",
+  "video": {
+    "yol": "videolar/yukleme_20261121122414.mp4",
+    "tarih": "2026-11-21T23:30:44.167Z"
+  },
+  "yayinlar": [
+    {
+      "hedef": "hikaye",
+      "platform": "instagram",
+      "tur": "hikaye",
+      "durum": "basladi",
+      "baslangic": "2026-11-21T23:30:44.167Z",
+      "video": "videolar/yukleme_20261121122414.mp4"
+    }
+  ],
+  "olcumler": [],
+  "ogrenildi": false
+}
