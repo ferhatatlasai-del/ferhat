@@ -285,7 +285,18 @@ async function direktifBaslat(metin, format) {
   return { r, baslangic: new Date(Date.now() - 5000).toISOString() };
 }
 
-async function varsayilanDal() { const r = await gh(`/repos/${REPO}`); const j = await r.json(); return j.default_branch; }
+// Varsayılan dal 10 dakika önbelleğe alınır: her okuma/yazma ayrı bir /repos çağrısı yapıp GitHub istek sınırını (saatte 5000) boşuna tüketiyordu;
+// ayrıca GitHub geçici hata verirse eski değer kullanılır, yoksa nedeni açıkça söyleyen bir hata fırlatılır (eskiden dal "undefined" olup 422 çıkıyordu).
+const dalOnbellek = { d: null, t: 0 };
+async function varsayilanDal() {
+  if (dalOnbellek.d && Date.now() - dalOnbellek.t < 600e3) return dalOnbellek.d;
+  let kod = 0, j = {};
+  try { const r = await gh(`/repos/${REPO}`); kod = r.status; j = await r.json(); } catch (e) { /* ağ hatası: aşağıda ele alınır */ }
+  if (j && j.default_branch) { dalOnbellek.d = j.default_branch; dalOnbellek.t = Date.now(); return j.default_branch; }
+  if (dalOnbellek.d) return dalOnbellek.d;
+  const e = new Error(kod === 401 ? 'GitHub anahtarı geçersiz ya da süresi dolmuş (Fly\'daki GITHUB_TOKEN yenilenmeli).' : (kod === 403 || kod === 429) ? 'GitHub istek sınırı doldu; birkaç dakika sonra kendiliğinden düzelir.' : 'GitHub yanıt vermedi (' + (kod || 'ağ hatası') + ').');
+  e.kullanici = true; throw e;
+}
 
 let viralIlerleme = null, viralOnbellek = { t: 0, veri: null };
 async function viralDurum() {
@@ -548,11 +559,12 @@ async function api(req, res, url) {
   if (url.pathname === '/api/yorum') {
     if (!TOKEN) return json(res, 503, { hata: 'Sunucuda GITHUB_TOKEN tanımlı değil.' });
     try {
-      const k = await depoOku('yorum/kuyruk.json').catch(() => null);
-      const a = await depoOku('yorum/ayar.json').catch(() => null);
+      const sessiz = e => { if (e && e.kullanici) throw e; return null; };   // GitHub anahtarı/sınır sorunu gizlenmesin; dosya yoksa boş say
+      const k = await depoOku('yorum/kuyruk.json').catch(sessiz);
+      const a = await depoOku('yorum/ayar.json').catch(sessiz);
       const ogeler = k ? (JSON.parse(k.metin).ogeler || []) : [];
       return json(res, 200, { ogeler: ogeler.slice(-80).reverse(), ayar: Object.assign({ aktif: true, mod: 'onay', gunluk_sinir: 30 }, a ? JSON.parse(a.metin) : {}) });
-    } catch (e) { return json(res, 502, { hata: 'Yorum verisi okunamadı.' }); }
+    } catch (e) { return json(res, 502, { hata: e && e.kullanici ? e.message : 'Yorum verisi okunamadı.' }); }
   }
   if (url.pathname === '/api/yorum-karar' && req.method === 'POST') {
     let b; try { b = await govde(req); } catch (e) { return json(res, 400, { hata: 'Geçersiz istek.' }); }
@@ -944,7 +956,7 @@ http.createServer(async (req, res) => {
     const guvenli = TOKEN ? m.split(TOKEN).join('***') : m;
     console.error('hata:', e && e.name, guvenli.slice(0, 300));
     const gecersiz = /invalid header|ERR_INVALID_CHAR/i.test(m);
-    json(res, 500, { hata: gecersiz ? 'GitHub anahtarında geçersiz karakter var. Anahtarı yeniden kaydet.' : 'Sunucu hatası (' + ((e && e.name) || '?') + ').' });
+    json(res, e && e.kullanici ? 502 : 500, { hata: e && e.kullanici ? e.message : gecersiz ? 'GitHub anahtarında geçersiz karakter var. Anahtarı yeniden kaydet.' : 'Sunucu hatası (' + ((e && e.name) || '?') + ').' });
   }
 }).listen(PORT, () => console.log('Ajan ofisi dinliyor: ' + PORT));
 
