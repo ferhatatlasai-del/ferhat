@@ -493,7 +493,7 @@ body.tam .hint{display:none}
           </div>
         
 </div>
-      <div class="card pub"><h2>Servis sağlığı (Nöbetçi)</h2><p class="alt">Anahtarlar ve servisler günlük denetlenir; sorun olursa burada kırmızı görünür.</p><div class="saglik" id="hSaglik">Henüz denetim yok.</div></div>
+      <div class="card pub"><h2>Servis sağlığı (Nöbetçi)</h2><p class="alt">Anahtarlar ve servisler günde 4 kez (08, 12, 16, 20) denetlenir; sorun olursa burada kırmızı görünür. Bağlantı koparsa aşağıdaki kurtarma düğmelerini kullan.</p><div class="saglik" id="hSaglik">Henüz denetim yok.</div><div id="kurtar" style="margin-top:12px"></div></div>
       <div class="card pub"><h2>Zamanlayıcı</h2><p class="alt">Sunucu, iş akışlarını Türkiye saatiyle kendisi tetikler (GitHub’ın zamanlayıcısı çalışmaları atlayabildiği için).</p><div class="saglik" id="zamDurum">Yükleniyor…</div></div>
 
     </div>
@@ -1778,6 +1778,7 @@ function hikayeCiz(v){
   // sağlık
   var s=$('#hSaglik'); s.textContent='';
   if(v.saglik&&v.saglik.kontroller){ s.appendChild(dom('div','not','Son denetim: '+fmt(v.saglik.tarih)+' (kuyruk satırı anlıktır)')); sagKontrolleri(v).forEach(function(c){ var d=dom('div',c.durum); d.appendChild(document.createElement('i')); d.appendChild(document.createTextNode(c.ad+': '+c.not)); s.appendChild(d); }); }
+  kurtarCiz(v);
   // ofisteki Hikaye ajanı masası
   var aj=BY.hikaye; if(aj){
     aj.durum=a.aktif?(aj.sonSonuc==='failure'?'hata':'calisiyor'):'hazir';
@@ -1793,6 +1794,26 @@ function hikayeCiz(v){
   }
 }
 
+// Kopma sonrası kurtarma (Servis sağlığı kartı): denetle, ajanı devam ettir, hatalıları sıraya geri al, otomatik devam
+function kurtarCiz(v){
+  var el=$('#kurtar'); if(!el||!v||!v.ayar) return; el.textContent='';
+  var a=v.ayar, k=v.kuyruk||[], durdu=!a.aktif&&/ardışık hata/.test(a.son_not||'');
+  var ICERIK=/^video |hikaye videosu|görsel dosyası|desteklenmeyen|dönüştürülemedi|okunamadı \(bozuk/i, hatali=k.filter(function(o){return o.durum==='hata'&&!ICERIK.test(o.hata||'');}).length, eskiHata=k.filter(function(o){return o.durum==='planli'&&o.hata;}).length;
+  el.appendChild(dom('b',null,'Kurtarma'));
+  var d=dom('div','not'); d.style.margin='4px 0 8px';
+  d.textContent='Hikaye ajanı: '+(a.aktif?'çalışıyor':(durdu?'HATALAR YÜZÜNDEN DURDU':'elle duraklatılmış'))+(a.son_not?' · '+a.son_not:'')+' · yeniden denenebilir hatalı hikaye: '+hatali+(eskiHata?' · eski hata notu olan: '+eskiHata:'');
+  if(durdu) d.style.color='#f43f5e';
+  el.appendChild(d);
+  var m=dom('div','not'); m.style.cssText='margin-top:6px;font-weight:600';
+  function msg(t,h){ m.textContent=t; m.style.color=h?'#f43f5e':'#34d399'; }
+  function dug(ad,fn,ana){ var b=dom('button',ana?'ana':null,ad); b.type='button'; b.style.margin='0 6px 6px 0'; b.addEventListener('click',function(){ if(!hSifreKontrol()) return; b.disabled=true; fn().then(function(t){ msg(t); b.disabled=false; }).catch(function(e){ msg(String(e.message||e),true); b.disabled=false; }); }); el.appendChild(b); return b; }
+  dug('Şimdi denetle',function(){ return hPost('/api/nobetci-calistir',{}).then(function(){ setTimeout(function(){ hikayeCek(true); },70000); return 'Denetim başladı; 1-2 dakika içinde sonuç yukarıda görünür.'; }); });
+  if(!a.aktif) dug('Hikaye ajanını devam ettir',function(){ return hPost('/api/hikaye-kurtar',{islem:'devam'}).then(function(){ hikayeCek(true); return 'Hikaye ajanı devam ettirildi; sıradaki kontrolde (en çok 20 dk) yayına başlar.'; }); },true);
+  if(hatali||eskiHata) dug('Hatalı hikayeleri sıraya geri al ('+(hatali+eskiHata)+')',function(){ return hPost('/api/hikaye-kurtar',{islem:'geri_al'}).then(function(r){ hikayeCek(true); return r.alinan+' hikaye sıraya geri alındı, '+r.temizlenen+' eski hata notu temizlendi'+(r.atlanan?(', '+r.atlanan+' içerik hatası (bozuk/uzun video) olduğu için bırakıldı'):'')+'.'; }); });
+  var oto=!!a.otomatik_devam;
+  dug('Engel kalkınca otomatik devam: '+(oto?'AÇIK':'kapalı'),function(){ return hPost('/api/hikaye-kurtar',{islem:'otomatik',deger:!oto}).then(function(){ hikayeCek(true); return !oto?'Açıldı: Nöbetçi Instagram\u2019ın düzeldiğini görünce ajanı kendisi başlatır (günde 4 denetim).':'Kapatıldı.'; }); });
+  el.appendChild(m);
+}
 // Kademe 2: yapay zekâ görsel üretimi
 function uretimCiz(v){
   var u=v.uretim||{}, h=v.harcama||{bugun:0,ay:0};
@@ -2174,6 +2195,7 @@ function yapilacaklar(){
   if(s.ders) l.push({n:s.ders,t:'Akademi dersi onay bekliyor',e:'Akademi',v:'akademi'});
   if(s.hata) l.push({n:s.hata,t:'Hatalı hikaye var',e:'Hikayeler',v:'hikaye',kt:1});
   if(s.sagSorun) l.push({n:s.sagSorun,t:'Servis sağlığında sorun',e:'Sistem',v:'sistem',kt:1});
+  if(OZ.hk&&s.hk.ayar&&!s.hk.ayar.aktif&&/ardışık hata/.test(s.hk.ayar.son_not||'')) l.push({n:'!',t:'Hikaye ajanı hatalar yüzünden durdu: Sistem → Kurtarma',e:'Sistem',v:'sistem',kt:1});
   if(s.zamKapali) l.push({n:'!',t:'Zamanlayıcı kapalı ya da yanıt vermiyor',e:'Sistem',v:'sistem',kt:1});
   if(OZ.hk&&s.hk.ayar&&s.hk.ayar.aktif&&s.planli===0&&s.onay===0) l.push({n:'!',t:'Hikaye kuyruğu boş, yayınlanacak bir şey yok',e:'Hikayeler',v:'hikaye'});
   return l;
@@ -2222,7 +2244,7 @@ function zamanlayiciCek(){
     function sat(ad,deg,sinif){ var d=dom('div',sinif||''); d.appendChild(document.createElement('i')); d.appendChild(document.createTextNode(ad+': '+deg)); k.appendChild(d); }
     sat('Durum',v.acik?'açık':'kapalı',v.acik?'iyi':'sorun');
     var son=v.son||{};
-    [['yayin','Son hikaye yayın tetiği'],['uretim','Son görsel üretimi tetiği'],['trend','Son trend tetiği'],['akademi','Son akademi tetiği'],['kisa','Son Shorts tetiği'],['viral','Son viral video tetiği']].forEach(function(p){ sat(p[1],son[p[0]]?fmt(son[p[0]]):'henüz (sunucu yeniden başladığında sıfırlanır)'); });
+    [['yayin','Son hikaye yayın tetiği'],['uretim','Son görsel üretimi tetiği'],['trend','Son trend tetiği'],['akademi','Son akademi tetiği'],['kisa','Son Shorts tetiği'],['viral','Son viral video tetiği'],['nobetci','Son nöbetçi tetiği']].forEach(function(p){ sat(p[1],son[p[0]]?fmt(son[p[0]]):'henüz (sunucu yeniden başladığında sıfırlanır)'); });
     if(son.hata) sat('Son hata',son.hata,'sorun');
   }).catch(function(){});
 }

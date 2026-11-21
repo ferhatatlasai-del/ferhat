@@ -188,3 +188,8 @@ Silinen her kaydın kısa özeti `hikaye/arsiv.jsonl` dosyasına yazılır; Akad
 ### Hikaye müzikleri: 12 dinlendirici stil
 `ajan/hikaye_muzik.py` müziği artık numpy ile sentezler (telifsiz, örnek dosya yok): keçe piyano, kalimba, Rhodes, müzik kutusu, naylon gitar, marimba, celesta, vibrafon, flüt, arp, yaylılar ve pad tınıları; yağmur, okyanus, rüzgâr, uzak kuş ve plak cızırtısı dokuları; yumuşak lo-fi/fırça ritimleri. Her hikaye sıradaki stili alır ve ayrıca 7 akor dizisi, 12 ton, ±%6 tempo ve melodi tohumu değişir; art arda aynı müzik çıkmaz. Ses −16 LUFS'a normalize edilir. Kullanan iş akışlarına numpy kurulumu eklendi (`hikaye-uret`, `kisa-video`, `printables-teshis`).
 
+### Kopma sonrası kurtarma (panel → Sistem → Servis sağlığı)
+- **Nöbetçi** artık günde 4 kez (TR 08, 12, 16, 20; sunucu zamanlayıcısı) çalışır. Meta'nın "API access blocked" (#200 / 5258005) engelini adıyla tanır ("anahtar bozuk değil, genelde birkaç saat içinde kalkar") ve yeni bir **Hikaye ajanı** satırı ajan ardışık hatalar yüzünden durduysa kırmızı gösterir.
+- **Kurtarma düğmeleri:** "Şimdi denetle" (Nöbetçi'yi hemen çalıştırır), "Hikaye ajanını devam ettir", "Hatalı hikayeleri sıraya geri al" (altyapı/anahtar hatasıyla `hata` olanları `planli`ya alır, eski hata notlarını temizler; uzun/bozuk video gibi içerik hataları bırakılır), "Engel kalkınca otomatik devam" (açıkken Nöbetçi Instagram'ın yeniden çalıştığını görünce ajanı kendisi başlatır; varsayılan açık). Özet → Yapılacaklar'da ajan hata ile durduysa uyarı çıkar.
+- Uç noktalar: `POST /api/nobetci-calistir` (saatte 6), `POST /api/hikaye-kurtar` `{islem: devam | geri_al | otomatik, deger}`.
+
