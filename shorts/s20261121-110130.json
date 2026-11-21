@@ -1,7 +1,7 @@
 {
   "id": "s20261121-110130",
   "olusturma": "2026-11-21T11:01:30Z",
-  "durum": "onay_bekliyor",
+  "durum": "yayinlandi",
   "tur": "viral",
   "video": "videolar/yukleme_20261121110130.mp4",
   "sure": 58.7,
@@ -10,5 +10,10 @@
   "muzik": "Sentez (kodla üretildi)",
   "konu": "İplik gibi sarkıtmalar (stringing) nasıl biter",
   "tasarimlar": [],
-  "hikayeler": []
+  "hikayeler": [],
+  "yayinlanan": [
+    "youtube",
+    "instagram"
+  ],
+  "yayin_tarihi": "2026-11-21T14:11:39.235Z"
 }
