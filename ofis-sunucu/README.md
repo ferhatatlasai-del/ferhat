@@ -222,3 +222,16 @@ Viral video üreticisi (`ajan/viral_video.py`) bunu iki yerde kullanır:
 - Liste senaryosu komutuna iki kural eklendi: yalnızca sıradan masaüstü yazıcıyla basılabilen malzemeler, tüm maddelerde aynı ölçü/birim.
 
 Kaldırılan kullanılmayan iş akışları: `gorsel.yml` (+`ajan/gorsel.py`) ve eski `shorts-uret.yml`. (`ajan/shorts_uret.py` yazı tipi bulma işlevi için duruyor; "Video paketi ajanı" = `zincir.yml`/`paket.py` kullanımda, durmalı.)
+
+## Yorum ajanı (Instagram yorumlarına nazik yanıt, onay modunda)
+
+`ajan/yorum_ajani.py` + `.github/workflows/yorum-ajani.yml` (sunucu 08–22 arası 30 dakikada bir tetikler; panelden "Şimdi tara" ile de çalışır).
+
+- **Akış:** son gönderilerin yeni yorumlarını okur (kendi yorumlarımız ve zaten yanıtlanmışlar atlanır) → yapay zekâ her yorum için `yanit` ya da `atla` kararı verir ve gönderi metnini bağlam alarak 1-2 cümlelik nazik yanıt yazar → **onay modunda** yanıtlar panelde (İçerik → Yorum ajanı) onay bekler; düzenleyip "Onayla ve gönder" dersin, gönderim birkaç dakika içinde yapılır.
+- **Atlananlar:** hakaret/küfür, siyaset/din, spam ve bağlantılı yorumlar, sağlık-hukuk-finans, şikâyet/iade/kargo, çok özel sorun giderme soruları. Geçmiş bölümünde görünür.
+- **Dürüstlük:** biri bot/yapay zekâ/gerçek kişi mi diye sorarsa yanıt, yapay zekâ asistanı olduğunu açıkça söyler (model söylemese bile kodda zorlanır). Yanıtlara link, @etiket, telefon konmaz; kişisel deneyim uydurulmaz.
+- **Sınırlar:** günde en çok 30 (panelden 1-60), turda en çok 6 gönderim, gönderimler arası 20-60 sn rastgele bekleme, turda en çok 15 taslak.
+- **Otomatik mod:** panelden (iki tıkla onay) açılır; yanıtlar onaysız gider. Önerilen: ilk hafta onay modu.
+- **Anahtar:** sırayla `IG_YORUM_TOKEN`, `IG_ISTATISTIK_TOKEN`, `IG_ACCESS_TOKEN`. Yorum okuma/yanıtlama için anahtarın `instagram_business_manage_comments` izni olmalı (Meta uygulaması → Instagram → izinler; sonra anahtarı yeniden üret). İzin yoksa panelde kırmızı "Gönderilemedi: kod=10" görünür.
+- **Veri:** `yorum/kuyruk.json` (son 250 kayıt) ve `yorum/ayar.json` — panel ve ajan aynı dosyaları sha kontrollü yazar.
+- **YouTube yorumları:** henüz yok; yanıt yazmak için `youtube.force-ssl` kapsamlı yeni bir yenileme anahtarı gerekir.

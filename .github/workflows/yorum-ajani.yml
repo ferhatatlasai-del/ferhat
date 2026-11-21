@@ -1,0 +1,45 @@
+name: Yorum ajanı (Instagram yorumlarına nazik yanıt taslağı; onaylananları gönderir)
+
+on:
+  workflow_dispatch:
+    inputs:
+      sadece_gonder:
+        description: "EVET: yeni yorum taramadan yalnızca onaylı yanıtları gönder"
+        default: "HAYIR"
+      elle:
+        description: "EVET: ajan kapalı olsa da bir kez çalış"
+        default: "HAYIR"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: yorum-ajani
+  cancel-in-progress: false
+
+jobs:
+  yorum:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - name: Yorumları oku, yanıt taslağı yaz, onaylıları gönder
+        env:
+          IG_YORUM_TOKEN: ${{ secrets.IG_YORUM_TOKEN }}
+          IG_ISTATISTIK_TOKEN: ${{ secrets.IG_ISTATISTIK_TOKEN }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: "17841457188392262"
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5.4-mini' }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OFIS_ADRES: "https://gurtechs-ajan-ofisi.fly.dev"
+          BILDIRIM_SIRRI: ${{ secrets.BILDIRIM_SIRRI }}
+          SADECE: ${{ inputs.sadece_gonder }}
+          ELLE: ${{ inputs.elle }}
+        run: |
+          ARG=""
+          if [ "$SADECE" = "EVET" ]; then ARG="$ARG --sadece-gonder"; fi
+          if [ "$ELLE" = "EVET" ]; then ARG="$ARG --elle"; fi
+          python3 ajan/yorum_ajani.py $ARG
