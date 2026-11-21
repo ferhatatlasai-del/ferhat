@@ -2,7 +2,7 @@ name: Hikaye ajanı (yayınla)
 
 on:
   schedule:
-    - cron: "5,35 7-19 * * *"   # Türkiye saatiyle 10:05-22:35, yarım saatte bir (GitHub geciktirebilir)
+    - cron: "5,25,45 5-19 * * *"   # Türkiye saatiyle 08:05-22:45, 20 dakikada bir (GitHub geciktirebilir; asıl zamanlayıcı sunucu)
   workflow_dispatch:
     inputs:
       hemen:

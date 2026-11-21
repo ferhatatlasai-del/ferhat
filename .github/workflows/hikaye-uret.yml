@@ -2,7 +2,7 @@ name: Hikaye ajanı (yapay zekâ görseli üret)
 
 on:
   schedule:
-    - cron: "20 5 * * *"   # Türkiye saatiyle 08:20 civarı, günde bir kez (GitHub geciktirebilir)
+    - cron: "20 5,10,14 * * *"   # Türkiye saatiyle 08:20, 13:20, 17:20 civarı (kuyruk doluysa ajan bekler)
   workflow_dispatch:
     inputs:
       hemen:
@@ -22,6 +22,8 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+      - name: numpy (müzik sentezi)
+        run: python3 -m pip install --quiet numpy
       - name: Trend tasarımlardan temsili hikaye görselleri üret (yalnızca CC0 / CC BY)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

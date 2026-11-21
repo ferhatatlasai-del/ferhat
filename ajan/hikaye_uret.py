@@ -957,9 +957,16 @@ def calis(a):
         return 0
     harcama = json_oku(HARCAMA, {})
     gun_say, ay_say, gun, ay = harcama_say(harcama, an)
-    if gun_say > 0 and not a.hemen:
-        print(f"Karar: bekle (bugün zaten üretim yapıldı: {gun_say} görsel; çift tetik ve çift harcama önlenir)")
-        return 0
+    # Günde birden fazla üretim turu olabilir (günde 20 hikaye için); çift tetik ve çift harcamayı önlemek için iki tur arasında en az 3 saat
+    son_tur = harcama.get("son_tur")
+    if son_tur and not a.hemen:
+        try:
+            gecen = (an - datetime.datetime.fromisoformat(son_tur)).total_seconds() / 3600
+        except Exception:
+            gecen = 99
+        if gecen < 3:
+            print(f"Karar: bekle (son üretim turu {gecen:.1f} saat önce; turlar arası en az 3 saat)")
+            return 0
     if gun_say >= ayar["gunluk_gorsel_siniri"] or ay_say >= ayar["aylik_gorsel_siniri"]:
         print(f"Karar: bekle (harcama sınırı: bugün {gun_say}/{ayar['gunluk_gorsel_siniri']}, bu ay {ay_say}/{ayar['aylik_gorsel_siniri']})")
         return 0
@@ -1111,6 +1118,7 @@ def calis(a):
             if gecti:
                 kabul = (b64, kontrol, deneme + 1)
                 break
+        harcama["son_tur"] = an.astimezone(datetime.timezone.utc).isoformat()
         yaz(HARCAMA, harcama)
         sira += 1
         if gorsel_hatasi:

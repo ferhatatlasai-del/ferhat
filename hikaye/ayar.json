@@ -1,9 +1,9 @@
 {
-  "aktif": false,
+  "aktif": true,
   "mod": "otomatik",
-  "gunluk_sayi": 12,
-  "baslangic_saat": 10,
-  "bitis_saat": 20,
+  "gunluk_sayi": 20,
+  "baslangic_saat": 8,
+  "bitis_saat": 22,
   "gunler": [
     1,
     2,
@@ -13,9 +13,9 @@
     6,
     7
   ],
-  "min_aralik_dk": 60,
+  "min_aralik_dk": 30,
   "ardisik_hata": 0,
   "hata_siniri": 3,
-  "son_not": "3 ardışık hata nedeniyle otomatik duraklatıldı",
+  "son_not": "Program: 08:00-22:00 arası günde 20 hikaye",
   "saklama_gun": 3
 }
