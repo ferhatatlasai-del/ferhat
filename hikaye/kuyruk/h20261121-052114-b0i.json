@@ -1,7 +1,7 @@
 {
   "id": "h20261121-052114-b0i",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-21T05:21:14.000Z",
   "gorsel": "hikaye/gorseller/h20261121-052114-b0i.mp4",
   "baslik": "Desk Bag Hook without the hole.",
@@ -21,7 +21,9 @@
     "sorunlar": []
   },
   "yayin": {
-    "tarih": "2026-11-21T12:45:32Z"
+    "tarih": "2026-11-21T12:47:23Z",
+    "medya_kimligi": "18133803535685269",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4035299533608715404"
   },
   "hata": "",
   "deneme": 0,
