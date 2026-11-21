@@ -1,0 +1,27 @@
+{
+  "kimlik": "y20261121-232752",
+  "olusturma": "2026-11-21T23:27:52.143Z",
+  "durum": "video",
+  "kaynak": "bagimsiz",
+  "direktif": "",
+  "konu": "3D baskıda katman kayması neden olur?",
+  "format": "reels",
+  "seri": "",
+  "kanca": "",
+  "video": {
+    "yol": "videolar/yukleme_20261121122414.mp4",
+    "tarih": "2026-11-21T23:27:45.711Z"
+  },
+  "yayinlar": [
+    {
+      "hedef": "instagram",
+      "platform": "instagram",
+      "tur": "reels",
+      "durum": "basladi",
+      "baslangic": "2026-11-21T23:27:45.711Z",
+      "video": "videolar/yukleme_20261121122414.mp4"
+    }
+  ],
+  "olcumler": [],
+  "ogrenildi": false
+}
