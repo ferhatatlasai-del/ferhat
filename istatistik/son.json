@@ -1,6 +1,6 @@
 {
- "tarih": "2026-11-21T06:00:23Z",
- "tr_saat": "21.11.2026 09:00",
+ "tarih": "2026-11-21T09:00:31Z",
+ "tr_saat": "21.11.2026 12:00",
  "toplam": {
   "reels": 0,
   "gonderi": 0,
@@ -8,8 +8,8 @@
   "youtube_video": 0,
   "hikaye": 0,
   "toplam": 0,
-  "begeni": 115,
-  "yorum": 4
+  "begeni": 120,
+  "yorum": 5
  },
  "fark": 0,
  "instagram": {
@@ -34,8 +34,8 @@
     "tur": "Reels",
     "tarih": "2026-11-20T23:05:39",
     "baslik": "Baskın tabladan kalkıyor mu? İlk katman yapışmıyorsa çoğu za",
-    "begeni": 8,
-    "yorum": 0,
+    "begeni": 13,
+    "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
     "izlenme": null,
     "erisim": null
@@ -482,7 +482,7 @@
   "YouTube okunamadı"
  ],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 09:00",
+  "baslik": "📊 İzlenme raporu 12:00",
   "govde": "Toplam 0 (eksik veri) · Reels ? · Short ? · Hikaye ? · Takipçi 417 · Instagram izlenme izni yok; YouTube okunamadı"
  }
 }
