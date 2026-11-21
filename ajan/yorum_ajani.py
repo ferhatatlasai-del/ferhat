@@ -233,7 +233,7 @@ def taslak_uret(ayar, ben):
         json_guncelle(KUYRUK, ekle, {"ogeler": []}, f"Yorum ajanı: {len(yeni)} yeni yorum")
         bek = sum(1 for o in yeni if o["durum"] == "onay_bekliyor")
         if bek:
-            H.bildir("Yorum yanıtları onay bekliyor", f"{bek} yeni yorum için yanıt taslağı hazır.", adres="/#icerik", etiket="yorum")
+            H.bildir("Yorum yanıtları onay bekliyor", f"{bek} yeni yorum için yanıt taslağı hazır.", adres="/#yorum", etiket="yorum")
     return len(yeni)
 
 
@@ -305,7 +305,7 @@ def gonder(ayar, bekle=True):
         json_guncelle(KUYRUK, isle, {"ogeler": []}, "Yorum ajanı: yanıtlar gönderildi")
         hatalar = [s for s in sonuc.values() if s[0] == "hata"]
         if hatalar:
-            H.bildir("Yorum yanıtı gönderilemedi", hatalar[0][1][:120], adres="/#icerik", etiket="yorum")
+            H.bildir("Yorum yanıtı gönderilemedi", hatalar[0][1][:120], adres="/#yorum", etiket="yorum")
     return len(sonuc)
 
 
@@ -343,7 +343,7 @@ def main():
         print(f"HATA: Instagram: {ozet}")
         if kod in (10, 200, 190):
             print("İpucu: yorum okuma/yanıtlama için anahtarın 'instagram_business_manage_comments' iznine ihtiyacı var (Meta uygulama → Instagram → izinler); anahtarı yeniden üret.")
-        H.bildir("Yorum ajanı çalışamadı", ozet[:120], adres="/#icerik", etiket="yorum")
+        H.bildir("Yorum ajanı çalışamadı", ozet[:120], adres="/#yorum", etiket="yorum")
         return 1
     return 0
 
