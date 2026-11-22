@@ -83,6 +83,28 @@
         "otomatik-yayin.yml için art arda başarısızlık var; bu acil incelenmeli."
       ],
       "eylem_sayisi": 1
+    },
+    {
+      "zaman": "2026-11-23 01:54",
+      "kademe": 3,
+      "model": "OpenAI (gpt-5.4)",
+      "rapor": [
+        "Acil: otomatik yayın hattında son 24 saatte .github/workflows/otomatik-yayin.yml için 11 başarısız akış görünüyor; mod açık ama bugünkü tur kaydı yok, bu yüzden hattı yakından kontrol etmen iyi olur.",
+        "Sağlık tarafında Instagram, YouTube, OpenAI, sunucu, hikâye kuyruğu ve hikâye ajanı iyi görünüyor; şu an ana bağlantı sorunu işareti yok.",
+        "İki onay bekleyen taslak var; içeriklerini göremediğim için onay öneremem. Ayrıca s20261122-185523 için daha önce zaten not düşülmüş, tekrar işlem yapmadım.",
+        "s20261122-215123 taslağı, son videodaki konuya çok benziyor: ikisi de Bambu Lab A1 Combo / AMS lite filament akışı-değişim sorunları etrafında dönüyor; tekrar riski nedeniyle inceleme notu bıraktım.",
+        "Yorum tarafında bekleyen yanıt yok; bu turda yorum onayı gerekmedi.",
+        "Hikâye sayısı 6 ve hedefinle uyumlu; bütçe kontrolü için değiştirmedim."
+      ],
+      "oneriler": [
+        "Otomatik-yayın başarısızlıklarının nedenini panel/log tarafında kontrol et; mod açıkken bugünkü tur görünmemesi aksaklık işareti olabilir.",
+        "Bambu Lab odaklı içeriklerde açıklamaya bağımsızlık notu eklenip eklenmediğini kontrol et; marka bağlantısı izlenimi riskini azaltır.",
+        "Sıradaki öncelikli konularda AMS lite tekrarına girmeden 'filament nemi ve kurutma' veya 'yeni başlayanların 5 hatası' gibi daha farklı başlıklara ağırlık verebilirsin."
+      ],
+      "uyarilar": [
+        "Son karar kayıtlarında s20261122-185523 için birden fazla kez 'onayla önerisi' görünüyor; bu eylem izinli değil ve tekrar kayıt anomalisine işaret ediyor."
+      ],
+      "eylem_sayisi": 1
     }
   ],
   "defter": [
@@ -135,6 +157,19 @@
       "neden": "Son 24 saatte otomatik-yayın akışı 9 kez başarısız olmuş; sistem sağlığını kontrol etmek gerekiyor.",
       "durum": "yapildi",
       "ayrinti": "nobetci.yml tetiklendi"
+    },
+    {
+      "zaman": "2026-11-23 01:54",
+      "kademe": 3,
+      "eylem": "taslak_isaretle",
+      "params": {
+        "id": "s20261122-215123",
+        "oneri": "incele",
+        "not": "Son videodaki AMS lite filament degisim sorunlari konusuna cok benziyor; tekrar riski var."
+      },
+      "neden": "Konu çeşitliliğini korumak ve tekrar riskini işaretlemek için.",
+      "durum": "yapildi",
+      "ayrinti": "s20261122-215123: incele önerisi"
     }
   ]
 }
