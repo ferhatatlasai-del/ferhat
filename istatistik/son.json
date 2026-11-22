@@ -1,17 +1,17 @@
 {
- "tarih": "2026-11-22T15:00:42Z",
- "tr_saat": "22.11.2026 18:00",
+ "tarih": "2026-11-22T18:00:56Z",
+ "tr_saat": "22.11.2026 21:00",
  "toplam": {
-  "reels": 15499,
+  "reels": 15853,
   "gonderi": 0,
-  "short": 10451,
+  "short": 10569,
   "youtube_video": 0,
-  "hikaye": 733,
-  "toplam": 26683,
-  "begeni": 255,
-  "yorum": 23
+  "hikaye": 769,
+  "toplam": 27191,
+  "begeni": 270,
+  "yorum": 27
  },
- "fark": 1032,
+ "fark": 508,
  "instagram": {
   "durum": "tamam",
   "izin": true,
@@ -19,69 +19,80 @@
   "hata": "graph.instagram.com profil: HTTP 400 kod=190 tür=OAuthException: Invalid OAuth access token - Cannot parse access token",
   "gonderiler": [
    {
+    "id": "18132478334487242",
+    "tur": "Reels",
+    "tarih": "2026-11-22T17:33:10",
+    "baslik": "Nozzle tıkanması neden olur, nasıl anlarsın ve nasıl çözersi",
+    "begeni": 0,
+    "yorum": 0,
+    "link": "https://www.instagram.com/reel/DgDWYKBE8DF/",
+    "izlenme": 54,
+    "erisim": 4
+   },
+   {
     "id": "18362708170216349",
     "tur": "Reels",
     "tarih": "2026-11-22T10:33:39",
     "baslik": "Kolaydan zora filamentleri hızlıca sıraya dizdik.",
-    "begeni": 7,
-    "yorum": 0,
+    "begeni": 10,
+    "yorum": 2,
     "link": "https://www.instagram.com/reel/DgCmX1zj1CJ/",
-    "izlenme": 956,
-    "erisim": 867
+    "izlenme": 1143,
+    "erisim": 1029
    },
    {
     "id": "17945283843388099",
     "tur": "Reels",
     "tarih": "2026-11-21T15:28:13",
     "baslik": "Katman kayması genelde mekanik bir sorundur.",
-    "begeni": 9,
+    "begeni": 10,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgAjP11DCGR/",
-    "izlenme": 1525,
-    "erisim": 1424
+    "izlenme": 1533,
+    "erisim": 1428
    },
    {
     "id": "17941420377402019",
     "tur": "Reels",
     "tarih": "2026-11-21T15:27:00",
     "baslik": "Hangi filament sıcağa daha çok dayanır?",
-    "begeni": 7,
+    "begeni": 8,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/DgAjINVCTkY/",
-    "izlenme": 814,
-    "erisim": 730
+    "izlenme": 832,
+    "erisim": 748
    },
    {
     "id": "17956070562049609",
     "tur": "Reels",
     "tarih": "2026-11-21T14:12:58",
     "baslik": "İplik gibi sarkıtmalar neden olur, nasıl azalır?",
-    "begeni": 9,
+    "begeni": 10,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgAaonlkhF3/",
-    "izlenme": 1646,
-    "erisim": 1499
+    "izlenme": 1658,
+    "erisim": 1507
    },
    {
     "id": "18193230361409051",
     "tur": "Reels",
     "tarih": "2026-11-21T09:56:40",
     "baslik": "Nemli filament baskıyı sessizce bozar.",
-    "begeni": 5,
-    "yorum": 0,
+    "begeni": 6,
+    "yorum": 2,
     "link": "https://www.instagram.com/reel/Df_9WXhAUi5/",
-    "izlenme": 1570,
-    "erisim": 1458
+    "izlenme": 1576,
+    "erisim": 1460
    },
    {
     "id": "17916096111516478",
     "tur": "Reels",
     "tarih": "2026-11-20T23:23:19",
     "baslik": "İlk katman sorunlarını çoğu zaman dört şey bozar: tabla sevi",
-    "begeni": 9,
+    "begeni": 10,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df-02JrFMVG/",
-    "izlenme": 1729,
+    "izlenme": 1733,
     "erisim": 1571
    },
    {
@@ -89,21 +100,21 @@
     "tur": "Reels",
     "tarih": "2026-11-20T23:05:39",
     "baslik": "Baskın tabladan kalkıyor mu? İlk katman yapışmıyorsa çoğu za",
-    "begeni": 29,
+    "begeni": 30,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": 3876,
-    "erisim": 3434
+    "izlenme": 3911,
+    "erisim": 3450
    },
    {
     "id": "18289759651292671",
     "tur": "Reels",
     "tarih": "2026-11-19T21:59:31",
     "baslik": "Dijital tasarımların katman katman gerçeğe dönüştüğü 3D bask",
-    "begeni": 2,
+    "begeni": 3,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df8Gek5DMrG/",
-    "izlenme": 296,
+    "izlenme": 300,
     "erisim": 248
    },
    {
@@ -111,21 +122,21 @@
     "tur": "Reels",
     "tarih": "2026-11-19T11:00:30",
     "baslik": "Gurtech 3d",
-    "begeni": 2,
+    "begeni": 3,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df67FfFgMHC/",
-    "izlenme": 177,
-    "erisim": 160
+    "izlenme": 181,
+    "erisim": 161
    },
    {
     "id": "18655251088021009",
     "tur": "Reels",
     "tarih": "2026-11-18T21:22:50",
     "baslik": "🤖 Doktor Filament yapay zekâ ile üretilmiş bir karakterdir.",
-    "begeni": 3,
+    "begeni": 4,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df5dfOAjiMp/",
-    "izlenme": 189,
+    "izlenme": 193,
     "erisim": 169
    },
    {
@@ -133,10 +144,10 @@
     "tur": "Reels",
     "tarih": "2026-11-18T12:59:15",
     "baslik": "3D baskıyla ortaya çıkan bu tasarımlar günlük hayatta işe ya",
-    "begeni": 2,
+    "begeni": 3,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df4j3AnDmy-/",
-    "izlenme": 214,
+    "izlenme": 218,
     "erisim": 181
    },
    {
@@ -147,8 +158,8 @@
     "begeni": 5,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df0SY8TGKVZ/",
-    "izlenme": 2171,
-    "erisim": 1835
+    "izlenme": 2181,
+    "erisim": 1840
    },
    {
     "id": "18121842679765284",
@@ -158,7 +169,7 @@
     "begeni": 3,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/Dfxy_-8Ekyj/",
-    "izlenme": 336,
+    "izlenme": 340,
     "erisim": 238
    },
    {
@@ -199,7 +210,7 @@
     "tur": "Reels",
     "tarih": "2025-11-26T21:12:23",
     "baslik": "",
-    "begeni": 3,
+    "begeni": 4,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DRiMSwBjebh/",
     "izlenme": null,
@@ -319,11 +330,19 @@
  "hikaye_izin": true,
  "hikayeler": [
   {
+   "id": "18121336967329729",
+   "tarih": "2026-11-22T17:34:36Z",
+   "baslik": "Video hikayesi",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
    "id": "18226143586340944",
    "tarih": "2026-11-22T13:27:11Z",
    "baslik": "Video hikayesi",
-   "izlenme": 5,
-   "erisim": 5,
+   "izlenme": 9,
+   "erisim": 8,
    "okundu": true,
    "yanit": 0
   },
@@ -331,8 +350,8 @@
    "id": "18352225648254861",
    "tarih": "2026-11-22T12:07:24Z",
    "baslik": "Shopping Bags Hook - Gancho para bolsas de la compra",
-   "izlenme": 8,
-   "erisim": 8,
+   "izlenme": 12,
+   "erisim": 11,
    "okundu": true,
    "yanit": 0
   },
@@ -340,8 +359,8 @@
    "id": "18039615434661529",
    "tarih": "2026-11-22T11:27:41Z",
    "baslik": "Towel Bar Hook",
-   "izlenme": 8,
-   "erisim": 8,
+   "izlenme": 12,
+   "erisim": 11,
    "okundu": true,
    "yanit": 0
   },
@@ -349,8 +368,8 @@
    "id": "18026747366945137",
    "tarih": "2026-11-22T10:36:15Z",
    "baslik": "Messenger Bag Desk Hook",
-   "izlenme": 11,
-   "erisim": 11,
+   "izlenme": 14,
+   "erisim": 13,
    "okundu": true,
    "yanit": 0
   },
@@ -358,8 +377,8 @@
    "id": "18119082491025513",
    "tarih": "2026-11-22T10:34:32Z",
    "baslik": "Video hikayesi",
-   "izlenme": 11,
-   "erisim": 11,
+   "izlenme": 17,
+   "erisim": 15,
    "okundu": true,
    "yanit": 0
   },
@@ -367,8 +386,8 @@
    "id": "17957956797280216",
    "tarih": "2026-11-21T23:32:26Z",
    "baslik": "Video hikayesi",
-   "izlenme": 20,
-   "erisim": 16,
+   "izlenme": 26,
+   "erisim": 20,
    "okundu": true,
    "yanit": 0
   },
@@ -376,7 +395,7 @@
    "id": "18164781550503882",
    "tarih": "2026-11-21T23:23:26Z",
    "baslik": "Video hikayesi",
-   "izlenme": 21,
+   "izlenme": 25,
    "erisim": 19,
    "okundu": true,
    "yanit": 0
@@ -385,8 +404,8 @@
    "id": "18456328711123952",
    "tarih": "2026-11-21T18:26:46Z",
    "baslik": "Under-mount handled bag hook",
-   "izlenme": 23,
-   "erisim": 20,
+   "izlenme": 28,
+   "erisim": 22,
    "okundu": true,
    "yanit": 0
   },
@@ -656,14 +675,6 @@
    "izlenme": 0,
    "erisim": 0,
    "okundu": false
-  },
-  {
-   "id": "18146966305609623",
-   "tarih": "2026-11-19T09:23:49Z",
-   "baslik": "Silica gel spool container",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
   }
  ],
  "youtube": {
@@ -671,11 +682,21 @@
   "izin": true,
   "videolar": [
    {
+    "id": "ix-yeSzHv1c",
+    "tur": "Short",
+    "tarih": "2026-11-22T17:50:11",
+    "baslik": "Nozzle Neden Tıkanır? 5 Gerçek Sebep",
+    "izlenme": 1,
+    "begeni": 0,
+    "yorum": 0,
+    "link": "https://www.youtube.com/watch?v=ix-yeSzHv1c"
+   },
+   {
     "id": "czKPQgTqQrw",
     "tur": "Short",
     "tarih": "2026-11-22T10:33:51",
     "baslik": "Baskısı en kolay filamentler: 5'ten 1'e",
-    "izlenme": 156,
+    "izlenme": 204,
     "begeni": 0,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=czKPQgTqQrw"
@@ -685,7 +706,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T23:29:15",
     "baslik": "3D baskıda katman kayması neden olur?",
-    "izlenme": 3,
+    "izlenme": 2,
     "begeni": 0,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=bkae5x7GNp4"
@@ -695,7 +716,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T19:16:49",
     "baslik": "3D baskıda katman kayması neden olur?",
-    "izlenme": 1203,
+    "izlenme": 1205,
     "begeni": 4,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=yGVzYJN-m6o"
@@ -705,7 +726,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T15:26:52",
     "baslik": "Isıya en dayanıklı 5 filament | 3D baskı",
-    "izlenme": 280,
+    "izlenme": 291,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=TXcpwaFMx1U"
@@ -715,7 +736,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T14:12:38",
     "baslik": "3D baskıda stringing nasıl azalır?",
-    "izlenme": 1159,
+    "izlenme": 1157,
     "begeni": 7,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=ZzZkzgV1eL4"
@@ -725,7 +746,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T09:57:09",
     "baslik": "Filament nem çekerse ne olur? Belirtiler ve çözüm",
-    "izlenme": 1123,
+    "izlenme": 1121,
     "begeni": 6,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=M9tyEIjEeH8"
@@ -735,8 +756,8 @@
     "tur": "Short",
     "tarih": "2026-11-20T23:23:12",
     "baslik": "İlk katman neden bozuluyor? 5 hızlı kontrol",
-    "izlenme": 899,
-    "begeni": 10,
+    "izlenme": 956,
+    "begeni": 11,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=JFRO2uhYfwQ"
    },
@@ -745,7 +766,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T22:17:19",
     "baslik": "3D Baskı Tablaya Yapışmıyor mu? 5 Pratik Çözüm",
-    "izlenme": 1209,
+    "izlenme": 1212,
     "begeni": 18,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=qcWHhTeaEHs"
@@ -765,7 +786,7 @@
     "tur": "Short",
     "tarih": "2026-11-19T21:59:26",
     "baslik": "Dr. Filament ile 3D Yazıcılar Nasıl Çalışır? | gurtech3d",
-    "izlenme": 1111,
+    "izlenme": 1112,
     "begeni": 5,
     "yorum": 1,
     "link": "https://www.youtube.com/watch?v=MGVp8xfBUtc"
@@ -825,7 +846,7 @@
  },
  "eksikler": [],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 18:00",
-  "govde": "Toplam 26.683 (+1.032) · Reels 15.499 · Short 10.451 · Hikaye 733 (5 bugün) · Takipçi 433 (+1) · En iyi Reels: Baskın tabladan kalkı 3.876"
+  "baslik": "📊 İzlenme raporu 21:00",
+  "govde": "Toplam 27.191 (+508) · Reels 15.853 · Short 10.569 · Hikaye 769 (6 bugün) · Takipçi 433 · En iyi Reels: Baskın tabladan kalkı 3.911"
  }
 }
