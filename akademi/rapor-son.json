@@ -1,39 +1,46 @@
 {
-  "tarih": "2026-11-19T19:40:39Z",
+  "tarih": "2026-11-22T15:00:42Z",
   "gun": 7,
   "hikaye": {
-    "olusturulan": 22,
+    "olusturulan": 60,
     "durumlar": {
-      "yayinda": 16,
-      "planli": 6
+      "planli": 9,
+      "yayinda": 51
     },
     "kaynaklar": {
+      "uretim": 48,
+      "yayin": 10,
       "foto": 1,
-      "uretim": 18,
-      "yayin": 2,
       "video": 1
     },
-    "ort_kontrol_puani": 8.89,
-    "ort_deneme": 1.11,
-    "referansli": 17,
-    "trend_kaynakli": 2,
-    "muzikli": 16,
+    "ort_kontrol_puani": 8.9,
+    "ort_deneme": 1.08,
+    "referansli": 44,
+    "trend_kaynakli": 33,
+    "muzikli": 46,
     "yayin_gunluk": {
       "2026-11-17": 3,
       "2026-11-18": 6,
-      "2026-11-19": 7
+      "2026-11-19": 7,
+      "2026-11-20": 8,
+      "2026-11-21": 20,
+      "2026-11-22": 7
     }
   },
   "olaylar": {
     "olaylar": {
-      "denetim": 21,
-      "uretildi": 16,
-      "referans_yok": 1
+      "denetim": 90,
+      "uretildi": 59,
+      "referans_yok": 5
     },
-    "denetim_deneme": 21,
-    "denetim_gecen": 16,
-    "denetim_gecme_orani": 0.76,
+    "denetim_deneme": 90,
+    "denetim_gecen": 59,
+    "denetim_gecme_orani": 0.66,
     "en_sik_denetim_sorunlari": [
+      [
+        "üzerinde okunabilir marka/yazı var.",
+        2
+      ],
       [
         "referans görselde colgate marka yazısı ve logo var",
         1
@@ -53,40 +60,40 @@
       [
         "üretim görseli referansla uyumlu genel formda",
         1
-      ],
-      [
-        "hikaye görseli temsili, ancak referans fotoğrafındaki tüp detayı doğrudan göster",
-        1
       ]
     ],
     "elenen_lisanslar": {},
     "referans_sorunlari": {
-      "uygun değil": 1
+      "uygun değil": 5
     },
     "gorsel_hatalari": 0
   },
   "elenenler": {
-    "uretildi": 26,
-    "atlandi": 13,
-    "lisans_uygun_degil": 16
+    "uretildi": 69,
+    "atlandi": 33,
+    "lisans_uygun_degil": 16,
+    "referans_uygun_degil": 1
   },
   "harcama": {
     "gunluk_gorsel": {
       "2026-11-17": 6,
       "2026-11-18": 20,
-      "2026-11-19": 13
+      "2026-11-19": 13,
+      "2026-11-20": 18,
+      "2026-11-21": 40,
+      "2026-11-22": 11
     },
-    "bu_ay": 39,
-    "son_7_gun_toplam": 39
+    "bu_ay": 108,
+    "son_7_gun_toplam": 108
   },
   "zincir": {
-    "kayit": 10,
+    "kayit": 29,
     "formatlar": {
-      "carousel": 1,
-      "reels": 9
+      "reels": 28,
+      "carousel": 1
     },
     "ort_elestiri_puani": 6.0,
-    "tekrarlanan_konu_sayisi": 0
+    "tekrarlanan_konu_sayisi": 3
   },
   "trend": {
     "tarih": "2026-11-19T12:02:48Z",
@@ -100,109 +107,81 @@
   },
   "calismalar": {
     "Akademi ajanı (haftalık rapor ve ders önerileri)": {
+      "calisma": 1,
+      "basarisiz": 0,
+      "iptal": 0,
+      "zamanlayici": 0,
+      "elle": 1
+    },
+    "Yorum ajanı (Instagram yorumlarına nazik yanıt taslağı; onaylananları gönderir)": {
+      "calisma": 49,
+      "basarisiz": 0,
+      "iptal": 0,
+      "zamanlayici": 0,
+      "elle": 49
+    },
+    "İstatistikçi ajan (izlenme raporu ve bildirim)": {
+      "calisma": 25,
+      "basarisiz": 0,
+      "iptal": 0,
+      "zamanlayici": 0,
+      "elle": 25
+    },
+    "Hikaye ajanı (yayınla)": {
+      "calisma": 150,
+      "basarisiz": 8,
+      "iptal": 4,
+      "zamanlayici": 3,
+      "elle": 147
+    },
+    "Günlük içerik taslağı": {
       "calisma": 2,
       "basarisiz": 0,
       "iptal": 0,
-      "zamanlayici": 0,
-      "elle": 2
-    },
-    "Hikaye ajanı (yayınla)": {
-      "calisma": 43,
-      "basarisiz": 3,
-      "iptal": 1,
-      "zamanlayici": 4,
-      "elle": 39
-    },
-    "İstatistikçi ajan (izlenme raporu ve bildirim)": {
-      "calisma": 19,
-      "basarisiz": 0,
-      "iptal": 0,
-      "zamanlayici": 0,
-      "elle": 19
-    },
-    "Günlük içerik taslağı": {
-      "calisma": 16,
-      "basarisiz": 0,
-      "iptal": 0,
-      "zamanlayici": 5,
-      "elle": 11
+      "zamanlayici": 2,
+      "elle": 0
     },
     "Hikaye ajanı (yapay zekâ görseli üret)": {
-      "calisma": 25,
-      "basarisiz": 1,
+      "calisma": 16,
+      "basarisiz": 0,
       "iptal": 1,
       "zamanlayici": 2,
-      "elle": 23
+      "elle": 14
     },
     "Nöbetçi (anahtar ve servis sağlığı)": {
-      "calisma": 7,
-      "basarisiz": 7,
+      "calisma": 17,
+      "basarisiz": 11,
       "iptal": 0,
       "zamanlayici": 2,
-      "elle": 5
-    },
-    "Trend ajanı": {
-      "calisma": 3,
-      "basarisiz": 0,
-      "iptal": 0,
-      "zamanlayici": 1,
-      "elle": 2
+      "elle": 15
     },
     "YouTube'a yükle (Shorts)": {
-      "calisma": 8,
-      "basarisiz": 1,
-      "iptal": 0,
-      "zamanlayici": 0,
-      "elle": 8
-    },
-    "Instagram'a yayınla (Reels)": {
       "calisma": 7,
       "basarisiz": 0,
       "iptal": 0,
       "zamanlayici": 0,
       "elle": 7
     },
-    "İçerik zinciri": {
-      "calisma": 5,
+    "Instagram'a yayınla (Reels)": {
+      "calisma": 8,
       "basarisiz": 0,
       "iptal": 0,
       "zamanlayici": 0,
-      "elle": 5
+      "elle": 8
     },
     "Ajan Ofisi'ni Fly'a yükle": {
-      "calisma": 4,
+      "calisma": 13,
       "basarisiz": 0,
       "iptal": 0,
       "zamanlayici": 0,
-      "elle": 4
+      "elle": 13
     },
-    "Shorts / Reels üretici (taslak hazırla, yayınlamaz)": {
-      "calisma": 1,
-      "basarisiz": 0,
-      "iptal": 0,
+    "Viral video üretici (3D animasyonlu Türkçe Shorts/Reels taslağı; yayınlamaz)": {
+      "calisma": 12,
+      "basarisiz": 1,
+      "iptal": 3,
       "zamanlayici": 0,
-      "elle": 1
-    },
-    "Hikaye ajanı (belirli saatte yayınla)": {
-      "calisma": 1,
-      "basarisiz": 0,
-      "iptal": 0,
-      "zamanlayici": 0,
-      "elle": 1
-    },
-    "Printables servis teşhisi (ücretsiz)": {
-      "calisma": 3,
-      "basarisiz": 0,
-      "iptal": 0,
-      "zamanlayici": 0,
-      "elle": 3
-    },
-    "İçerik ajanı (direktifle)": {
-      "calisma": 2,
-      "basarisiz": 0,
-      "iptal": 0,
-      "zamanlayici": 0,
-      "elle": 2
+      "elle": 12
     }
   }
 }

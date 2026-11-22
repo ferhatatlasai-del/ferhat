@@ -59,6 +59,36 @@
       "id": "o20261119-6",
       "tarih": "2026-11-19T19:40:46Z",
       "durum": "reddedildi"
+    },
+    {
+      "ajan": "sistem",
+      "baslik": "Denetimdeki düşük geçme oranını iyileştir",
+      "ders": "Denetimden geçmeyen işleri yayın kuyruğuna alma.",
+      "kanit": "denetim geçme oranı 0.66; 90 denemede 59 geçti, 31’i elendi.",
+      "onem": 1,
+      "id": "o20261122-1",
+      "tarih": "2026-11-22T15:00:50Z",
+      "durum": "onay_bekliyor"
+    },
+    {
+      "ajan": "hikaye",
+      "baslik": "Yüksek referans kullanımını zorunlu tut",
+      "ders": "Her görsel üretimde referans görsel eklemeden başlatma.",
+      "kanit": "60 üretimin 44’ü referanslı, 16’sı referanssız; denetimde 5 referans yok.",
+      "onem": 1,
+      "id": "o20261122-2",
+      "tarih": "2026-11-22T15:00:50Z",
+      "durum": "onay_bekliyor"
+    },
+    {
+      "ajan": "hikaye",
+      "baslik": "Marka yazısı kontrolünü sıkılaştır",
+      "ders": "Metinde görünen tüm marka ve ürün yazılarını üretim öncesi sil.",
+      "kanit": "En sık denetim sorunu 2 kez 'üzerinde okunabilir marka/yazı var.' oldu.",
+      "onem": 1,
+      "id": "o20261122-3",
+      "tarih": "2026-11-22T15:00:50Z",
+      "durum": "onay_bekliyor"
     }
   ]
 }
