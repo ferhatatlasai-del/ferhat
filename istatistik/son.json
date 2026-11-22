@@ -1,21 +1,21 @@
 {
- "tarih": "2026-11-21T20:29:00Z",
- "tr_saat": "21.11.2026 23:29",
+ "tarih": "2026-11-22T06:00:32Z",
+ "tr_saat": "22.11.2026 09:00",
  "toplam": {
-  "reels": 13165,
+  "reels": 14068,
   "gonderi": 0,
-  "short": 7974,
+  "short": 9755,
   "youtube_video": 0,
-  "hikaye": 456,
-  "toplam": 21595,
-  "begeni": 237,
-  "yorum": 20
+  "hikaye": 564,
+  "toplam": 24387,
+  "begeni": 246,
+  "yorum": 23
  },
- "fark": 72,
+ "fark": 2792,
  "instagram": {
   "durum": "tamam",
   "izin": true,
-  "takipci": 429,
+  "takipci": 430,
   "hata": "graph.instagram.com profil: HTTP 400 kod=190 tür=OAuthException: Invalid OAuth access token - Cannot parse access token",
   "gonderiler": [
    {
@@ -26,19 +26,19 @@
     "begeni": 9,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgAjP11DCGR/",
-    "izlenme": 1454,
-    "erisim": 1360
+    "izlenme": 1492,
+    "erisim": 1392
    },
    {
     "id": "17941420377402019",
     "tur": "Reels",
     "tarih": "2026-11-21T15:27:00",
     "baslik": "Hangi filament sıcağa daha çok dayanır?",
-    "begeni": 5,
-    "yorum": 0,
+    "begeni": 7,
+    "yorum": 2,
     "link": "https://www.instagram.com/reel/DgAjINVCTkY/",
-    "izlenme": 271,
-    "erisim": 235
+    "izlenme": 576,
+    "erisim": 500
    },
    {
     "id": "17956070562049609",
@@ -48,8 +48,8 @@
     "begeni": 9,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgAaonlkhF3/",
-    "izlenme": 1581,
-    "erisim": 1434
+    "izlenme": 1617,
+    "erisim": 1476
    },
    {
     "id": "18193230361409051",
@@ -59,8 +59,8 @@
     "begeni": 5,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df_9WXhAUi5/",
-    "izlenme": 1559,
-    "erisim": 1444
+    "izlenme": 1563,
+    "erisim": 1446
    },
    {
     "id": "17916096111516478",
@@ -70,19 +70,19 @@
     "begeni": 9,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df-02JrFMVG/",
-    "izlenme": 1718,
-    "erisim": 1560
+    "izlenme": 1727,
+    "erisim": 1569
    },
    {
     "id": "18037926155853133",
     "tur": "Reels",
     "tarih": "2026-11-20T23:05:39",
     "baslik": "Baskın tabladan kalkıyor mu? İlk katman yapışmıyorsa çoğu za",
-    "begeni": 23,
+    "begeni": 27,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": 3223,
-    "erisim": 2851
+    "izlenme": 3720,
+    "erisim": 3284
    },
    {
     "id": "18289759651292671",
@@ -92,8 +92,8 @@
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df8Gek5DMrG/",
-    "izlenme": 294,
-    "erisim": 246
+    "izlenme": 295,
+    "erisim": 247
    },
    {
     "id": "18132390508855696",
@@ -103,8 +103,8 @@
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df67FfFgMHC/",
-    "izlenme": 171,
-    "erisim": 157
+    "izlenme": 175,
+    "erisim": 159
    },
    {
     "id": "18655251088021009",
@@ -114,8 +114,8 @@
     "begeni": 3,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df5dfOAjiMp/",
-    "izlenme": 186,
-    "erisim": 167
+    "izlenme": 187,
+    "erisim": 168
    },
    {
     "id": "18140690902641017",
@@ -125,8 +125,8 @@
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df4j3AnDmy-/",
-    "izlenme": 208,
-    "erisim": 178
+    "izlenme": 212,
+    "erisim": 180
    },
    {
     "id": "17925649080445339",
@@ -136,8 +136,8 @@
     "begeni": 5,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df0SY8TGKVZ/",
-    "izlenme": 2168,
-    "erisim": 1832
+    "izlenme": 2169,
+    "erisim": 1833
    },
    {
     "id": "18121842679765284",
@@ -145,10 +145,10 @@
     "tarih": "2026-11-15T21:56:42",
     "baslik": "Tanışın: Doktor Filament! 🤖",
     "begeni": 3,
-    "yorum": 1,
+    "yorum": 2,
     "link": "https://www.instagram.com/reel/Dfxy_-8Ekyj/",
-    "izlenme": 332,
-    "erisim": 236
+    "izlenme": 335,
+    "erisim": 237
    },
    {
     "id": "18077982347330509",
@@ -308,11 +308,29 @@
  "hikaye_izin": true,
  "hikayeler": [
   {
+   "id": "17957956797280216",
+   "tarih": "2026-11-21T23:32:26Z",
+   "baslik": "Video hikayesi",
+   "izlenme": 6,
+   "erisim": 6,
+   "okundu": true,
+   "yanit": 0
+  },
+  {
+   "id": "18164781550503882",
+   "tarih": "2026-11-21T23:23:26Z",
+   "baslik": "Video hikayesi",
+   "izlenme": 7,
+   "erisim": 6,
+   "okundu": true,
+   "yanit": 0
+  },
+  {
    "id": "18456328711123952",
    "tarih": "2026-11-21T18:26:46Z",
    "baslik": "Under-mount handled bag hook",
-   "izlenme": 11,
-   "erisim": 10,
+   "izlenme": 17,
+   "erisim": 14,
    "okundu": true,
    "yanit": 0
   },
@@ -320,8 +338,8 @@
    "id": "18119094625827736",
    "tarih": "2026-11-21T17:46:39Z",
    "baslik": "VAUDE  bicycle bag hook shark tooth spare part",
-   "izlenme": 14,
-   "erisim": 11,
+   "izlenme": 19,
+   "erisim": 14,
    "okundu": true,
    "yanit": 0
   },
@@ -329,8 +347,8 @@
    "id": "18081372350749410",
    "tarih": "2026-11-21T17:06:42Z",
    "baslik": "Table bag hook",
-   "izlenme": 14,
-   "erisim": 12,
+   "izlenme": 19,
+   "erisim": 15,
    "okundu": true,
    "yanit": 0
   },
@@ -338,8 +356,8 @@
    "id": "18025038785955858",
    "tarih": "2026-11-21T16:26:39Z",
    "baslik": "Bag hook for car trunk",
-   "izlenme": 16,
-   "erisim": 12,
+   "izlenme": 21,
+   "erisim": 15,
    "okundu": true,
    "yanit": 0
   },
@@ -347,8 +365,8 @@
    "id": "18078108707591628",
    "tarih": "2026-11-21T15:46:41Z",
    "baslik": "VW Hook for shopping bags in trunk, Haken für VW Passat Koff",
-   "izlenme": 15,
-   "erisim": 13,
+   "izlenme": 20,
+   "erisim": 17,
    "okundu": true,
    "yanit": 0
   },
@@ -356,8 +374,8 @@
    "id": "18138218831507788",
    "tarih": "2026-11-21T15:26:43Z",
    "baslik": "IV bag hook",
-   "izlenme": 14,
-   "erisim": 13,
+   "izlenme": 19,
+   "erisim": 16,
    "okundu": true,
    "yanit": 0
   },
@@ -365,8 +383,8 @@
    "id": "18132820246889835",
    "tarih": "2026-11-21T15:06:51Z",
    "baslik": "Universal Pannier Bag Hook - turn any backpack into a pannie",
-   "izlenme": 16,
-   "erisim": 12,
+   "izlenme": 21,
+   "erisim": 16,
    "okundu": true,
    "yanit": 0
   },
@@ -374,8 +392,8 @@
    "id": "17972032542195687",
    "tarih": "2026-11-21T14:46:57Z",
    "baslik": "Grocery store bag hooks for using as a trash bin",
-   "izlenme": 16,
-   "erisim": 13,
+   "izlenme": 22,
+   "erisim": 17,
    "okundu": true,
    "yanit": 0
   },
@@ -383,8 +401,8 @@
    "id": "18116034896149730",
    "tarih": "2026-11-21T14:14:57Z",
    "baslik": "Video hikayesi",
-   "izlenme": 17,
-   "erisim": 16,
+   "izlenme": 22,
+   "erisim": 20,
    "okundu": true,
    "yanit": 0
   },
@@ -392,8 +410,8 @@
    "id": "18070147136790450",
    "tarih": "2026-11-21T14:07:31Z",
    "baslik": "Larger Hooks for the Ortlieb QL2.1 Bike Bags. If your bike h",
-   "izlenme": 19,
-   "erisim": 16,
+   "izlenme": 24,
+   "erisim": 20,
    "okundu": true,
    "yanit": 0
   },
@@ -401,8 +419,8 @@
    "id": "18109250996197034",
    "tarih": "2026-11-21T13:46:56Z",
    "baslik": "Hook for Bike Helmet / Bag (adhesive",
-   "izlenme": 21,
-   "erisim": 19,
+   "izlenme": 26,
+   "erisim": 22,
    "okundu": true,
    "yanit": 0
   },
@@ -410,8 +428,8 @@
    "id": "17890900209689564",
    "tarih": "2026-11-21T13:27:07Z",
    "baslik": "Prius Gen 3 Car Trashcan Bag Clip/hook for Center Console",
-   "izlenme": 20,
-   "erisim": 19,
+   "izlenme": 26,
+   "erisim": 23,
    "okundu": true,
    "yanit": 0
   },
@@ -419,8 +437,8 @@
    "id": "18110376599347393",
    "tarih": "2026-11-21T13:06:44Z",
    "baslik": "Nissan Leaf bag hook",
-   "izlenme": 20,
-   "erisim": 19,
+   "izlenme": 26,
+   "erisim": 23,
    "okundu": true,
    "yanit": 0
   },
@@ -428,8 +446,8 @@
    "id": "18133803535685269",
    "tarih": "2026-11-21T12:47:23Z",
    "baslik": "Desk Bag Hook without the hole.",
-   "izlenme": 22,
-   "erisim": 21,
+   "izlenme": 27,
+   "erisim": 24,
    "okundu": true,
    "yanit": 0
   },
@@ -437,8 +455,8 @@
    "id": "18140981413729268",
    "tarih": "2026-11-21T12:27:08Z",
    "baslik": "Otizo Drill Press Depth Stop",
-   "izlenme": 24,
-   "erisim": 21,
+   "izlenme": 30,
+   "erisim": 25,
    "okundu": true,
    "yanit": 0
   },
@@ -446,8 +464,8 @@
    "id": "18130975696857932",
    "tarih": "2026-11-21T12:06:27Z",
    "baslik": "drill press depth stop",
-   "izlenme": 28,
-   "erisim": 24,
+   "izlenme": 33,
+   "erisim": 27,
    "okundu": true,
    "yanit": 0
   },
@@ -455,8 +473,8 @@
    "id": "17880984465567168",
    "tarih": "2026-11-21T11:36:39Z",
    "baslik": "Drill Bit Depth Stop w/ Spacers",
-   "izlenme": 32,
-   "erisim": 26,
+   "izlenme": 37,
+   "erisim": 30,
    "okundu": true,
    "yanit": 0
   },
@@ -464,8 +482,8 @@
    "id": "18119683825820465",
    "tarih": "2026-11-21T10:21:05Z",
    "baslik": "Video hikayesi",
-   "izlenme": 35,
-   "erisim": 30,
+   "izlenme": 40,
+   "erisim": 34,
    "okundu": true,
    "yanit": 0
   },
@@ -630,22 +648,6 @@
    "izlenme": 0,
    "erisim": 0,
    "okundu": false
-  },
-  {
-   "id": "18121125191002878",
-   "tarih": "2026-11-18T11:06:52Z",
-   "baslik": "LUCKY 13 Printable Jointed Figure",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
-  },
-  {
-   "id": "17980307817167880",
-   "tarih": "2026-11-18T06:38:12Z",
-   "baslik": "REMIX of \"Parametric Rugged Box\" - No Assembly Required",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
   }
  ],
  "youtube": {
@@ -653,11 +655,21 @@
   "izin": true,
   "videolar": [
    {
+    "id": "bkae5x7GNp4",
+    "tur": "Short",
+    "tarih": "2026-11-21T23:29:15",
+    "baslik": "3D baskıda katman kayması neden olur?",
+    "izlenme": 3,
+    "begeni": 0,
+    "yorum": 0,
+    "link": "https://www.youtube.com/watch?v=bkae5x7GNp4"
+   },
+   {
     "id": "yGVzYJN-m6o",
     "tur": "Short",
     "tarih": "2026-11-21T19:16:49",
     "baslik": "3D baskıda katman kayması neden olur?",
-    "izlenme": 160,
+    "izlenme": 1194,
     "begeni": 4,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=yGVzYJN-m6o"
@@ -667,8 +679,8 @@
     "tur": "Short",
     "tarih": "2026-11-21T15:26:52",
     "baslik": "Isıya en dayanıklı 5 filament | 3D baskı",
-    "izlenme": 137,
-    "begeni": 1,
+    "izlenme": 196,
+    "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=TXcpwaFMx1U"
    },
@@ -677,8 +689,8 @@
     "tur": "Short",
     "tarih": "2026-11-21T14:12:38",
     "baslik": "3D baskıda stringing nasıl azalır?",
-    "izlenme": 552,
-    "begeni": 5,
+    "izlenme": 918,
+    "begeni": 7,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=ZzZkzgV1eL4"
    },
@@ -687,8 +699,8 @@
     "tur": "Short",
     "tarih": "2026-11-21T09:57:09",
     "baslik": "Filament nem çekerse ne olur? Belirtiler ve çözüm",
-    "izlenme": 921,
-    "begeni": 7,
+    "izlenme": 1114,
+    "begeni": 6,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=M9tyEIjEeH8"
    },
@@ -697,7 +709,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T23:23:12",
     "baslik": "İlk katman neden bozuluyor? 5 hızlı kontrol",
-    "izlenme": 641,
+    "izlenme": 724,
     "begeni": 10,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=JFRO2uhYfwQ"
@@ -707,7 +719,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T22:17:19",
     "baslik": "3D Baskı Tablaya Yapışmıyor mu? 5 Pratik Çözüm",
-    "izlenme": 1161,
+    "izlenme": 1190,
     "begeni": 18,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=qcWHhTeaEHs"
@@ -717,7 +729,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T21:56:57",
     "baslik": "3D Baskı ile Araba İçi Pratik Aksesuarlar",
-    "izlenme": 151,
+    "izlenme": 157,
     "begeni": 0,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=DevZ1m13Ku4"
@@ -727,7 +739,7 @@
     "tur": "Short",
     "tarih": "2026-11-19T21:59:26",
     "baslik": "Dr. Filament ile 3D Yazıcılar Nasıl Çalışır? | gurtech3d",
-    "izlenme": 1103,
+    "izlenme": 1110,
     "begeni": 5,
     "yorum": 1,
     "link": "https://www.youtube.com/watch?v=MGVp8xfBUtc"
@@ -767,8 +779,8 @@
     "tur": "Short",
     "tarih": "2026-11-16T21:09:30",
     "baslik": "Kablolar neden karışıyor. Dr Filament çözüm bulsun",
-    "izlenme": 693,
-    "begeni": 7,
+    "izlenme": 694,
+    "begeni": 8,
     "yorum": 6,
     "link": "https://www.youtube.com/watch?v=aM1LRQ48pSQ"
    },
@@ -787,7 +799,7 @@
  },
  "eksikler": [],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 23:29",
-  "govde": "Toplam 21.595 (+72) · Reels 13.165 · Short 7.974 · Hikaye 456 (18 bugün) · Takipçi 429 · En iyi Reels: Baskın tabladan kalkı 3.223"
+  "baslik": "📊 İzlenme raporu 09:00",
+  "govde": "Toplam 24.387 (+2.792) · Reels 14.068 · Short 9.755 · Hikaye 564 · Takipçi 430 (+1) · En iyi Reels: Baskın tabladan kalkı 3.720"
  }
 }
