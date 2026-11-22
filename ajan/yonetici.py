@@ -282,7 +282,7 @@ def bekleyen_video_incele(ozet, kademe, yonerge, bilgi_tabani):
         with tempfile.TemporaryDirectory() as g:
             yol = pathlib.Path(g) / "video.mp4"
             try:
-                urllib.request.urlretrieve(f"https://raw.githubusercontent.com/{REPO}/{DAL}/{d['video']}" if "127.0.0.1" not in GH_API else d["video"], yol)
+                urllib.request.urlretrieve((os.environ.get("YONETICI_VIDEO_TABAN") or f"https://raw.githubusercontent.com/{REPO}/{DAL}/") + d["video"], yol)
                 nk, _ = dosya_oku("shorts/viral_noktalar.json")
                 onceki = [n for v in (nk or {}).get("videolar", []) for n in v.get("noktalar", [])]
                 bilgi = {"baslik": d.get("baslik"), "konu": d.get("konu"), "aciklama": d.get("aciklama"), "anlati": d.get("anlati") or "(anlatı metni kayıtlı değil)", "sahneler": [z.get("tip") for z in d.get("zamanlama") or []], "noktalar": []}
