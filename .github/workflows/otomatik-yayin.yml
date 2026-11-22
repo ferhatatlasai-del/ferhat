@@ -1,4 +1,4 @@
-name: Otomatik üretim ve yayın (yönetici ajan Kademe 3: üret, yönetici izler, 4 platforma yayınla)
+name: "Otomatik üretim ve yayın (yönetici ajan Kademe 3: üret, yönetici izler, 4 platforma yayınla)"
 
 on:
   workflow_dispatch:
