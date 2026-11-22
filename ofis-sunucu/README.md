@@ -278,3 +278,10 @@ Yeni viral videolar artık **anlat** biçimindedir: konuya özel, sürekli harek
 **Reddetme güvenliği:** Hazır videolarda "Reddet ya da sil" ayrı, kapalı bir bölümdedir ve iki tıkla onay ister. Reddedilen video silinmez: "Reddedilenler" altında **24 saat boyunca "Geri al"** ile kurtarılır; temizlik yalnızca 24 saati geçmiş reddedilenleri siler (`karar: kurtar`).
 
 **Öncelikli seri:** `shorts/viral_ayar.json` içindeki `oncelikli` listesi (konu, ipucu, isteğe bağlı `not`) başarı hafızasından ve konu listesinden **önce**, sırayla ve her biri bir kez üretilir; `not` açıklamaya eklenir. Şu an içinde 6 videoluk "Bambu Lab A1 / A1 Combo" serisi var (açıklamada "Bambu Lab ile bağlantısı yoktur" notu). Yeni seri için aynı listeye konu eklenir; liste bitince normal akış sürer.
+
+## Anlat biçimi: her videoya özel görüntü ve içerik tekrarını önleme
+
+- **Özel sahne (`ozel`):** Yapay zekâ hazır şablon seçmek yerine bazı sahneleri (videoda 1-3) kendisi tasarlar: şekiller, oklar, yazılar, ikonlar (nozul, termometre, alev, duman…), parçacıklar ve zamanlı hareketler (`video/anlat_sahneler.js`, `S.ozel`). Tarif `ajan/anlat_senaryo.py` içinde güvenli biçime indirgenir (eleman sayısı/sınırları, renk ve ikon listesi, metin temizliği; en az 5 eleman, en az bir yazı/ikon).
+- **Kalite kontrolü:** Özel sahnelerden 3'er kare çizilip görsel modele gösterilir (`ozel_kontrol`); boş/okunmaz/taşan sahne hazır `yedek` tiple değiştirilir. Anahtar yoksa sahne korunur.
+- **Her videoya farklı görünüm:** renk tonu (`plan.ton`, art arda iki videoda aynı olmaz) ve tema kayması (`plan.tema_kaydir`) konudan türetilir; aynı sahne şablonu farklı renkte çıkar.
+- **İçerik tekrarı önlemi:** her sahne tek bir somut bilgi (`nokta`) taşır. Önceki videoların noktaları `shorts/viral_noktalar.json`'da saklanır ve komuta "bunları tekrar etme" diye eklenir; yeni noktaların ≥2'si önceki videolarda varsa (kelime benzerliği ≥0,6) ya da bir video kendi içinde aynı noktayı iki sahnede anlatıyorsa doğrulama reddeder ve yapay zekâ yeniden yazar. Aynı konuda seri (ör. Bambu A1) videoları da birbirinin noktalarını tekrarlamaz.

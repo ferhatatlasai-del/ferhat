@@ -303,5 +303,66 @@
     yazi(x, 'TAKİP ET', 540, 1100, 60, '#fff', 'center', false); yazi(x, '@gurtechs3d', 540, 1230, 60, '#ffd36b');
   };
 
+  /* ---------- ÖZEL SAHNE: yapay zekâ tarifli (şekiller, oklar, yazılar, ikonlar, hareket) ---------- */
+  const RENK = { turuncu: '#ff7a1a', mavi: '#4fc3ff', yesil: '#3cc47a', kirmizi: '#ff5a4f', sari: '#ffd36b', mor: '#b49cff', pembe: '#ff7fb0', beyaz: '#ffffff', koyu: '#12304f', gri: '#8fa6c4', kahve: '#6b3a1e', siyah: '#10161f' };
+  const renk = v => RENK[v] || (/^#[0-9a-fA-F]{6}$/.test(v || '') ? v : '#ffffff');
+  const EGRI = { yumusak: sm, lineer: v => cl(v), ziplama: back, cikis: eo };
+  const IKONLAR = {
+    nozul: (c, t, p) => nozul(c, 0, 60, 1, t, 0.3, 40, false), nozul_tikali: (c, t, p) => nozul(c, 0, 60, 1, t, 0.3, 14, true), makara: (c, t, p) => makara(c, 0, 0, 60, t, renk(p.renk || 'turuncu'), 1),
+    disli: (c, t) => disli(c, 0, 0, 1, t, 62, 48, 10),
+    fan: (c, t) => { c.fillStyle = '#2c3d5a'; rr(c, -60, -60, 120, 120, 22); c.fill(); c.strokeStyle = '#9fb6d6'; c.lineWidth = 4; c.stroke(); c.save(); c.rotate(t * 12); c.fillStyle = '#8fd0ff'; for (let i = 0; i < 4; i++) { c.rotate(Math.PI / 2); c.beginPath(); c.ellipse(22, 0, 24, 10, 0, 0, 6.3); c.fill(); } c.restore(); },
+    termometre: (c, t, p) => { const d = cl(p.doluluk == null ? 0.7 : p.doluluk); c.fillStyle = '#e9edf3'; rr(c, -14, -70, 28, 120, 14); c.fill(); c.fillStyle = mix('#4fc3ff', '#ff3b30', d); rr(c, -9, 50 - 110 * d - 6, 18, 110 * d + 6, 9); c.fill(); c.beginPath(); c.arc(0, 56, 26, 0, 6.3); c.fillStyle = mix('#4fc3ff', '#ff3b30', d); c.fill(); },
+    damla: (c) => { c.fillStyle = '#5ab8ff'; c.beginPath(); c.moveTo(0, -42); c.quadraticCurveTo(34, 6, 0, 38); c.quadraticCurveTo(-34, 6, 0, -42); c.fill(); c.fillStyle = 'rgba(255,255,255,0.5)'; c.beginPath(); c.ellipse(-9, 8, 5, 10, 0.4, 0, 6.3); c.fill(); },
+    alev: (c, t) => { const w = Math.sin(t * 9) * 4; c.fillStyle = '#ff7a1a'; c.beginPath(); c.moveTo(0, -60 + w); c.quadraticCurveTo(46, -2, 22, 38); c.quadraticCurveTo(0, 56, -22, 38); c.quadraticCurveTo(-46, -2, 0, -60 + w); c.fill(); c.fillStyle = '#ffd36b'; c.beginPath(); c.moveTo(0, -20 + w); c.quadraticCurveTo(22, 12, 10, 38); c.quadraticCurveTo(0, 46, -10, 38); c.quadraticCurveTo(-22, 12, 0, -20 + w); c.fill(); },
+    duman: (c, t) => { for (let k = 0; k < 4; k++) { const q = (t * 0.5 + k / 4) % 1; c.fillStyle = 'rgba(200,205,215,' + (0.6 * (1 - q)) + ')'; c.beginPath(); c.arc(Math.sin(q * 8 + k) * 22, 40 - q * 110, 14 + q * 26, 0, 6.3); c.fill(); } },
+    tik: (c) => { c.fillStyle = '#3cc47a'; c.beginPath(); c.arc(0, 0, 46, 0, 6.3); c.fill(); c.strokeStyle = '#fff'; c.lineWidth = 12; c.lineCap = 'round'; c.lineJoin = 'round'; c.beginPath(); c.moveTo(-20, 2); c.lineTo(-6, 18); c.lineTo(22, -14); c.stroke(); },
+    carpi: (c) => { c.fillStyle = '#ff5a4f'; c.beginPath(); c.arc(0, 0, 46, 0, 6.3); c.fill(); c.strokeStyle = '#fff'; c.lineWidth = 12; c.lineCap = 'round'; c.beginPath(); c.moveTo(-18, -18); c.lineTo(18, 18); c.moveTo(18, -18); c.lineTo(-18, 18); c.stroke(); },
+    uyari: (c) => { c.fillStyle = '#ffc533'; c.beginPath(); c.moveTo(0, -48); c.lineTo(48, 38); c.lineTo(-48, 38); c.closePath(); c.fill(); c.fillStyle = '#12304f'; c.fillRect(-5, -16, 10, 30); c.beginPath(); c.arc(0, 26, 6, 0, 6.3); c.fill(); },
+    saat: (c, t) => { c.fillStyle = '#fff'; c.beginPath(); c.arc(0, 0, 48, 0, 6.3); c.fill(); c.strokeStyle = '#12304f'; c.lineWidth = 6; c.stroke(); c.lineCap = 'round'; c.beginPath(); c.moveTo(0, 0); c.lineTo(Math.sin(t * 3) * 30, -Math.cos(t * 3) * 30); c.stroke(); c.beginPath(); c.moveTo(0, 0); c.lineTo(Math.sin(t * 0.25) * 20, -Math.cos(t * 0.25) * 20); c.stroke(); },
+    lupa: (c) => { c.strokeStyle = '#fff'; c.lineWidth = 9; c.beginPath(); c.arc(-8, -8, 30, 0, 6.3); c.stroke(); c.lineCap = 'round'; c.beginPath(); c.moveTo(14, 14); c.lineTo(42, 42); c.stroke(); },
+    yildiz: (c, t) => { c.fillStyle = '#ffd36b'; c.beginPath(); for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 22 : 50; c.lineTo(Math.cos(a) * r, Math.sin(a) * r); } c.closePath(); c.fill(); },
+    parca: (c, t, p) => { for (let i = 0; i < 5; i++) { c.fillStyle = mix('#ff7a1a', '#ffb347', i / 5); rr(c, -50 + i * 2, 38 - i * 20, 100 - i * 4, 18, 6); c.fill(); } },
+    filament: (c, t) => { c.strokeStyle = '#eaf3ff'; c.lineWidth = 12; c.lineCap = 'round'; c.beginPath(); for (let u = -60; u <= 60; u += 4) { const y = Math.sin(u * 0.08 + t * 2) * 14; u === -60 ? c.moveTo(u, y) : c.lineTo(u, y); } c.stroke(); },
+    yatak: (c) => { c.fillStyle = '#3a4c68'; rr(c, -80, -12, 160, 24, 8); c.fill(); c.fillStyle = '#6d86a8'; c.fillRect(-80, -12, 160, 4); },
+    kilit: (c) => { c.strokeStyle = '#fff'; c.lineWidth = 9; c.beginPath(); c.arc(0, -14, 22, Math.PI, 0); c.stroke(); c.fillStyle = '#ffc533'; rr(c, -34, -14, 68, 56, 10); c.fill(); }
+  };
+  function ozelEleman(c, e, lt, t, id) {
+    const g = (e.t && e.t[0]) || 0, cik = (e.t && e.t[1] != null) ? e.t[1] : 1e9;
+    if (lt < g || lt > cik) return;
+    const pr = { x: 0, y: 0, w: 100, h: 100, r: 0, olcek: 1, donus: 0, opaklik: 1, doluluk: null, cizim: 1, boyut: 48 };
+    for (const k in e) if (typeof e[k] === 'number') pr[k] = e[k];
+    (e.hareket || []).forEach(function (a) { const q = (EGRI[a.egri] || sm)((lt - (a.t0 || 0)) / Math.max(0.05, (a.t1 || 1) - (a.t0 || 0))); pr[a.o] = lerp(a.den, a.a, q); });
+    const d = e.dongu || {};
+    if (d.titre) pr.x += Math.sin(t * 22 + id) * d.titre; if (d.yuz) pr.y += Math.sin(t * 1.6 + id) * d.yuz; if (d.dondur) pr.donus += t * d.dondur; if (d.salin) pr.donus += Math.sin(t * 2 + id) * d.salin; if (d.nabiz) pr.olcek *= 1 + d.nabiz * Math.sin(t * 4 + id);
+    const al = pr.opaklik * cl((lt - g) / 0.3) * (cik < 1e8 ? cl((cik - lt) / 0.3) : 1); if (al <= 0.01) return;
+    c.save(); c.globalAlpha = al; c.translate(pr.x, pr.y); c.rotate(pr.donus); c.scale(pr.olcek, pr.olcek);
+    const rk = renk(e.renk);
+    if (e.tur === 'dikdortgen') {
+      const w = pr.w, h = pr.h; c.fillStyle = e.doluluk_zemin ? renk(e.doluluk_zemin) : rk; if (pr.doluluk == null) { rr(c, -w / 2, -h / 2, w, h, pr.r); c.fill(); } else {
+        c.fillStyle = 'rgba(255,255,255,0.16)'; rr(c, -w / 2, -h / 2, w, h, pr.r); c.fill(); c.fillStyle = rk; const f = cl(pr.doluluk); if (e.yon === 'dikey') rr(c, -w / 2, h / 2 - h * f, w, Math.max(h * f, 1), pr.r); else rr(c, -w / 2, -h / 2, Math.max(w * f, 1), h, pr.r); c.fill(); }
+      if (e.kenar) { c.strokeStyle = renk(e.kenar); c.lineWidth = pr.kalinlik || 5; rr(c, -w / 2, -h / 2, w, h, pr.r); c.stroke(); }
+    } else if (e.tur === 'daire') {
+      if (e.halka) { c.strokeStyle = rk; c.lineWidth = pr.halka || 10; c.beginPath(); c.arc(0, 0, pr.r || 50, 0, 6.3 * cl(pr.cizim)); c.stroke(); } else { c.fillStyle = rk; c.beginPath(); c.arc(0, 0, pr.r || 50, 0, 6.3); c.fill(); }
+    } else if (e.tur === 'cizgi' || e.tur === 'ok') {
+      c.translate(-pr.x, -pr.y); const x1 = pr.x1 || 0, y1 = pr.y1 || 0, x2 = lerp(x1, pr.x2 || 0, cl(pr.cizim)), y2 = lerp(y1, pr.y2 || 0, cl(pr.cizim));
+      c.strokeStyle = rk; c.lineWidth = pr.kalinlik || 8; c.lineCap = 'round'; c.lineJoin = 'round'; if (e.kesikli) c.setLineDash([22, 18]); c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke(); c.setLineDash([]);
+      if (e.tur === 'ok' && pr.cizim > 0.95) { const a = Math.atan2(y2 - y1, x2 - x1); c.fillStyle = rk; c.beginPath(); c.moveTo(x2, y2); c.lineTo(x2 - Math.cos(a - 0.5) * 34, y2 - Math.sin(a - 0.5) * 34); c.lineTo(x2 - Math.cos(a + 0.5) * 34, y2 - Math.sin(a + 0.5) * 34); c.closePath(); c.fill(); }
+    } else if (e.tur === 'yazi') {
+      yazi(c, String(e.metin || '').slice(0, 40), 0, 0, pr.boyut, rk, e.hiza || 'center', e.kontur !== false);
+    } else if (e.tur === 'ikon' && IKONLAR[e.ad]) {
+      IKONLAR[e.ad](c, t, { renk: e.renk, doluluk: pr.doluluk });
+    } else if (e.tur === 'parcacik') {
+      const n = Math.min(40, e.sayi || 14), gw = pr.w || 100, yon = e.yon || 'yukari'; for (let k = 0; k < n; k++) { const q = (t * (e.hiz || 0.5) + k / n) % 1, bx = (Math.sin(k * 7.3) * 0.5) * gw; let px = bx, py = 0; const dist = pr.h || 160;
+        if (yon === 'yukari') py = -q * dist; else if (yon === 'asagi') py = q * dist; else if (yon === 'sag') { px = q * dist; py = Math.sin(k * 3.1) * gw * 0.4; } else if (yon === 'sol') { px = -q * dist; py = Math.sin(k * 3.1) * gw * 0.4; } else { px = Math.cos(k * 2.4 + t) * q * dist; py = Math.sin(k * 2.4 + t) * q * dist; }
+        c.globalAlpha = al * Math.sin(q * Math.PI); c.fillStyle = rk; c.beginPath(); c.arc(px, py, (e.boyut || 8) * (0.6 + (k % 3) * 0.25), 0, 6.3); c.fill(); }
+    }
+    c.restore();
+  }
+  S.ozel = function (c) {
+    const { x, t, lt, d, p } = c; c.arka(p.tema || 'mavi'); const els = (p.elemanlar || []).slice(0, 40), cam = p.kamera || [[540, 760, 1.0], [540, 760, 1.08]];
+    c.dunya(cam[0], cam[1] || cam[0], function () { els.forEach(function (e, i) { ozelEleman(x, e, lt, t, i); }); });
+    (p.etiket_noktalari || []).slice(0, 2).forEach(function (q, k) { const a = c.nokta(q[0], q[1]); c.etiket(k, a[0], a[1], q[2] || 1.2 + k * 0.8, q[3] || 1); });
+  };
+
   A.tipler = Object.keys(S);
 })();
