@@ -119,8 +119,10 @@ def durum_ozeti():
     for ad in sorted(n for n in klasor_adlari("shorts") if re.fullmatch(r"s\d{8}-\d{6}\.json", n))[-6:]:
         d, _ = dosya_oku("shorts/" + ad)
         if d:
-            tas.append({"id": d.get("id"), "durum": d.get("durum"), "baslik": str(d.get("baslik"))[:70], "yayinlanan": d.get("yayinlanan"), "admin_notu": d.get("admin_notu")})
+            tas.append({"id": d.get("id"), "durum": d.get("durum"), "baslik": str(d.get("baslik"))[:70], "yayinlanan": d.get("yayinlanan"), "admin_oneri": d.get("admin_oneri"), "konu": str(d.get("konu"))[:80], "sahne_tipleri": [z.get("tip") for z in (d.get("zamanlama") or [])], "sure": d.get("sure")})
     o["video_taslaklari"] = tas
+    nk, _ = dosya_oku("shorts/viral_noktalar.json")
+    o["son_video_noktalari"] = [{"konu": str(v.get("konu"))[:60], "noktalar": [str(n)[:50] for n in v.get("noktalar", [])[:8]]} for v in (nk or {}).get("videolar", [])[-3:]]
     yk, _ = dosya_oku("yorum/kuyruk.json")
     ya, _ = dosya_oku("yorum/ayar.json")
     yo = (yk or {}).get("ogeler", [])
@@ -179,7 +181,7 @@ SERT SINIRLAR (hiçbir kademede yapma): bütçe tavanını ya da anahtar/sır de
 EYLEM_2 = """- workflow_tetikle {"akis": "nobetci.yml" | "istatistik-rapor.yml" | "yorum-ajani.yml"}: ilgili ajanı bir kez çalıştırır (yalnızca gerçekten gerektiğinde).
 - hikaye_ayar {"gunluk_sayi": 3-12}: günlük hikâye sayısını en çok ±2 değiştirir (bütçe ve izlenmeye göre).
 - konu_oncelik_ekle {"konu": "...", "ipucu": "..."}: yeni video konusunu sıraya ekler (bekleyen öncelikli konu 3'ten azsa; başarılı içeriklerin kalıbına yakın ve daha önce yapılmamış olsun).
-- taslak_isaretle {"id": "sYYYYMMDD-HHMMSS", "oneri": "onayla"|"reddet", "not": "kısa neden"}: onay bekleyen video taslağına sahibi için not düşer (kendisi onaylamaz/reddetmez)."""
+- taslak_isaretle {"id": "sYYYYMMDD-HHMMSS", "oneri": "incele"|"reddet", "not": "kısa neden"}: onay bekleyen video taslağına sahibi için not düşer (kendisi onaylamaz/reddetmez). Videonun İÇERİĞİNİ GÖRMEZSİN (yalnızca başlık, konu, sahne tipleri ve noktalar): bu yüzden "onayla" önerme; yalnızca somut bir nedenin varsa (konu önceki videoyla çok benziyor, sahne çeşitliliği az, başlık kural dışı) "incele" ya da "reddet" yaz. Aynı taslağa zaten not düşüldüyse tekrar yazma."""
 EYLEM_3 = """- yorum_onayla {"idler": ["ig-..."]}: onay bekleyen RİSKSİZ yorum yanıtlarını (nazik, kısa, kurallara uygun) onaylar; turda en çok 5."""
 KADEME_ACIKLAMA = {1: "Yalnızca ÖNERİ: hiçbir eylem yürütülmez; eylem yazarsan 'önerildi' olarak kaydedilir.", 2: "Güvenli işleri kendin yaparsın (aşağıdaki eylemler).", 3: "Kademe 2 + onay yetkisi (yorum yanıtlarını onaylayabilirsin)."}
 
@@ -210,7 +212,7 @@ def eylem_yurut(e, kademe, ozet):
             return "reddedildi", "bu konu zaten sırada"
         p = {"konu": konu, "ipucu": ipucu}
     elif ad == "taslak_isaretle":
-        if not SHORTS_RE.match(str(p.get("id") or "")) or p.get("oneri") not in ("onayla", "reddet"):
+        if not SHORTS_RE.match(str(p.get("id") or "")) or p.get("oneri") not in ("incele", "reddet"):
             return "reddedildi", "geçersiz taslak kimliği ya da öneri"
     elif ad == "yorum_onayla":
         idler = [str(i) for i in (p.get("idler") or []) if re.fullmatch(r"ig-\d{5,30}", str(i))][:5]
@@ -231,8 +233,12 @@ def eylem_yurut(e, kademe, ozet):
             json_guncelle("shorts/viral_ayar.json", lambda v: v.setdefault("oncelikli", []).append({"konu": p["konu"], "ipucu": p["ipucu"]}), {}, "Yönetici: öncelikli video konusu")
             return "yapildi", p["konu"]
         if ad == "taslak_isaretle":
-            ok = json_guncelle(f"shorts/{p['id']}.json", lambda v: False if v.get("durum") != "onay_bekliyor" else v.update(admin_notu=str(p.get("not") or "")[:160], admin_oneri=p["oneri"]), {}, "Yönetici: taslak notu")
-            return ("yapildi", f"{p['id']}: {p['oneri']} önerisi") if ok else ("reddedildi", "taslak onay beklemiyor ya da bulunamadı")
+            def isaretle(v):
+                if v.get("durum") != "onay_bekliyor" or v.get("admin_oneri") == p["oneri"]:   # onay beklemiyorsa ya da aynı öneri zaten yazılıysa dokunma
+                    return False
+                v.update(admin_notu=str(p.get("not") or "")[:160], admin_oneri=p["oneri"])
+            ok = json_guncelle(f"shorts/{p['id']}.json", isaretle, {}, "Yönetici: taslak notu")
+            return ("yapildi", f"{p['id']}: {p['oneri']} önerisi") if ok else ("reddedildi", "taslak onay beklemiyor, bulunamadı ya da aynı öneri zaten yazılı")
         if ad == "yorum_onayla":
             sonuc = []
 

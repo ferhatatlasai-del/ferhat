@@ -295,3 +295,5 @@ Yeni viral videolar artık **anlat** biçimindedir: konuya özel, sürekli harek
 - **Sert sınırlar (her kademede, kodda zorlanır; model ne yazarsa yazsın):** bütçe tavanı/anahtar/sır değiştirmez, kalıcı silmez, video yayınlamaz, yorum modunu otomatiğe almaz; izinli iş akışları sabit liste; günde en çok 15 işlem. Reddedilen kararlar bile deftere yazılır.
 - **Kayıt:** `yonetici/rapor.json` → son 30 rapor + son 200 karar ("yapıldı / önerildi / reddedildi / hata").
 - **Model:** `ANTHROPIC_API_KEY` GitHub secret'ı tanımlıysa **Claude** (`YONETICI_MODEL`, varsayılan `claude-sonnet-5-5`), yoksa OpenAI. Maliyet: günde 2-3 çağrı, birkaç sent.
+
+**Yönetici ajan notları:** video içeriğini göremediği için taslağa "onayla" önerisi vermez; yalnızca "incele" ya da "reddet" notu düşer (aynı not tekrar yazılmaz). Modele taslakların sahne tipleri ve son 3 videonun noktaları da verilir (tekrar/çeşitlilik değerlendirmesi için). **Anlat biçiminde en az bir `ozel` sahne zorunludur**; yoksa hikâye tahtası reddedilip yeniden yazdırılır.
