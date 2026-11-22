@@ -214,7 +214,7 @@
   };
 
   S.karsilastir = function (c) {
-    const { x, t, lt, d, p } = c; c.arka(c.p.tema || 'mavi'); const a = p.a || { ad: 'A', deger: 60 }, b = p.b || { ad: 'B', deger: 40 }, mx = Math.max(sayi(a.deger, 1), sayi(b.deger, 1), 1e-9), q = eo((lt - 0.3) / 1.2), ond = mx < 10 ? 2 : 0, fmt = v => (ond ? v.toFixed(ond).replace('.', ',') : String(Math.round(v)))   // küçük değerlerde (0,02 mm) ondalık göster, birim = p.birim || '';
+    const { x, t, lt, d, p } = c; c.arka(c.p.tema || 'mavi'); const a = p.a || { ad: 'A', deger: 60 }, b = p.b || { ad: 'B', deger: 40 }, mx = Math.max(sayi(a.deger, 1), sayi(b.deger, 1), 1e-9), q = eo((lt - 0.3) / 1.2), ond = mx < 10 ? 2 : 0, fmt = v => (ond ? v.toFixed(ond).replace('.', ',') : String(Math.round(v))), birim = p.birim || '';   // küçük değerlerde (0,02 mm) ondalık göster
     c.dunya([540, 800, 1.0], [540, 800, 1.06], function () {
       x.fillStyle = 'rgba(255,255,255,0.08)'; rr(x, 90, 380, 900, 780, 40); x.fill();
       [[a, 330, TURUNCU], [b, 750, MAVI]].forEach(function (pr) {
