@@ -387,6 +387,8 @@ def _atmosfer(rng, sure):
 
 def _olaylar_ham(plan):
     """Renderer ile aynı zaman çizelgesinden efekt olayları: [(zaman, ad)]"""
+    if plan.get('olaylar') is not None:   # anlat biçimi: olaylar plan'la birlikte hazır gelir
+        return sorted((float(e[0]), e[1]) + tuple(e[2:]) for e in plan['olaylar'])
     ol = [(0.06, 'darbe')]
     sahneler = plan['sahneler']
     for i, s in enumerate(sahneler):

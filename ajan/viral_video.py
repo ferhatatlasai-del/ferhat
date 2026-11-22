@@ -39,6 +39,7 @@ try:
 except Exception:   # başarı hafızası yoksa eski davranış (konu listesi)
     B = None
 import hikaye_uret as U  # noqa: E402
+import anlat_senaryo as AN  # noqa: E402
 import ses_tasarim as SES  # noqa: E402
 
 KOK = H.KOK
@@ -52,7 +53,7 @@ MODEL = os.environ.get("OPENAI_MODEL") or "gpt-4o-mini"
 TTS_ADRES = os.environ.get("TTS_ADRES") or "https://texttospeech.googleapis.com/v1beta1/text:synthesize"
 GEMINI_ADRES = os.environ.get("GEMINI_ADRES") or "https://generativelanguage.googleapis.com/v1beta/models"
 GEMINI_MODEL = os.environ.get("GEMINI_TTS_MODEL") or "gemini-2.5-flash-preview-tts"
-VARSAYILAN = {"bicim": "liste", "gorsel_kalitesi": "medium", "gemini_ses": "Orus", "aktif": True, "en_cok_bekleyen": 3, "ses": "tr-TR-Wavenet-B", "konusma_hizi": 1.06, "perde": -1.5}
+VARSAYILAN = {"bicim": "anlat", "gorsel_kalitesi": "medium", "gemini_ses": "Orus", "aktif": True, "en_cok_bekleyen": 3, "ses": "tr-TR-Wavenet-B", "konusma_hizi": 1.06, "perde": -1.5}
 GENISLIK, YUKSEKLIK, FPS = 1080, 1920, 30
 SAHNE_TIPLERI = ["baski", "temizlik", "ilk_katman", "sicaklik", "hiz", "yapistirici", "sayi", "karsilastir", "ozet", "cta"]
 # Türkçe konuşmada yanlış okunan kısaltmalar: yalnızca SESE uygulanır, alt yazıda özgün yazı kalır.
@@ -343,6 +344,53 @@ def liste_senaryo_sec(a):
         s = liste_senaryo_uret(k["konu"], k.get("ipucu"), int(k.get("n") or 5))
         return (s, kim) if s else (None, f"'{k['konu']}' için liste senaryosu üretilemedi")
     return None, "kullanılmamış liste konusu kalmadı (video/liste_konulari.json'a yeni konu ekle)"
+
+
+def anlat_senaryo_uret(konu, ipucu):
+    """Yapay zekâ hikâye tahtasını (çeşitli animasyon sahneleri) yazar; doğrulama (çeşitlilik kuralları) geçmezse hata ile yeniden dener."""
+    anahtar = os.environ.get("OPENAI_API_KEY")
+    if not anahtar:
+        return None
+    govde = {"model": MODEL, "response_format": {"type": "json_object"}, "temperature": 0.8,
+             "messages": [{"role": "system", "content": "Sen Türkçe 3D baskı eğitim videoları yazan, animasyonla anlatan, doğruluğa önem veren bir içerik editörüsün. Yalnızca geçerli JSON döndür."},
+                          {"role": "user", "content": ilham_ekle(AN.ISTEM.format(konu=konu, ipucu=ipucu or "-"))}]}
+    for deneme in range(3):
+        try:
+            r = urllib.request.Request(f"{OPENAI}/chat/completions", data=json.dumps(govde).encode(), method="POST",
+                                       headers={"Content-Type": "application/json", "Authorization": f"Bearer {anahtar}"})
+            with urllib.request.urlopen(r, timeout=150) as y:
+                j = json.loads(json.load(y)["choices"][0]["message"]["content"])
+            j["konu"] = j.get("konu") or konu
+            return AN.dogrula(j, U.yazi_temizle)
+        except Exception as e:
+            print(f"UYARI: anlat hikâye tahtası üretimi/doğrulaması başarısız ({deneme + 1}/3): {type(e).__name__}: {str(e)[:160]}")
+            if deneme == 1:
+                govde["messages"].append({"role": "user", "content": "Önceki yanıt şu kurala uymadı: " + str(e)[:200] + ". Kuralları düzelterek JSON'u yeniden yaz."})
+    return None
+
+
+def anlat_senaryo_sec(a):
+    kullanilan = set(json_oku(KULLANILAN, []))
+    if a.senaryo:
+        SECIM.update(tur="elle")
+        return AN.dogrula(json_oku(a.senaryo, {}), U.yazi_temizle), pathlib.Path(a.senaryo).stem
+    if a.konu:
+        SECIM.update(tur="elle")
+        s = anlat_senaryo_uret(a.konu, "")
+        return (s, "anlat-" + slug(a.konu)) if s else (None, "anlat senaryosu üretilemedi (OPENAI_API_KEY yok ya da yanıt geçersiz)")
+    t = turev_sec()
+    if t:
+        s = anlat_senaryo_uret(t[0], t[1])
+        if s:
+            return s, "turev-" + slug(t[0])
+        SECIM.update(tur="liste")
+    for k in json_oku(VIDEO / "konular.json", []):
+        kim = "anlat-" + slug(k["konu"])
+        if kim in kullanilan or slug(k["konu"]) in kullanilan:
+            continue
+        s = anlat_senaryo_uret(k["konu"], k.get("ipucu"))
+        return (s, kim) if s else (None, f"'{k['konu']}' için anlat senaryosu üretilemedi")
+    return None, "kullanılmamış konu kalmadı (video/konular.json'a yeni konu ekle)"
 
 
 def liste_bolumleri(ls):
@@ -658,7 +706,7 @@ def parcala_altyazi(kelimeler, en_cok_kelime=5, en_cok_harf=30):
         t0, t1 = p[0]["t0"], p[-1]["t1"] + 0.2
         if i + 1 < len(parcalar):
             t1 = min(t1, parcalar[i + 1][0]["t0"] - 0.02)
-        cikti.append({"t0": round(t0, 3), "t1": round(max(t1, t0 + 0.3), 3), "kelimeler": [{"k": x["k"], "t0": round(x["t0"], 3), "t1": round(x["t1"], 3)} for x in p]})
+        cikti.append({"t0": round(t0, 3), "t1": round(max(t1, t0 + 0.3), 3), "kelimeler": [{"k": x["k"], "t0": round(x["t0"], 3), "t1": round(x["t1"], 3), "v": x.get("v", 0)} for x in p]})
     return cikti
 
 
@@ -698,6 +746,46 @@ def cizelge_kur(senaryo, sesler, alt_kelime=5, alt_harf=30):
         sahneler.append({"tip": s["tip"], "t0": round(t, 3), "t1": round(t1, 3), "ekran": s.get("ekran", ""), "rozet": s.get("rozet", ""), "params": dict(s.get("params") or {}), "ses_son": round(ses_son, 3)})
         t = t1
     plan = {"genislik": GENISLIK, "yukseklik": YUKSEKLIK, "fps": FPS, "sure": round(t, 3), "sahneler": sahneler, "altyazi": parcala_altyazi(kelimeler, alt_kelime, alt_harf)}
+    return plan, parcalar_ses
+
+
+GECISLER = ["kay", "yakin", "daire", "cevir", "parlama"]
+
+
+def anlat_cizelge_kur(senaryo, sesler, alt_kelime=5, alt_harf=30):
+    """Anlat biçimi: sahne süreleri konuşmaya göre; geçiş efekti çeşitli; bölüm etiketleri, başlık kartları, vurgulu alt yazı ve ses efekti olayları."""
+    tohum = int(hashlib.md5(senaryo["konu"].encode()).hexdigest()[:6], 16)
+    t, sahneler, kelimeler, parcalar_ses, bolumler, basliklar, olaylar = 0.0, [], [], [], [], [], []
+    n = len(senaryo["sahneler"])
+    for i, (s, v) in enumerate(zip(senaryo["sahneler"], sesler)):
+        kel = s["anlati"].split()
+        v0 = t + (0.6 if i == 0 else 0.25)
+        son_rel = konusma_sonu(v, kel)
+        ses_son = v0 + son_rel
+        t1 = max(ses_son + (KAPANIS_KUYRUGU if i == n - 1 else GECIS_ARASI), t + AN.EN_AZ_SURE.get(s["tip"], 3.4))   # animasyon bitebilsin diye sahne en az bu kadar sürer
+        for k, (w, b) in enumerate(zip(kel, v["baslangic"])):
+            bitis = v["baslangic"][k + 1] if k + 1 < len(kel) else son_rel
+            kelimeler.append({"k": w, "t0": v0 + b, "t1": v0 + max(bitis - 0.02, b + 0.08), "sahne": i, "v": s["isaret"][k] if k < len(s["isaret"]) else 0})
+        if v["ses"] is not None:
+            parcalar_ses.append((v0, v["ses"]))
+        sahneler.append({"tip": s["tip"], "t0": round(t, 3), "t1": round(t1, 3), "params": dict(s.get("params") or {}), "etiketler": list(s.get("etiketler") or []),
+                         "gecis": GECISLER[(tohum + i * 2) % 5] if i else "kay", "ses_son": round(ses_son, 3)})
+        if s.get("bolum"):
+            if bolumler:
+                bolumler[-1]["t1"] = round(t, 3)
+            bolumler.append({"no": len(bolumler) + 1, "ad": s["bolum"], "t0": round(t, 3), "t1": 0})
+        if s.get("baslik"):
+            basliklar.append({"t": round(v0 + 0.5, 3), "metin": s["baslik"], "sure": 1.2})
+            olaylar.append((round(v0 + 0.5, 3), "darbe"))
+        for k in range(len(s.get("etiketler") or [])):
+            olaylar.append((round(t + 1.0 + k * 0.9, 3), "pop"))
+        if i:
+            olaylar.append((round(t, 3), "gecis"))
+        t = t1
+    if bolumler:
+        bolumler[-1]["t1"] = round(t, 3)
+    plan = {"genislik": GENISLIK, "yukseklik": YUKSEKLIK, "fps": FPS, "sure": round(t, 3), "sahneler": sahneler, "bolumler": bolumler, "basliklar": basliklar,
+            "altyazi": parcala_altyazi(kelimeler, alt_kelime, alt_harf), "olaylar": sorted(olaylar)}
     return plan, parcalar_ses
 
 
@@ -784,11 +872,13 @@ def calis(a):
     gemini = os.environ.get("GEMINI_API_KEY")
     if not (anahtar or gemini) and not (a.tts_dizin or a.sessiz):
         return hata("seslendirme anahtarı yok. İkisinden biri gerekli (GitHub Secrets): 'GEMINI_API_KEY' (aistudio.google.com/apikey, kart gerekmez) ya da 'GOOGLE_TTS_API_KEY' (Google Cloud Text-to-Speech).")
-    bicim = a.bicim or ayar.get("bicim") or "liste"
+    bicim = a.bicim or ayar.get("bicim") or "anlat"
     if a.senaryo and "maddeler" in json_oku(a.senaryo, {}):
         bicim = "liste"
     try:
-        if bicim == "liste":
+        if bicim == "anlat":
+            senaryo, kaynak = anlat_senaryo_sec(a)
+        elif bicim == "liste":
             ls, kaynak = liste_senaryo_sec(a)
             senaryo = None
             if ls:
@@ -818,6 +908,9 @@ def calis(a):
         ls = senaryo["liste"]
         plan, parcalar = cizelge_kur(senaryo, sesler, 11, 64)
         plan.update(sayfa="liste.html", bicim="liste", baslik_ust=ls["liste_basligi"], toplam=len(ls["maddeler"]), olcu=ls["olcu"], tohum=int(hashlib.md5(ls["konu"].encode()).hexdigest()[:6], 16))
+    elif senaryo.get("bicim") == "anlat":
+        plan, parcalar = anlat_cizelge_kur(senaryo, sesler)
+        plan.update(sayfa="anlat.html", bicim="anlat", tohum=int(hashlib.md5(senaryo["konu"].encode()).hexdigest()[:6], 16))
     else:
         plan, parcalar = cizelge_kur(senaryo, sesler)
     print(f"Süre: {plan['sure']:.1f} sn, {len(plan['altyazi'])} alt yazı parçası")
@@ -874,7 +967,7 @@ def main():
     ap.add_argument("--tts-dizin", help="test: önceden üretilmiş konuşma dizini (s0.wav, s0.json…)")
     ap.add_argument("--sessiz", action="store_true", help="test: seslendirme olmadan (tahmini zamanlama)")
     ap.add_argument("--plan-kaydet", help="plan.json'u bu yola da yaz")
-    ap.add_argument("--bicim", choices=["liste", "3d"], help="video biçimi: liste (geri sayım + gerçekçi görseller, varsayılan) ya da 3d")
+    ap.add_argument("--bicim", choices=["anlat", "liste", "3d"], help="video biçimi: anlat (çeşitli animasyonlu sahneler, varsayılan), liste (geri sayım + gerçekçi görseller) ya da 3d")
     ap.add_argument("--gorsel-dizin", help="test: görsel üretmek yerine bu dizindeki görselleri kullan")
     try:
         kod = calis(ap.parse_args())
