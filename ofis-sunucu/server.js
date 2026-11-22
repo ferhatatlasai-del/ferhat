@@ -34,6 +34,7 @@ const AKIS_NOBETCI = 'nobetci.yml';
 const AKIS_TREND = 'trend.yml';
 const AKIS_ISTATISTIK = 'istatistik-rapor.yml';
 const AKIS_YORUM = 'yorum-ajani.yml';
+const AKIS_YONETICI = 'yonetici.yml';
 const YORUM_RE = /^ig-\d{5,30}$/;
 const SHORTS_RE = /^s\d{8}-\d{6}$/;
 const AKADEMI_RE = /^o\d{8}-\d+$/;
@@ -43,7 +44,7 @@ let ajanOnbellek = { t: 0, veri: null };
 let trendOnbellek = { t: 0, veri: null };
 let zincirOnbellek = { t: 0, veri: null };
 let hikayeOnbellek = { t: 0, veri: null };
-const hikayeTetikler = [], uretimTetikler = [], akademiTetikler = [], viralTetikler = [], nobetciTetikler = [], yorumTetikler = [], trendTetikler = [], istatistikTetikler = [], bildirimler = [];
+const hikayeTetikler = [], uretimTetikler = [], akademiTetikler = [], viralTetikler = [], nobetciTetikler = [], yorumTetikler = [], yoneticiTetikler = [], trendTetikler = [], istatistikTetikler = [], bildirimler = [];
 const guncellenenler = new Set();
 const GH_API = process.env.GH_API || 'https://api.github.com';
 const MAX_VIDEO = 30 * 1024 * 1024;
@@ -571,6 +572,41 @@ async function api(req, res, url) {
     const r = await depoYaz(yol, JSON.stringify(t, null, 2), k.sha, 'Panel: Shorts taslağı ' + t.durum);
     return r.ok ? json(res, 200, { ok: true, durum: t.durum }) : json(res, 502, { hata: 'Kaydedilemedi.' });
   }
+  if (url.pathname === '/api/yonetici') {
+    if (!TOKEN) return json(res, 503, { hata: 'Sunucuda GITHUB_TOKEN tanımlı değil.' });
+    try {
+      const sessiz = e => { if (e && e.kullanici) throw e; return null; };
+      const a = await depoOku('yonetici/ayar.json').catch(sessiz), r = await depoOku('yonetici/rapor.json').catch(sessiz);
+      const rp = r ? JSON.parse(r.metin) : {};
+      return json(res, 200, { ayar: Object.assign({ aktif: false, kademe: 2, yonerge: '' }, a ? JSON.parse(a.metin) : {}), raporlar: (rp.raporlar || []).slice(-6).reverse(), defter: (rp.defter || []).slice(-40).reverse() });
+    } catch (e) { return json(res, 502, { hata: e && e.kullanici ? e.message : 'Yönetici verisi okunamadı.' }); }
+  }
+  if (url.pathname === '/api/yonetici-ayar' && req.method === 'POST') {
+    let b; try { b = await govde(req); } catch (e) { return json(res, 400, { hata: 'Geçersiz istek.' }); }
+    const yeni = {};
+    if (typeof b.aktif === 'boolean') yeni.aktif = b.aktif;
+    if (b.kademe !== undefined) { if (![1, 2, 3].includes(b.kademe)) return json(res, 400, { hata: 'Kademe 1, 2 ya da 3 olmalı.' }); yeni.kademe = b.kademe; }
+    if (b.yonerge !== undefined) { const y = String(b.yonerge || '').replace(/\r/g, '').trim(); if (y.length < 20 || y.length > 4000) return json(res, 400, { hata: 'Yönerge 20-4000 karakter olmalı.' }); yeni.yonerge = y; }
+    if (!Object.keys(yeni).length) return json(res, 400, { hata: 'Değişiklik yok.' });
+    let sonuc;
+    const ok = await jsonGuncelle('yonetici/ayar.json', v => { Object.assign(v, Object.assign({ aktif: false, kademe: 2, yonerge: '' }, v, yeni)); sonuc = { aktif: v.aktif, kademe: v.kademe }; }, 'Panel: yönetici ajan ayarı', {});
+    if (!ok) return json(res, 502, { hata: 'Ayar kaydedilemedi.' });
+    if (yeni.aktif === true) {   // açar açmaz ilk değerlendirmeyi yapsın
+      const dal = await varsayilanDal();
+      await gh(`/repos/${REPO}/actions/workflows/${AKIS_YONETICI}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: {} }) }).catch(() => {});
+    }
+    return json(res, 200, { ok: true, ayar: sonuc });
+  }
+  if (url.pathname === '/api/yonetici-calistir' && req.method === 'POST') {
+    const simdi = Date.now();
+    while (yoneticiTetikler.length && simdi - yoneticiTetikler[0] > 3600e3) yoneticiTetikler.shift();
+    if (yoneticiTetikler.length >= 4) return json(res, 429, { hata: 'Saatte en fazla 4 elle yönetici çalıştırması.' });
+    const dal = await varsayilanDal();
+    const r = await gh(`/repos/${REPO}/actions/workflows/${AKIS_YONETICI}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: {} }) });
+    if (r.status !== 204) return json(res, 502, { hata: 'GitHub kabul etmedi (' + r.status + ').' });
+    yoneticiTetikler.push(simdi);
+    return json(res, 200, { ok: true });
+  }
   if (url.pathname === '/api/yorum') {
     if (!TOKEN) return json(res, 503, { hata: 'Sunucuda GITHUB_TOKEN tanımlı değil.' });
     try {
@@ -1009,7 +1045,7 @@ async function videoTemizligi() {
 // İş akışları kendi kararını verir (slot, günlük sınır); çift tetik zararsızdır (ortak kilit + "önce talep et" mantığı).
 const ZAM_KAPALI = process.env.ZAMANLAYICI === 'kapali';
 let yorumSonTetik = 0, yorumYenidenTetik = 0;
-const zamSon = { yorum: null, yayin: null, uretim: null, trend: null, akademi: null, viral: null, nobetci: null, istatistik: null, hata: null };
+const zamSon = { yonetici: null, yorum: null, yayin: null, uretim: null, trend: null, akademi: null, viral: null, nobetci: null, istatistik: null, hata: null };
 const zamYapilan = new Set();
 function zamSimdiTR() { const z = process.env.ZAM_ZAMAN ? new Date(process.env.ZAM_ZAMAN) : new Date(); return new Date(z.getTime() + 3 * 3600e3); }
 async function zamTetikle(akis, girdi, ad) {
@@ -1068,6 +1104,13 @@ async function zamKontrol() {
   if (dk >= 40) {
     const anahtar = `m${gun}-${saat}`;
     if (!zamYapilan.has(anahtar)) { zamYapilan.add(anahtar); videoTemizligi().then(n => { if (n) console.log('Temizlik: ' + n + ' video taslağı silindi'); }).catch(() => {}); }
+  }
+  // yönetici ajan: günde 2 rapor (TR 08:30 ve 18:30'dan sonra bir kez; ajan kapalıysa iş akışı kendisi hemen çıkar)
+  for (const [ad, bas, bit] of [['sabah', 8, 12], ['aksam', 18, 22]]) {
+    if ((saat > bas || (saat === bas && dk >= 30)) && saat < bit) {
+      const anahtar = `yn${gun}-${ad}`;
+      if (!zamYapilan.has(anahtar)) { zamYapilan.add(anahtar); await zamTetikle(AKIS_YONETICI, {}, 'yonetici'); }
+    }
   }
   // yorum ajanı: 08:00-23:00 arası 30 dakikada bir (kapalıysa ya da yeni yorum yoksa iş akışı kendisi hemen çıkar)
   if (saat >= 8 && saat <= 22) {

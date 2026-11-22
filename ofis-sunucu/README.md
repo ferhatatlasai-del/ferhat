@@ -285,3 +285,13 @@ Yeni viral videolar artık **anlat** biçimindedir: konuya özel, sürekli harek
 - **Kalite kontrolü:** Özel sahnelerden 3'er kare çizilip görsel modele gösterilir (`ozel_kontrol`); boş/okunmaz/taşan sahne hazır `yedek` tiple değiştirilir. Anahtar yoksa sahne korunur.
 - **Her videoya farklı görünüm:** renk tonu (`plan.ton`, art arda iki videoda aynı olmaz) ve tema kayması (`plan.tema_kaydir`) konudan türetilir; aynı sahne şablonu farklı renkte çıkar.
 - **İçerik tekrarı önlemi:** her sahne tek bir somut bilgi (`nokta`) taşır. Önceki videoların noktaları `shorts/viral_noktalar.json`'da saklanır ve komuta "bunları tekrar etme" diye eklenir; yeni noktaların ≥2'si önceki videolarda varsa (kelime benzerliği ≥0,6) ya da bir video kendi içinde aynı noktayı iki sahnede anlatıyorsa doğrulama reddeder ve yapay zekâ yeniden yazar. Aynı konuda seri (ör. Bambu A1) videoları da birbirinin noktalarını tekrarlamaz.
+
+## Yönetici ajan (admin)
+
+`ajan/yonetici.py` + `.github/workflows/yonetici.yml`; panelde **Yönetici** bölümü ve ofiste taçlı "Yönetici" avatarı.
+
+- **Ne yapar:** sahibinin amacını ve tarzını **yönergeden** (`yonetici/ayar.json` → `yonerge`, panelden düzenlenir) ve geçmiş kararlarından taklit eder; hikâye/bütçe durumu, Nöbetçi sağlığı, istatistik, video taslakları, yorum kuyruğu ve son 24 saatin başarısız iş akışlarını okur; günde 2 rapor yazar (sunucu 08:30 ve 18:30'dan sonra tetikler) ve açıldığı anda ilk değerlendirmesini yapar. Panelden **Aç/Kapat**; sen kapatana kadar açık kalır.
+- **Kademeler (panelden sen seçersin):** 1 = yalnızca öneri (hiçbir şey yürütülmez); 2 = güvenli işler (Nöbetçi/İstatistik/Yorum taramasını tetikler, günlük hikâye sayısını ±2 ayarlar [3-12], öncelikli video konusu ekler, onay bekleyen taslağa "yönetici önerisi" notu düşer); 3 = onay yetkisi (2 + risksiz yorum yanıtlarını onaylar, turda en çok 5; kategori şikâyet/hakaret/hata olanlar ve 220 karakterden uzunlar asla onaylanmaz). Kademe 3'e geçiş iki tıkla onay ister.
+- **Sert sınırlar (her kademede, kodda zorlanır; model ne yazarsa yazsın):** bütçe tavanı/anahtar/sır değiştirmez, kalıcı silmez, video yayınlamaz, yorum modunu otomatiğe almaz; izinli iş akışları sabit liste; günde en çok 15 işlem. Reddedilen kararlar bile deftere yazılır.
+- **Kayıt:** `yonetici/rapor.json` → son 30 rapor + son 200 karar ("yapıldı / önerildi / reddedildi / hata").
+- **Model:** `ANTHROPIC_API_KEY` GitHub secret'ı tanımlıysa **Claude** (`YONETICI_MODEL`, varsayılan `claude-sonnet-5-5`), yoksa OpenAI. Maliyet: günde 2-3 çağrı, birkaç sent.
