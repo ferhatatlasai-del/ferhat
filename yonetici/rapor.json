@@ -61,6 +61,28 @@
       ],
       "uyarilar": [],
       "eylem_sayisi": 1
+    },
+    {
+      "zaman": "2026-11-23 01:53",
+      "kademe": 3,
+      "model": "OpenAI (gpt-5.4-mini)",
+      "rapor": [
+        "Senin otomatik hat bugün henüz video üretmemiş görünüyor; mod açık ama bugünkü tur listesi boş.",
+        "Onay bekleyen iki taslak var; içerik başlıkları önceki konulara yakın ama aynı değil, bu yüzden içerik görmeden kesin karar vermiyorum.",
+        "Son 24 saatte otomatik-yayın iş akışı 9 kez başarısız olmuş; bu acil bir sistem sorunu gibi duruyor.",
+        "Yorum tarafında bekleyen iş yok; otomatik modda 5 yorum gönderilmiş, 1 atlanmış.",
+        "Hikâye kuyruğu dolu görünüyor ve günlük sayı 6; bütçe tavanın değişmiyor, gereksiz çalışma yapmıyorum.",
+        "Emin olmadığım için taslaklara şimdi not düşmüyorum; önce iş akışı hatasını çözmek daha öncelikli."
+      ],
+      "oneriler": [
+        "Önce Nöbetçi ile otomatik-yayın hata nedenini bul; tekrar eden hata varsa yayın hattını geçici durdurmayı düşün.",
+        "İki onay bekleyen taslak için içerik önizlemesi olmadan karar verme; gerekirse bir sonraki turda inceleme iste.",
+        "Aynı gün içinde tekrar eden başarısız akışlar sürerse rapora açıkça yaz; bu, yayın güvenilirliğini etkiler."
+      ],
+      "uyarilar": [
+        "otomatik-yayin.yml için art arda başarısızlık var; bu acil incelenmeli."
+      ],
+      "eylem_sayisi": 1
     }
   ],
   "defter": [
@@ -102,6 +124,17 @@
       "neden": "Bekleyen taslak uygun görünüyor; sahibine not düşmek yeterli.",
       "durum": "yapildi",
       "ayrinti": "s20261122-185523: onayla önerisi"
+    },
+    {
+      "zaman": "2026-11-23 01:53",
+      "kademe": 3,
+      "eylem": "workflow_tetikle",
+      "params": {
+        "akis": "nobetci.yml"
+      },
+      "neden": "Son 24 saatte otomatik-yayın akışı 9 kez başarısız olmuş; sistem sağlığını kontrol etmek gerekiyor.",
+      "durum": "yapildi",
+      "ayrinti": "nobetci.yml tetiklendi"
     }
   ]
 }
