@@ -135,3 +135,17 @@
 {"t": "2026-11-21T20:39:43Z", "tur": "denetim", "gecti": false, "deneme": 2, "puan": 8.0, "site": "printables.com", "sorunlar": ["Görselde mağaza logosu ve yazı var.", "Referans görselde çanta ve içindekiler nedeniyle kompozisyon kalabalık."]}
 {"t": "2026-11-21T20:39:52Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
 {"t": "2026-11-21T20:40:04Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-22T05:21:20Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-22T05:21:27Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-22T05:21:37Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-22T05:21:45Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-22T05:21:55Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 9.0, "site": "printables.com", "sorunlar": ["Kablo uçlarında küçük USB logosu var", "Görselde yazı okunmuyor ama kablo üzerindeki işaretler görülüyor"]}
+{"t": "2026-11-22T05:22:03Z", "tur": "denetim", "gecti": false, "deneme": 2, "puan": 9.0, "site": "printables.com", "sorunlar": ["USB konnektöründe logo/işaret var", "Görsel biraz render hissi veriyor", "Arka plan referanstan farklı ama nesne uyumlu"]}
+{"t": "2026-11-22T05:22:14Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 3.0, "site": "printables.com", "sorunlar": ["Görselde yazı/marka benzeri işaretler var (arka plan detayları).", "Tek bir ürün yerine referanstaki çiftli düzen yerine tek parça gösterilmiş.", "Üst yüzey detayı ve kablo çıkış yönü referansla tam eşleşmiyor."]}
+{"t": "2026-11-22T05:22:25Z", "tur": "denetim", "gecti": false, "deneme": 2, "puan": 4.0, "site": "printables.com", "sorunlar": ["Tek nesne yerine iki ayrı winder gösteriliyor.", "Referanstaki çiftli düzen ve parça sayısı eşleşmiyor.", "Yüzey/merkez detayları ve yerleşim referansla tam aynı değil."]}
+{"t": "2026-11-22T05:22:35Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 8.0, "site": "printables.com", "sorunlar": ["Kablodaki kırmızı konnektörde küçük bir logo/yazı görünüyor.", "Referans ve üretim görseli arasında açı ve arka plan farkı var, ancak nesne türü aynı."]}
+{"t": "2026-11-22T05:22:42Z", "tur": "denetim", "gecti": false, "deneme": 2, "puan": 8.0, "site": "printables.com", "sorunlar": ["Kablolar ve reel yüzeyinde marka/yazı görünüyor.", "Referans fotoğrafına göre renk/ışık ve açı farklı.", "Üç boyutlu baskı çizgileri belirgin."]}
+{"t": "2026-11-22T05:22:51Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-22T05:22:58Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-22T05:23:07Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-22T05:23:14Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
