@@ -1,5 +1,5 @@
 {
-  "aktif": true,
+  "aktif": false,
   "mod": "otomatik",
   "gunluk_uretim": 12,
   "gunluk_gorsel_siniri": 40,
