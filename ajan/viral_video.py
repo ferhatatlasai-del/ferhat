@@ -1010,10 +1010,16 @@ def calis(a):
     if a.git or not a.cikti:
         kimlik = f"s{z.strftime('%Y%m%d-%H%M%S')}"
         gercek = bool(anahtar or gemini) and not a.tts_dizin and not a.sessiz
-        taslak = {"id": kimlik, "olusturma": z.strftime("%Y-%m-%dT%H:%M:%SZ"), "durum": "onay_bekliyor", "tur": "viral", "video": f"videolar/{cikti.name}", "sure": round(plan["sure"], 1),
+        taslak = {"id": kimlik, "olusturma": z.strftime("%Y-%m-%dT%H:%M:%SZ"), "durum": "otomatik" if a.otomatik else "onay_bekliyor", "tur": "viral", "video": "" if a.otomatik else f"videolar/{cikti.name}", "sure": round(plan["sure"], 1),
                   "baslik": senaryo["baslik"], "aciklama": aciklama_olustur(senaryo, gercek), "muzik": "Sentez (kodla üretildi)", "konu": senaryo["konu"], "tasarimlar": [], "hikayeler": [], "secim": dict(SECIM),
                   "zamanlama": [{"tip": x["tip"], "t0": x["t0"], "t1": x["t1"], "ses_son": x.get("ses_son")} for x in plan["sahneler"]]}   # sahne/konuşma zamanları: ses sorunlarını sonradan ayıklamak için
+        if a.otomatik:
+            taslak["otomatik"] = True
+            taslak["anlati"] = " ".join(x["anlati"] for x in senaryo["sahneler"])[:1500]
         yaz(DIZIN / f"{kimlik}.json", taslak)
+        if a.sonuc_dosyasi:
+            yaz(a.sonuc_dosyasi, {"id": kimlik, "baslik": senaryo["baslik"], "aciklama": taslak["aciklama"], "konu": senaryo["konu"], "sure": round(plan["sure"], 1), "anlati": " ".join(x["anlati"] for x in senaryo["sahneler"]),
+                                  "sahneler": [x["tip"] for x in plan["sahneler"]], "noktalar": [x.get("nokta") for x in senaryo["sahneler"] if x.get("nokta")], "video": str(cikti)})
         yaz(KULLANILAN, sorted(set(json_oku(KULLANILAN, [])) | {kaynak}))
         if plan.get("bicim") == "anlat":
             hafiza = json_oku(NOKTALAR, {})
@@ -1023,9 +1029,10 @@ def calis(a):
             yaz(NOKTALAR, hafiza)
         print(f"Taslak hazır: {kimlik}; başlık: {senaryo['baslik']}")
         if a.git:
-            H.git_kaydet(f"Viral video: {kimlik} taslağı ({senaryo['konu'][:60]})", [DIZIN, KOK / "videolar"])
+            H.git_kaydet(f"Viral video: {kimlik} taslağı ({senaryo['konu'][:60]})", [DIZIN] if a.otomatik else [DIZIN, KOK / "videolar"])
             ilerleme("Hazır", 100, senaryo["baslik"][:100], zorla=True)
-            H.bildir("Yeni viral video taslağı hazır", f"{senaryo['baslik']} — panelde onayını bekliyor.", adres="/", etiket="shorts")
+            if not a.otomatik:
+                H.bildir("Yeni viral video taslağı hazır", f"{senaryo['baslik']} — panelde onayını bekliyor.", adres="/", etiket="shorts")
     return 0
 
 
@@ -1042,6 +1049,8 @@ def main():
     ap.add_argument("--plan-kaydet", help="plan.json'u bu yola da yaz")
     ap.add_argument("--bicim", choices=["anlat", "liste", "3d"], help="video biçimi: anlat (çeşitli animasyonlu sahneler, varsayılan), liste (geri sayım + gerçekçi görseller) ya da 3d")
     ap.add_argument("--gorsel-dizin", help="test: görsel üretmek yerine bu dizindeki görselleri kullan")
+    ap.add_argument("--otomatik", action="store_true", help="otomatik hat: video depoya yazılmaz (--cikti ile dışarı), taslak kaydı 'otomatik' durumunda açılır, yalnızca küçük kayıt dosyaları commit edilir")
+    ap.add_argument("--sonuc-dosyasi", help="üretim sonucunu (taslak kimliği, başlık, anlatı…) bu JSON dosyasına yaz")
     try:
         kod = calis(ap.parse_args())
     except Exception as e:
