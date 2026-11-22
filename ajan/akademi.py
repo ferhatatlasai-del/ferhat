@@ -30,7 +30,8 @@ DIZIN = KOK / "akademi"
 ONERILER = DIZIN / "oneriler.json"
 RAPOR_JSON = DIZIN / "rapor-son.json"
 OPENAI = os.environ.get("OPENAI_BASE_URL") or "https://api.openai.com/v1"
-MODEL = os.environ.get("OPENAI_MODEL") or "gpt-4o-mini"
+import yz_model as YZ  # noqa: E402
+MODEL = YZ.model("genel", "gpt-4o-mini")
 GH_API = os.environ.get("GH_API") or "https://api.github.com"
 GUN = 7
 AJANLAR = ("hikaye", "trend", "icerik", "sistem")   # 'sistem': kullanıcıya yönelik öneri, istemlere eklenmez

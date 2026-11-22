@@ -47,7 +47,8 @@ import uret  # noqa: E402
 
 KOK = H.KOK
 OPENAI = os.environ.get("OPENAI_BASE_URL") or "https://api.openai.com/v1"
-MODEL = os.environ.get("OPENAI_MODEL") or "gpt-4o-mini"
+import yz_model as YZ  # noqa: E402
+MODEL = YZ.model("genel", "gpt-4o-mini")
 GORSEL_MODELI = os.environ.get("OPENAI_IMAGE_MODEL") or "gpt-image-1"
 URETIM = KOK / "hikaye" / "uretim.json"
 HARCAMA = KOK / "hikaye" / "harcama.json"

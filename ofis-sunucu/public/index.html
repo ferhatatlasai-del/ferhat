@@ -420,6 +420,7 @@ body.tam .hint{display:none}
         <p class="not" id="ynOtoNot"></p>
         <p class="hata" id="ynHata" hidden></p>
       </div>
+      <div class="card pub" id="ynZeka"><h2>Yapay zekâ seviyesi (OpenAI)</h2><p class="alt">Her iş için kullanılacak OpenAI modelini sen seç. Küçük (mini) ucuz ve hızlıdır; büyük model daha iyi anlar ve yazar ama çağrı başına daha pahalıdır. Seçim bir sonraki çalışmada geçerli olur; "Varsayılan" seçersen sistemin kendi ayarı kullanılır (gpt-5.4-mini).</p><div id="ynZekaIc"></div><p class="hata" id="ynZekaHata" hidden></p></div>
       <div class="card pub" id="ynHat"><h2>Otomatik hat</h2><p class="alt">Üretilen her videoyu yönetici izler; saçma, yanlış ya da bozuk bulursa reddeder ve nedenini yazar.</p><div id="ynHatIc" class="gov">Henüz tur yok.</div></div>
       <div class="card pub" id="ynRapor"><h2>Son rapor</h2><div id="ynRaporIc" class="gov">Henüz rapor yok.</div></div>
       <div class="card pub"><h2>Karar defteri</h2><p class="alt">Yönetici ajanın verdiği kararlar ve sonuçları (en yeni üstte).</p><div id="ynDefter" class="gov">Henüz karar yok.</div></div>
@@ -2177,7 +2178,7 @@ function akademiCek(){ fetch('/api/akademi').then(function(r){return r.ok?r.json
 var YN=null;
 var KADEMELER=[[1,'Kademe 1 · Öneri','Hiçbir şeyi değiştirmez; yapacağını "önerildi" diye rapora yazar.'],[2,'Kademe 2 · Güvenli işler','Ajanları tetikler, hikâye sayısını ±2 ayarlar, öncelikli video konusu ekler, taslaklara not düşer.'],[3,'Kademe 3 · Onay yetkisi','Kademe 2 + risksiz yorum yanıtlarını kendisi onaylar (turda en çok 5).']];
 function yoneticiCiz(v){
-  YN=v; OZ.yn=v; var a=v.ayar||{}, r0=(v.raporlar||[])[0];
+  YN=v; OZ.yn=v; zekaCiz(v.yz); var a=v.ayar||{}, r0=(v.raporlar||[])[0];
   $('#ynDurum').textContent=(a.aktif?'🟢 AÇIK':'⚪ KAPALI')+' · Kademe '+a.kademe+(r0?(' · son rapor: '+r0.zaman+' ('+r0.model+')'):' · henüz rapor yok');
   $('#ynAktif').textContent=a.aktif?'⏸ Ajanı kapat':'▶ Ajanı aç'; $('#ynCalistir').disabled=!a.aktif;
   var kg=$('#ynKademe'); kg.textContent='';
@@ -2229,6 +2230,26 @@ function yoneticiCiz(v){
   var ta=$('#ynYonergeMetin'); if(document.activeElement!==ta&&!ta.dataset.kirli) ta.value=a.yonerge||'';
   var rz=document.querySelector('#nav button[data-v=yonetici] .rz'); if(rz){ var n=r0&&r0.uyarilar?r0.uyarilar.length:0; rz.hidden=!n; rz.textContent=n; }
   setTimeout(ozetCiz,0);
+}
+var ZEKA_ROLLER=[['yonetici','Yönetici ajan ve video izleme','Videoyu izleyip yayınlayıp yayınlamayacağına karar verir; en önemli iş.'],['video','Viral video senaryosu','Videonun konusu, sahneleri, anlatımı ve özel sahneleri.'],['genel','Diğer işler','Hikâye metni, yorum yanıtları, trend, akademi, istatistik.']];
+var ZEKA_SECENEK=[['','Varsayılan (gpt-5.4-mini)'],['gpt-5.4-mini','gpt-5.4-mini (ekonomik)'],['gpt-5.4','gpt-5.4 (güçlü)']];
+function zekaCiz(yz){
+  var kap=$('#ynZekaIc'); if(!kap) return; kap.textContent=''; yz=yz||{};
+  ZEKA_ROLLER.forEach(function(r){
+    var mevcut=yz[r[0]]||'', liste=ZEKA_SECENEK.slice(), ozel=mevcut&&!ZEKA_SECENEK.some(function(o){return o[0]===mevcut;});
+    var kut=dom('div',null); kut.style.cssText='margin:10px 0'; var b=document.createElement('b'); b.textContent=r[1]; kut.appendChild(b); kut.appendChild(dom('div','not',r[2]));
+    var sat=dom('div','satir'); var sec=document.createElement('select'); sec.style.cssText='font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px';
+    liste.concat([['__ozel','Başka model adı yaz…']]).forEach(function(o){ var op=document.createElement('option'); op.value=o[0]; op.textContent=o[1]; sec.appendChild(op); });
+    var inp=document.createElement('input'); inp.type='text'; inp.maxLength=48; inp.placeholder='model adı (ör. gpt-5.4)'; inp.style.cssText='flex:1;min-width:140px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px'; inp.hidden=!ozel;
+    sec.value=ozel?'__ozel':mevcut; if(ozel) inp.value=mevcut;
+    var kay=document.createElement('button'); kay.type='button'; kay.textContent='Kaydet';
+    sec.addEventListener('change',function(){ inp.hidden=sec.value!=='__ozel'; });
+    kay.addEventListener('click',function(){
+      if(!hSifreKontrol()) return; var m=sec.value==='__ozel'?inp.value.trim():sec.value, he=$('#ynZekaHata'); he.hidden=true; kay.disabled=true;
+      hPost('/api/yonetici-ayar',{yz:{rol:r[0],model:m}}).then(function(){ kay.textContent='Kaydedildi ✓'; setTimeout(function(){ kay.textContent='Kaydet'; kay.disabled=false; },1800); }).catch(function(e){ he.textContent=String(e.message||e); he.hidden=false; kay.disabled=false; });
+    });
+    sat.appendChild(sec); sat.appendChild(inp); sat.appendChild(kay); kut.appendChild(sat); kap.appendChild(kut);
+  });
 }
 function yoneticiCek(){ try{ pSifreOku(); }catch(e){} if(!SIF){ $('#ynDurum').textContent='Yönetici ajanı görmek için yukarıya ofis şifresini yazıp Kaydet’e bas.'; return; } fetch('/api/yonetici',{headers:{'X-Sifre':SIF}}).then(function(r){return r.ok?r.json():r.json().then(function(j){throw new Error(j.hata||'Hata');});}).then(yoneticiCiz).catch(function(e){ $('#ynDurum').textContent=String(e.message||'Yönetici verisi okunamadı.'); }); }
 $('#ynAktif').addEventListener('click',function(){ if(!hSifreKontrol()||!YN) return; var yeni=!(YN.ayar&&YN.ayar.aktif), b=this; b.disabled=true; hPost('/api/yonetici-ayar',{aktif:yeni}).then(function(){ b.disabled=false; yoneticiCek(); $('#ynDurum').textContent=yeni?'Açıldı; ilk değerlendirme birkaç dakikada rapora düşer.':'Kapatıldı.'; }).catch(function(e){ var he=$('#ynHata'); he.textContent=String(e.message||e); he.hidden=false; b.disabled=false; }); });

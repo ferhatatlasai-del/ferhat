@@ -17,7 +17,8 @@ import urllib.request
 KOK = pathlib.Path(os.environ.get("HIKAYE_KOK") or pathlib.Path(__file__).resolve().parent.parent)
 SON = KOK / "istatistik" / "son.json"
 OPENAI = os.environ.get("OPENAI_BASE_URL") or "https://api.openai.com/v1"
-MODEL = os.environ.get("OPENAI_MODEL") or "gpt-4o-mini"
+import yz_model as YZ  # noqa: E402
+MODEL = YZ.model("genel", "gpt-4o-mini")
 DURAK = set("bir ve ile de da mi mu mı mü neden nasıl ne nedir için icin olur olmaz gibi daha en çok cok hangi kadar bu şu o ama veya ya".split())
 
 

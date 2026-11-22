@@ -577,9 +577,9 @@ async function api(req, res, url) {
     if (!TOKEN) return json(res, 503, { hata: 'Sunucuda GITHUB_TOKEN tanımlı değil.' });
     try {
       const sessiz = e => { if (e && e.kullanici) throw e; return null; };
-      const a = await depoOku('yonetici/ayar.json').catch(sessiz), r = await depoOku('yonetici/rapor.json').catch(sessiz), ot = await depoOku('yonetici/otomatik.json').catch(sessiz);
+      const a = await depoOku('yonetici/ayar.json').catch(sessiz), r = await depoOku('yonetici/rapor.json').catch(sessiz), ot = await depoOku('yonetici/otomatik.json').catch(sessiz), yz = await depoOku('yapay_zeka/ayar.json').catch(sessiz);
       const rp = r ? JSON.parse(r.metin) : {};
-      return json(res, 200, { ayar: Object.assign({ aktif: false, kademe: 2, yonerge: '', otomatik_yayin: 'kapali' }, a ? JSON.parse(a.metin) : {}), raporlar: (rp.raporlar || []).slice(-6).reverse(), defter: (rp.defter || []).slice(-40).reverse(), otomatik: (ot ? (JSON.parse(ot.metin).kayitlar || []) : []).slice(-12).reverse() });
+      return json(res, 200, { ayar: Object.assign({ aktif: false, kademe: 2, yonerge: '', otomatik_yayin: 'kapali' }, a ? JSON.parse(a.metin) : {}), raporlar: (rp.raporlar || []).slice(-6).reverse(), defter: (rp.defter || []).slice(-40).reverse(), otomatik: (ot ? (JSON.parse(ot.metin).kayitlar || []) : []).slice(-12).reverse(), yz: Object.assign({ yonetici: '', video: '', genel: '' }, yz ? (JSON.parse(yz.metin).roller || {}) : {}) });
     } catch (e) { return json(res, 502, { hata: e && e.kullanici ? e.message : 'Yönetici verisi okunamadı.' }); }
   }
   if (url.pathname === '/api/yonetici-ayar' && req.method === 'POST') {
@@ -589,6 +589,13 @@ async function api(req, res, url) {
     if (b.kademe !== undefined) { if (![1, 2, 3].includes(b.kademe)) return json(res, 400, { hata: 'Kademe 1, 2 ya da 3 olmalı.' }); yeni.kademe = b.kademe; }
     if (b.otomatik_yayin !== undefined) { if (!['kapali', 'deneme', 'acik'].includes(b.otomatik_yayin)) return json(res, 400, { hata: 'Geçersiz otomatik yayın modu.' }); yeni.otomatik_yayin = b.otomatik_yayin; }
     if (b.yonerge !== undefined) { const y = String(b.yonerge || '').replace(/\r/g, '').trim(); if (y.length < 20 || y.length > 4000) return json(res, 400, { hata: 'Yönerge 20-4000 karakter olmalı.' }); yeni.yonerge = y; }
+    if (b.yz !== undefined) {   // OpenAI zekâ seviyesi (rol -> model adı; boş = varsayılan)
+      const rol = b.yz && b.yz.rol, m = String((b.yz && b.yz.model) || '').trim();
+      if (!['yonetici', 'video', 'genel'].includes(rol)) return json(res, 400, { hata: 'Geçersiz rol.' });
+      if (m && !/^[A-Za-z0-9][A-Za-z0-9._-]{1,47}$/.test(m)) return json(res, 400, { hata: 'Model adı geçersiz (harf, rakam, nokta, tire).' });
+      const okYz = await jsonGuncelle('yapay_zeka/ayar.json', v => { v.roller = Object.assign({ yonetici: '', video: '', genel: '' }, v.roller || {}); v.roller[rol] = m; }, 'Panel: OpenAI model seçimi (' + rol + ')', { roller: {} });
+      return okYz ? json(res, 200, { ok: true }) : json(res, 502, { hata: 'Model seçimi kaydedilemedi.' });
+    }
     if (!Object.keys(yeni).length) return json(res, 400, { hata: 'Değişiklik yok.' });
     let sonuc;
     const ok = await jsonGuncelle('yonetici/ayar.json', v => { Object.assign(v, Object.assign({ aktif: false, kademe: 2, yonerge: '', otomatik_yayin: 'kapali' }, v, yeni)); sonuc = { aktif: v.aktif, kademe: v.kademe, otomatik_yayin: v.otomatik_yayin }; }, 'Panel: yönetici ajan ayarı', {});

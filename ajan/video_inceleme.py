@@ -14,7 +14,8 @@ import urllib.request
 KOK = pathlib.Path(__file__).resolve().parent.parent
 OPENAI = os.environ.get("OPENAI_BASE_URL") or "https://api.openai.com/v1"
 ANTHROPIC = os.environ.get("ANTHROPIC_BASE_URL") or "https://api.anthropic.com"
-OPENAI_MODEL = os.environ.get("OPENAI_MODEL") or "gpt-5.4-mini"
+import yz_model as YZ  # noqa: E402
+OPENAI_MODEL = YZ.model("yonetici", "gpt-5.4-mini")
 CLAUDE_MODEL = os.environ.get("YONETICI_MODEL") or "claude-sonnet-5-5"
 
 

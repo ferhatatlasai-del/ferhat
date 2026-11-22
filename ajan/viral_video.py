@@ -51,7 +51,8 @@ KULLANILAN = DIZIN / "viral_kullanilan.json"
 NOKTALAR = DIZIN / "viral_noktalar.json"   # önceki videolarda anlatılan noktalar (içerik tekrarını önlemek için) + son renk tonu
 TONLAR = [0, -32, 38, 72, 150, 190, 250, 305]
 OPENAI = os.environ.get("OPENAI_BASE_URL") or "https://api.openai.com/v1"
-MODEL = os.environ.get("OPENAI_MODEL") or "gpt-4o-mini"
+import yz_model as YZ  # noqa: E402
+MODEL = YZ.model("video", "gpt-4o-mini")
 TTS_ADRES = os.environ.get("TTS_ADRES") or "https://texttospeech.googleapis.com/v1beta1/text:synthesize"
 GEMINI_ADRES = os.environ.get("GEMINI_ADRES") or "https://generativelanguage.googleapis.com/v1beta/models"
 GEMINI_MODEL = os.environ.get("GEMINI_TTS_MODEL") or "gemini-2.5-flash-preview-tts"
