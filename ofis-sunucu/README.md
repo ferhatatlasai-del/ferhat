@@ -276,3 +276,5 @@ Yeni viral videolar artık **anlat** biçimindedir: konuya özel, sürekli harek
 - Konu seçimi: yine 3'te 3 "başarılı içeriklerden türetilmiş", 4.'sü keşif. Hâlâ `--bicim liste` / `--bicim 3d` ile eski biçimler çalıştırılabilir; ayar dosyasında (`shorts/viral_ayar.json`) `bicim` ile varsayılan değişir.
 
 **Reddetme güvenliği:** Hazır videolarda "Reddet ya da sil" ayrı, kapalı bir bölümdedir ve iki tıkla onay ister. Reddedilen video silinmez: "Reddedilenler" altında **24 saat boyunca "Geri al"** ile kurtarılır; temizlik yalnızca 24 saati geçmiş reddedilenleri siler (`karar: kurtar`).
+
+**Öncelikli seri:** `shorts/viral_ayar.json` içindeki `oncelikli` listesi (konu, ipucu, isteğe bağlı `not`) başarı hafızasından ve konu listesinden **önce**, sırayla ve her biri bir kez üretilir; `not` açıklamaya eklenir. Şu an içinde 6 videoluk "Bambu Lab A1 / A1 Combo" serisi var (açıklamada "Bambu Lab ile bağlantısı yoktur" notu). Yeni seri için aynı listeye konu eklenir; liste bitince normal akış sürer.
