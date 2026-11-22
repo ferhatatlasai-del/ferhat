@@ -25,7 +25,7 @@
     const lt = Math.max(0, t - s.t0), d = Math.max(0.1, s.t1 - s.t0), p = s.params || {};
     const o = { x: c, W, H, t, lt, d, p, i, etiketler: s.etiketler || [], cam: { cx: 540, cy: 760, z: 1 } };
     o.arka = function (tema) {
-      const th = TEMALAR[tema || p.tema || 'mavi'] || TEMALAR.mavi;
+      const adlar = Object.keys(TEMALAR), ad0 = tema || p.tema || 'mavi', ix = adlar.indexOf(ad0), th = TEMALAR[ix < 0 ? 'mavi' : adlar[(ix + (plan.tema_kaydir || 0)) % adlar.length]];   // videoya göre tema kayar: aynı sahne farklı renkte
       const g = c.createLinearGradient(0, 0, 0, H); g.addColorStop(0, th[0]); g.addColorStop(0.55, th[1]); g.addColorStop(1, th[2]); c.fillStyle = g; c.fillRect(0, 0, W, H);
       c.fillStyle = 'rgba(160,210,255,0.12)'; const ox = -(o.cam.cx * 0.3) % 90 - lt * 6, oy = -(o.cam.cy * 0.3) % 90;
       for (let gx = -90; gx < W + 90; gx += 90) for (let gy = -90; gy < H + 90; gy += 90) { c.beginPath(); c.arc(gx + ox, gy + oy, 3, 0, 6.3); c.fill(); }
@@ -57,12 +57,13 @@
 
   /* ---------- geçişler ---------- */
   const GEC_YARI = 0.3;
+  function tonFiltresi() { return plan.ton ? 'hue-rotate(' + plan.ton + 'deg)' : 'none'; }   // videoya özgü renk tonu (turuncu→yeşil/pembe/mor…)
   function efektif(i) { const s = plan.sahneler[i]; return i === 0 ? s : Object.assign({}, s, { t0: s.t0 - GEC_YARI }); }   // sahne geçiş başlarken zaten hareket etmeye başlar (sıçrama olmasın)
   function gecisCiz(t, i) {   // sahne i → i+1 sınırında
     const S = plan.sahneler, A1 = S[i], B1 = S[i + 1], tb = A1.t1, q = cl((t - (tb - GEC_YARI)) / (2 * GEC_YARI)), e = sm(q), tip = B1.gecis || 'kay';
     xa.setTransform(olcek, 0, 0, olcek, 0, 0); xb.setTransform(olcek, 0, 0, olcek, 0, 0);
     sahneCiz(xa, t, efektif(i), i); sahneCiz(xb, t, efektif(i + 1), i + 1);
-    x.save(); x.setTransform(1, 0, 0, 1, 0, 0);
+    x.save(); x.setTransform(1, 0, 0, 1, 0, 0); x.filter = tonFiltresi();
     const pw = cv.width, ph = cv.height;
     if (tip === 'kay') {
       x.drawImage(ca, -e * pw, 0, pw, ph); x.drawImage(cb, (1 - e) * pw, 0, pw, ph);
@@ -130,7 +131,7 @@
     x.setTransform(olcek, 0, 0, olcek, 0, 0);
     const S = plan.sahneler; let i = S.length - 1; for (let k = 0; k < S.length; k++) if (t < S[k].t1) { i = k; break; }
     if (i < S.length - 1 && t > S[i].t1 - GEC_YARI) gecisCiz(t, i);
-    else sahneCiz(x, t, efektif(i), i);
+    else { xa.setTransform(olcek, 0, 0, olcek, 0, 0); sahneCiz(xa, t, efektif(i), i); x.save(); x.setTransform(1, 0, 0, 1, 0, 0); x.filter = tonFiltresi(); x.drawImage(ca, 0, 0); x.restore(); }
     x.setTransform(olcek, 0, 0, olcek, 0, 0);
     bolumEtiketi(t); baslikKarti(t); altyazi(t); marka(t);
   }

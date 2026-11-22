@@ -48,6 +48,8 @@ SENARYOLAR = VIDEO / "senaryolar"
 DIZIN = KOK / "shorts"
 AYAR = DIZIN / "viral_ayar.json"
 KULLANILAN = DIZIN / "viral_kullanilan.json"
+NOKTALAR = DIZIN / "viral_noktalar.json"   # önceki videolarda anlatılan noktalar (içerik tekrarını önlemek için) + son renk tonu
+TONLAR = [0, -32, 38, 72, 150, 190, 250, 305]
 OPENAI = os.environ.get("OPENAI_BASE_URL") or "https://api.openai.com/v1"
 MODEL = os.environ.get("OPENAI_MODEL") or "gpt-4o-mini"
 TTS_ADRES = os.environ.get("TTS_ADRES") or "https://texttospeech.googleapis.com/v1beta1/text:synthesize"
@@ -351,9 +353,16 @@ def anlat_senaryo_uret(konu, ipucu):
     anahtar = os.environ.get("OPENAI_API_KEY")
     if not anahtar:
         return None
+    gecmis_kayit = [[k.get("konu", ""), k.get("noktalar", [])] for k in json_oku(NOKTALAR, {}).get("videolar", [])]
+    gecmis_noktalar = [n for _, ns in gecmis_kayit for n in ns]
+    gecmis_konular = []
+    for f in sorted(DIZIN.glob("s*.json"))[-12:]:
+        o = json_oku(f, {})
+        if o.get("tur") == "viral" and (o.get("konu") or o.get("baslik")):
+            gecmis_konular.append(str(o.get("konu") or o.get("baslik")))
     govde = {"model": MODEL, "response_format": {"type": "json_object"}, "temperature": 0.8,
              "messages": [{"role": "system", "content": "Sen Türkçe 3D baskı eğitim videoları yazan, animasyonla anlatan, doğruluğa önem veren bir içerik editörüsün. Yalnızca geçerli JSON döndür."},
-                          {"role": "user", "content": ilham_ekle(AN.ISTEM.format(konu=konu, ipucu=ipucu or "-"))}]}
+                          {"role": "user", "content": ilham_ekle(AN.ISTEM.format(konu=konu, ipucu=ipucu or "-", onceki=AN.onceki_metni(gecmis_kayit, gecmis_konular)))}]}
     for deneme in range(3):
         try:
             r = urllib.request.Request(f"{OPENAI}/chat/completions", data=json.dumps(govde).encode(), method="POST",
@@ -361,7 +370,7 @@ def anlat_senaryo_uret(konu, ipucu):
             with urllib.request.urlopen(r, timeout=150) as y:
                 j = json.loads(json.load(y)["choices"][0]["message"]["content"])
             j["konu"] = j.get("konu") or konu
-            return AN.dogrula(j, U.yazi_temizle)
+            return AN.dogrula(j, U.yazi_temizle, gecmis_noktalar)
         except Exception as e:
             print(f"UYARI: anlat hikâye tahtası üretimi/doğrulaması başarısız ({deneme + 1}/3): {type(e).__name__}: {str(e)[:160]}")
             if deneme == 1:
@@ -796,9 +805,51 @@ def anlat_cizelge_kur(senaryo, sesler, alt_kelime=5, alt_harf=30):
         t = t1
     if bolumler:
         bolumler[-1]["t1"] = round(t, 3)
+    son_ton = json_oku(NOKTALAR, {}).get("son_ton")
+    ix = tohum % len(TONLAR)
+    if TONLAR[ix] == son_ton:
+        ix = (ix + 3) % len(TONLAR)   # art arda iki videoda aynı renk tonu olmasın
     plan = {"genislik": GENISLIK, "yukseklik": YUKSEKLIK, "fps": FPS, "sure": round(t, 3), "sahneler": sahneler, "bolumler": bolumler, "basliklar": basliklar,
-            "altyazi": parcala_altyazi(kelimeler, alt_kelime, alt_harf), "olaylar": sorted(olaylar)}
+            "altyazi": parcala_altyazi(kelimeler, alt_kelime, alt_harf), "olaylar": sorted(olaylar), "ton": TONLAR[ix], "tema_kaydir": (tohum >> 4) % 5}
     return plan, parcalar_ses
+
+
+def ozel_kontrol(plan, dizin, plan_yolu):
+    """Özel (yapay zekâ tarifli) sahnelerden birkaç kare çizip görsel modele gösterir; boş/bozuk/okunmaz ise sahneyi 'yedek' hazır tiple değiştirir."""
+    anahtar = os.environ.get("OPENAI_API_KEY")
+    degisen = 0
+    for i, sh in enumerate(plan["sahneler"]):
+        if sh["tip"] != "ozel":
+            continue
+        if not anahtar:
+            continue
+        d = sh["t1"] - sh["t0"]
+        ts = [round(sh["t0"] + d * f, 2) for f in (0.3, 0.6, 0.95)]
+        klasor = pathlib.Path(dizin) / f"onizleme{i}"
+        r = subprocess.run([os.environ.get("NODE") or "node", str(VIDEO / "render.js"), str(plan_yolu), "--kareler", ",".join(map(str, ts)), "--dizin", str(klasor), "--olcek", "0.3"],
+                           cwd=str(VIDEO), capture_output=True, text=True)
+        kareler = sorted(klasor.glob("k_*.jpg"), key=lambda f: float(f.stem[2:].replace("_", ".")))
+        gecti, sorun = True, ""
+        if r.returncode != 0 or len(kareler) < 3:
+            gecti, sorun = False, "önizleme çizilemedi: " + (r.stderr or "")[-120:]
+        else:
+            try:
+                icerik = [{"type": "text", "text": "Bu 3 kare, 3D yazıcı hakkında bir animasyon sahnesinin farklı anlarıdır (dikey video). Sahne: " + str(plan["sahneler"][i].get("params", {}).get("yedek", "")) + ". Değerlendir: sahne boş ya da neredeyse boş mu, yazılar okunamıyor ya da üst üste biniyor mu, ögeler ekran dışına taşıyor ya da çok küçük/bozuk mu, kareler arasında hareket var mı? Yalnızca JSON: {\"gecti\": true/false, \"sorun\": \"kısa\"}. Küçük kusurlar için true de."}]
+                for k in kareler:
+                    icerik.append({"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + base64.b64encode(k.read_bytes()).decode()}})
+                govde = {"model": MODEL, "response_format": {"type": "json_object"}, "messages": [{"role": "user", "content": icerik}]}
+                rq = urllib.request.Request(f"{OPENAI}/chat/completions", data=json.dumps(govde).encode(), method="POST", headers={"Content-Type": "application/json", "Authorization": f"Bearer {anahtar}"})
+                with urllib.request.urlopen(rq, timeout=120) as y:
+                    j = json.loads(json.load(y)["choices"][0]["message"]["content"])
+                gecti, sorun = bool(j.get("gecti")), str(j.get("sorun") or "")[:100]
+            except Exception as e:
+                print(f"UYARI: özel sahne kontrolü yapılamadı ({type(e).__name__}); sahne korunuyor.")
+        print(f"Özel sahne {i + 1}: {'GEÇTİ' if gecti else 'GEÇMEDİ → yedek sahne'} {sorun}")
+        if not gecti:
+            yedek = (sh.get("params") or {}).get("yedek") or "ekstruder"
+            sh["tip"], sh["params"] = yedek, {}
+            degisen += 1
+    return degisen
 
 
 def konusma_dosyasi(parcalar_ses, sure, yol):
@@ -939,6 +990,10 @@ def calis(a):
             for sh, (yol, odak) in zip(plan["sahneler"], gorseller):
                 sh["params"]["gorsel"], sh["params"]["odak"] = "file://" + yol, odak
         yaz(g / "plan.json", plan)
+        if plan.get("bicim") == "anlat" and any(sh["tip"] == "ozel" for sh in plan["sahneler"]):
+            ilerleme("Özel sahneler kontrol ediliyor", 23, "", zorla=True)
+            if ozel_kontrol(plan, g, g / "plan.json"):
+                yaz(g / "plan.json", plan)
         konusma = None
         if parcalar:
             konusma_dosyasi(parcalar, plan["sure"], g / "konusma.wav")
@@ -960,6 +1015,12 @@ def calis(a):
                   "zamanlama": [{"tip": x["tip"], "t0": x["t0"], "t1": x["t1"], "ses_son": x.get("ses_son")} for x in plan["sahneler"]]}   # sahne/konuşma zamanları: ses sorunlarını sonradan ayıklamak için
         yaz(DIZIN / f"{kimlik}.json", taslak)
         yaz(KULLANILAN, sorted(set(json_oku(KULLANILAN, [])) | {kaynak}))
+        if plan.get("bicim") == "anlat":
+            hafiza = json_oku(NOKTALAR, {})
+            hafiza.setdefault("videolar", []).append({"id": kimlik, "konu": senaryo["konu"], "noktalar": [x.get("nokta") for x in senaryo["sahneler"] if x.get("nokta")]})
+            hafiza["videolar"] = hafiza["videolar"][-40:]
+            hafiza["son_ton"] = plan.get("ton")
+            yaz(NOKTALAR, hafiza)
         print(f"Taslak hazır: {kimlik}; başlık: {senaryo['baslik']}")
         if a.git:
             H.git_kaydet(f"Viral video: {kimlik} taslağı ({senaryo['konu'][:60]})", [DIZIN, KOK / "videolar"])
