@@ -149,3 +149,6 @@
 {"t": "2026-11-22T05:22:58Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
 {"t": "2026-11-22T05:23:07Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
 {"t": "2026-11-22T05:23:14Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-22T10:21:07Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 8.0, "site": "printables.com"}
+{"t": "2026-11-22T10:21:15Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 8.0}
+{"t": "2026-11-22T10:21:23Z", "tur": "referans_yok", "site": "printables.com", "uygunsuz": 1, "neden": "uygun değil (Ana nesne görünür olsa da görüntüde tüm sayfa arayüzü, menüler ve ikonlar baskın; bu yüzden ana fotoğraf olarak uygun değil.)"}
