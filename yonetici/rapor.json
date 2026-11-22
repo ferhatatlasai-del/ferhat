@@ -20,6 +20,27 @@
       ],
       "uyarilar": [],
       "eylem_sayisi": 1
+    },
+    {
+      "zaman": "2026-11-23 00:46",
+      "kademe": 2,
+      "model": "OpenAI (gpt-5.4-mini)",
+      "rapor": [
+        "Senin sistemde sağlık iyi görünüyor: Instagram, YouTube, OpenAI ve ofis sunucusu çalışıyor; acil bir bağlantı sorunu yok.",
+        "Hikâye kuyruğunda 9 planlı içerik var; günlük 6 hikâye ayarı bütçe ve hedefle uyumlu, şu an değiştirmedim.",
+        "Onay bekleyen tek taslak için daha önce onay önerisi verilmiş: s20261122-185523, başlık kanal çizgisine uygun görünüyor.",
+        "Öncelikli konu listesinde hâlâ A1 odaklı 5 konu var; çeşitlilik için yeni konu eklemek mümkün ama bekleyen öncelikli konu sayısı 3’ten fazla olduğu için ekleme yapmadım.",
+        "İstatistikte en çok izlenen içerikler ilk katman, kablo düzeni, ipliklenme ve nem gibi yeni başlayan sorunları; bu kalıp kanalın çizgisine uyuyor.",
+        "Yorum modunda otomatik sistem açık; şu an bekleyen yorum yok, bu yüzden yorum ajanını çalıştırmadım."
+      ],
+      "oneriler": [
+        "Bu akşam için A1 odaklı ama tekrar etmeyen bir video planla; örneğin ilk katman yerine filament değişimi veya bakım tarafına kay.",
+        "Hikâye akışını koru; günlük 6 hedefi şu an yeterli görünüyor.",
+        "Bekleyen öncelikli konu sayısı 3’ün altına düşerse, en çok izlenen kalıba yakın ama yeni bir konu ekleyebilirsin.",
+        "Yeni taslaklarda başlık kadar sahne çeşitliliğini de artır; aynı görsel dili üst üste kullanma."
+      ],
+      "uyarilar": [],
+      "eylem_sayisi": 1
     }
   ],
   "defter": [
@@ -33,6 +54,19 @@
         "not": "Konu, kanalın yeni başlayan odaklı çizgisine uyuyor; içerik detayını görmeden kesin onay vermiyorum ama başlık uygun."
       },
       "neden": "Taslak onay bekliyor ve konu kanal hedefiyle uyumlu görünüyor.",
+      "durum": "yapildi",
+      "ayrinti": "s20261122-185523: onayla önerisi"
+    },
+    {
+      "zaman": "2026-11-23 00:46",
+      "kademe": 2,
+      "eylem": "taslak_isaretle",
+      "params": {
+        "id": "s20261122-185523",
+        "oneri": "onayla",
+        "not": "Başlık yeni başlayan odaklı ve kanal çizgisine uyuyor; içerik detayını görmeden kesin onay vermiyorum ama konu uygun."
+      },
+      "neden": "Önceki kararı koruyup taslağa not düşmek için",
       "durum": "yapildi",
       "ayrinti": "s20261122-185523: onayla önerisi"
     }
