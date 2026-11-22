@@ -214,14 +214,14 @@
   };
 
   S.karsilastir = function (c) {
-    const { x, t, lt, d, p } = c; c.arka(c.p.tema || 'mavi'); const a = p.a || { ad: 'A', deger: 60 }, b = p.b || { ad: 'B', deger: 40 }, mx = Math.max(sayi(a.deger, 1), sayi(b.deger, 1), 1), q = eo((lt - 0.3) / 1.2), birim = p.birim || '';
+    const { x, t, lt, d, p } = c; c.arka(c.p.tema || 'mavi'); const a = p.a || { ad: 'A', deger: 60 }, b = p.b || { ad: 'B', deger: 40 }, mx = Math.max(sayi(a.deger, 1), sayi(b.deger, 1), 1e-9), q = eo((lt - 0.3) / 1.2), ond = mx < 10 ? 2 : 0, fmt = v => (ond ? v.toFixed(ond).replace('.', ',') : String(Math.round(v)))   // küçük değerlerde (0,02 mm) ondalık göster, birim = p.birim || '';
     c.dunya([540, 800, 1.0], [540, 800, 1.06], function () {
       x.fillStyle = 'rgba(255,255,255,0.08)'; rr(x, 90, 380, 900, 780, 40); x.fill();
       [[a, 330, TURUNCU], [b, 750, MAVI]].forEach(function (pr) {
         const o = pr[0], cx = pr[1], renk = pr[2], h = 560 * (sayi(o.deger, 0) / mx) * q;
         const g = x.createLinearGradient(0, 1100 - h, 0, 1100); g.addColorStop(0, renk); g.addColorStop(1, mix(renk, '#000000', 0.35)); x.fillStyle = g; rr(x, cx - 110, 1100 - h, 220, Math.max(h, 8), 22); x.fill();
         x.fillStyle = 'rgba(255,255,255,0.22)'; rr(x, cx - 90, 1100 - h + 10, 40, Math.max(h - 20, 0), 14); x.fill();
-        yazi(x, Math.round(sayi(o.deger, 0) * q) + (birim ? ' ' + birim : ''), cx, 1100 - h - 52, 66, '#fff'); yazi(x, String(o.ad), cx, 1160, 52, '#fff');
+        yazi(x, fmt(sayi(o.deger, 0) * q) + (birim ? ' ' + birim : ''), cx, 1100 - h - 52, 66, '#fff'); yazi(x, String(o.ad), cx, 1160, 52, '#fff');
       });
       x.fillStyle = '#fff'; x.beginPath(); x.arc(540, 800, 52, 0, 6.3); x.fill(); yazi(x, 'VS', 540, 804, 44, KOYU, 'center', false);
     });
