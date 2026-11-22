@@ -1,7 +1,7 @@
 {
   "id": "h20261121-114429-o1v",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-21T11:44:29.000Z",
   "gorsel": "hikaye/gorseller/h20261121-114429-o1v.mp4",
   "baslik": "Shopping Bags Hook - Gancho para bolsas de la compra",
@@ -21,7 +21,9 @@
     "sorunlar": []
   },
   "yayin": {
-    "tarih": "2026-11-22T12:05:38Z"
+    "tarih": "2026-11-22T12:07:24Z",
+    "medya_kimligi": "18352225648254861",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4036004146700046820"
   },
   "hata": "",
   "deneme": 0,
