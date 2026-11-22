@@ -1,7 +1,7 @@
 {
   "id": "s20261122-215123",
   "olusturma": "2026-11-22T21:51:23Z",
-  "durum": "onay_bekliyor",
+  "durum": "yayinlandi",
   "tur": "viral",
   "video": "videolar/yukleme_20261122215123.mp4",
   "sure": 52.8,
@@ -73,8 +73,9 @@
   "admin_notu": "Son videodaki AMS lite filament degisim sorunlari konusuna cok benziyor; tekrar riski var.",
   "admin_oneri": "incele",
   "yayinlanan": [
-    "instagram"
+    "instagram",
+    "youtube"
   ],
-  "yayin_tarihi": "2026-11-22T23:16:32.195Z",
+  "yayin_tarihi": "2026-11-22T23:17:04.363Z",
   "hikaye_tarihi": "2026-11-22T23:16:38.120Z"
 }
