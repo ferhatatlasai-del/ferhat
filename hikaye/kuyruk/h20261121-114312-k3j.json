@@ -1,7 +1,7 @@
 {
   "id": "h20261121-114312-k3j",
   "kaynak": "uretim",
-  "durum": "planli",
+  "durum": "yayinlaniyor",
   "olusturma": "2026-11-21T11:43:12.000Z",
   "gorsel": "hikaye/gorseller/h20261121-114312-k3j.mp4",
   "baslik": "Towel Bar Hook",
@@ -20,7 +20,9 @@
     "deneme": 1,
     "sorunlar": []
   },
-  "yayin": null,
+  "yayin": {
+    "tarih": "2026-11-22T11:25:38Z"
+  },
   "hata": "",
   "deneme": 0,
   "tur": "video",
