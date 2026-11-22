@@ -50,7 +50,7 @@ SAHNE TİPLERİ (animasyon; tipin yanındaki params zorunlu/isteğe bağlı alan
   ikon adları: nozul, nozul_tikali, makara, disli, fan, termometre, damla, alev, duman, tik, carpi, uyari, saat, lupa, yildiz, parca, filament, yatak, kilit. Renkler: turuncu, mavi, yesil, kirmizi, sari, mor, pembe, beyaz, koyu, gri, kahve, siyah ya da #rrggbb.
   Örnek mini özel sahne: [{{"tur":"ikon","ad":"termometre","x":300,"y":760,"olcek":2.2,"doluluk":0.2,"hareket":[{{"o":"doluluk","den":0.2,"a":0.95,"t0":0.3,"t1":2.5}}]}},{{"tur":"ikon","ad":"alev","x":300,"y":1040,"olcek":1.4,"dongu":{{"nabiz":0.06}},"t":[0.3,99]}},{{"tur":"ok","x1":420,"y1":760,"x2":720,"y2":760,"renk":"sari","kalinlik":12,"hareket":[{{"o":"cizim","den":0,"a":1,"t0":1.0,"t1":1.6}}]}},{{"tur":"yazi","x":760,"y":700,"metin":"ISI YUKARI ÇIKAR","boyut":52,"renk":"sari","t":[1.6,99]}}]
 
-ÇEŞİTLİLİK KURALLARI: Konuya UYAN tipleri seç ve her sahneyi bir fikre ayır. Aynı tip arka arkaya gelmesin, bir tip en çok 2 kez kullanılsın (ozel en çok 3), en az 5 farklı tip olsun. Konuyla ilgisi olmayan sahneyi zorla koyma. Videoda 1-3 "ozel" sahne tasarla: bu konunun kendine özgü kavramını çizen, başka videoda kullanılamayacak sahneler; diğerleri hazır tiplerden olsun.
+ÇEŞİTLİLİK KURALLARI: Konuya UYAN tipleri seç ve her sahneyi bir fikre ayır. Aynı tip arka arkaya gelmesin, bir tip en çok 2 kez kullanılsın (ozel en çok 3), en az 5 farklı tip olsun. Konuyla ilgisi olmayan sahneyi zorla koyma. Videoda EN AZ 1, en çok 3 "ozel" sahne tasarla (ZORUNLU): bu konunun kendine özgü kavramını çizen, başka videoda kullanılamayacak sahneler; diğerleri hazır tiplerden olsun. Hazır tiplerin hepsini seçip "ozel" sahne koymazsan yanıt reddedilir.
 TEKRARA DÜŞME: Her sahnenin "nokta" alanına o sahnede anlattığın TEK somut bilgiyi 3-8 kelimeyle yaz (örn. "nem nozulda buharlaşır"). Aşağıdaki, daha önceki videolarda ZATEN anlatılmış noktaları ve konuları TEKRAR ETME; aynı genel fikri farklı bir açıdan, yeni bilgiyle anlat. Bu videonun noktaları da birbirinden farklı olsun (aynı bilgiyi iki sahnede söyleme).
 {onceki}
 ANLATI: sahne başına 1-2 kısa cümle (8-22 kelime), toplam 110-150 kelime. İlk sahne güçlü kanca (soru ya da yaygın hata). Cümleler kısa, konuşma dili, "sen" hitabı. Son sahne yoruma davet + takip et.
@@ -225,6 +225,8 @@ def dogrula(s, temizle=lambda x: x, gecmis=()):
         raise ValueError("ilk sahne 'kanca' olmalı")
     if temiz[-1]["tip"] != "kapanis":
         raise ValueError("son sahne 'kapanis' olmalı")
+    if not sayac.get("ozel"):
+        raise ValueError("en az bir 'ozel' (konuya özel tasarlanmış) sahne gerekli; yalnızca hazır tipler kullanılmış")
     if len(sayac) < 5:
         raise ValueError(f"en az 5 farklı sahne tipi gerekli ({len(sayac)})")
     kelime = sum(len(x["anlati"].split()) for x in temiz)

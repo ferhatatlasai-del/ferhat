@@ -2309,7 +2309,7 @@ function shortsCiz(v){
     var ac=document.createElement('textarea'); ac.rows=6; ac.maxLength=2000; ac.value=x.aciklama||''; ac.style.cssText='width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-top:6px';
     var det=document.createElement('details'); det.className='tr'; var sm=document.createElement('summary'); sm.textContent='Başlık: '+(x.baslik||'(yok)').slice(0,50)+' — düzenle'; det.appendChild(sm); det.appendChild(bas); det.appendChild(ac); d.appendChild(det);
     YAYIN_YERLERI.forEach(function(y){ yayinDugmesi(x,y,d,{baslik:bas,aciklama:ac}); });
-    if(x.admin_oneri){ var an=dom('div','not','🧠 Yönetici önerisi: '+(x.admin_oneri==='onayla'?'onayla':'reddet')+(x.admin_notu?' — '+x.admin_notu:'')); an.style.cssText='margin-top:8px;padding:6px 10px;border-radius:10px;background:var(--bg);border:1px solid var(--line);font-weight:600'; d.appendChild(an); }
+    if(x.admin_oneri){ var an=dom('div','not','🧠 Yönetici önerisi: '+(x.admin_oneri==='reddet'?'reddet':'dikkatle incele')+(x.admin_notu?' — '+x.admin_notu:'')); an.style.cssText='margin-top:8px;padding:6px 10px;border-radius:10px;background:var(--bg);border:1px solid var(--line);font-weight:600'; d.appendChild(an); }
     var son=sonYayinZamani(x); if(son) d.appendChild(dom('div','not','Son yayın: '+fmt(new Date(son).toISOString())+' · bu kart ondan 24 saat sonra kalkar.'));
     var dz=document.createElement('details'); dz.className='tr'; var dzs=document.createElement('summary'); dzs.textContent='Reddet ya da sil'; dz.appendChild(dzs);
     dz.appendChild(dom('p','not','Reddedilen video 24 saat boyunca “Reddedilenler” bölümünden geri alınabilir. “Sil” kalıcıdır.'));
