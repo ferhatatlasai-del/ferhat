@@ -1,5 +1,5 @@
 {
-  "tarih": "2026-11-22T09:10:46Z",
+  "tarih": "2026-11-22T13:10:39Z",
   "kontroller": [
     {
       "ad": "Instagram",
@@ -24,12 +24,12 @@
     {
       "ad": "Hikaye kuyruğu",
       "durum": "iyi",
-      "not": "Kuyrukta 12 planlı hikaye var"
+      "not": "Kuyrukta 10 planlı hikaye var"
     },
     {
       "ad": "Hikaye ajanı",
       "durum": "iyi",
-      "not": "Hikaye ajanı elle duraklatılmış"
+      "not": "Hikaye ajanı çalışıyor"
     }
   ]
 }
