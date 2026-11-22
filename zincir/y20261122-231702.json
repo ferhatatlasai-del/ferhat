@@ -1,0 +1,27 @@
+{
+  "kimlik": "y20261122-231702",
+  "olusturma": "2026-11-22T23:17:02.848Z",
+  "durum": "video",
+  "kaynak": "bagimsiz",
+  "direktif": "",
+  "konu": "Bambu Lab A1 Combo AMS lite filament değişim sorunları",
+  "format": "reels",
+  "seri": "",
+  "kanca": "",
+  "video": {
+    "yol": "videolar/yukleme_20261122215123.mp4",
+    "tarih": "2026-11-22T23:16:56.518Z"
+  },
+  "yayinlar": [
+    {
+      "hedef": "youtube",
+      "platform": "youtube",
+      "tur": "shorts",
+      "durum": "basladi",
+      "baslangic": "2026-11-22T23:16:56.518Z",
+      "video": "videolar/yukleme_20261122215123.mp4"
+    }
+  ],
+  "olcumler": [],
+  "ogrenildi": false
+}
