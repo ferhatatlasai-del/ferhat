@@ -1,0 +1,20 @@
+{
+  "videolar": [
+    {
+      "id": "s20261122-215123",
+      "konu": "Bambu Lab A1 Combo'da AMS lite ile filament değişimi: sık sorunlar",
+      "noktalar": [
+        "filament yolu ve makara etkisi",
+        "makara hizası sürtünme yaratır",
+        "dişli kaydırması beslemeyi bozar",
+        "uçtaki düğüm değişimi keser",
+        "nemli filament ses yapar",
+        "renk geçişinde atık oluşur",
+        "yetersiz ısı akışı zorlar",
+        "üçlü kontrol çoğu sorunu çözer",
+        "yorum ve takip çağrısı"
+      ]
+    }
+  ],
+  "son_ton": 250
+}
