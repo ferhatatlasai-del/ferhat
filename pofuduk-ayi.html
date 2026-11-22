@@ -79,8 +79,8 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 .small { font-size: .85rem; opacity: .8; }
 .who { display: grid; gap: 8px; border-top: 3px dashed color-mix(in srgb, var(--bark) 40%, transparent); padding-top: 12px; }
 .who label { font-family: var(--display); font-size: 1.1rem; letter-spacing: .02em; }
-#nameInput, #passInput { font-family: var(--display); font-size: 1.35rem; text-align: center; color: var(--bark); background: #fff; border: 3px solid var(--bark); border-radius: 12px; padding: 6px 10px; width: 100%; max-width: 16rem; box-sizing: border-box; justify-self: center; }
-#nameInput:focus-visible, #passInput:focus-visible { outline: 3px solid var(--leaf); outline-offset: 2px; }
+#nameInput, #passInput, #ageInput { font-family: var(--display); font-size: 1.35rem; text-align: center; color: var(--bark); background: #fff; border: 3px solid var(--bark); border-radius: 12px; padding: 6px 10px; width: 100%; max-width: 16rem; box-sizing: border-box; justify-self: center; }
+#nameInput:focus-visible, #passInput:focus-visible, #ageInput:focus-visible { outline: 3px solid var(--leaf); outline-offset: 2px; }
 .pick { display: flex; gap: 12px; justify-content: center; }
 .pk { display: grid; justify-items: center; gap: 2px; padding: 6px 12px 8px; background: var(--cream); color: var(--bark); border: 3px solid color-mix(in srgb, var(--bark) 35%, transparent); border-radius: 14px; cursor: pointer; font-family: var(--display); font-size: 1rem; letter-spacing: .03em; }
 .pk canvas { width: 72px; height: 72px; }
@@ -208,8 +208,10 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 .axe .st { font-family: var(--display); font-size: .9rem; letter-spacing: .03em; }
 .set { display: grid; gap: 14px; text-align: left; }
 .set label { display: grid; grid-template-columns: 1fr minmax(0, 14rem); align-items: center; gap: 12px; font-weight: 800; }
+.set select { font-family: var(--display); font-size: 1rem; color: var(--bark); background: #fff; border: 3px solid var(--bark); border-radius: 10px; padding: 4px 8px; width: 100%; box-sizing: border-box; }
 .set input[type="range"] { width: 100%; accent-color: var(--honey-deep); }
 .set input[type="checkbox"] { width: 28px; height: 28px; accent-color: var(--honey-deep); justify-self: end; }
+.set input[type="number"] { font-family: var(--display); font-size: 1.1rem; color: var(--bark); background: #fff; border: 3px solid var(--bark); border-radius: 10px; padding: 4px 8px; width: 100%; box-sizing: border-box; }
 .set input[type="text"] { font-family: var(--display); font-size: 1.1rem; color: var(--bark); background: #fff; border: 3px solid var(--bark); border-radius: 10px; padding: 4px 8px; width: 100%; box-sizing: border-box; }
 .set input[type="text"]:focus-visible { outline: 3px solid var(--leaf); outline-offset: 2px; }
 .set .val { font-variant-numeric: tabular-nums; opacity: .7; font-weight: 600; }
@@ -256,6 +258,11 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
       <label for="passInput">Şifre</label>
       <input id="passInput" type="password" maxlength="24" autocomplete="current-password" placeholder="Şifre (en az 3 harf)">
       <p id="accHint" class="small" role="status"></p>
+      <div id="ageWrap" class="who" style="border-top:0;padding-top:0;margin-top:-4px">
+        <label for="ageInput">Yaşın</label>
+        <input id="ageInput" type="number" min="3" max="99" inputmode="numeric" autocomplete="off" placeholder="Yaşın (3-99)">
+        <p id="ageNote" class="small" role="status"></p>
+      </div>
       <div id="avWrap" class="who" style="border-top:0;padding-top:0">
         <label>Hesap görseli</label>
         <div class="avpick" id="avPick" role="group" aria-label="Hesap görseli seç"></div>
@@ -396,10 +403,12 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
     <h2>Ayarlar</h2>
     <div class="set">
       <label for="setName"><span>Ayının adı</span><input type="text" id="setName" maxlength="14" autocomplete="off" spellcheck="false" placeholder="Pofuduk"></label>
+      <label for="setAge"><span>Yaşın <span class="val" id="vAge"></span></span><input type="number" id="setAge" min="3" max="99" inputmode="numeric"></label>
       <label for="setMusic"><span>Müzik</span><input type="checkbox" id="setMusic"></label>
       <label for="setMusicVol"><span>Müzik sesi <span class="val" id="vMusic"></span></span><input type="range" id="setMusicVol" min="0" max="100" step="5"></label>
       <label for="setSfxVol"><span>Efekt sesleri <span class="val" id="vSfx"></span></span><input type="range" id="setSfxVol" min="0" max="100" step="5"></label>
       <label for="setView"><span>Görüş uzaklığı <span class="val" id="vView"></span></span><input type="range" id="setView" min="50" max="250" step="10"></label>
+      <label for="setQual"><span>Grafik kalitesi</span><select id="setQual"><option value="auto">Otomatik</option><option value="low">Düşük</option><option value="med">Orta</option><option value="high">Yüksek</option></select></label>
       <label for="setCam"><span>Kamera dönüş hızı <span class="val" id="vCam"></span></span><input type="range" id="setCam" min="30" max="200" step="10"></label>
     </div>
     <p class="small">Klavyede M tuşu bütün sesleri bir anda susturur.</p>
@@ -930,7 +939,7 @@ function drawHud() {
   for (let i = 0; i < save.maxHp; i++) drawHeart(30 + i * 34, 28, i < P.hp);
   { const cx = 46, cy = 76, r = 17; ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7); ctx.fillStyle = '#fff4dc'; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = '#4a2c17'; ctx.stroke(); ctx.clip();
     const im = avatar.photo && avImage(avatar.photo); if (im) ctx.drawImage(im, cx - r, cy - r, 2 * r, 2 * r); else { ctx.font = '22px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#000'; ctx.fillText(avatar.sel || '🐻', cx, cy + 1); } ctx.restore();
-    txt(save.name, 72, 83, 20, '#fff4dc'); }
+    txt(save.name, 72, 83, 20, '#fff4dc'); if (save.age) txt(`${save.age} yaş · ${heightCm(save.age)} cm`, 72, 101, 14, '#ffe8bf'); }
   let hx = 30 + save.maxHp * 34 + 4;
   drawHoneyJar(hx, 33, 1.15); txt('' + (L.hub ? save.bal || 0 : honey), hx + 16, 42, 26); hx += 70;
   drawCoin(hx, 32, 1.1); txt('' + save.coins, hx + 16, 42, 26); hx += 80;
@@ -973,6 +982,7 @@ function drawHud() {
       txt(sg.title, VW / 2, py + 36, 26, '#ffd23f', 'center'); lines.forEach((l, i) => txt(l, VW / 2, py + 68 + i * 28, 20, '#fff4dc', 'center'));
     }
   }
+  if (qualMsg > 0) { qualMsg--; ctx.globalAlpha = Math.min(1, qualMsg / 30); txt(qualTxt, VW / 2, VH - 120, 20, '#ffd23f', 'center'); ctx.globalAlpha = 1; }
   if (L.hub && nightMsg > 0 && banner <= 0) { // waits until the village title has faded
     nightMsg--; ctx.globalAlpha = Math.min(1, nightMsg / 30);
     txt(nightTxt, VW / 2, 170, 40, isNight() ? '#c9d6ff' : '#ffd23f', 'center');
@@ -1002,7 +1012,7 @@ const glc = document.getElementById('gl');
 let USE3D = false;
 const G = { shotMeshes: [], bearKey: '', camYaw: 0, manualT: 0, v: null, clouds: [] };
 try {
-  if (window.THREE) { G.r = new THREE.WebGLRenderer({ canvas: glc, antialias: true }); USE3D = true; }
+  if (window.THREE) { G.r = new THREE.WebGLRenderer({ canvas: glc, antialias: !isTouch, powerPreference: 'high-performance' }); USE3D = true; }
 } catch (e) { USE3D = false; }
 if (!USE3D) glc.hidden = true;
 
@@ -1033,13 +1043,95 @@ function applyView() {
   G.cam.far = Math.max(300, G.fogBase[1] * v + 80); G.cam.updateProjectionMatrix();
 }
 const viewWord = v => v < 0.8 ? 'Yakın' : v < 1.3 ? 'Normal' : v < 1.9 ? 'Uzak' : 'Çok uzak';
+/* ---------- graphics quality: auto, low, medium or high ---------- */
+const QUAL = { low: { pr: 1, shadow: false, name: 'Düşük' }, med: { pr: 1, shadow: true, name: 'Orta' }, high: { pr: 2, shadow: true, name: 'Yüksek' } };
+const qualityLevel = () => { const q = save.quality || 'auto'; return q === 'auto' ? (G.autoQ || (isTouch ? 'med' : 'high')) : QUAL[q] ? q : 'high'; };
+function applyQuality() {
+  if (!USE3D || !G.r) return;
+  const lv = qualityLevel(), q = QUAL[lv], r = G.r, pr = Math.min(window.devicePixelRatio || 1, q.pr);
+  if (r.getPixelRatio() !== pr) { r.setPixelRatio(pr); r.setSize(VW, VH, false); }
+  if (G.sun) G.sun.castShadow = q.shadow;
+  G.qualNow = lv;
+}
+let perfAcc = 0, perfN = 0, perfSlow = 0, qualMsg = 0, qualTxt = '';
+function perfTick(dt) { // if the game runs slowly on "auto", step the quality down by itself
+  if (!USE3D || document.hidden || state !== 'play' || dt > 400) { perfAcc = 0; perfN = 0; return; }
+  perfAcc += dt; perfN++;
+  if (perfAcc < 4000) return;
+  const fps = perfN / (perfAcc / 1000); perfAcc = 0; perfN = 0;
+  if ((save.quality || 'auto') !== 'auto' || G.qualNow === 'low') { perfSlow = 0; return; }
+  perfSlow = fps < 32 ? perfSlow + 1 : 0;
+  if (perfSlow >= 2) { perfSlow = 0; G.autoQ = G.qualNow === 'high' ? 'med' : 'low'; applyQuality(); qualMsg = 300; qualTxt = `Oyun yavaş çalıştığı için grafikleri düşürdüm (${QUAL[G.autoQ].name})`; }
+}
+/* ---------- merging the static scenery into big chunks: far fewer draw calls ---------- */
+const MERGE_CELL_D = 28, mergeCell = () => window.MERGE_CELL || MERGE_CELL_D;
+function mergeBucket(meshes) {
+  let vc = 0, ic = 0;
+  for (const m of meshes) { const g = m.geometry; if (!g.attributes.normal) g.computeVertexNormals(); vc += g.attributes.position.count; ic += g.index ? g.index.count : g.attributes.position.count; }
+  const pos = new Float32Array(vc * 3), nor = new Float32Array(vc * 3), uv = new Float32Array(vc * 2), idx = vc > 65535 ? new Uint32Array(ic) : new Uint16Array(ic), nm = new THREE.Matrix3();
+  let vo = 0, io = 0;
+  for (const m of meshes) {
+    const g = m.geometry, P = g.attributes.position, N = g.attributes.normal, U = g.attributes.uv, e = m.matrixWorld.elements, n = nm.getNormalMatrix(m.matrixWorld).elements, flip = m.matrixWorld.determinant() < 0;
+    for (let i = 0; i < P.count; i++) {
+      const x = P.getX(i), y = P.getY(i), z = P.getZ(i), o = (vo + i) * 3;
+      pos[o] = e[0] * x + e[4] * y + e[8] * z + e[12]; pos[o + 1] = e[1] * x + e[5] * y + e[9] * z + e[13]; pos[o + 2] = e[2] * x + e[6] * y + e[10] * z + e[14];
+      const a = N.getX(i), b = N.getY(i), c = N.getZ(i), nx = n[0] * a + n[3] * b + n[6] * c, ny = n[1] * a + n[4] * b + n[7] * c, nz = n[2] * a + n[5] * b + n[8] * c, l = Math.hypot(nx, ny, nz) || 1;
+      nor[o] = nx / l; nor[o + 1] = ny / l; nor[o + 2] = nz / l;
+      if (U) { uv[(vo + i) * 2] = U.getX(i); uv[(vo + i) * 2 + 1] = U.getY(i); }
+    }
+    const I = g.index, cnt = I ? I.count : P.count;
+    for (let t = 0; t < cnt; t += 3) { const a = I ? I.getX(t) : t, b = I ? I.getX(t + 1) : t + 1, c = I ? I.getX(t + 2) : t + 2; idx[io + t] = vo + a; idx[io + t + 1] = vo + (flip ? c : b); idx[io + t + 2] = vo + (flip ? b : c); }
+    vo += P.count; io += cnt;
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setAttribute('normal', new THREE.BufferAttribute(nor, 3)); geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2)); geo.setIndex(new THREE.BufferAttribute(idx, 1));
+  geo.computeBoundingSphere(); geo.computeBoundingBox();
+  return geo;
+}
+function mergeStatic(root, keep) { // everything under `root` except the things in `keep` becomes a few meshes per area and material
+  const refs = new Set(G.boxMeshes ? [...G.boxMeshes.values()] : []), list = [];
+  const walk = o => {
+    if (keep.has(o) || o.visible === false) return;
+    if (o.isMesh && o.geometry && o.geometry.attributes && o.geometry.attributes.position && o.material && !Array.isArray(o.material) && !o.material.transparent) list.push(o);
+    for (const c of o.children) walk(c);
+  };
+  walk(root); root.updateMatrixWorld(true);
+  const buckets = new Map(), box = new THREE.Box3(), size = new THREE.Vector3(), ctr = new THREE.Vector3();
+  for (const m of list) {
+    const g = m.geometry; if (!g.boundingBox) g.computeBoundingBox();
+    box.copy(g.boundingBox).applyMatrix4(m.matrixWorld); box.getSize(size); if (size.x > 60 || size.z > 60) continue; // big slabs stay as they are
+    box.getCenter(ctr);
+    const key = m.material.uuid + '|' + (m.castShadow ? 1 : 0) + (m.receiveShadow ? 1 : 0) + '|' + Math.floor(ctr.x / mergeCell()) + ',' + Math.floor(ctr.z / mergeCell());
+    let b = buckets.get(key); if (!b) buckets.set(key, b = []); b.push(m);
+  }
+  const emptied = new Set(); let made = 0, gone = 0;
+  for (const b of buckets.values()) {
+    if (b.length < 2) continue;
+    const m0 = b[0], mesh = new THREE.Mesh(mergeBucket(b), m0.material);
+    mesh.castShadow = m0.castShadow; mesh.receiveShadow = m0.receiveShadow; mesh.matrixAutoUpdate = false; mesh.userData.merged = true;
+    G.world.add(mesh); made++;
+    for (const m of b) { if (m.parent) { emptied.add(m.parent); m.parent.remove(m); gone++; } }
+  }
+  const prune = o => { if (o !== root && o !== G.world && o.parent && o.children.length === 0 && !keep.has(o) && !refs.has(o)) { const par = o.parent; par.remove(o); prune(par); } }; // empty groups would still cost a matrix update every frame
+  for (const o of emptied) prune(o);
+  return { made, gone };
+}
+function mergeHub() {
+  if (window.NOMERGE) return;
+  const keep = new Set([G.sunMesh, G.doorGlow, G.blob, G.marker, G.trail, G.stars, G.homeMark].filter(Boolean));
+  for (const c of G.clouds || []) keep.add(c);
+  for (const it of L.items || []) if (it.mesh) keep.add(it.mesh);
+  for (const o of [...(L.portals || []).map(q => q.disc), ...(L.mts || []).map(q => q.glow), ...(L.parks || []).map(q => q.glow), ...(L.turtles || []).map(q => q.mesh), ...(L.rabbits || []).map(q => q.mesh), ...(L.babies || []).map(q => q.mesh), L.burrow && L.burrow.mesh, ...(L.stores || []).map(q => q.keeper)]) if (o) keep.add(o);
+  const m = L.mansion; if (m) for (const o of [...(m.doors || []).map(d => d.g), ...(m.fish || []), m.jet, m.glow]) if (o) keep.add(o);
+  const t0 = performance.now(), r = mergeStatic(G.world, keep);
+  G.mergeInfo = { ...r, ms: Math.round(performance.now() - t0) };
+}
 function canvasTex(w, h, fn) { const c = document.createElement('canvas'); c.width = w; c.height = h; fn(c.getContext('2d'), w, h); return new THREE.CanvasTexture(c); }
 
 function init3D() {
   const r = G.r;
-  r.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   r.setSize(VW, VH, false);
-  r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap;
+  r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFShadowMap;
   G.scene = new THREE.Scene();
   G.cam = new THREE.PerspectiveCamera(40, VW / VH, 0.5, 300);
   G.hemi = new THREE.HemisphereLight(0xffffff, 0x445544, 0.62); G.scene.add(G.hemi);
@@ -1050,9 +1142,10 @@ function init3D() {
   G.scene.add(G.sun); G.scene.add(G.sun.target);
   G.homeLight = new THREE.PointLight(0xffd9a0, 0, 7.5, 1.4); G.scene.add(G.homeLight); // lit only inside a house
   G.lamp = new THREE.PointLight(0xffd59a, 0, 18, 1.1); G.scene.add(G.lamp); // the bear's glow at night
+  applyQuality();
   G.v = new THREE.Vector3();
   G.geo = {
-    box: new THREE.BoxGeometry(1, 1, 1), sph: new THREE.SphereGeometry(1, 20, 14),
+    box: new THREE.BoxGeometry(1, 1, 1), sph: new THREE.SphereGeometry(1, 20, 14), sphL: new THREE.SphereGeometry(1, 12, 8), pebble: new THREE.IcosahedronGeometry(1, 0),
     hemi: new THREE.SphereGeometry(1, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2),
     cyl: new THREE.CylinderGeometry(1, 1, 1, 18), cone: new THREE.ConeGeometry(1, 1, 16), coneLow: new THREE.ConeGeometry(1, 1, 6),
     ico: new THREE.IcosahedronGeometry(1, 1), gem: new THREE.OctahedronGeometry(1, 0), torus: new THREE.TorusGeometry(1, 0.28, 10, 26), prism: new THREE.CylinderGeometry(1, 1, 1, 3), ring: new THREE.TorusGeometry(1, 0.07, 6, 48), disc: new THREE.CircleGeometry(1, 40),
@@ -1237,7 +1330,7 @@ function mansionShell(m) { // walls, floors, stairs, balcony and terrace parapet
   return out;
 }
 function mansionBoxes(m) { // furniture you bump into and stand on
-  const { hw, hd, h1, h2, h: hh, R1, zb } = MAN, d = save.decor || [], r = (...a) => localRect(m, ...a);
+  const { hw, hd, h1, h2, h: hh, R1, zb } = MAN, d = m.decor || save.decor || [], r = (...a) => localRect(m, ...a);
   const out = [
     r(R1 - 0.7, 0.2, R1, 2.6, 0, 2.4), r(3.6, 0.1, 4.7, 2.7, 0, 0.75),                 // fireplace, sofa
     r(1.5, zb, R1, zb + 0.8, 0, 1.0), r(R1 - 1.0, zb + 0.8, R1, zb + 1.9, 0, 2.2),     // kitchen counter, fridge
@@ -1254,6 +1347,7 @@ function mansionBoxes(m) { // furniture you bump into and stand on
 function mansionModel(parent, h) {
   const { hw, hd, h1, h2, h: hh, wt, dw, dh, L0, L1, R0, R1, zb, zf, topZ, run, bw, bd } = MAN;
   const t = grp(parent, h.x, 0, h.z); t.rotation.y = h.yaw;
+  const OWN = h.owned || save.owned || [], DEC = h.decor || save.decor || []; // a friend's house shows a friend's clothes and furniture
   const wall = '#f0dcb0', trim = '#6b4220', wood = '#9a6234', glass = '#ffe08a', floorC = '#a8743d';
   const box = (c, sx, sy, sz, x, y, z, o) => mk('box', c, [sx, sy, sz], [x, y, z], t, o);
   // outside walls (the front has the door and, upstairs, the balcony door)
@@ -1323,7 +1417,7 @@ function mansionModel(parent, h) {
   { const wx = -4.4, wz = zb + 0.38, dk = '#7a4a24'; // open wardrobe: everything you have bought hangs inside
     box(dk, 1.6, 2.4, 0.1, wx, h1 + 1.2, zb + 0.05); box(dk, 1.6, 0.1, 0.75, wx, h1 + 2.4, wz); box(dk, 1.6, 0.1, 0.75, wx, h1 + 0.05, wz); for (const sx of [-1, 1]) box(dk, 0.08, 2.4, 0.75, wx + sx * 0.8, h1 + 1.2, wz);
     const rod = mk('cyl', '#c0c6cc', [0.03, 1.5, 0.03], [wx, h1 + 2.1, wz], t); rod.rotation.z = Math.PI / 2;
-    const own = (save.owned || []).filter(o => o !== 'none'), n = own.length;
+    const own = OWN.filter(o => o !== 'none'), n = own.length;
     own.forEach((o, i) => { const x = wx + (n > 1 ? (i / (n - 1) - 0.5) * 1.3 : 0); mk('cyl', '#c0c6cc', [0.01, 0.15, 0.01], [x, h1 + 2.0, wz], t); box(OUT_COL[o] || '#888888', 0.1, 0.75, 0.5, x, h1 + 1.55, wz); }); }
   { const c = grp(t, MAN.chest[0], h1, MAN.chest[1]);
     mk('box', '#8a5a2b', [1.3, 0.75, 0.85], [0, 0.38, 0], c); mk('box', '#a06d3a', [1.34, 0.38, 0.9], [0, 0.92, 0], c);
@@ -1338,7 +1432,7 @@ function mansionModel(parent, h) {
     mk('cyl', '#c08a4e', [0.28, 0.07, 0.28], [x, hh + 0.48, z], t); for (const [dx, dz] of [[-0.15, -0.15], [0.15, -0.15], [-0.15, 0.15], [0.15, 0.15]]) mk('cyl', trim, [0.025, 0.46, 0.025], [x + dx, hh + 0.23, z + dz], t);
   }
   // things bought with honey jars
-  const d = save.decor || [];
+  const d = DEC;
   if (d.includes('plants')) for (const [x, y, z] of [[R1 - 0.5, 0, zf - 0.5], [-5.4, 0, zf - 0.5], [-5.4, h1, zf - 0.5], [-dw - 1.3, 0, hd + 0.6], [dw + 1.3, 0, hd + 0.6], [-6.5, hh, 5.4], [6.5, hh, 5.4]]) {
     mk('cyl', '#b5452f', [0.28, 0.45, 0.28], [x, y + 0.22, z], t); mk('sph', '#3f9b37', [0.42, 0.42, 0.42], [x, y + 0.75, z], t);
     for (let k = 0; k < 3; k++) mk('sph', ['#ff5fa2', '#ffd23f', '#ffffff'][k], [0.1, 0.1, 0.1], [x + Math.cos(k * 2.1) * 0.25, y + 1.0, z + Math.sin(k * 2.1) * 0.25], t);
@@ -1366,15 +1460,14 @@ function mansionModel(parent, h) {
     mk('cyl', '#d9c27a', [0.22, 1.3, 0.22], [0, 1.1, fz], t); mk('cyl', '#d9c27a', [0.6, 0.15, 0.6], [0, 1.75, fz], t);
     h.jet = mk('sph', '#ffd23f', [0.22, 0.5, 0.22], [0, 2.15, fz], t, { emissive: '#b07a00' });
   } else h.jet = null;
-  h.sig = JSON.stringify([save.owned, save.decor, save.outfit]);
+  h.sig = JSON.stringify([OWN, DEC, save.outfit]);
   return t;
 }
 function o_cur(id) { return id && id !== 'none'; }
-function refreshMansion() { // rebuild the mansion after shopping, so new clothes and things show up
-  const m = L && L.mansion; if (!m || !USE3D || !G.world || !m.mesh) return;
-  if (m.sig === JSON.stringify([save.owned, save.decor, save.outfit])) return;
-  m.mesh.parent && m.mesh.parent.remove(m.mesh); m.mesh = mansionModel(G.world, m);
-  L.boxes = L.boxes.filter(b => !b.mf).concat(mansionBoxes(m));
+function refreshMansion() { // new clothes or furniture: build the village again so the house shows them
+  const m = L && L.mansion; if (!m || !m.mesh || !USE3D) return;
+  if (m.sig === JSON.stringify([save.owned || [], save.decor || [], save.outfit])) return;
+  rebuildHub();
 }
 function houseModel(parent, h) {
   const { hw, hd, h: hh, wt, dw, rise } = HOUSE;
@@ -1662,7 +1755,7 @@ function bearModel(o) {
   return root;
 }
 function treeModel(kind, parent, x, y, z, s, rnd) {
-  const mk = (g, c, sz, p, par, o) => mkBase(g, c, sz, p, par, Object.assign({ side: 'double' }, o || {})); // filled look from inside too
+  const mk = (g, c, sz, p, par, o) => mkBase(g === 'sph' ? 'sphL' : g, c, sz, p, par, Object.assign({ side: 'double' }, o || {})); // filled look from inside too
   const t = grp(parent, x, y, z); t.scale.setScalar(s); t.rotation.y = rnd() * 6;
   if (kind === 'pine') {
     mk('cyl', '#5b4030', [0.2, 1.4, 0.2], [0, 0.7, 0], t);
@@ -2032,6 +2125,16 @@ function buildHub() {
       houses.forEach((o, j) => { if (j === save.home || Math.hypot(o.x - best.x, o.z - best.z) < rad + 4.2) o.gone = true; });
     }
   }
+  // the other players' houses (from the room): built where they stand in their own village, clearing what is in the way
+  const remotes = [], MR = Math.hypot(MAN.hw, MAN.hd);
+  net.homesDirty = false;
+  if (net.on) for (const [pid, rp] of net.players) {
+    if (!rp.hm) continue;
+    const rm = { x: rp.hm.x, z: rp.hm.z, dir: rp.hm.dir, yaw: rp.hm.dir * Math.PI / 2, big: true, remote: true, pid, name: rp.n, decor: rp.dc ? rp.dc.split(',').filter(Boolean) : [], owned: ['none'].concat(rp.ow ? rp.ow.split(',').filter(Boolean) : []), outfit: rp.o };
+    if (mansion && Math.hypot(rm.x - mansion.x, rm.z - mansion.z) < 2 * MR) continue; // you chose the same house
+    if (remotes.some(o => Math.hypot(rm.x - o.x, rm.z - o.z) < 2 * MR)) continue;
+    remotes.push(rm); houses.forEach(o => { if (Math.hypot(o.x - rm.x, o.z - rm.z) < MR + 4.2) o.gone = true; });
+  }
   // hollow houses: four walls with a doorway at the front, and a few coins inside
   const hitems = [], got = save.houseCoins || [];
   houses.forEach((h, hi) => {
@@ -2052,12 +2155,14 @@ function buildHub() {
     m.chest = spot(MAN.chest, MAN.h1); m.wardT = spot(MAN.ward, MAN.h1); m.wArmed = true;
     m.stove = spot(MAN.stove, 0);
     for (const b of mansionBoxes(m)) boxes.push(b);
+    save.homePos = [Math.round(m.x * 10) / 10, Math.round(m.z * 10) / 10, m.dir]; // sent to the room so friends can see your house
   }
+  for (const rm of remotes) { for (const b of mansionShell(rm)) boxes.push(b); for (const b of mansionBoxes(rm)) boxes.push(b); } // no door: a friend's house is always open
   const clear = (x, z) => !nearAny(x, z) && houses.every(h => Math.hypot(x - h.x, z - h.z) > 5.8);
   const segD = (x, z, pa) => { const dx = pa.x1 - pa.x0, dz = pa.z1 - pa.z0, t = Math.max(0, Math.min(1, ((x - pa.x0) * dx + (z - pa.z0) * dz) / (dx * dx + dz * dz))); return Math.hypot(x - pa.x0 - dx * t, z - pa.z0 - dz * t); };
   const offPath = (x, z) => paths.every(pa => segD(x, z, pa) > 2.4) && Math.hypot(x - tutGate.x, z - tutGate.z) > 4;
   for (let i = 0; i < 620; i++) { const x = (rnd() - 0.5) * 2 * (R - 2), z = (rnd() - 0.5) * 2 * (R - 2); if (clear(x, z) && offPath(x, z)) trees.push({ x, y: 0, z, s: 0.7 + rnd() * 0.5 }); }
-  const offMan = (x, z) => (!mansion || Math.hypot(x - mansion.x, z - mansion.z) > Math.hypot(MAN.hw, MAN.hd) + 5) && stores.every(s => Math.hypot(x - s.x, z - s.z) > SR + 5.5); // a clear yard all around
+  const offMan = (x, z) => (!mansion || Math.hypot(x - mansion.x, z - mansion.z) > Math.hypot(MAN.hw, MAN.hd) + 5) && remotes.every(rm => Math.hypot(x - rm.x, z - rm.z) > MR + 5) && stores.every(s => Math.hypot(x - s.x, z - s.z) > SR + 5.5); // a clear yard all around
   for (const t of trees) if (!offMan(t.x, t.z)) t.gone = true;
   // the shops move into their buildings now that the trees are placed (the trees still grow where they always did)
   const [shopS, wardS, smithS, honeyS] = stores;
@@ -2098,7 +2203,7 @@ function buildHub() {
     const a = burrow.yaw + (id - 2) * 0.62, hx = burrow.x + Math.sin(a) * 2.1, hz = burrow.z + Math.cos(a) * 2.1, ok = home.includes(id);
     babies.push({ id, lx: x, lz: z, hx, hz, x: ok ? hx : x, y: 0, z: ok ? hz : z, yaw: ok ? a : rr2() * 6.28, st: ok ? 'home' : 'lost', t: rr2() * 5, hop: 0 });
   }
-  return { def: HUB, hub: true, R, boxes, items: hitems, enemies: [], trees, paths, start: { x: 0, y: 0, z: 50 }, checkpoints: [], cpActive: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, ward, smith, board, tutGate, houses, turtles, parks, mts, burrow, rabbits, babies, mansion, stores, honeyShop };
+  return { def: HUB, hub: true, R, boxes, items: hitems, enemies: [], trees, paths, start: { x: 0, y: 0, z: 50 }, checkpoints: [], cpActive: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, ward, smith, board, tutGate, houses, turtles, parks, mts, burrow, rabbits, babies, mansion, remotes, stores, honeyShop };
 }
 function mkBoss(type, c) {
   const base = { type, c, x: c.x, z: c.zc - 3, y: c.y, vx: 0, vz: 0, vy: 0, t: 0, inv: 0, active: false, defeated: false, deadT: 0, yaw: 0, tx: 0, tz: 0, state: type === 'mush' ? 'walk' : type === 'queen' ? 'hover' : 'aim' };
@@ -2550,6 +2655,7 @@ function clockStep() {
   if (!was && isNight()) { nightMsg = 300; nightTxt = 'Gece oldu! Kurtlar geliyor'; sfx.howl(); }
   if (was && !isNight()) { nightMsg = 200; nightTxt = 'Günaydın! Kurtlar ormana kaçtı'; sfx.flag(); }
 }
+const inRemote = (x, z, y) => !!(L.remotes && L.remotes.some(rm => y < MAN.h && inRect(rm, MAN, x, z)));
 const inRect = (hs, D, x, z, pad = 0) => { const c = Math.cos(hs.yaw), sn = Math.sin(hs.yaw), dx = x - hs.x, dz = z - hs.z, lx = dx * c - dz * sn, lz = dx * sn + dz * c; return Math.abs(lx) < D.hw + pad && Math.abs(lz) < D.hd + pad; };
 function houseIdxAt(x, z, y) {
   if (L.mansion && y < MAN.h && inRect(L.mansion, MAN, x, z)) return save.home;
@@ -2607,7 +2713,7 @@ const WOLF_MAX = 6;
 function wolfStep() {
   L.wolves = L.wolves || []; const night = isNight() && !sleepT;
   const inStore = (x, z) => L.stores && L.stores.some(s => inRect(s, s.D || STORE, x, z, 0.3));
-  const inHouse = houseIdxAt(P.x, P.z, P.y) >= 0 || inStore(P.x, P.z), safe = inHouse || P.y > 2.4 || P.dead;
+  const inHouse = houseIdxAt(P.x, P.z, P.y) >= 0 || inStore(P.x, P.z) || inRemote(P.x, P.z, P.y), safe = inHouse || P.y > 2.4 || P.dead;
   L.wolfT = (L.wolfT || 0) - DT;
   if (night && L.wolfT <= 0 && L.wolves.filter(w => !w.gone && w.hp > 0).length < WOLF_MAX) {
     L.wolfT = 5;
@@ -2630,7 +2736,7 @@ function wolfStep() {
     else { w.st = 'wander'; if (w.t > 3) { w.t = 0; w.wy = w.yaw + (Math.random() - 0.5) * 2.4; } want = w.wy ?? w.yaw; if (safe && d < 9) { want = Math.atan2(dx, dz) + Math.PI / 2; sp = 2.4; } } // prowls around a hiding bear
     w.yaw += angDiff(want, w.yaw) * 0.15;
     const nx = w.x + Math.sin(w.yaw) * sp * DT, nz = w.z + Math.cos(w.yaw) * sp * DT;
-    if ((hubBlocked(nx, nz, 0.5) || houseIdxAt(nx, nz, 0) >= 0 || inStore(nx, nz)) && !hubBlocked(w.x, w.z, 0.5)) { w.wy = w.yaw + Math.PI * (0.5 + Math.random() * 0.5); w.yaw += (Math.random() < 0.5 ? 1 : -1) * 0.25; w.t = 0; }
+    if ((hubBlocked(nx, nz, 0.5) || houseIdxAt(nx, nz, 0) >= 0 || inStore(nx, nz) || inRemote(nx, nz, 0)) && !hubBlocked(w.x, w.z, 0.5)) { w.wy = w.yaw + Math.PI * (0.5 + Math.random() * 0.5); w.yaw += (Math.random() < 0.5 ? 1 : -1) * 0.25; w.t = 0; }
     else { w.x = nx; w.z = nz; }
     for (const mt of L.mts) { const ox = w.x - mt.cx, oz = w.z - mt.cz, od = Math.hypot(ox, oz), rr = mt.r + 1.2;
       if (od < rr && od > 1e-3) { w.x = mt.cx + ox / od * rr; w.z = mt.cz + oz / od * rr; const rad = Math.atan2(ox, oz), t1 = rad + Math.PI / 2, t2 = rad - Math.PI / 2, tg = Math.abs(angDiff(want, t1)) < Math.abs(angDiff(want, t2)) ? t1 : t2; w.yaw += angDiff(tg, w.yaw) * 0.3; } } // walk round a mountain, the way it wanted to go
@@ -2668,11 +2774,12 @@ function momText() {
   return `${n}/5 yavrum evde. Kalan ${5 - n} yavrumu da bulur musun? Haritada (H) pembe noktalarla görünürler.`;
 }
 // treasure chests refill 10 minutes (real time) after they are opened
-const CHEST_MS = 10 * 60 * 1000;
-const chestLeft = key => Math.max(0, ((save.chestT || {})[key] || 0) - Date.now());
+const CHEST_MS = 5 * 60 * 1000;
+const chestLeft = key => Math.max(0, Math.min(CHEST_MS, ((save.chestT || {})[key] || 0) - Date.now()));
 const mmss = ms => { const t = Math.ceil(ms / 1000); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); };
 function openChest(key) { (save.chestT = save.chestT || {})[key] = Date.now() + CHEST_MS; }
 function hubStep() {
+  if (net.homesDirty) { rebuildHub(); return; }
   turtleStep(); rabbitStep(); wolfStep(); sleepStep(); doorStep();
   save.peaks = save.peaks || {};
   for (const m of L.mts) {
@@ -3073,7 +3180,7 @@ function buildScene() {
       const nTuft = Math.floor(w * d / 9);
       for (let i = 0; i < nTuft; i++) {
         const tx = (rnd() - 0.5) * (w - 0.4), tz = (rnd() - 0.5) * (d - 0.4), sz = 0.1 + rnd() * 0.1;
-        const t = mk('ico', deco[Math.floor(rnd() * deco.length)], [sz * 1.4, sz * 0.8, sz * 1.4], [tx, b.y1 + 0.04, tz], m, th.cave ? { emissive: '#2a3a55' } : null); t.castShadow = false;
+        const t = mk('pebble', deco[Math.floor(rnd() * deco.length)], [sz * 1.4, sz * 0.8, sz * 1.4], [tx, b.y1 + 0.04, tz], m, th.cave ? { emissive: '#2a3a55' } : null); t.castShadow = false;
       }
     } else if (b.kind === 'plat' || b.kind === 'move') {
       m = grp(W, cx, cy, cz);
@@ -3100,7 +3207,7 @@ function buildScene() {
     } else if (b.kind === 'cloud') {
       m = grp(W, cx, b.y0, cz);
       mk('box', '#ffffff', [w, 0.3, d], [0, h - 0.15, 0], m, { emissive: '#3a3f4a' }).receiveShadow = true;
-      for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2; mk('sph', '#ffffff', [w * 0.32, 0.42, d * 0.32], [Math.cos(a) * w * 0.32, h * 0.35, Math.sin(a) * d * 0.32], m, { emissive: '#3a3f4a' }); }
+      for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2; mk('sphL', '#ffffff', [w * 0.32, 0.42, d * 0.32], [Math.cos(a) * w * 0.32, h * 0.35, Math.sin(a) * d * 0.32], m, { emissive: '#3a3f4a' }); }
       mk('sph', '#f2f6ff', [w * 0.45, 0.38, d * 0.45], [0, h * 0.2, 0], m, { emissive: '#30343c' });
     } else if (b.kind === 'bush') {
       m = grp(W, cx, b.y0, cz);
@@ -3232,6 +3339,7 @@ function buildScene() {
       mk('box', '#5c3a1c', [3.1, 0.16, 0.36], [0, 2.92, 0], g2); }
     for (const h of L.houses) if (!h.gone) houseModel(W, h);
     if (L.mansion) L.mansion.mesh = mansionModel(W, L.mansion);
+    for (const rm of L.remotes || []) { rm.mesh = mansionModel(W, rm); for (const d of rm.doors || []) d.g.rotation.y = d.sx * 1.65; remoteHomeMark(rm); }
     const nSteps = L.mts.reduce((a, m) => a + m.steps.length, 0);
     const stepTop = new THREE.InstancedMesh(G.geo.box, new THREE.MeshLambertMaterial({ color: '#c9bcae' }), nSteps), stepBody = new THREE.InstancedMesh(G.geo.box, new THREE.MeshLambertMaterial({ color: '#8d8378' }), nSteps);
     stepTop.frustumCulled = stepBody.frustumCulled = false; stepTop.castShadow = stepTop.receiveShadow = stepBody.castShadow = true; W.add(stepTop); W.add(stepBody);
@@ -3280,6 +3388,7 @@ function buildScene() {
   G.blob = mk('cyl', '#000000', [0.42, 0.02, 0.42], [0, 0, 0], W, { transparent: true, opacity: 0.32, depthWrite: false }); G.blob.castShadow = false;
   G.marker = new THREE.Mesh(G.geo.ring, mat('#ff4d6d', { emissive: '#7a1020' })); G.marker.rotation.x = Math.PI / 2; W.add(G.marker);
   G.ringMat = mat('#ffffff', { transparent: true, opacity: 0.85, emissive: '#555555' });
+  if (L.hub) mergeHub(); // the village is mostly scenery that never moves
 }
 function portalSpin() {
   if (L.mansion && L.mansion.doors) for (const d of L.mansion.doors) d.g.rotation.y = d.sx * (L.mansion.doorA || 0);
@@ -3292,17 +3401,18 @@ function portalSpin() {
   if (L.portals) for (const p of L.portals) if (p.disc) p.disc.rotation.z -= 0.03;
   if (L.rabbits) {
     for (const r of L.rabbits) {
-      const m = r.mesh, u = m.userData; m.position.set(r.x, r.y, r.z); m.rotation.y = r.yaw;
+      const m = r.mesh, u = m.userData; m.visible = Math.abs(r.x - P.x) + Math.abs(r.z - P.z) < 80; m.position.set(r.x, r.y, r.z); m.rotation.y = r.yaw;
       u.body.rotation.x = r.hop > 0 ? -0.25 * Math.sin(Math.max(0, 1 - r.hop / r.hopLen) * Math.PI) : 0;
       const wig = r.caughtT > 0 ? Math.sin(frame * 0.3) * 0.25 : Math.sin(frame * 0.05 + r.id) * 0.08;
       u.ears.forEach((e, i) => { e.rotation.x = r.fast && r.hop > 0 ? -0.7 : -0.1 + wig * (i ? 1 : -1); });
     }
-    for (const b of L.babies) { const m = b.mesh, u = m.userData; m.position.set(b.x, b.y + (b.hop || 0), b.z); m.rotation.y = b.yaw; u.ears.forEach((e, i) => { e.rotation.x = -0.15 + Math.sin(frame * 0.12 + i + b.id) * 0.12; }); }
+    for (const b of L.babies) { const m = b.mesh, u = m.userData; m.visible = b.st === 'follow' || Math.abs(b.x - P.x) + Math.abs(b.z - P.z) < 80; m.position.set(b.x, b.y + (b.hop || 0), b.z); m.rotation.y = b.yaw; u.ears.forEach((e, i) => { e.rotation.x = -0.15 + Math.sin(frame * 0.12 + i + b.id) * 0.12; }); }
     const bw = L.burrow; if (bw.mesh) { bw.mesh.rotation.y = Math.atan2(P.x - bw.mesh.position.x, P.z - bw.mesh.position.z); bw.mesh.userData.ears.forEach((e, i) => { e.rotation.x = -0.1 + Math.sin(frame * 0.06 + i) * 0.1; }); }
     if (bw.bang) { const p0 = bw.mesh.position; bw.bang.visible = ((save.stats || {}).bunny || []).length < 5; bw.bang.position.set(p0.x, 2.75 + Math.sin(frame * 0.08) * 0.12, p0.z); }
   }
   if (L.turtles) for (const t of L.turtles) {
     const m = t.mesh, u = m.userData, moving = !t.rest && t.petT <= 180;
+    m.visible = Math.abs(t.x - P.x) + Math.abs(t.z - P.z) < 80;
     m.position.set(t.x, t.hop > 0 ? Math.sin(t.hop / 0.5 * Math.PI) * 0.35 : 0, t.z); m.rotation.y = t.yaw;
     u.legs.forEach((l, i) => { l.position.y = 0.08 + (moving ? Math.max(0, Math.sin(frame * 0.15 + i * 1.6)) * 0.05 : 0); });
     u.head.position.z = t.petT > 0 ? 0.88 : 0.82 + Math.sin(frame * 0.05 + t.id) * 0.03;
@@ -3319,6 +3429,22 @@ function placeHomeMark() {
   const name = possessive(save.name) + ' Evi';
   const tex = canvasTex(512, 128, (c, w, hh) => { c.fillStyle = 'rgba(74,44,23,0.9)'; c.beginPath(); if (c.roundRect) c.roundRect(8, 14, w - 16, hh - 28, 26); else c.rect(8, 14, w - 16, hh - 28); c.fill(); c.lineWidth = 6; c.strokeStyle = '#ffd23f'; c.stroke(); c.fillStyle = '#ffd23f'; c.font = '56px "Lilita One", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(name, w / 2, hh / 2 + 3, w - 50); });
   const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false })); sp.scale.set(hs.big ? 6 : 4, hs.big ? 1.5 : 1, 1); sp.position.set(0, D.h + D.rise + (hs.big ? 2 : 1.3), 0); g.add(sp);
+}
+const homeSignTex = name => canvasTex(512, 128, (c, w, hh) => { c.fillStyle = 'rgba(74,44,23,0.9)'; c.beginPath(); if (c.roundRect) c.roundRect(8, 14, w - 16, hh - 28, 26); else c.rect(8, 14, w - 16, hh - 28); c.fill(); c.lineWidth = 6; c.strokeStyle = '#ffd23f'; c.stroke(); c.fillStyle = '#ffd23f'; c.font = '56px "Lilita One", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(name, w / 2, hh / 2 + 3, w - 50); });
+function remoteHomeMark(rm) { // a blue flag and a sign with the owner's name
+  if (!G.world) return;
+  const ph = 9.5, g = grp(G.world, rm.x, 0, rm.z); g.rotation.y = rm.yaw;
+  const fx = MAN.hw - 0.5, fz = MAN.hd + 3.4;
+  mk('cyl', '#6b4220', [0.08, ph, 0.08], [fx, ph / 2, fz], g); mk('sph', '#ffd23f', [0.14, 0.14, 0.14], [fx, ph + 0.05, fz], g, { emissive: '#5a4300' });
+  mk('box', '#3b6fb0', [0.06, 0.62, 0.95], [fx, ph - 0.45, fz - 0.5], g);
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: homeSignTex(possessive(rm.name) + ' Evi'), transparent: true, depthWrite: false })); sp.scale.set(6, 1.5, 1); sp.position.set(0, MAN.h + MAN.rise + 2, 0); g.add(sp);
+}
+function rebuildHub() { // the village is built again: a friend's house appeared or changed, or you bought furniture. You stay where you are.
+  if (!L || !L.hub || !P) return;
+  const o = { x: P.x, y: P.y, z: P.z, vx: P.vx, vy: P.vy, vz: P.vz, yaw: P.yaw, hp: P.hp, inv: P.inv, onGround: P.onGround }, cy = G.camYaw, cp = G.camPitch, wasLives = lives;
+  loadLevel(-1); lives = wasLives; banner = 0;
+  Object.assign(P, o, { ox: o.x, oy: o.y, oz: o.z, oyaw: o.yaw });
+  if (USE3D) { G.camYaw = cy; G.camPitch = cp; }
 }
 function applyNight(n) {
   const d = G.day; if (!d) return;
@@ -3349,6 +3475,7 @@ function drawWolves() {
 }
 function lookKey() { return save.species + save.outfit + save.gender + save.axe; }
 function render3D(alpha = 1, dtMs = 16.667) {
+  perfTick(dtMs);
   const ip = (o, n) => o === undefined ? n : o + (n - o) * alpha;
   const fI = frame + (state === 'play' ? alpha : 0), animI = ip(P.oanim, P.anim);
   const PX = ip(P.ox, P.x), PY = ip(P.oy, P.y), PZ = ip(P.oz, P.z), fk = b => 1 - Math.pow(1 - b, dtMs / 16.667);
@@ -3357,7 +3484,7 @@ function render3D(alpha = 1, dtMs = 16.667) {
   if (bf) { tgt.x += (bf.x - PX) * 0.3; tgt.z += (bf.z - PZ) * 0.3; tgt.y = Math.max(tgt.y, bf.c.y + (bf.type === 'queen' ? 3.2 : 1.6)); }
   const toHouse = (h, x, z) => { const c = Math.cos(h.yaw), sn = Math.sin(h.yaw), dx = x - h.x, dz = z - h.z; return [dx * c - dz * sn, dx * sn + dz * c]; };
   const inside = (h, D) => { const [lx, lz] = toHouse(h, PX, PZ); return Math.abs(lx) < D.hw && lz > -D.hd && lz < D.hd - 0.9 && PY < D.h; };
-  const hin = L.mansion && inside(L.mansion, MAN) ? L.mansion : (L.stores && L.stores.find(s => inside(s, s.D || STORE))) || (L.houses ? L.houses.find(h => !h.gone && inside(h, HOUSE)) : null);
+  const hin = L.mansion && inside(L.mansion, MAN) ? L.mansion : (L.remotes && L.remotes.find(rm => inside(rm, MAN))) || (L.stores && L.stores.find(s => inside(s, s.D || STORE))) || (L.houses ? L.houses.find(h => !h.gone && inside(h, HOUSE)) : null);
   const HD = hin && hin.big ? MAN : hin && hin.store ? (hin.D || STORE) : HOUSE, ceil = hin && hin.big ? MAN.ceil(PY) : HD.h;
   G.dist = (G.dist || 7.4) + ((bf ? 11.5 : hin ? (hin.big ? 4.2 : hin.store ? 3.2 : 2.4) : L.hub ? 9.5 : 7.4) - (G.dist || 7.4)) * fk(hin ? 0.2 : 0.05);
   if (!G.ct) G.ct = tgt.clone(); else G.ct.lerp(tgt, fk(P.dead ? 0.02 : 0.15));
@@ -3529,7 +3656,7 @@ function render3D(alpha = 1, dtMs = 16.667) {
   }
   const br = G.bear, pp = br.userData.parts;
   br.visible = !(P.inv > 0 && !P.dead && Math.floor(P.inv / 5) % 2);
-  br.position.set(PX, PY, PZ);
+  br.position.set(PX, PY, PZ); br.scale.setScalar(heightScale(save.age));
   const spf = Math.max(0, P.spin - alpha), flip = P.spin > 0 ? (1 - spf / 30) * Math.PI * 2 : 0;
   const yawI = P.oyaw === undefined ? P.yaw : P.oyaw + angDiff(P.yaw, P.oyaw) * alpha;
   pp.flip.rotation.set(flip, yawI, 0, 'YXZ');
@@ -3835,6 +3962,7 @@ function mapView(c, bb, [vx, vy, vw, vh], side, me, opt, fs) {
     for (const pt of L.portals) { dot(pt.x, pt.z, fs * 0.62, pt.locked ? '#9a9a9a' : LEVELS[pt.i].grass, pt.locked ? '#555' : '#3d2a1a'); label(String(pt.i + 1), pt.x, pt.z, fs * 0.8, pt.locked ? '#dddddd' : '#ffffff'); }
     const place = (o, ch, name, col) => { dot(o.x, o.z, fs * 0.6, col); label(ch, o.x, o.z, fs * 0.7); label(name, o.x, o.z, fs * 0.7, '#ffd23f', -fs * 1.05); };
     place(L.shop, '♥', 'Kalp', '#e63946'); place(L.ward, '★', 'Kıyafet', '#8a5aa8'); place(L.smith, '⚒', 'Demirci', '#5d6670'); place(L.honeyShop, '🍯', 'Bal', '#e89a1a'); if (!opt.board) place(L.board, '▦', 'Harita', '#8a5a2b'); if (L.burrow) place(L.burrow, '✿', 'Anne Tavşan', '#ff8fb8');  { const hs = L.mansion || L.houses[save.home]; if (hs) place(hs, '⌂', L.mansion ? 'Konağım' : 'Evim', '#ffb627'); }
+    for (const rm of L.remotes || []) place(rm, '⌂', rm.name, '#7fb8e0');
     if (!opt.board) for (const w of L.wolves || []) if (!w.gone && w.hp > 0) dot(w.x, w.z, 3.4, '#6d7480', '#22252b');
   } else {
     if (L.start) dot(L.start.x, L.start.z, fs * 0.35, '#7fd3ff');
@@ -3883,26 +4011,37 @@ const clip = (v, n) => String(v == null ? '' : v).replace(/[\u0000-\u001f\u007f-
 const num = (v, lim = 1e4) => { v = +v; return Number.isFinite(v) ? Math.max(-lim, Math.min(lim, v)) : 0; };
 const lvKey = () => !L ? '' : L.hub ? 'hub' : L.tut ? 'tut' : 'L' + lvlIdx;
 const lvName = k => k === 'hub' ? 'Bal Köyü' : k === 'tut' ? 'Öğretici' : /^L\d+$/.test(k) && LEVELS[+k.slice(1)] ? `${+k.slice(1) + 1}. ${LEVELS[+k.slice(1)].name}` : 'Menüde';
-function myState() {
+let lastFullState = 0;
+function myState() { // the house and the wardrobe are sent only every couple of seconds
+  const st = myStateBase(), now = Date.now();
+  if (save.homePos && now - lastFullState > 2000) { lastFullState = now; st.hm = save.homePos; st.dc = (save.decor || []).join(','); st.ow = (save.owned || []).filter(o => o !== 'none').join(','); }
+  return st;
+}
+function myStateBase() {
   const r2 = v => Math.round(v * 100) / 100;
   return { n: save.name, c: save.code, lv: state === 'title' ? '' : lvKey(), x: P ? r2(P.x) : 0, y: P ? r2(P.y) : 0, z: P ? r2(P.z) : 0, yw: P ? r2(P.yaw) : 0,
     sp: P ? r2(Math.hypot(P.vx, P.vz)) : 0, air: P ? (P.onGround ? 0 : 1) : 0, fl: P ? Math.round(P.spin || 0) : 0, at: P && P.atkT > 0 ? 1 : 0,
-    g: save.gender, s: save.species, o: save.outfit, a: save.axe, av: avatar.sel || '', ck: net.host ? Math.round((save.clock || 0) * 10) / 10 : undefined };
+    g: save.gender, s: save.species, o: save.outfit, a: save.axe, av: avatar.sel || '', ag: save.age || 0, ck: net.host ? Math.round((save.clock || 0) * 10) / 10 : undefined };
 }
 // remote players: keep only well-formed values
 function takePlayer(id, st) {
   if (!st || typeof st !== 'object') return;
   const old = net.players.get(id) || { id };
   const p = Object.assign(old, { n: clip(st.n, 14) || 'Ayı', c: clip(st.c, 6).toUpperCase(), lv: clip(st.lv, 8), x: num(st.x), y: num(st.y), z: num(st.z), yw: num(st.yw, 100),
-    sp: num(st.sp, 40), air: !!st.air, fl: num(st.fl, 60), at: !!st.at, g: st.g === 'girl' ? 'girl' : 'boy', s: clip(st.s, 12), o: clip(st.o, 12), av: clip(st.av, 4), a: Math.max(0, Math.min(AXES.length - 1, Math.round(num(st.a, 9)))), seen: Date.now() });
+    sp: num(st.sp, 40), air: !!st.air, fl: num(st.fl, 60), at: !!st.at, g: st.g === 'girl' ? 'girl' : 'boy', s: clip(st.s, 12), o: clip(st.o, 12), av: clip(st.av, 4), ag: Math.max(0, Math.min(99, Math.round(num(st.ag, 99)))), a: Math.max(0, Math.min(AXES.length - 1, Math.round(num(st.a, 9)))), seen: Date.now() });
   p.h = st.h ? 1 : 0;
   if (p.h && Number.isFinite(+st.ck) && +st.ck >= 0 && +st.ck < CYC + 1) net.hostClock = { ck: +st.ck, t: Date.now(), id }; // the founder's time of day
+  p.sc = heightScale(p.ag);
+  if (Array.isArray(st.hm) && st.hm.length === 3) { // this player's house
+    const hx = num(st.hm[0], 200), hz = num(st.hm[1], 200), hd2 = Math.max(0, Math.min(3, Math.round(num(st.hm[2], 3)))), dc = clip(st.dc, 90), ow = clip(st.ow, 140), sig = [hx, hz, hd2, dc, ow].join('|');
+    if (sig !== p.hsig) { p.hsig = sig; p.hm = { x: hx, z: hz, dir: hd2 }; p.dc = dc; p.ow = ow; net.homesDirty = true; }
+  }
   if (!SPECIES[p.s]) p.s = 'brown';
   net.players.set(id, p);
   const f = save.friends.find(f => f.code === p.c); if (f && f.name !== p.n) { f.name = p.n; saveGame(); }
   if (p.rx === undefined) { p.rx = p.x; p.ry = p.y; p.rz = p.z; p.ryw = p.yw; p.ph = 0; }
 }
-function dropPlayer(id) { const p = net.players.get(id); if (p && p.mesh) G.scene.remove(p.mesh); net.players.delete(id); }
+function dropPlayer(id) { const p = net.players.get(id); if (p && p.mesh) G.scene.remove(p.mesh); if (p && p.hm) net.homesDirty = true; net.players.delete(id); }
 function netMsg(t, ok) { const m = $('nMsg'); m.textContent = t; m.className = 'msg' + (ok ? ' ok' : ''); }
 function netReset() {
   clearInterval(net.timer); net.unsub.forEach(u => { try { u(); } catch (e) {} }); net.unsub = [];
@@ -3930,6 +4069,7 @@ function loadMqttLib() {
 function startTicker(send) { clearInterval(net.timer); net.timer = setInterval(() => { try { send(); } catch (e) {} for (const [id, p] of net.players) if (Date.now() - p.seen > 10000) dropPlayer(id); if (!pNet.hidden && net.on) { $('nRoomTitle').textContent = 'Oda: ' + net.room + ' · ' + (net.players.size + 1) + ' oyuncu'; renderPlayers(); } }, 100); }
 async function netGo(create) {
   if (net.on) return;
+  lastFullState = 0;
   const roomTxt = clip($(create ? 'nRoomC' : 'nRoomJ').value.trim(), 20), pass = clip($(create ? 'nPassC' : 'nPassJ').value.trim(), 20);
   if (!slug(roomTxt)) return netMsg('Odaya bir ad ver (harf ya da rakam).');
   if (!pass) return netMsg('Odaya bir şifre koy.');
@@ -4035,6 +4175,13 @@ async function testRelays() {
   netMsg((good ? '' : 'Hiçbirine ulaşılamadı. ') + res.map(r => (r[1] ? '✓ ' : '✗ ') + r[0]).join(' · ') + (good ? ` — ${good} sunucuya ulaşılıyor, oda kurabilirsin.` : ' — Başka bir Wi-Fi ya da mobil veri dene.'), good > 0);
 }
 function inviteText() { return `Pofuduk'un Bal Macerası'nda benimle oyna! 👥 Birlikte Oyna > Odaya katıl. Oda: ${net.room} · Şifre: ${$(net.host ? 'nPassC' : 'nPassJ').value}`; }
+function visitHome(id) {
+  const rm = L.remotes && L.remotes.find(r => r.pid === id);
+  if (!L.hub) return netMsg('Önce köye dön, sonra arkadaşının evine gidebilirsin.');
+  if (!rm || !P) return netMsg('Bu evi köyde göremiyoruz: aynı evi seçtiniz ya da ev henüz yüklenmedi. Biraz bekleyip tekrar dene.');
+  const d = MAN.hd + 4; P.x = rm.x + Math.sin(rm.yaw) * d; P.z = rm.z + Math.cos(rm.yaw) * d; P.y = 0; P.vx = P.vy = P.vz = 0; P.yaw = rm.yaw + Math.PI;
+  G.camYaw = rm.yaw; G.camYaw += 0; G.ct = null; G.manualT = 120; closeNet();
+}
 function teleportTo(p) { if (!P || p.lv !== lvKey()) return; P.x = p.x + 1.2; P.y = p.y + 0.5; P.z = p.z; P.vx = P.vy = P.vz = 0; G.ct = null; closeNet(); }
 function addFriend(code, name) {
   code = clip(code, 6).toUpperCase();
@@ -4056,15 +4203,16 @@ function rowEl(online, title, sub, buttons) {
 let playersSig = '';
 function renderPlayers(force) {
   // rebuild only when something visible changed, so buttons stay put while being clicked
-  const sig = [lvKey(), save.friends.length, ...[...net.players.values()].map(p => p.n + p.c + p.lv)].join('|');
+  const sig = [lvKey(), save.friends.length, ...[...net.players.values()].map(p => p.n + p.c + p.lv + (p.hm ? 'H' : ''))].join('|');
   if (!force && sig === playersSig) return; playersSig = sig;
   const box = $('nPlayers'); box.textContent = '';
   box.append(rowEl(true, (avatar.sel ? avatar.sel + ' ' : '') + save.name + ' (sen)', lvName(lvKey()) + (net.host ? ' · oda kurucusu' : ''), []));
-  for (const p of net.players.values()) {
+  for (const [pid, p] of net.players) {
     const fr = save.friends.some(f => f.code === p.c), btns = [];
+    if (p.hm && L.hub) btns.push(['Evine git', () => visitHome(pid)]);
     if (p.lv && p.lv === lvKey()) btns.push(['Yanına git', () => teleportTo(p)]);
     if (!fr && p.c && p.c !== save.code) btns.push(['Arkadaş ekle', () => addFriend(p.c, p.n)]);
-    box.append(rowEl(true, (p.av ? p.av + ' ' : '') + p.n + (fr ? ' ★' : ''), lvName(p.lv) + (p.h ? ' · oda kurucusu' : ''), btns));
+    box.append(rowEl(true, (p.av ? p.av + ' ' : '') + p.n + (fr ? ' ★' : ''), lvName(p.lv) + (p.ag ? ` · ${p.ag} yaş, ${heightCm(p.ag)} cm` : '') + (p.h ? ' · oda kurucusu' : ''), btns));
   }
 }
 function renderFriends() {
@@ -4126,7 +4274,7 @@ function drawRemote(dtMs) {
     if (Math.hypot(p.x - p.rx, p.z - p.rz) > 8) { p.rx = p.x; p.ry = p.y; p.rz = p.z; }
     p.rx += (p.x - p.rx) * k; p.ry += (p.y - p.ry) * k; p.rz += (p.z - p.rz) * k; p.ryw += angDiff(p.yw, p.ryw) * k;
     p.ph += (dtMs || 16.7) / 1000 * Math.min(12, p.sp * 2.2);
-    const pp = p.mesh.userData.parts; p.mesh.position.set(p.rx, p.ry, p.rz);
+    const pp = p.mesh.userData.parts; p.mesh.position.set(p.rx, p.ry, p.rz); p.mesh.scale.setScalar(p.sc || 1);
     pp.flip.rotation.set(p.fl > 0 ? (1 - p.fl / 30) * Math.PI * 2 : 0, p.ryw, 0, 'YXZ');
     const wk = p.air ? 0 : Math.sin(p.ph) * Math.min(1, p.sp / 3);
     pp.legs.forEach((l, i) => { l.rotation.x = p.air ? (i ? 0.35 : -0.25) : (i ? wk : -wk) * 0.7; });
@@ -4138,7 +4286,7 @@ function drawRemoteTags() {
   if (!net.on) return;
   for (const p of net.players.values()) {
     if (!p.mesh || !p.mesh.visible) continue;
-    const q = scr(p.rx, p.ry + 2.15, p.rz); if (!q) continue;
+    const q = scr(p.rx, p.ry + 2.15 * (p.sc || 1), p.rz); if (!q) continue;
     const fr = save.friends.some(f => f.code === p.c);
     txt(p.n + (fr ? ' ★' : ''), q.x, q.y, 18, fr ? '#9dffb0' : '#ffffff', 'center');
   }
@@ -4179,6 +4327,7 @@ function syncSettings() {
   $('setMusicVol').value = Math.round((save.musicVol ?? 1) * 100); $('vMusic').textContent = $('setMusicVol').value + '%';
   $('setSfxVol').value = Math.round((save.sfxVol ?? 1) * 100); $('vSfx').textContent = $('setSfxVol').value + '%';
   $('setView').value = Math.round((save.viewDist || 1) * 100); $('vView').textContent = viewWord(save.viewDist || 1) + ' · ' + $('setView').value + '%';
+  $('setQual').value = save.quality || 'auto'; $('setAge').value = save.age || ''; $('vAge').textContent = save.age ? `· boy ${heightCm(save.age)} cm` : '';
   $('setCam').value = Math.round((save.camSens || 1) * 100); $('vCam').textContent = $('setCam').value + '%';
 }
 function openSettings() {
@@ -4201,6 +4350,13 @@ $('setMusicVol').oninput = e => { save.musicVol = e.target.value / 100; $('vMusi
 $('setSfxVol').oninput = e => { save.sfxVol = e.target.value / 100; $('vSfx').textContent = e.target.value + '%'; };
 $('setSfxVol').onchange = () => sfx.coin();
 $('setView').oninput = e => { save.viewDist = e.target.value / 100; $('vView').textContent = viewWord(save.viewDist) + ' · ' + e.target.value + '%'; applyView(); };
+$('setAge').oninput = e => {
+  const a = validAge(e.target.value); if (!a) return;
+  save.age = a; $('vAge').textContent = `· boy ${heightCm(a)} cm`;
+  if (activeId) { const accs = readAccounts(); if (accs[activeId]) { accs[activeId].age = a; writeAccounts(accs); } }
+  saveGame();
+};
+$('setQual').onchange = e => { save.quality = e.target.value; G.autoQ = null; perfSlow = 0; applyQuality(); saveGame(); };
 $('setCam').oninput = e => { save.camSens = e.target.value / 100; $('vCam').textContent = e.target.value + '%'; };
 function goHub() { saveGame(); honey = 0; lives = 3; loadLevel(-1); setPlaying(); }
 /* ---------- accounts: a name, a password and a picture, kept on this device ---------- */
@@ -4236,6 +4392,8 @@ function renderAvatars() {
 function updateAccHint() {
   const id = slug(typedName()), acc = id ? readAccounts()[id] : null, hint = $('accHint');
   $('avWrap').hidden = !!acc;
+  $('ageWrap').hidden = !!(acc && acc.age);
+  const ag = validAge($('ageInput').value); $('ageNote').textContent = ag ? `Boyun ${heightCm(ag)} cm olacak.` : 'Ayın yaşına göre uzun ya da kısa olur.';
   hint.textContent = !id ? 'Aynı ad ve şifreyle tekrar girersen aynı hesap açılır.' : acc ? `${acc.photo ? '📷' : acc.av || '🐻'} Bu adla bir hesap var. Şifreni yazınca aynı hesap açılır.` : avatar.sel ? 'Yeni hesap oluşturulacak. Aynı ad ve şifreyle tekrar girince bu hesap açılır.' : 'Yeni hesap: bir şifre yaz ve hesabına bir görsel seç.';
 }
 $('avFile').onchange = e => {
@@ -4245,19 +4403,27 @@ $('avFile').onchange = e => {
   im.onerror = () => { URL.revokeObjectURL(url); const er = $('nameErr'); er.textContent = 'Bu dosya görsel olarak açılamadı. Başka bir fotoğraf dene.'; er.hidden = false; };
   im.src = url;
 };
-function applySaveEffects() { try { musicVol(); } catch (e) {} applyView(); nameInput.value = save.name; refreshWho(); questDotSync(); }
+const HEIGHTS = [[3, 95], [5, 108], [8, 128], [10, 138], [12, 149], [14, 162], [16, 171], [18, 175], [40, 177], [70, 172], [99, 168]]; // age -> height in cm
+function heightCm(age) {
+  age = Math.max(3, Math.min(99, +age || 12));
+  for (let i = 1; i < HEIGHTS.length; i++) if (age <= HEIGHTS[i][0]) { const [a0, h0] = HEIGHTS[i - 1], [a1, h1] = HEIGHTS[i]; return Math.round(h0 + (h1 - h0) * (age - a0) / (a1 - a0)); }
+  return 168;
+}
+const heightScale = age => age ? Math.max(0.62, Math.min(1.12, 0.62 + (heightCm(age) - 95) / 80 * 0.5)) : 1; // a small child is a small bear, a grown-up a bigger one
+const validAge = v => { const n = Math.round(+v); return Number.isFinite(n) && String(v).trim() !== '' && n >= 3 && n <= 99 ? n : 0; };
+function applySaveEffects() { try { musicVol(); } catch (e) {} applyView(); applyQuality(); nameInput.value = save.name; refreshWho(); questDotSync(); }
 function loginAccount(id, acc) {
   let s = null; try { s = JSON.parse(localStorage.getItem(accSaveKey(id)) || 'null'); } catch (e) {}
-  save = migrateSave(Object.assign(defaultSave(), s && typeof s === 'object' ? s : {})); save.name = acc.name; activeId = id;
+  save = migrateSave(Object.assign(defaultSave(), s && typeof s === 'object' ? s : {})); save.name = acc.name; save.age = acc.age || save.age || 0; activeId = id;
   avatar.sel = acc.av || '🐻'; avatar.photo = acc.photo || null;
   ensureCode(); try { localStorage.setItem('pofuduk-last', acc.name); } catch (e) {}
   applySaveEffects();
 }
-function createAccount(id, name, ph) {
+function createAccount(id, name, ph, age) {
   const accs = readAccounts(), first = !Object.keys(accs).length;
   save = migrateSave(first && legacySave ? save : Object.assign(defaultSave(), { gender: save.gender, species: save.species })); // the first account keeps the old single save
-  save.name = name; activeId = id; ensureCode();
-  accs[id] = { name, ph, av: avatar.sel, photo: avatar.photo || null, made: Date.now() }; writeAccounts(accs);
+  save.name = name; save.age = age; activeId = id; ensureCode();
+  accs[id] = { name, ph, age, av: avatar.sel, photo: avatar.photo || null, made: Date.now() }; writeAccounts(accs);
   if (first && legacySave) { try { localStorage.removeItem('pofuduk-save'); } catch (e) {} legacySave = null; }
   saveGame(); try { localStorage.setItem('pofuduk-last', name); } catch (e) {}
   applySaveEffects();
@@ -4271,12 +4437,17 @@ $('startBtn').onclick = () => {
   if (!id) { er('Adında en az bir harf ya da rakam olsun.'); nameInput.focus(); return; }
   if (pass.length < 3) { er('Şifren en az 3 karakter olmalı.'); $('passInput').focus(); return; }
   const accs = readAccounts(), ph = passHash(id, pass), acc = accs[id];
-  if (acc) { if (acc.ph !== ph) { er('Bu ad için şifre yanlış. Şifreni kontrol et ya da başka bir ad yazıp yeni hesap aç.'); $('passInput').focus(); return; } loginAccount(id, acc); }
-  else { if (!avatar.sel) { er('Hesabın için bir görsel seç.'); return; } createAccount(id, name, ph); }
+  if (acc && acc.ph !== ph) { er('Bu ad için şifre yanlış. Şifreni kontrol et ya da başka bir ad yazıp yeni hesap aç.'); $('passInput').focus(); return; }
+  let age = acc && acc.age ? acc.age : validAge($('ageInput').value);
+  if (!age) { er('Yaşını 3 ile 99 arasında bir sayı olarak yaz.'); $('ageInput').focus(); return; }
+  if (acc) { if (!acc.age) { acc.age = age; accs[id] = acc; writeAccounts(accs); } loginAccount(id, acc); }
+  else { if (!avatar.sel) { er('Hesabın için bir görsel seç.'); return; } createAccount(id, name, ph, age); }
   $('nameErr').hidden = true; $('passInput').value = ''; startAfterLogin();
 };
 $('passInput').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') $('startBtn').click(); });
 $('passInput').addEventListener('input', () => { $('nameErr').hidden = true; });
+$('ageInput').addEventListener('input', () => { $('nameErr').hidden = true; updateAccHint(); });
+$('ageInput').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') $('startBtn').click(); });
 renderAvatars(); updateAccHint();
 $('setLogout').onclick = () => { saveGame(); try { localStorage.setItem('pofuduk-last', save.name); } catch (e) {} activeId = null; location.reload(); };
 pauseBtn.onclick = () => togglePause();
