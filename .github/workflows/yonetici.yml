@@ -1,0 +1,39 @@
+name: Yönetici ajan (sistemi izler, kademeye göre ajanlara talimat verir, günde 2 rapor yazar)
+
+on:
+  workflow_dispatch:
+    inputs:
+      elle:
+        description: "EVET: ajan kapalı olsa da bir kez çalış"
+        default: "HAYIR"
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: yonetici
+  cancel-in-progress: false
+
+jobs:
+  yonetici:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - name: Durumu değerlendir, kademeye göre uygula, rapor yaz
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          YONETICI_MODEL: ${{ vars.YONETICI_MODEL || 'claude-sonnet-5-5' }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5.4-mini' }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OFIS_ADRES: "https://gurtechs-ajan-ofisi.fly.dev"
+          BILDIRIM_SIRRI: ${{ secrets.BILDIRIM_SIRRI }}
+          ELLE: ${{ inputs.elle }}
+        run: |
+          ARG=""
+          if [ "$ELLE" = "EVET" ]; then ARG="--elle"; fi
+          python3 ajan/yonetici.py $ARG
