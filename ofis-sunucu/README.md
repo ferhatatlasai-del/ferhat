@@ -264,3 +264,13 @@ Ayarlar → **Hikâye ayarları** tek karttır: açık/kapalı, günde kaç hik�
 - **Ajan kadrosu gerçeğe uyduruldu:** kurulmamış *Facebook* masası kaldırıldı; çalışan ama ofiste görünmeyen **Video üretici**, **Yorum ajanı** ve **Nöbetçi** masaları eklendi (her birinin ekran animasyonu ve menü düğmeleri var: video üret, yorumlara bak / şimdi tara, şimdi denetle). Kahve köşesi, su sebili ve yeni pencereler/bitkiler eklendi.
 - **Avatarlar:** yumuşak gölgelendirme, yuvarlak gövde ve uzuvlar, kulak-burun-göz akı ve bebeği, kaş, gülümseme, yanak; 5 saç stili (kısa, yan, uzun, topuz, kıvırcık) ve ajana özel aksesuarlar.
 - **Hareket:** göz kırpma ve nefes alma (herkeste), boşta oturanlar arada kahve yudumlar, ve 35-60 sn'de bir Instagram/YouTube/Yorum/Video üretici ajanlarından biri masadan kalkıp kahve köşesine yürür, bekler, döner (bir sahne/yayın animasyonu başlarsa mola yarıda kesilip masasına döner).
+
+## Viral video: "Anlat" biçimi (varsayılan)
+
+Yeni viral videolar artık **anlat** biçimindedir: konuya özel, sürekli hareketli animasyon sahneleri; fotoğraf ve görsel üretimi yoktur (maliyet yalnızca metin).
+
+- **Hikâye tahtası:** yapay zekâ (`ajan/anlat_senaryo.py`, `ISTEM`) konuyu 5-10 sahneye böler ve her sahne için bir animasyon tipi seçer (basit konuda 5-6, çok adımlı konuda 8-10 sahne). Doğrulama çeşitliliği zorlar: ilk sahne `kanca`, son sahne `kapanis`, aynı tip art arda gelmez, bir tip en çok 2 kez kullanılır, en az 5 farklı tip bulunur; kural bozulursa yapay zekâya hatayı söyleyip yeniden yazdırır (3 deneme).
+- **Sahne kütüphanesi** (`video/anlat_sahneler.js`, 17 tip): kanca, ekstruder, sicak_uc, katman, tikanma, ilk_katman, sogutma, nem, stringing, warping, karsilastir (iki değer sütunu), sayi (halka sayaç), kontrol_listesi, dolgu, hiz, destek, kapanis. Yeni sahne eklemek: `ANLAT.sahneler[ad]` işlevi yaz, `anlat_senaryo.TIPLER` ve `ISTEM`'e ekle.
+- **Motor** (`video/anlat.js`): sahneler arası 5 geçiş efekti (kayma, yakınlaşma, daire, dikey itme, parlama; videoya göre dönüşümlü), bölüm etiketi (numaralı hap), renk vurgulu alt yazı (anlatıda `*turuncu*`, `~mavi~`), büyük başlık kartı ("ERİR!") ve sahneye bağlı bilgi etiketleri.
+- **Zamanlama:** sahne süreleri Türkçe anlatıcı sesine (Gemini/Google TTS) göre; her sahne animasyonu bitsin diye en az tipine özgü süre kadar sürer. Ses efektleri (geçiş, vurgu, darbe) plan'la birlikte gelir (`plan.olaylar`) ve konuşmaya binmez.
+- Konu seçimi: yine 3'te 3 "başarılı içeriklerden türetilmiş", 4.'sü keşif. Hâlâ `--bicim liste` / `--bicim 3d` ile eski biçimler çalıştırılabilir; ayar dosyasında (`shorts/viral_ayar.json`) `bicim` ile varsayılan değişir.
