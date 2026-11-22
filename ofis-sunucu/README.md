@@ -297,3 +297,17 @@ Yeni viral videolar artık **anlat** biçimindedir: konuya özel, sürekli harek
 - **Model:** `ANTHROPIC_API_KEY` GitHub secret'ı tanımlıysa **Claude** (`YONETICI_MODEL`, varsayılan `claude-sonnet-5-5`), yoksa OpenAI. Maliyet: günde 2-3 çağrı, birkaç sent.
 
 **Yönetici ajan notları:** video içeriğini göremediği için taslağa "onayla" önerisi vermez; yalnızca "incele" ya da "reddet" notu düşer (aynı not tekrar yazılmaz). Modele taslakların sahne tipleri ve son 3 videonun noktaları da verilir (tekrar/çeşitlilik değerlendirmesi için). **Anlat biçiminde en az bir `ozel` sahne zorunludur**; yoksa hikâye tahtası reddedilip yeniden yazdırılır.
+
+## Otomatik üretim ve yayın hattı (kademe 3)
+
+`ajan/otomatik_yayin.py` + `.github/workflows/otomatik-yayin.yml`; panelde **Yönetici → Otomatik üretim ve yayın**.
+
+- **Ne zaman çalışır:** yalnızca yönetici ajan **AÇIK** ve **Kademe 3** iken. Sunucu zamanlayıcısı günde 3 kez tetikler (TR 10:05, 15:05, 20:05; anahtarlar `oy<gün>-a/b/c`). Günde en çok 3 video (`GUNLUK_VIDEO`); iki çalışma arası en az 100 dk (çift tetik koruması).
+- **Modlar (panelden):** **Kapalı** (hiçbir şey yapmaz) · **Deneme** (varsayılan: üretir, yönetici izler, **yayınlamaz**; video taslak olarak ve "Otomatik hat" kartında önizlenir) · **Açık** (iki tıkla onay; onaylanan video 4 yere yayınlanır). Önce Deneme'de çıktılara bakıp sonra Açık'a geç.
+- **Akış:** `viral_video.py --otomatik` videoyu üretir (taslak `durum: otomatik`) → **yönetici videoyu izler** (`ajan/video_inceleme.py`: kareler + anlatı metni + `yonetici/bilgi.md` alan bilgisi; sıcaklık/malzeme/Bambu A1 bilgisi yanlışsa, sahne boş/okunmaz/saçmaysa, anlatı ile görüntü uyuşmuyorsa reddeder) → kabul ise yayın, red ise başka konuyla yeniden dener (en çok 2 deneme/çalışma).
+- **Kesin red kuralları (kodda):** puan < 7 ya da teknik sorun (süre, ses yok, bozuk kare) varsa model "yayınla" dese bile reddedilir. Yönetici sesi **duyamaz**; anlatı metnini ve kareleri değerlendirir.
+- **Yayın hedefleri:** 📸 Instagram Reels · 📱 Instagram Hikâye · ▶️ YouTube Shorts · ▶️ YouTube normal video (16:9, bulanık arka planlı; `youtube_yukle.py --normal`). Instagram videoyu bir URL'den çektiği için video geçici yetim dala (`yayin-gecici`) yüklenir ve yayından sonra silinir (depo şişmez; Deneme'de önizleme için kalır).
+- **Limitler:** YouTube yükleme kotası (≤6/gün; her yükleme 1.600 birim, günlük 10.000); saatlik yayın bilerek yapılmadı (spam riski, kota, konu tükenmesi).
+- **Kayıt:** `yonetici/otomatik.json` (son çalışmalar: konu, puan, karar, platform adımları).
+- **Alan bilgisi:** `yonetici/bilgi.md` düzenlenerek yöneticinin 3D baskı bilgisi/kriterleri genişletilir. Bekleyen elle-onay taslakları da yönetici raporunda izlenir ve `admin_inceleme`/`admin_oneri` notu düşülür.
+- **Not:** Yayın adımları gerçek Instagram/YouTube API'sine karşı henüz canlıda denenmedi (sahte sunucuyla test edildi); ilk canlı yayını Açık moda geçince izle.

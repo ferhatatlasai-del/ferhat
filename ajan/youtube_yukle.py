@@ -192,6 +192,7 @@ def main():
     ap.add_argument("--metin-dosyasi", required=True)
     ap.add_argument("--gizlilik", default="public", choices=["public", "unlisted", "private"])
     ap.add_argument("--yukle", action="store_true", help="Gerçekten yükle (yoksa yalnızca kontrol)")
+    ap.add_argument("--normal", action="store_true", help="Normal (yatay) video olarak yükle: dikeye çevirme yok, bağlantı /watch")
     a = ap.parse_args()
 
     for gerekli in ("YT_CLIENT_ID", "YT_CLIENT_SECRET", "YT_REFRESH_TOKEN"):
@@ -211,11 +212,11 @@ def main():
         print(f"KONTROL MODU: '{baslik}' ({video.stat().st_size // 1024} KB) yüklenmeye hazır. YÜKLENMEDİ.")
         return
     with tempfile.TemporaryDirectory() as gecici:
-        gonderilecek = dikey_hazirla(video, gecici)
+        gonderilecek = video if a.normal else dikey_hazirla(video, gecici)
         veri = yukle(erisim, gonderilecek, baslik, aciklama, a.gizlilik)
     gercek = (veri.get("status") or {}).get("privacyStatus", "?")
     print(f"YÜKLENDİ. Video kimliği: {veri['id']}")
-    print(f"Bağlantı: https://www.youtube.com/shorts/{veri['id']}")
+    print(f"Bağlantı: https://www.youtube.com/{'watch?v=' if a.normal else 'shorts/'}{veri['id']}")
     print(f"İstenen gizlilik: {a.gizlilik}, gerçek gizlilik: {gercek}")
     if gercek != a.gizlilik:
         print("UYARI: YouTube gizliliği değiştirdi (örneğin denetimden geçmemiş API projesi videoyu özel yapabilir). "

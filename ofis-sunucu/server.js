@@ -35,6 +35,7 @@ const AKIS_TREND = 'trend.yml';
 const AKIS_ISTATISTIK = 'istatistik-rapor.yml';
 const AKIS_YORUM = 'yorum-ajani.yml';
 const AKIS_YONETICI = 'yonetici.yml';
+const AKIS_OTOMATIK = 'otomatik-yayin.yml';
 const YORUM_RE = /^ig-\d{5,30}$/;
 const SHORTS_RE = /^s\d{8}-\d{6}$/;
 const AKADEMI_RE = /^o\d{8}-\d+$/;
@@ -576,9 +577,9 @@ async function api(req, res, url) {
     if (!TOKEN) return json(res, 503, { hata: 'Sunucuda GITHUB_TOKEN tanımlı değil.' });
     try {
       const sessiz = e => { if (e && e.kullanici) throw e; return null; };
-      const a = await depoOku('yonetici/ayar.json').catch(sessiz), r = await depoOku('yonetici/rapor.json').catch(sessiz);
+      const a = await depoOku('yonetici/ayar.json').catch(sessiz), r = await depoOku('yonetici/rapor.json').catch(sessiz), ot = await depoOku('yonetici/otomatik.json').catch(sessiz);
       const rp = r ? JSON.parse(r.metin) : {};
-      return json(res, 200, { ayar: Object.assign({ aktif: false, kademe: 2, yonerge: '' }, a ? JSON.parse(a.metin) : {}), raporlar: (rp.raporlar || []).slice(-6).reverse(), defter: (rp.defter || []).slice(-40).reverse() });
+      return json(res, 200, { ayar: Object.assign({ aktif: false, kademe: 2, yonerge: '', otomatik_yayin: 'kapali' }, a ? JSON.parse(a.metin) : {}), raporlar: (rp.raporlar || []).slice(-6).reverse(), defter: (rp.defter || []).slice(-40).reverse(), otomatik: (ot ? (JSON.parse(ot.metin).kayitlar || []) : []).slice(-12).reverse() });
     } catch (e) { return json(res, 502, { hata: e && e.kullanici ? e.message : 'Yönetici verisi okunamadı.' }); }
   }
   if (url.pathname === '/api/yonetici-ayar' && req.method === 'POST') {
@@ -586,10 +587,11 @@ async function api(req, res, url) {
     const yeni = {};
     if (typeof b.aktif === 'boolean') yeni.aktif = b.aktif;
     if (b.kademe !== undefined) { if (![1, 2, 3].includes(b.kademe)) return json(res, 400, { hata: 'Kademe 1, 2 ya da 3 olmalı.' }); yeni.kademe = b.kademe; }
+    if (b.otomatik_yayin !== undefined) { if (!['kapali', 'deneme', 'acik'].includes(b.otomatik_yayin)) return json(res, 400, { hata: 'Geçersiz otomatik yayın modu.' }); yeni.otomatik_yayin = b.otomatik_yayin; }
     if (b.yonerge !== undefined) { const y = String(b.yonerge || '').replace(/\r/g, '').trim(); if (y.length < 20 || y.length > 4000) return json(res, 400, { hata: 'Yönerge 20-4000 karakter olmalı.' }); yeni.yonerge = y; }
     if (!Object.keys(yeni).length) return json(res, 400, { hata: 'Değişiklik yok.' });
     let sonuc;
-    const ok = await jsonGuncelle('yonetici/ayar.json', v => { Object.assign(v, Object.assign({ aktif: false, kademe: 2, yonerge: '' }, v, yeni)); sonuc = { aktif: v.aktif, kademe: v.kademe }; }, 'Panel: yönetici ajan ayarı', {});
+    const ok = await jsonGuncelle('yonetici/ayar.json', v => { Object.assign(v, Object.assign({ aktif: false, kademe: 2, yonerge: '', otomatik_yayin: 'kapali' }, v, yeni)); sonuc = { aktif: v.aktif, kademe: v.kademe, otomatik_yayin: v.otomatik_yayin }; }, 'Panel: yönetici ajan ayarı', {});
     if (!ok) return json(res, 502, { hata: 'Ayar kaydedilemedi.' });
     if (yeni.aktif === true) {   // açar açmaz ilk değerlendirmeyi yapsın
       const dal = await varsayilanDal();
@@ -1045,7 +1047,7 @@ async function videoTemizligi() {
 // İş akışları kendi kararını verir (slot, günlük sınır); çift tetik zararsızdır (ortak kilit + "önce talep et" mantığı).
 const ZAM_KAPALI = process.env.ZAMANLAYICI === 'kapali';
 let yorumSonTetik = 0, yorumYenidenTetik = 0;
-const zamSon = { yonetici: null, yorum: null, yayin: null, uretim: null, trend: null, akademi: null, viral: null, nobetci: null, istatistik: null, hata: null };
+const zamSon = { otomatik: null, yonetici: null, yorum: null, yayin: null, uretim: null, trend: null, akademi: null, viral: null, nobetci: null, istatistik: null, hata: null };
 const zamYapilan = new Set();
 function zamSimdiTR() { const z = process.env.ZAM_ZAMAN ? new Date(process.env.ZAM_ZAMAN) : new Date(); return new Date(z.getTime() + 3 * 3600e3); }
 async function zamTetikle(akis, girdi, ad) {
@@ -1104,6 +1106,13 @@ async function zamKontrol() {
   if (dk >= 40) {
     const anahtar = `m${gun}-${saat}`;
     if (!zamYapilan.has(anahtar)) { zamYapilan.add(anahtar); videoTemizligi().then(n => { if (n) console.log('Temizlik: ' + n + ' video taslağı silindi'); }).catch(() => {}); }
+  }
+  // otomatik üretim ve yayın hattı: günde 3 tur (TR 10:05, 15:05, 20:05'ten sonra bir kez). İş akışı kendisi kontrol eder: ajan açık + Kademe 3 + mod deneme/acik değilse hemen çıkar.
+  for (const [ad, sa] of [['a', 10], ['b', 15], ['c', 20]]) {
+    if ((saat > sa || (saat === sa && dk >= 5)) && saat < sa + 2) {
+      const anahtar = `oy${gun}-${ad}`;
+      if (!zamYapilan.has(anahtar)) { zamYapilan.add(anahtar); await zamTetikle(AKIS_OTOMATIK, {}, 'otomatik'); }
+    }
   }
   // yönetici ajan: günde 2 rapor (TR 08:30 ve 18:30'dan sonra bir kez; ajan kapalıysa iş akışı kendisi hemen çıkar)
   for (const [ad, bas, bit] of [['sabah', 8, 12], ['aksam', 18, 22]]) {
