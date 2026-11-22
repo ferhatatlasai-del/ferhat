@@ -414,9 +414,13 @@ body.tam .hint{display:none}
         <div class="satir"><button type="button" class="ana" id="ynAktif">…</button><button type="button" id="ynCalistir">Şimdi çalıştır</button></div>
         <label class="k">Yetki kademesi</label>
         <div id="ynKademe" style="display:grid;gap:8px"></div>
-        <p class="not">Her kademede sert sınırlar: bütçe/anahtar değiştirmez, silmez, video <b>yayınlamaz</b>, günde en çok 15 işlem yapar.</p>
+        <p class="not">Sert sınırlar: bütçe/anahtar değiştirmez, silmez, günde en çok 15 işlem yapar. Videoyu yalnızca aşağıdaki <b>otomatik hat</b> açıkken ve Kademe 3'te yayınlar.</p>
+        <label class="k">Otomatik üretim ve yayın (Kademe 3, günde 3 video: 10:00, 15:00, 20:00)</label>
+        <div id="ynOto" style="display:grid;gap:8px"></div>
+        <p class="not" id="ynOtoNot"></p>
         <p class="hata" id="ynHata" hidden></p>
       </div>
+      <div class="card pub" id="ynHat"><h2>Otomatik hat</h2><p class="alt">Üretilen her videoyu yönetici izler; saçma, yanlış ya da bozuk bulursa reddeder ve nedenini yazar.</p><div id="ynHatIc" class="gov">Henüz tur yok.</div></div>
       <div class="card pub" id="ynRapor"><h2>Son rapor</h2><div id="ynRaporIc" class="gov">Henüz rapor yok.</div></div>
       <div class="card pub"><h2>Karar defteri</h2><p class="alt">Yönetici ajanın verdiği kararlar ve sonuçları (en yeni üstte).</p><div id="ynDefter" class="gov">Henüz karar yok.</div></div>
       <div class="card pub" id="ynYonerge"><h2>Admin yönergesi</h2><p class="alt">Yönetici ajan seni bu metne göre taklit eder. İstediğin zaman düzenle; sonraki çalışmada geçerli olur.</p>
@@ -2185,6 +2189,32 @@ function yoneticiCiz(v){
       hPost('/api/yonetici-ayar',{kademe:k[0]}).then(function(){ yoneticiCek(); }).catch(function(e){ var he=$('#ynHata'); he.textContent=String(e.message||e); he.hidden=false; });
     }); kg.appendChild(b);
   });
+  var OM=[['kapali','Kapalı','Otomatik video üretmez.'],['deneme','Deneme','Üretir, yönetici izler; YAYINLAMAZ (önizleme gelir).'],['acik','Açık','Üretir, yönetici onaylarsa 4 platforma yayınlar.']];
+  var og=$('#ynOto'); og.textContent=''; var oyMod=a.otomatik_yayin||'kapali';
+  OM.forEach(function(k){
+    var b=dom('button',null); b.type='button'; b.style.cssText='text-align:left;padding:10px 12px'+(k[0]===oyMod?';border:2px solid var(--accent);background:var(--bg)':''); var h=document.createElement('b'); h.textContent=k[1]+(k[0]===oyMod?' ✓':''); b.appendChild(h); b.appendChild(dom('div','not',k[2]));
+    var onay=false; b.addEventListener('click',function(){
+      if(k[0]===oyMod||!hSifreKontrol()) return;
+      if(k[0]==='acik'&&!onay){ onay=true; h.textContent='Emin misin? Evet, videolar kendiliğinden yayınlansın'; setTimeout(function(){ onay=false; h.textContent=k[1]; },6000); return; }
+      hPost('/api/yonetici-ayar',{otomatik_yayin:k[0]}).then(function(){ yoneticiCek(); }).catch(function(e){ var he=$('#ynHata'); he.textContent=String(e.message||e); he.hidden=false; });
+    }); og.appendChild(b);
+  });
+  $('#ynOtoNot').textContent=(oyMod!=='kapali'&&!(a.aktif&&a.kademe===3))?'⚠ Otomatik hat yalnızca ajan AÇIK ve Kademe 3 iken çalışır (şu an çalışmıyor).':(oyMod==='acik'?'Hat açık: bir sonraki tur 10:05, 15:05 ya da 20:05\'te.':'');
+  var hi=$('#ynHatIc'); hi.textContent='';
+  var IK={ig_reels:'📸 Reels',ig_hikaye:'📱 Hikâye',yt_shorts:'▶️ Shorts',yt_video:'🎬 Video'};
+  (v.otomatik||[]).slice(0,8).forEach(function(k){
+    var d=dom('div','hoge'); d.style.cssText='margin-top:8px;text-align:left';
+    var dr={yayinlandi:['Yayınlandı','iyi'],deneme:['Deneme: yayınlanmadı','orta'],reddedildi:['Yönetici reddetti','kt'],hata:['Hata','kt']}[k.durum]||[k.durum,'orta'];
+    d.appendChild(dom('span','rozet '+dr[1],dr[0]+(k.inceleme?' · puan '+k.inceleme.puan:'')));
+    d.appendChild(dom('div',null,(k.baslik||k.ayrinti||'Tur')));
+    d.appendChild(dom('div','not',k.zaman));
+    if(k.inceleme&&k.inceleme.gerekce) d.appendChild(dom('div','not','🧠 '+k.inceleme.gerekce));
+    ((k.inceleme&&k.inceleme.sorunlar)||[]).slice(0,3).forEach(function(q){ d.appendChild(dom('div','not','⚠ '+q)); });
+    if(k.sonuc){ Object.keys(IK).forEach(function(kk){ var x2=k.sonuc[kk]; if(!x2) return; var p2=dom('div','not',(x2.durum==='ok'||x2.durum==='kuru'?'✅ ':x2.durum==='atlandi'?'⏭ ':'⛔ ')+IK[kk]+(x2.hata?' — '+x2.hata:'')); if(x2.link&&/^https:\/\//.test(x2.link)){ var al=dom('a',null,' aç'); al.href=x2.link; al.target='_blank'; al.rel='noopener noreferrer'; p2.appendChild(al); } d.appendChild(p2); }); }
+    if(k.onizleme&&/^https:\/\//.test(k.onizleme)){ var vd=document.createElement('video'); vd.controls=true; vd.playsInline=true; vd.preload='metadata'; vd.style.cssText='width:100%;max-width:220px;display:block;border-radius:10px;background:#000;margin-top:6px'; vd.src=k.onizleme+'#t=0.5'; d.appendChild(vd); }
+    hi.appendChild(d);
+  });
+  if(!hi.firstChild) hi.textContent='Henüz tur yok.';
   var ic=$('#ynRaporIc'); ic.textContent='';
   if(r0){
     ic.appendChild(dom('p','not',r0.zaman+' · Kademe '+r0.kademe+' · '+r0.model+' · '+r0.eylem_sayisi+' işlem yapıldı'));
@@ -2298,11 +2328,12 @@ function yayinDugmesi(x,y,d,alanlar){
 }
 function shortsCiz(v){
   OZ.sk=v; setTimeout(ozetCiz,0);
-  var t=(v.taslaklar||[]).filter(videoKartiGorunur); var bekleyen=t.filter(function(x){return YAYIN_YERLERI.some(function(y){return !yayinlandiMi(x,y.k);}) && !sonYayinZamani(x);});
+  var t=(v.taslaklar||[]).filter(videoKartiGorunur); var bekleyen=t.filter(function(x){return !x.otomatik&&YAYIN_YERLERI.some(function(y){return !yayinlandiMi(x,y.k);}) && !sonYayinZamani(x);});
   $('#skDurum').textContent=bekleyen.length?(bekleyen.length+' video yayınını bekliyor.'):(t.length?'Bekleyen yeni video yok.':'Henüz video yok. "Üret" bölümünden bir video üretebilirsin.');
   var kap=$('#skListe'); kap.textContent='';
   t.forEach(function(x){
     var d=dom('div','hoge'); d.style.cssText='margin-top:10px;text-align:left;max-width:380px';
+    if(x.otomatik){ d.appendChild(dom('span','rozet '+(x.durum==='yayinlandi'?'iyi':x.durum==='deneme'?'orta':'zayif'),'🤖 Otomatik hat · '+({yayinlandi:'yayınlandı',deneme:'deneme (yayınlanmadı)',reddedildi:'yönetici reddetti',otomatik:'işleniyor'}[x.durum]||x.durum))); d.appendChild(dom('div',null,x.baslik||'')); var ai=x.admin_inceleme; if(ai) d.appendChild(dom('div','not','🧠 Yönetici: '+ai.karar+' (puan '+ai.puan+') — '+(ai.gerekce||''))); var lk=x.linkler||{}; Object.keys(lk).forEach(function(kk){ if(/^https:\/\//.test(lk[kk])){ var al=dom('a',null,'↗ '+kk.replace('_',' ')+' '); al.href=lk[kk]; al.target='_blank'; al.rel='noopener noreferrer'; al.style.marginRight='8px'; d.appendChild(al); } }); if(x.onizleme_url&&/^https:\/\//.test(x.onizleme_url)){ var pv=document.createElement('video'); pv.controls=true; pv.playsInline=true; pv.preload='metadata'; pv.style.cssText='width:100%;max-width:260px;display:block;border-radius:10px;background:#000;margin-top:6px'; pv.src=x.onizleme_url+'#t=0.5'; d.appendChild(pv); } kap.appendChild(d); return; }
     var vd=document.createElement('video'); vd.controls=true; vd.muted=false; vd.playsInline=true; vd.preload='metadata'; vd.style.cssText='width:100%;max-width:260px;display:block;border-radius:10px;background:#000'; vd.src='https://raw.githubusercontent.com/'+v.depo+'/'+v.dal+'/'+x.video+'#t=0.5'; d.appendChild(vd);
     d.appendChild(dom('span','rozet orta',(x.tur==='viral'?'3D video':'Video')+' · '+Math.round(x.sure||0)+' sn'));
     var bas=document.createElement('input'); bas.type='text'; bas.maxLength=100; bas.value=x.baslik||''; bas.style.cssText='width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-top:6px';
@@ -2429,7 +2460,7 @@ function sayilar(){
   return {hk:hk,k:k,a:a,u:u,yay:yay,planli:k.filter(function(o){return o.durum==='planli';}).length,
     onay:k.filter(function(o){return o.durum==='onay_bekliyor';}).length, hata:k.filter(function(o){return o.durum==='hata';}).length,
     sagSorun:sag.filter(function(c){return c.durum==='sorun'||c.durum==='kt';}).length,
-    shorts:((OZ.sk&&OZ.sk.taslaklar)||[]).filter(function(x){return videoKartiGorunur(x)&&!sonYayinZamani(x);}).length,
+    shorts:((OZ.sk&&OZ.sk.taslaklar)||[]).filter(function(x){return !x.otomatik&&videoKartiGorunur(x)&&!sonYayinZamani(x);}).length,
     yorum:((OZ.yo&&OZ.yo.ogeler)||[]).filter(function(x){return x.durum==='onay_bekliyor';}).length,
     ders:((OZ.ak&&OZ.ak.oneriler)||[]).filter(function(x){return x.durum==='onay_bekliyor';}).length,
     zamKapali:OZ.zam&&OZ.zam.acik===false};

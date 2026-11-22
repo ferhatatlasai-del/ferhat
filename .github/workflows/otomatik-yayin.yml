@@ -1,0 +1,63 @@
+name: Otomatik üretim ve yayın (yönetici ajan Kademe 3: üret, yönetici izler, 4 platforma yayınla)
+
+on:
+  workflow_dispatch:
+    inputs:
+      elle:
+        description: "EVET: ayar, günlük sınır ve tur aralığı kontrolünü yok say (deneme)"
+        default: "HAYIR"
+      kuru:
+        description: "EVET: yayın komutlarını çalıştırma, yalnızca ne yapılacağını yaz"
+        default: "HAYIR"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: otomatik-yayin
+  cancel-in-progress: false
+
+jobs:
+  hat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Araçları hazırla (numpy, ffmpeg, playwright-core)
+        run: |
+          python3 -m pip install --quiet numpy
+          if ! command -v ffmpeg >/dev/null 2>&1; then sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg; fi
+          npm install --no-save --prefix "$RUNNER_TEMP/pw" playwright-core
+          echo "NODE_PATH=$RUNNER_TEMP/pw/node_modules" >> "$GITHUB_ENV"
+          CH="$(command -v google-chrome || command -v chromium-browser || command -v chromium || true)"
+          if [ -z "$CH" ]; then echo "Chrome bulunamadı"; exit 1; fi
+          echo "CHROME_YOLU=$CH" >> "$GITHUB_ENV"
+      - name: Üret, yönetici izlesin, yayınla
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          YONETICI_MODEL: ${{ vars.YONETICI_MODEL || 'claude-sonnet-5-5' }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5.4-mini' }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_TTS_API_KEY: ${{ secrets.GOOGLE_TTS_API_KEY }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: "17841457188392262"
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OFIS_ADRES: "https://gurtechs-ajan-ofisi.fly.dev"
+          BILDIRIM_SIRRI: ${{ secrets.BILDIRIM_SIRRI }}
+          ELLE: ${{ inputs.elle }}
+          KURU: ${{ inputs.kuru }}
+        run: |
+          ARG=""
+          if [ "$ELLE" = "EVET" ]; then ARG="$ARG --elle"; fi
+          if [ "$KURU" = "EVET" ]; then ARG="$ARG --kuru"; fi
+          python3 ajan/otomatik_yayin.py $ARG

@@ -37,7 +37,7 @@ GUNLUK_ISLEM = 15
 SERBEST_AKISLAR = {"nobetci.yml": {}, "istatistik-rapor.yml": {"elle": "EVET"}, "yorum-ajani.yml": {"elle": "EVET"}}
 YORUM_ONAY_KATEGORILERI = {"övgü", "teşekkür", "soru", "öneri", "emoji", "diğer"}
 SHORTS_RE = re.compile(r"^s\d{8}-\d{6}$")
-VARSAYILAN_AYAR = {"aktif": False, "kademe": 2, "yonerge": ""}
+VARSAYILAN_AYAR = {"aktif": False, "kademe": 2, "yonerge": "", "otomatik_yayin": "kapali"}
 
 
 def simdi_tr():
@@ -133,6 +133,10 @@ def durum_ozeti():
     kul = kul or []
     bek = [k["konu"] for k in (va or {}).get("oncelikli", []) if "anlat-" + slug(k["konu"]) not in kul]
     o["video_konulari"] = {"oncelikli_kalan": bek[:6], "uretilmis_sayi": len(kul)}
+    ot, _ = dosya_oku("yonetici/otomatik.json")
+    kay = (ot or {}).get("kayitlar", [])
+    o["otomatik_hat"] = {"mod": None, "bugun": [f"{k.get('zaman', '')[11:]} {str(k.get('baslik') or k.get('ayrinti'))[:50]} → {k.get('durum')}" + (f" (puan {k['inceleme'].get('puan')}; {'; '.join(k['inceleme'].get('sorunlar', [])[:2])})" if k.get("inceleme") else "") for k in kay if str(k.get("zaman", ""))[:10] == gun],
+                         "son_5": [f"{k.get('zaman')} {str(k.get('baslik') or k.get('ayrinti'))[:40]} → {k.get('durum')}" for k in kay[-5:]]}
     try:
         runs = gh("GET", f"/repos/{REPO}/actions/runs?per_page=40").get("workflow_runs", [])
         esik = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=24)).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -143,6 +147,8 @@ def durum_ozeti():
         o["son_24s_basarisiz_is_akislari"] = hatalar
     except Exception:
         pass
+    yon, _ = dosya_oku(AYAR)
+    o["otomatik_hat"]["mod"] = (yon or {}).get("otomatik_yayin", "kapali")
     return o, {"ayar": ayar or {}}
 
 
@@ -173,6 +179,9 @@ def llm(sistem, kullanici):
 SISTEM = """Sen "Yönetici" ajansın: Gür-Techs 3D (@gurtechs3d, 3D yazıcı içerikleri, Türkçe Reels/Shorts/hikâye) kanalının sahibinin (admin) amacını, tarzını ve tercihlerini taklit ederek sistemi izlersin.
 Sahibinin yönergesi aşağıda. Ona göre karar ver; emin değilsen karar verme, öneri yaz. Yalnızca geçerli JSON döndür.
 DÜRÜST OL: durum özetinde olmayan bir şeyi uydurma; veri yoksa "veri yok" de.
+OTOMATİK HAT (bilmen gereken): Kademe 3'te ve panelden "otomatik_yayin" açıkken sistem günde 3 video (TR 10:05, 15:05, 20:05) üretir; videoyu SEN izlersin (kareler + anlatı + bilgi tabanı) ve saçma/yanlış/bozuk bulursan reddedersin, yalnızca onayladıklarını Instagram Reels, Instagram Hikâye, YouTube Shorts ve YouTube normal video olarak yayınlarsın. Mod: kapali / deneme (üret+izle, yayınlama) / acik. Durum özetindeki "otomatik_hat" bugünkü turları gösterir. Bu hattın modunu DEĞİŞTİREMEZSİN (sahibi panelden belirler); aksaklık, art arda ret ya da kota sorununu raporda belirt ve öner.
+BİLGİ TABANI (3D baskı doğruluk ölçütleri):
+{bilgi}
 KADEME {kademe}: {kademe_aciklama}
 KULLANABİLECEĞİN EYLEMLER (başka eylem yazma):
 {eylemler}
@@ -261,6 +270,33 @@ def eylem_yurut(e, kademe, ozet):
     return "reddedildi", "bilinmeyen"
 
 
+def bekleyen_video_incele(ozet, kademe, yonerge, bilgi_tabani):
+    """Onay bekleyen (elle yayınlanacak) en yeni video taslağını, daha önce incelenmediyse İZLER (karelerle); sonucu özete ve (Kademe 2+) taslağa not olarak yazar."""
+    import tempfile
+    import video_inceleme as VI
+    adaylar = [t for t in reversed(ozet.get("video_taslaklari", [])) if t.get("durum") == "onay_bekliyor"]
+    for t in adaylar[:1]:
+        d, _ = dosya_oku(f"shorts/{t['id']}.json")
+        if not d or d.get("admin_inceleme") or not d.get("video"):
+            continue
+        with tempfile.TemporaryDirectory() as g:
+            yol = pathlib.Path(g) / "video.mp4"
+            try:
+                urllib.request.urlretrieve(f"https://raw.githubusercontent.com/{REPO}/{DAL}/{d['video']}" if "127.0.0.1" not in GH_API else d["video"], yol)
+                nk, _ = dosya_oku("shorts/viral_noktalar.json")
+                onceki = [n for v in (nk or {}).get("videolar", []) for n in v.get("noktalar", [])]
+                bilgi = {"baslik": d.get("baslik"), "konu": d.get("konu"), "aciklama": d.get("aciklama"), "anlati": d.get("anlati") or "(anlatı metni kayıtlı değil)", "sahneler": [z.get("tip") for z in d.get("zamanlama") or []], "noktalar": []}
+                inc = VI.incele(yol, bilgi, yonerge, bilgi_tabani, onceki)
+            except Exception as e:
+                print(f"UYARI: taslak incelenemedi ({type(e).__name__}: {str(e)[:100]})")
+                continue
+        ozet_inc = {k: inc.get(k) for k in ("karar", "puan", "sorunlar", "gerekce", "model", "iddialar")}
+        t["inceleme"] = {"karar": inc["karar"], "puan": inc["puan"], "sorunlar": inc["sorunlar"][:3], "gerekce": inc["gerekce"]}
+        print(f"Bekleyen taslak incelendi: {t['id']} → {inc['karar']} (puan {inc['puan']})")
+        if kademe >= 2:
+            json_guncelle(f"shorts/{t['id']}.json", lambda v: v.update(admin_inceleme=ozet_inc, admin_oneri=("reddet" if inc["karar"] != "yayinla" else v.get("admin_oneri")), admin_notu=(inc["gerekce"][:160] if inc["karar"] != "yayinla" else v.get("admin_notu"))), {}, "Yönetici: taslak incelemesi")
+
+
 def calis(a):
     ayar, _ = dosya_oku(AYAR)
     ayar = {**VARSAYILAN_AYAR, **(ayar or {})}
@@ -270,13 +306,19 @@ def calis(a):
     kademe = int(ayar.get("kademe") or 2)
     kademe = kademe if kademe in (1, 2, 3) else 2
     ozet, _ = durum_ozeti()
+    bd = pathlib.Path(__file__).resolve().parent.parent / "yonetici" / "bilgi.md"
+    try:
+        bekleyen_video_incele(ozet, kademe, ayar.get("yonerge", ""), bd.read_text(encoding="utf-8") if bd.exists() else "")
+    except Exception as e:
+        print(f"UYARI: video incelemesi atlandı ({type(e).__name__}: {str(e)[:100]})")
     rapor_d, _ = dosya_oku(RAPOR)
     rapor_d = rapor_d or {}
     bugun = simdi_tr().strftime("%Y-%m-%d")
     kalan = GUNLUK_ISLEM - sum(1 for d in rapor_d.get("defter", []) if str(d.get("zaman", ""))[:10] == bugun and d.get("durum") == "yapildi")
     hafiza = [f"{d.get('zaman', '')[:10]} {d.get('eylem')} → {d.get('durum')}: {str(d.get('ayrinti'))[:60]}" for d in rapor_d.get("defter", [])[-8:]]
     eylemler = EYLEM_2 + ("\n" + EYLEM_3 if kademe >= 3 else "")
-    sistem = SISTEM.format(kademe=kademe, kademe_aciklama=KADEME_ACIKLAMA[kademe], eylemler=eylemler)
+    bilgi_dosyasi = pathlib.Path(__file__).resolve().parent.parent / "yonetici" / "bilgi.md"
+    sistem = SISTEM.format(kademe=kademe, kademe_aciklama=KADEME_ACIKLAMA[kademe], eylemler=eylemler, bilgi=(bilgi_dosyasi.read_text(encoding="utf-8")[:4500] if bilgi_dosyasi.exists() else "(yok)"))
     kullanici = ("SAHİBİNİN YÖNERGESİ:\n" + (ayar.get("yonerge") or "(yönerge yok)")[:4000] + "\n\nSİSTEM DURUMU (JSON):\n" + json.dumps(ozet, ensure_ascii=False)[:9000] +
                  "\n\nSON KARARLARIN:\n" + ("\n".join(hafiza) or "(henüz yok)") + f"\n\nBugün kalan işlem hakkı: {kalan}. Şimdi: {simdi_tr().strftime('%d.%m.%Y %H:%M')} (TR).")
     try:
