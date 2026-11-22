@@ -1,4 +1,40 @@
 {
-  "raporlar": [],
-  "defter": []
+  "raporlar": [
+    {
+      "zaman": "2026-11-23 00:45",
+      "kademe": 2,
+      "model": "OpenAI (gpt-5.4-mini)",
+      "rapor": [
+        "Senin sistemin genel olarak iyi durumda; Instagram, YouTube, OpenAI ve ofis sunucusu çalışıyor, kritik bir arıza görünmüyor.",
+        "Hikâye kuyruğunda 9 planlı içerik var; günlük hedef 6 olduğu için akış şimdilik yeterli görünüyor.",
+        "Bugün görsel kullanımın 0, aylık 108; bütçe açısından acil bir taşma sinyali yok.",
+        "Onay bekleyen tek video taslağı var: s20261122-185523. Başlık konu olarak uygun görünüyor ama içerik detayını görmeden onaylamıyorum.",
+        "Öncelikli konu listesinde Bambu Lab A1 etrafında tekrar eden ama hâlâ güçlü başlıklar var; çeşitlilik için yeni açı seçmek iyi olur.",
+        "Şu an acil müdahale gerektiren bir sağlık/bağlantı sorunu yok; bu yüzden gereksiz workflow çalıştırmıyorum."
+      ],
+      "oneriler": [
+        "Bu akşam yeni taslak üretirken Bambu Lab A1 çevresinde ama farklı açı seç: örneğin baskı öncesi kontrol listesi veya yeni başlayan hataları.",
+        "Hikâye sayısını şimdilik değiştirme; kuyruk dolu ve günlük hedefe yakınsın.",
+        "Yorumlarda otomatik akış açık kalsın ama hakaret, siyaset, sağlık-hukuk içeren yorumları yine dikkatle ayıkla.",
+        "Yarın sabah raporunda özellikle onay bekleyen taslağın içeriğini kontrol et; başlık iyi olsa da detay doğrulaması önemli."
+      ],
+      "uyarilar": [],
+      "eylem_sayisi": 1
+    }
+  ],
+  "defter": [
+    {
+      "zaman": "2026-11-23 00:45",
+      "kademe": 2,
+      "eylem": "taslak_isaretle",
+      "params": {
+        "id": "s20261122-185523",
+        "oneri": "onayla",
+        "not": "Konu, kanalın yeni başlayan odaklı çizgisine uyuyor; içerik detayını görmeden kesin onay vermiyorum ama başlık uygun."
+      },
+      "neden": "Taslak onay bekliyor ve konu kanal hedefiyle uyumlu görünüyor.",
+      "durum": "yapildi",
+      "ayrinti": "s20261122-185523: onayla önerisi"
+    }
+  ]
 }
