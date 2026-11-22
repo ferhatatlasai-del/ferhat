@@ -1,21 +1,21 @@
 {
- "tarih": "2026-11-22T12:00:37Z",
- "tr_saat": "22.11.2026 15:00",
+ "tarih": "2026-11-22T15:00:42Z",
+ "tr_saat": "22.11.2026 18:00",
  "toplam": {
-  "reels": 14808,
+  "reels": 15499,
   "gonderi": 0,
-  "short": 10153,
+  "short": 10451,
   "youtube_video": 0,
-  "hikaye": 690,
-  "toplam": 25651,
-  "begeni": 249,
+  "hikaye": 733,
+  "toplam": 26683,
+  "begeni": 255,
   "yorum": 23
  },
- "fark": 883,
+ "fark": 1032,
  "instagram": {
   "durum": "tamam",
   "izin": true,
-  "takipci": 432,
+  "takipci": 433,
   "hata": "graph.instagram.com profil: HTTP 400 kod=190 tür=OAuthException: Invalid OAuth access token - Cannot parse access token",
   "gonderiler": [
    {
@@ -23,11 +23,11 @@
     "tur": "Reels",
     "tarih": "2026-11-22T10:33:39",
     "baslik": "Kolaydan zora filamentleri hızlıca sıraya dizdik.",
-    "begeni": 3,
+    "begeni": 7,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgCmX1zj1CJ/",
-    "izlenme": 387,
-    "erisim": 291
+    "izlenme": 956,
+    "erisim": 867
    },
    {
     "id": "17945283843388099",
@@ -37,8 +37,8 @@
     "begeni": 9,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgAjP11DCGR/",
-    "izlenme": 1513,
-    "erisim": 1412
+    "izlenme": 1525,
+    "erisim": 1424
    },
    {
     "id": "17941420377402019",
@@ -48,8 +48,8 @@
     "begeni": 7,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/DgAjINVCTkY/",
-    "izlenme": 768,
-    "erisim": 686
+    "izlenme": 814,
+    "erisim": 730
    },
    {
     "id": "17956070562049609",
@@ -59,8 +59,8 @@
     "begeni": 9,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgAaonlkhF3/",
-    "izlenme": 1640,
-    "erisim": 1493
+    "izlenme": 1646,
+    "erisim": 1499
    },
    {
     "id": "18193230361409051",
@@ -70,8 +70,8 @@
     "begeni": 5,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df_9WXhAUi5/",
-    "izlenme": 1567,
-    "erisim": 1454
+    "izlenme": 1570,
+    "erisim": 1458
    },
    {
     "id": "17916096111516478",
@@ -81,19 +81,19 @@
     "begeni": 9,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df-02JrFMVG/",
-    "izlenme": 1728,
-    "erisim": 1569
+    "izlenme": 1729,
+    "erisim": 1571
    },
    {
     "id": "18037926155853133",
     "tur": "Reels",
     "tarih": "2026-11-20T23:05:39",
     "baslik": "Baskın tabladan kalkıyor mu? İlk katman yapışmıyorsa çoğu za",
-    "begeni": 27,
+    "begeni": 29,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": 3831,
-    "erisim": 3376
+    "izlenme": 3876,
+    "erisim": 3434
    },
    {
     "id": "18289759651292671",
@@ -103,8 +103,8 @@
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df8Gek5DMrG/",
-    "izlenme": 295,
-    "erisim": 247
+    "izlenme": 296,
+    "erisim": 248
    },
    {
     "id": "18132390508855696",
@@ -114,8 +114,8 @@
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df67FfFgMHC/",
-    "izlenme": 175,
-    "erisim": 159
+    "izlenme": 177,
+    "erisim": 160
    },
    {
     "id": "18655251088021009",
@@ -125,8 +125,8 @@
     "begeni": 3,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df5dfOAjiMp/",
-    "izlenme": 187,
-    "erisim": 168
+    "izlenme": 189,
+    "erisim": 169
    },
    {
     "id": "18140690902641017",
@@ -136,8 +136,8 @@
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df4j3AnDmy-/",
-    "izlenme": 212,
-    "erisim": 180
+    "izlenme": 214,
+    "erisim": 181
    },
    {
     "id": "17925649080445339",
@@ -147,8 +147,8 @@
     "begeni": 5,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df0SY8TGKVZ/",
-    "izlenme": 2170,
-    "erisim": 1834
+    "izlenme": 2171,
+    "erisim": 1835
    },
    {
     "id": "18121842679765284",
@@ -158,8 +158,8 @@
     "begeni": 3,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/Dfxy_-8Ekyj/",
-    "izlenme": 335,
-    "erisim": 237
+    "izlenme": 336,
+    "erisim": 238
    },
    {
     "id": "18077982347330509",
@@ -319,19 +319,38 @@
  "hikaye_izin": true,
  "hikayeler": [
   {
+   "id": "18226143586340944",
+   "tarih": "2026-11-22T13:27:11Z",
+   "baslik": "Video hikayesi",
+   "izlenme": 5,
+   "erisim": 5,
+   "okundu": true,
+   "yanit": 0
+  },
+  {
+   "id": "18352225648254861",
+   "tarih": "2026-11-22T12:07:24Z",
+   "baslik": "Shopping Bags Hook - Gancho para bolsas de la compra",
+   "izlenme": 8,
+   "erisim": 8,
+   "okundu": true,
+   "yanit": 0
+  },
+  {
    "id": "18039615434661529",
    "tarih": "2026-11-22T11:27:41Z",
    "baslik": "Towel Bar Hook",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 8,
+   "erisim": 8,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "18026747366945137",
    "tarih": "2026-11-22T10:36:15Z",
    "baslik": "Messenger Bag Desk Hook",
-   "izlenme": 6,
-   "erisim": 5,
+   "izlenme": 11,
+   "erisim": 11,
    "okundu": true,
    "yanit": 0
   },
@@ -339,8 +358,8 @@
    "id": "18119082491025513",
    "tarih": "2026-11-22T10:34:32Z",
    "baslik": "Video hikayesi",
-   "izlenme": 6,
-   "erisim": 5,
+   "izlenme": 11,
+   "erisim": 11,
    "okundu": true,
    "yanit": 0
   },
@@ -348,8 +367,8 @@
    "id": "17957956797280216",
    "tarih": "2026-11-21T23:32:26Z",
    "baslik": "Video hikayesi",
-   "izlenme": 18,
-   "erisim": 14,
+   "izlenme": 20,
+   "erisim": 16,
    "okundu": true,
    "yanit": 0
   },
@@ -357,8 +376,8 @@
    "id": "18164781550503882",
    "tarih": "2026-11-21T23:23:26Z",
    "baslik": "Video hikayesi",
-   "izlenme": 19,
-   "erisim": 17,
+   "izlenme": 21,
+   "erisim": 19,
    "okundu": true,
    "yanit": 0
   },
@@ -384,7 +403,7 @@
    "id": "18081372350749410",
    "tarih": "2026-11-21T17:06:42Z",
    "baslik": "Table bag hook",
-   "izlenme": 24,
+   "izlenme": 25,
    "erisim": 20,
    "okundu": true,
    "yanit": 0
@@ -393,8 +412,8 @@
    "id": "18025038785955858",
    "tarih": "2026-11-21T16:26:39Z",
    "baslik": "Bag hook for car trunk",
-   "izlenme": 27,
-   "erisim": 20,
+   "izlenme": 29,
+   "erisim": 21,
    "okundu": true,
    "yanit": 0
   },
@@ -402,8 +421,8 @@
    "id": "18078108707591628",
    "tarih": "2026-11-21T15:46:41Z",
    "baslik": "VW Hook for shopping bags in trunk, Haken für VW Passat Koff",
-   "izlenme": 25,
-   "erisim": 21,
+   "izlenme": 27,
+   "erisim": 22,
    "okundu": true,
    "yanit": 0
   },
@@ -411,8 +430,8 @@
    "id": "18138218831507788",
    "tarih": "2026-11-21T15:26:43Z",
    "baslik": "IV bag hook",
-   "izlenme": 24,
-   "erisim": 21,
+   "izlenme": 26,
+   "erisim": 22,
    "okundu": true,
    "yanit": 0
   },
@@ -420,8 +439,8 @@
    "id": "18132820246889835",
    "tarih": "2026-11-21T15:06:51Z",
    "baslik": "Universal Pannier Bag Hook - turn any backpack into a pannie",
-   "izlenme": 26,
-   "erisim": 21,
+   "izlenme": 27,
+   "erisim": 22,
    "okundu": true,
    "yanit": 0
   },
@@ -645,22 +664,6 @@
    "izlenme": 0,
    "erisim": 0,
    "okundu": false
-  },
-  {
-   "id": "18359945398169882",
-   "tarih": "2026-11-19T06:38:30Z",
-   "baslik": "Realistic Skull Candy Bowl | Halloween Skull Decoration",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
-  },
-  {
-   "id": "17872622289660510",
-   "tarih": "2026-11-18T21:23:54Z",
-   "baslik": "GURTECH 3D",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
   }
  ],
  "youtube": {
@@ -672,7 +675,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T10:33:51",
     "baslik": "Baskısı en kolay filamentler: 5'ten 1'e",
-    "izlenme": 1,
+    "izlenme": 156,
     "begeni": 0,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=czKPQgTqQrw"
@@ -692,7 +695,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T19:16:49",
     "baslik": "3D baskıda katman kayması neden olur?",
-    "izlenme": 1200,
+    "izlenme": 1203,
     "begeni": 4,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=yGVzYJN-m6o"
@@ -702,7 +705,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T15:26:52",
     "baslik": "Isıya en dayanıklı 5 filament | 3D baskı",
-    "izlenme": 274,
+    "izlenme": 280,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=TXcpwaFMx1U"
@@ -712,7 +715,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T14:12:38",
     "baslik": "3D baskıda stringing nasıl azalır?",
-    "izlenme": 1091,
+    "izlenme": 1159,
     "begeni": 7,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=ZzZkzgV1eL4"
@@ -722,7 +725,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T09:57:09",
     "baslik": "Filament nem çekerse ne olur? Belirtiler ve çözüm",
-    "izlenme": 1121,
+    "izlenme": 1123,
     "begeni": 6,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=M9tyEIjEeH8"
@@ -732,7 +735,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T23:23:12",
     "baslik": "İlk katman neden bozuluyor? 5 hızlı kontrol",
-    "izlenme": 838,
+    "izlenme": 899,
     "begeni": 10,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=JFRO2uhYfwQ"
@@ -742,7 +745,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T22:17:19",
     "baslik": "3D Baskı Tablaya Yapışmıyor mu? 5 Pratik Çözüm",
-    "izlenme": 1207,
+    "izlenme": 1209,
     "begeni": 18,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=qcWHhTeaEHs"
@@ -762,7 +765,7 @@
     "tur": "Short",
     "tarih": "2026-11-19T21:59:26",
     "baslik": "Dr. Filament ile 3D Yazıcılar Nasıl Çalışır? | gurtech3d",
-    "izlenme": 1110,
+    "izlenme": 1111,
     "begeni": 5,
     "yorum": 1,
     "link": "https://www.youtube.com/watch?v=MGVp8xfBUtc"
@@ -822,7 +825,7 @@
  },
  "eksikler": [],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 15:00",
-  "govde": "Toplam 25.651 (+883) · Reels 14.808 · Short 10.153 · Hikaye 690 (3 bugün) · Takipçi 432 (+2) · En iyi Reels: Baskın tabladan kalkı 3.831"
+  "baslik": "📊 İzlenme raporu 18:00",
+  "govde": "Toplam 26.683 (+1.032) · Reels 15.499 · Short 10.451 · Hikaye 733 (5 bugün) · Takipçi 433 (+1) · En iyi Reels: Baskın tabladan kalkı 3.876"
  }
 }
