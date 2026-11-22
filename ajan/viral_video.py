@@ -378,6 +378,18 @@ def anlat_senaryo_sec(a):
         SECIM.update(tur="elle")
         s = anlat_senaryo_uret(a.konu, "")
         return (s, "anlat-" + slug(a.konu)) if s else (None, "anlat senaryosu üretilemedi (OPENAI_API_KEY yok ya da yanıt geçersiz)")
+    # öncelikli seri: shorts/viral_ayar.json içindeki "oncelikli" konular (sırayla, her biri bir kez) başarı hafızasından ve listeden önce gelir
+    for k in (json_oku(AYAR, {}).get("oncelikli") or []):
+        kim = "anlat-" + slug(k["konu"])
+        if kim in kullanilan:
+            continue
+        SECIM.update(tur="seri")
+        s = anlat_senaryo_uret(k["konu"], k.get("ipucu"))
+        if s:
+            if k.get("not"):
+                s["aciklama"] = (s["aciklama"].rstrip() + "\n\n" + str(k["not"])[:300]).strip()   # ör. marka bağlantısı olmadığı notu
+            return s, kim
+        return None, f"'{k['konu']}' için anlat senaryosu üretilemedi"
     t = turev_sec()
     if t:
         s = anlat_senaryo_uret(t[0], t[1])

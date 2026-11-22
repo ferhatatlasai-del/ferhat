@@ -1,0 +1,34 @@
+{
+  "oncelikli": [
+    {
+      "konu": "Bambu Lab A1'de ilk katman yapışmıyorsa ne yapmalı?",
+      "ipucu": "Tabla temizliği, Z ofseti/otomatik kalibrasyon, ilk katman yüksekliği, tabla ısısı. Yalnızca genel, doğru ve yaygın kabul gören bilgi ver. Modele özel sayı (sıcaklık, hız, aralık) uydurma; emin olmadığın ayrıntıyı genel tut ya da üretici ayarlarına yönlendir. Marka logosu ya da ürün görseli yok.",
+      "not": "Bu içerik bağımsızdır; Bambu Lab ile bir bağlantısı yoktur."
+    },
+    {
+      "konu": "Bambu Lab A1 Combo'da AMS lite ile filament değişimi: sık sorunlar",
+      "ipucu": "Filament yolu, makara yerleşimi, sıkışma, renk geçişinde atık. Genel kal. Yalnızca genel, doğru ve yaygın kabul gören bilgi ver. Modele özel sayı (sıcaklık, hız, aralık) uydurma; emin olmadığın ayrıntıyı genel tut ya da üretici ayarlarına yönlendir. Marka logosu ya da ürün görseli yok.",
+      "not": "Bu içerik bağımsızdır; Bambu Lab ile bir bağlantısı yoktur."
+    },
+    {
+      "konu": "Bambu Lab A1'de filament nemi ve kurutma",
+      "ipucu": "Nem çeken filament belirtileri (çıtırtı, pürüz), kurutma ve saklama. Yalnızca genel, doğru ve yaygın kabul gören bilgi ver. Modele özel sayı (sıcaklık, hız, aralık) uydurma; emin olmadığın ayrıntıyı genel tut ya da üretici ayarlarına yönlendir. Marka logosu ya da ürün görseli yok.",
+      "not": "Bu içerik bağımsızdır; Bambu Lab ile bir bağlantısı yoktur."
+    },
+    {
+      "konu": "Bambu Lab A1'de nozul tıkanması ve bakım",
+      "ipucu": "Tıkanma nedenleri, temizleme yöntemleri, bakım alışkanlığı. Yalnızca genel, doğru ve yaygın kabul gören bilgi ver. Modele özel sayı (sıcaklık, hız, aralık) uydurma; emin olmadığın ayrıntıyı genel tut ya da üretici ayarlarına yönlendir. Marka logosu ya da ürün görseli yok.",
+      "not": "Bu içerik bağımsızdır; Bambu Lab ile bir bağlantısı yoktur."
+    },
+    {
+      "konu": "Bambu Lab A1'de yeni başlayanların sık yaptığı 5 hata",
+      "ipucu": "Tabla, filament ayarı, kalibrasyon, hız, bakım gibi yaygın hatalar. Yalnızca genel, doğru ve yaygın kabul gören bilgi ver. Modele özel sayı (sıcaklık, hız, aralık) uydurma; emin olmadığın ayrıntıyı genel tut ya da üretici ayarlarına yönlendir. Marka logosu ya da ürün görseli yok.",
+      "not": "Bu içerik bağımsızdır; Bambu Lab ile bir bağlantısı yoktur."
+    },
+    {
+      "konu": "Bambu Lab A1 Combo için baskı öncesi kontrol listesi",
+      "ipucu": "Baskıdan önce bakılacak kısa liste: tabla, filament, nozul, kalibrasyon. Yalnızca genel, doğru ve yaygın kabul gören bilgi ver. Modele özel sayı (sıcaklık, hız, aralık) uydurma; emin olmadığın ayrıntıyı genel tut ya da üretici ayarlarına yönlendir. Marka logosu ya da ürün görseli yok.",
+      "not": "Bu içerik bağımsızdır; Bambu Lab ile bir bağlantısı yoktur."
+    }
+  ]
+}
