@@ -17,7 +17,7 @@
   "zamanlama": [
     {
       "tip": "kanca",
-      "t0": 0.0,
+      "t0": 0,
       "t1": 5.93,
       "ses_son": 5.43
     },
@@ -54,12 +54,12 @@
     {
       "tip": "sicak_uc",
       "t0": 33.79,
-      "t1": 39.0,
+      "t1": 39,
       "ses_son": 38.5
     },
     {
       "tip": "kontrol_listesi",
-      "t0": 39.0,
+      "t0": 39,
       "t1": 44.55,
       "ses_son": 44.05
     },
@@ -71,5 +71,9 @@
     }
   ],
   "admin_notu": "Son videodaki AMS lite filament degisim sorunlari konusuna cok benziyor; tekrar riski var.",
-  "admin_oneri": "incele"
+  "admin_oneri": "incele",
+  "yayinlanan": [
+    "instagram"
+  ],
+  "yayin_tarihi": "2026-11-22T23:16:32.195Z"
 }
