@@ -119,6 +119,36 @@
       "id": "o20261122-6",
       "tarih": "2026-11-22T17:18:27Z",
       "durum": "onayli"
+    },
+    {
+      "ajan": "hikaye",
+      "baslik": "referanssız denemeyi erken kes",
+      "ders": "Referanssız üretimi denemede hemen durdur.",
+      "kanit": "90 denetimde 5 referans yok ve 0.66 geçme oranı var.",
+      "onem": 1,
+      "id": "o20261122-7",
+      "tarih": "2026-11-22T20:52:24Z",
+      "durum": "onay_bekliyor"
+    },
+    {
+      "ajan": "hikaye",
+      "baslik": "marka yazısını üretimde engelle",
+      "ders": "Görselde okunabilir marka yazısı görünürse üretimi reddet.",
+      "kanit": "En sık sorun 2 kez görülen okunabilir marka/yazı.",
+      "onem": 2,
+      "id": "o20261122-8",
+      "tarih": "2026-11-22T20:52:24Z",
+      "durum": "onay_bekliyor"
+    },
+    {
+      "ajan": "sistem",
+      "baslik": "yayın sıçramasını sınırla",
+      "ders": "Günlük yayını 10'u aşınca otomatik kuyrukla.",
+      "kanit": "Yayın 8'den 20'ye sıçradı ve günlük harcama 40'a çıktı.",
+      "onem": 3,
+      "id": "o20261122-9",
+      "tarih": "2026-11-22T20:52:24Z",
+      "durum": "onay_bekliyor"
     }
   ]
 }

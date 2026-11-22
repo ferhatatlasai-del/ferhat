@@ -1,30 +1,30 @@
 {
-  "tarih": "2026-11-22T17:18:20Z",
+  "tarih": "2026-11-22T20:52:15Z",
   "gun": 7,
   "hikaye": {
     "olusturulan": 60,
     "durumlar": {
-      "planli": 9,
-      "yayinda": 51
+      "planli": 8,
+      "yayinda": 52
     },
     "kaynaklar": {
-      "uretim": 48,
-      "yayin": 10,
+      "uretim": 47,
+      "yayin": 11,
       "foto": 1,
       "video": 1
     },
-    "ort_kontrol_puani": 8.9,
-    "ort_deneme": 1.08,
-    "referansli": 44,
-    "trend_kaynakli": 33,
-    "muzikli": 46,
+    "ort_kontrol_puani": 8.89,
+    "ort_deneme": 1.06,
+    "referansli": 43,
+    "trend_kaynakli": 32,
+    "muzikli": 45,
     "yayin_gunluk": {
       "2026-11-17": 3,
       "2026-11-18": 6,
       "2026-11-19": 7,
       "2026-11-20": 8,
       "2026-11-21": 20,
-      "2026-11-22": 7
+      "2026-11-22": 8
     }
   },
   "olaylar": {
@@ -87,13 +87,13 @@
     "son_7_gun_toplam": 108
   },
   "zincir": {
-    "kayit": 29,
+    "kayit": 31,
     "formatlar": {
-      "reels": 28,
+      "reels": 30,
       "carousel": 1
     },
     "ort_elestiri_puani": 6.0,
-    "tekrarlanan_konu_sayisi": 3
+    "tekrarlanan_konu_sayisi": 4
   },
   "trend": {
     "tarih": "2026-11-19T12:02:48Z",
@@ -107,53 +107,74 @@
   },
   "calismalar": {
     "Akademi ajanı (haftalık rapor ve ders önerileri)": {
-      "calisma": 3,
+      "calisma": 5,
       "basarisiz": 0,
       "iptal": 0,
-      "zamanlayici": 0,
-      "elle": 3
+      "zamanlayici": 1,
+      "elle": 4
     },
-    "Yorum ajanı (Instagram yorumlarına nazik yanıt taslağı; onaylananları gönderir)": {
-      "calisma": 60,
-      "basarisiz": 0,
-      "iptal": 0,
-      "zamanlayici": 0,
-      "elle": 60
-    },
-    "Nöbetçi (anahtar ve servis sağlığı)": {
-      "calisma": 19,
-      "basarisiz": 12,
-      "iptal": 0,
-      "zamanlayici": 2,
-      "elle": 17
-    },
-    "Hikaye ajanı (yayınla)": {
-      "calisma": 150,
-      "basarisiz": 8,
-      "iptal": 4,
-      "zamanlayici": 3,
-      "elle": 147
-    },
-    "Ajan Ofisi'ni Fly'a yükle": {
+    "Hikaye ajanı (yapay zekâ görseli üret)": {
       "calisma": 11,
       "basarisiz": 0,
       "iptal": 0,
-      "zamanlayici": 0,
-      "elle": 11
+      "zamanlayici": 3,
+      "elle": 8
     },
-    "Viral video üretici (3D animasyonlu Türkçe Shorts/Reels taslağı; yayınlamaz)": {
-      "calisma": 10,
-      "basarisiz": 0,
+    "Hikaye ajanı (yayınla)": {
+      "calisma": 145,
+      "basarisiz": 4,
       "iptal": 3,
-      "zamanlayici": 0,
-      "elle": 10
+      "zamanlayici": 4,
+      "elle": 141
     },
-    "İstatistikçi ajan (izlenme raporu ve bildirim)": {
-      "calisma": 21,
+    "Yorum ajanı (Instagram yorumlarına nazik yanıt taslağı; onaylananları gönderir)": {
+      "calisma": 72,
       "basarisiz": 0,
       "iptal": 0,
       "zamanlayici": 0,
-      "elle": 21
+      "elle": 72
+    },
+    "Viral video üretici (3D animasyonlu Türkçe Shorts/Reels taslağı; yayınlamaz)": {
+      "calisma": 7,
+      "basarisiz": 0,
+      "iptal": 1,
+      "zamanlayici": 0,
+      "elle": 7
+    },
+    "İstatistikçi ajan (izlenme raporu ve bildirim)": {
+      "calisma": 19,
+      "basarisiz": 0,
+      "iptal": 0,
+      "zamanlayici": 0,
+      "elle": 19
+    },
+    "YouTube'a yükle (Shorts)": {
+      "calisma": 6,
+      "basarisiz": 0,
+      "iptal": 0,
+      "zamanlayici": 0,
+      "elle": 6
+    },
+    "Instagram'a yayınla (Reels)": {
+      "calisma": 6,
+      "basarisiz": 0,
+      "iptal": 0,
+      "zamanlayici": 0,
+      "elle": 6
+    },
+    "Nöbetçi (anahtar ve servis sağlığı)": {
+      "calisma": 18,
+      "basarisiz": 11,
+      "iptal": 0,
+      "zamanlayici": 2,
+      "elle": 16
+    },
+    "Ajan Ofisi'ni Fly'a yükle": {
+      "calisma": 9,
+      "basarisiz": 0,
+      "iptal": 0,
+      "zamanlayici": 0,
+      "elle": 9
     },
     "Günlük içerik taslağı": {
       "calisma": 2,
@@ -161,27 +182,6 @@
       "iptal": 0,
       "zamanlayici": 2,
       "elle": 0
-    },
-    "Hikaye ajanı (yapay zekâ görseli üret)": {
-      "calisma": 14,
-      "basarisiz": 0,
-      "iptal": 1,
-      "zamanlayici": 2,
-      "elle": 12
-    },
-    "YouTube'a yükle (Shorts)": {
-      "calisma": 5,
-      "basarisiz": 0,
-      "iptal": 0,
-      "zamanlayici": 0,
-      "elle": 5
-    },
-    "Instagram'a yayınla (Reels)": {
-      "calisma": 5,
-      "basarisiz": 0,
-      "iptal": 0,
-      "zamanlayici": 0,
-      "elle": 5
     }
   }
 }
