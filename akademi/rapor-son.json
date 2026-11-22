@@ -1,5 +1,5 @@
 {
-  "tarih": "2026-11-22T15:00:42Z",
+  "tarih": "2026-11-22T17:18:20Z",
   "gun": 7,
   "hikaye": {
     "olusturulan": 60,
@@ -107,25 +107,25 @@
   },
   "calismalar": {
     "Akademi ajanı (haftalık rapor ve ders önerileri)": {
-      "calisma": 1,
+      "calisma": 3,
       "basarisiz": 0,
       "iptal": 0,
       "zamanlayici": 0,
-      "elle": 1
+      "elle": 3
     },
     "Yorum ajanı (Instagram yorumlarına nazik yanıt taslağı; onaylananları gönderir)": {
-      "calisma": 49,
+      "calisma": 60,
       "basarisiz": 0,
       "iptal": 0,
       "zamanlayici": 0,
-      "elle": 49
+      "elle": 60
     },
-    "İstatistikçi ajan (izlenme raporu ve bildirim)": {
-      "calisma": 25,
-      "basarisiz": 0,
+    "Nöbetçi (anahtar ve servis sağlığı)": {
+      "calisma": 19,
+      "basarisiz": 12,
       "iptal": 0,
-      "zamanlayici": 0,
-      "elle": 25
+      "zamanlayici": 2,
+      "elle": 17
     },
     "Hikaye ajanı (yayınla)": {
       "calisma": 150,
@@ -133,6 +133,27 @@
       "iptal": 4,
       "zamanlayici": 3,
       "elle": 147
+    },
+    "Ajan Ofisi'ni Fly'a yükle": {
+      "calisma": 11,
+      "basarisiz": 0,
+      "iptal": 0,
+      "zamanlayici": 0,
+      "elle": 11
+    },
+    "Viral video üretici (3D animasyonlu Türkçe Shorts/Reels taslağı; yayınlamaz)": {
+      "calisma": 10,
+      "basarisiz": 0,
+      "iptal": 3,
+      "zamanlayici": 0,
+      "elle": 10
+    },
+    "İstatistikçi ajan (izlenme raporu ve bildirim)": {
+      "calisma": 21,
+      "basarisiz": 0,
+      "iptal": 0,
+      "zamanlayici": 0,
+      "elle": 21
     },
     "Günlük içerik taslağı": {
       "calisma": 2,
@@ -142,46 +163,25 @@
       "elle": 0
     },
     "Hikaye ajanı (yapay zekâ görseli üret)": {
-      "calisma": 16,
+      "calisma": 14,
       "basarisiz": 0,
       "iptal": 1,
       "zamanlayici": 2,
-      "elle": 14
-    },
-    "Nöbetçi (anahtar ve servis sağlığı)": {
-      "calisma": 17,
-      "basarisiz": 11,
-      "iptal": 0,
-      "zamanlayici": 2,
-      "elle": 15
+      "elle": 12
     },
     "YouTube'a yükle (Shorts)": {
-      "calisma": 7,
+      "calisma": 5,
       "basarisiz": 0,
       "iptal": 0,
       "zamanlayici": 0,
-      "elle": 7
+      "elle": 5
     },
     "Instagram'a yayınla (Reels)": {
-      "calisma": 8,
+      "calisma": 5,
       "basarisiz": 0,
       "iptal": 0,
       "zamanlayici": 0,
-      "elle": 8
-    },
-    "Ajan Ofisi'ni Fly'a yükle": {
-      "calisma": 13,
-      "basarisiz": 0,
-      "iptal": 0,
-      "zamanlayici": 0,
-      "elle": 13
-    },
-    "Viral video üretici (3D animasyonlu Türkçe Shorts/Reels taslağı; yayınlamaz)": {
-      "calisma": 12,
-      "basarisiz": 1,
-      "iptal": 3,
-      "zamanlayici": 0,
-      "elle": 12
+      "elle": 5
     }
   }
 }

@@ -89,6 +89,36 @@
       "id": "o20261122-3",
       "tarih": "2026-11-22T15:00:50Z",
       "durum": "onay_bekliyor"
+    },
+    {
+      "ajan": "hikaye",
+      "baslik": "Denetim sorununu azalt",
+      "ders": "Marka yazısı görünen referansları üretime alma.",
+      "kanit": "En sık denetim sorunu 2 kez: üzerinde okunabilir marka/yazı var.",
+      "onem": 1,
+      "id": "o20261122-4",
+      "tarih": "2026-11-22T17:18:27Z",
+      "durum": "onay_bekliyor"
+    },
+    {
+      "ajan": "hikaye",
+      "baslik": "Referans kontrolü ekle",
+      "ders": "Referans görseli uygun değilse üretimi başlatma.",
+      "kanit": "Referans sorunları içinde uygun değil 5 kez kaydedildi.",
+      "onem": 1,
+      "id": "o20261122-5",
+      "tarih": "2026-11-22T17:18:27Z",
+      "durum": "onay_bekliyor"
+    },
+    {
+      "ajan": "hikaye",
+      "baslik": "Yayın ritmini yumuşat",
+      "ders": "Günlük yayını 10 adedi aşarsa otomatik yavaşlat.",
+      "kanit": "Yayın bir günde 20'ye çıktı, haftalık dağılımda en yüksek değer bu.",
+      "onem": 1,
+      "id": "o20261122-6",
+      "tarih": "2026-11-22T17:18:27Z",
+      "durum": "onay_bekliyor"
     }
   ]
 }
