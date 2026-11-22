@@ -274,3 +274,5 @@ Yeni viral videolar artık **anlat** biçimindedir: konuya özel, sürekli harek
 - **Motor** (`video/anlat.js`): sahneler arası 5 geçiş efekti (kayma, yakınlaşma, daire, dikey itme, parlama; videoya göre dönüşümlü), bölüm etiketi (numaralı hap), renk vurgulu alt yazı (anlatıda `*turuncu*`, `~mavi~`), büyük başlık kartı ("ERİR!") ve sahneye bağlı bilgi etiketleri.
 - **Zamanlama:** sahne süreleri Türkçe anlatıcı sesine (Gemini/Google TTS) göre; her sahne animasyonu bitsin diye en az tipine özgü süre kadar sürer. Ses efektleri (geçiş, vurgu, darbe) plan'la birlikte gelir (`plan.olaylar`) ve konuşmaya binmez.
 - Konu seçimi: yine 3'te 3 "başarılı içeriklerden türetilmiş", 4.'sü keşif. Hâlâ `--bicim liste` / `--bicim 3d` ile eski biçimler çalıştırılabilir; ayar dosyasında (`shorts/viral_ayar.json`) `bicim` ile varsayılan değişir.
+
+**Reddetme güvenliği:** Hazır videolarda "Reddet ya da sil" ayrı, kapalı bir bölümdedir ve iki tıkla onay ister. Reddedilen video silinmez: "Reddedilenler" altında **24 saat boyunca "Geri al"** ile kurtarılır; temizlik yalnızca 24 saati geçmiş reddedilenleri siler (`karar: kurtar`).
