@@ -311,3 +311,11 @@ Yeni viral videolar artık **anlat** biçimindedir: konuya özel, sürekli harek
 - **Kayıt:** `yonetici/otomatik.json` (son çalışmalar: konu, puan, karar, platform adımları).
 - **Alan bilgisi:** `yonetici/bilgi.md` düzenlenerek yöneticinin 3D baskı bilgisi/kriterleri genişletilir. Bekleyen elle-onay taslakları da yönetici raporunda izlenir ve `admin_inceleme`/`admin_oneri` notu düşülür.
 - **Not:** Yayın adımları gerçek Instagram/YouTube API'sine karşı henüz canlıda denenmedi (sahte sunucuyla test edildi); ilk canlı yayını Açık moda geçince izle.
+
+## OpenAI zekâ seviyesi (panelden)
+
+Panel → Yönetici → **Yapay zekâ seviyesi**: üç iş için ayrı OpenAI modeli seçilir; kayıt `yapay_zeka/ayar.json` (`roller`). Seçim bir sonraki çalışmada geçerlidir.
+
+- **yonetici:** yönetici ajan ve video izleme · **video:** viral video senaryosu · **genel:** hikâye metni, yorum yanıtları, trend, akademi, başarı, günlük taslak.
+- Seçenekler: Varsayılan (`gpt-5.4-mini`), `gpt-5.4-mini`, `gpt-5.4` ya da elle yazılan model adı (harf, rakam, nokta, tire). Öncelik: panel seçimi > `OPENAI_MODEL` GitHub variable > koddaki varsayılan (`ajan/yz_model.py`).
+- Yanlış yazılan model adı 404 verir: hikâye/taslak üreticileri `gpt-4o-mini`'ye düşer, diğerleri o çalışmada hata verir (yönetici güvenli tarafta "yayınlama" der). Görsel (resim) modeli bu ayarın dışındadır.

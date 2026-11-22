@@ -33,7 +33,8 @@ GH_API = os.environ.get("GH_API") or "https://api.github.com"
 REPO = os.environ.get("GITHUB_REPOSITORY") or os.environ.get("GH_REPO") or ""
 DAL = os.environ.get("GITHUB_REF_NAME") or os.environ.get("GH_DAL") or "main"
 OPENAI = os.environ.get("OPENAI_BASE_URL") or "https://api.openai.com/v1"
-MODEL = os.environ.get("OPENAI_MODEL") or "gpt-5.4-mini"
+import yz_model as YZ  # noqa: E402
+MODEL = YZ.model("genel", "gpt-5.4-mini")
 KUYRUK = "yorum/kuyruk.json"
 AYAR = "yorum/ayar.json"
 VARSAYILAN = {"aktif": True, "mod": "onay", "gunluk_sinir": 30, "medya_sayisi": 12, "en_cok_taslak": 15, "en_cok_gonderim": 6, "gun_siniri": 7}

@@ -25,7 +25,8 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import thingiverse as TV  # noqa: E402
 
 KOK = pathlib.Path(__file__).resolve().parent.parent
-MODEL = os.environ.get("OPENAI_TREND_MODEL") or os.environ.get("OPENAI_MODEL") or "gpt-4o-mini"
+import yz_model as YZ  # noqa: E402
+MODEL = os.environ.get("OPENAI_TREND_MODEL") or YZ.model("genel", "gpt-4o-mini")
 ARAC_TURLERI = ["web_search", "web_search_preview"]
 OPENAI_ADRES = os.environ.get("OPENAI_BASE_URL") or "https://api.openai.com/v1"
 

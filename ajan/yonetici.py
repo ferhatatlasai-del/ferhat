@@ -29,7 +29,8 @@ REPO = os.environ.get("GITHUB_REPOSITORY") or os.environ.get("GH_REPO") or ""
 DAL = os.environ.get("GITHUB_REF_NAME") or os.environ.get("GH_DAL") or "main"
 OPENAI = os.environ.get("OPENAI_BASE_URL") or "https://api.openai.com/v1"
 ANTHROPIC = os.environ.get("ANTHROPIC_BASE_URL") or "https://api.anthropic.com"
-OPENAI_MODEL = os.environ.get("OPENAI_MODEL") or "gpt-5.4-mini"
+import yz_model as YZ  # noqa: E402
+OPENAI_MODEL = YZ.model("yonetici", "gpt-5.4-mini")
 CLAUDE_MODEL = os.environ.get("YONETICI_MODEL") or "claude-sonnet-5-5"
 AYAR = "yonetici/ayar.json"
 RAPOR = "yonetici/rapor.json"

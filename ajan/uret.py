@@ -19,7 +19,8 @@ import urllib.request
 
 KOK = pathlib.Path(__file__).resolve().parent.parent
 TASLAK_DIZINI = KOK / "taslaklar"
-MODEL = os.environ.get("OPENAI_MODEL") or "gpt-4o-mini"
+import yz_model as YZ  # noqa: E402
+MODEL = YZ.model("genel", "gpt-4o-mini")
 OPENAI_ADRES = os.environ.get("OPENAI_BASE_URL") or "https://api.openai.com/v1"
 YEDEK_MODEL = "gpt-4o-mini"
 
