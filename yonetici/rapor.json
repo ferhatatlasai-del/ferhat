@@ -41,6 +41,26 @@
       ],
       "uyarilar": [],
       "eylem_sayisi": 1
+    },
+    {
+      "zaman": "2026-11-23 00:47",
+      "kademe": 3,
+      "model": "OpenAI (gpt-5.4-mini)",
+      "rapor": [
+        "Acil bir sorun görünmüyor; sistem sağlığı iyi, Instagram/YouTube/OpenAI anahtarları çalışıyor.",
+        "Bekleyen tek video taslağı yeni başlayan odağına uyuyor; içerik detayını görmeden kesin onay vermiyorum.",
+        "Hikâye kuyruğunda 9 planlı içerik var; günlük 6 hedefiyle uyumlu görünüyor, şu an artırma gereği yok.",
+        "Öncelikli konu listesinde A1/AMS lite ve bakım odaklı başlıklar var; bunlar kanal çizgisine uygun ve tekrar riski düşük.",
+        "Yorum tarafında bekleyen yok; otomatik mod açık ama riskli yorumları yine onaylamamalısın.",
+        "Bugün kalan işlem hakkın yeterli; gereksiz workflow çalıştırmadım, bütçe kontrolü için beklemede kaldım."
+      ],
+      "oneriler": [
+        "Bu taslağın içeriği gelirse ilk katman/ilk baskı örnekleriyle sade ve kısa tutulmasını öneririm.",
+        "A1/AMS lite serisinde konu çeşitliliğini koru; aynı problemi art arda işlememeye dikkat et.",
+        "Hikâye sayısını şimdilik değiştirme; mevcut kuyruk ve günlük hedef yeterli görünüyor."
+      ],
+      "uyarilar": [],
+      "eylem_sayisi": 1
     }
   ],
   "defter": [
@@ -67,6 +87,19 @@
         "not": "Başlık yeni başlayan odaklı ve kanal çizgisine uyuyor; içerik detayını görmeden kesin onay vermiyorum ama konu uygun."
       },
       "neden": "Önceki kararı koruyup taslağa not düşmek için",
+      "durum": "yapildi",
+      "ayrinti": "s20261122-185523: onayla önerisi"
+    },
+    {
+      "zaman": "2026-11-23 00:47",
+      "kademe": 3,
+      "eylem": "taslak_isaretle",
+      "params": {
+        "id": "s20261122-185523",
+        "oneri": "onayla",
+        "not": "Yeni başlayan odaklı, kanal çizgisine uyuyor; detay görmeden kesin onay vermiyorum ama konu uygun."
+      },
+      "neden": "Bekleyen taslak uygun görünüyor; sahibine not düşmek yeterli.",
       "durum": "yapildi",
       "ayrinti": "s20261122-185523: onayla önerisi"
     }
