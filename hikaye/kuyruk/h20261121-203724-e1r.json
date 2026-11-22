@@ -1,7 +1,7 @@
 {
   "id": "h20261121-203724-e1r",
   "kaynak": "uretim",
-  "durum": "planli",
+  "durum": "yayinlaniyor",
   "olusturma": "2026-11-21T20:37:24.000Z",
   "gorsel": "hikaye/gorseller/h20261121-203724-e1r.mp4",
   "baslik": "Bag hook",
@@ -23,7 +23,9 @@
       "İkinci görselde ürünün pratik kullanım halinde çoklu kanca/askı düzeni görülüyor, ilk görsel bunu te"
     ]
   },
-  "yayin": null,
+  "yayin": {
+    "tarih": "2026-11-22T23:16:19Z"
+  },
   "hata": "",
   "deneme": 0,
   "tur": "video",
