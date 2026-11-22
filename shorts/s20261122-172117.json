@@ -1,7 +1,7 @@
 {
   "id": "s20261122-172117",
   "olusturma": "2026-11-22T17:21:17Z",
-  "durum": "onay_bekliyor",
+  "durum": "reddedildi",
   "tur": "viral",
   "video": "videolar/yukleme_20261122172117.mp4",
   "sure": 53.6,
@@ -17,7 +17,7 @@
   "zamanlama": [
     {
       "tip": "kanca",
-      "t0": 0.0,
+      "t0": 0,
       "t1": 5.36,
       "ses_son": 4.86
     },
@@ -69,5 +69,6 @@
       "t1": 53.58,
       "ses_son": 51.18
     }
-  ]
+  ],
+  "red_tarihi": "2026-11-22T17:32:09.931Z"
 }
