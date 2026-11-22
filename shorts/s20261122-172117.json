@@ -1,7 +1,7 @@
 {
   "id": "s20261122-172117",
   "olusturma": "2026-11-22T17:21:17Z",
-  "durum": "reddedildi",
+  "durum": "onay_bekliyor",
   "tur": "viral",
   "video": "videolar/yukleme_20261122172117.mp4",
   "sure": 53.6,
@@ -15,62 +15,16 @@
     "tur": "elle"
   },
   "zamanlama": [
-    {
-      "tip": "kanca",
-      "t0": 0,
-      "t1": 5.36,
-      "ses_son": 4.86
-    },
-    {
-      "tip": "sicak_uc",
-      "t0": 5.36,
-      "t1": 10.88,
-      "ses_son": 10.38
-    },
-    {
-      "tip": "nem",
-      "t0": 10.88,
-      "t1": 16.83,
-      "ses_son": 16.33
-    },
-    {
-      "tip": "ekstruder",
-      "t0": 16.83,
-      "t1": 22.68,
-      "ses_son": 22.18
-    },
-    {
-      "tip": "ilk_katman",
-      "t0": 22.68,
-      "t1": 28.25,
-      "ses_son": 27.75
-    },
-    {
-      "tip": "sogutma",
-      "t0": 28.25,
-      "t1": 33.96,
-      "ses_son": 33.46
-    },
-    {
-      "tip": "hiz",
-      "t0": 33.96,
-      "t1": 39.53,
-      "ses_son": 39.03
-    },
-    {
-      "tip": "tikanma",
-      "t0": 39.53,
-      "t1": 46.09,
-      "ses_son": 45.59
-    },
-    {
-      "tip": "kapanis",
-      "t0": 46.09,
-      "t1": 53.58,
-      "ses_son": 51.18
-    }
+    {"tip": "kanca", "t0": 0, "t1": 5.36, "ses_son": 4.86},
+    {"tip": "sicak_uc", "t0": 5.36, "t1": 10.88, "ses_son": 10.38},
+    {"tip": "nem", "t0": 10.88, "t1": 16.83, "ses_son": 16.33},
+    {"tip": "ekstruder", "t0": 16.83, "t1": 22.68, "ses_son": 22.18},
+    {"tip": "ilk_katman", "t0": 22.68, "t1": 28.25, "ses_son": 27.75},
+    {"tip": "sogutma", "t0": 28.25, "t1": 33.96, "ses_son": 33.46},
+    {"tip": "hiz", "t0": 33.96, "t1": 39.53, "ses_son": 39.03},
+    {"tip": "tikanma", "t0": 39.53, "t1": 46.09, "ses_son": 45.59},
+    {"tip": "kapanis", "t0": 46.09, "t1": 53.58, "ses_son": 51.18}
   ],
-  "red_tarihi": "2026-11-22T17:32:09.931Z",
   "yayinlanan": [
     "instagram"
   ],
