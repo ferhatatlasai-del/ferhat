@@ -544,7 +544,7 @@ async function api(req, res, url) {
   if (url.pathname === '/api/shorts-karar' && req.method === 'POST') {
     let b; try { b = await govde(req); } catch (e) { return json(res, 400, { hata: 'Geçersiz istek.' }); }
     if (!SHORTS_RE.test(String(b.id || ''))) return json(res, 400, { hata: 'Geçersiz kimlik.' });
-    if (!['reddet', 'sil', 'yayinlandi', 'hikaye', 'geri_al'].includes(b.karar)) return json(res, 400, { hata: 'Geçersiz karar.' });
+    if (!['reddet', 'sil', 'yayinlandi', 'hikaye', 'geri_al', 'kurtar'].includes(b.karar)) return json(res, 400, { hata: 'Geçersiz karar.' });
     const yol = `shorts/${b.id}.json`;
     const k = await depoOku(yol);
     if (!k) return json(res, 404, { hata: 'Taslak bulunamadı.' });
@@ -562,6 +562,7 @@ async function api(req, res, url) {
       t.durum = 'onay_bekliyor';
     }
     else if (b.karar === 'reddet') { t.durum = 'reddedildi'; t.red_tarihi = new Date().toISOString(); }
+    else if (b.karar === 'kurtar') { if (t.durum !== 'reddedildi') return json(res, 409, { hata: 'Bu taslak reddedilmemiş.' }); t.durum = 'onay_bekliyor'; delete t.red_tarihi; }   // yanlışlıkla reddedileni geri al
     else if (['youtube', 'instagram'].includes(b.hedef)) {   // tek platform yayınlandı: diğeri için taslak beklemeye devam eder
       t.yayinlanan = [...new Set([...(t.yayinlanan || []), b.hedef])];
       t.yayin_tarihi = new Date().toISOString();
@@ -994,7 +995,7 @@ async function videoTemizligi() {
     const tarih = v => (v ? (Date.parse(v) || 0) : 0);   // tarih yoksa 0 (Date.parse(0) yıl 2000 sayıp yayınlanmamış taslağı silerdi)
     const son = Math.max(tarih(t.yayin_tarihi), tarih(t.hikaye_tarihi));
     const eskiYayin = son > 0 && Date.now() - son > 24 * 3600e3;
-    const eskiRed = t.durum === 'reddedildi' && Date.now() - tarih(t.red_tarihi) > 3600e3;   // reddedilmiş ama tarihi kaydedilmemişse (eski kayıt) silinmeye hazır sayılır
+    const eskiRed = t.durum === 'reddedildi' && tarih(t.red_tarihi) > 0 && Date.now() - tarih(t.red_tarihi) > 24 * 3600e3;   // reddedilen 24 saat boyunca 'Geri al' ile kurtarılabilir; tarihsiz eski kayıt hiç otomatik silinmez
     if (!(eskiYayin || eskiRed)) continue;
     if (/^videolar\/yukleme_\d{14}\.mp4$/.test(t.video || '')) { const vk = await depoOku(t.video).catch(() => null); if (vk) await depoSil(t.video, vk.sha, 'Temizlik: yayınlanmış video silindi'); }
     await depoSil('shorts/' + ad, k.sha, 'Temizlik: video taslağı silindi');
