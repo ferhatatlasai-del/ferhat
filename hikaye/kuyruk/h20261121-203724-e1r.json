@@ -1,7 +1,7 @@
 {
   "id": "h20261121-203724-e1r",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-21T20:37:24.000Z",
   "gorsel": "hikaye/gorseller/h20261121-203724-e1r.mp4",
   "baslik": "Bag hook",
@@ -24,7 +24,9 @@
     ]
   },
   "yayin": {
-    "tarih": "2026-11-22T23:16:19Z"
+    "tarih": "2026-11-22T23:17:35Z",
+    "medya_kimligi": "17994366561069708",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4036341455185908566"
   },
   "hata": "",
   "deneme": 0,
