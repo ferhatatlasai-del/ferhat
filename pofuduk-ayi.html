@@ -357,7 +357,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
       <div class="box" id="netIn" hidden>
         <h3 id="nRoomTitle">Oda</h3>
         <div id="nPlayers" class="net"></div>
-        <div class="fr2"><input id="nInvite" readonly aria-label="Davet yazısı"><button class="btn" id="nShare" type="button">WhatsApp'ta davet et</button></div>
+        <div class="fr2"><input id="nInvite" readonly aria-label="Davet yazısı"><button class="btn" id="nShare" type="button">Daveti kopyala / gönder</button></div>
         <button class="btn alt" id="nLeave" type="button">Odadan çık</button>
       </div>
       <p class="small" id="nTip">İpucu: İkiniz de oyunu <b>aynı linkten</b> açarsanız en iyisi. Odayı kuran kişi oyunun içinde kalmalı; davet gönderdikten sonra hemen oyuna geri dönsün.</p>
@@ -4447,8 +4447,9 @@ function renderNet() {
 function shareInvite() {
   const t = inviteText(); $('nInvite').value = t; $('nInvite').select();
   try { navigator.clipboard && navigator.clipboard.writeText(t).catch(() => {}); } catch (e) {}
-  const w = window.open('https://wa.me/?text=' + encodeURIComponent(t), '_blank', 'noopener');
-  netMsg(w ? 'WhatsApp açıldı. Mesajı arkadaşına gönder.' : 'Davet yazısı kopyalandı; WhatsApp\'a yapıştırıp gönderebilirsin.', true);
+  // nothing opens by itself: on phones the system's own share sheet, otherwise the text is just copied
+  if (navigator.share && isTouch) navigator.share({ text: t }).then(() => netMsg('Davet gönderildi.', true)).catch(() => netMsg('Davet yazısı kopyalandı; arkadaşına yapıştırıp gönderebilirsin.', true));
+  else netMsg('Davet yazısı kopyalandı; arkadaşına yapıştırıp gönderebilirsin.', true);
 }
 const pNet = $('pNet'); let netPaused = false;
 function openNet() {
