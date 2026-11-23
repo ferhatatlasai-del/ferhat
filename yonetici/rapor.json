@@ -151,6 +151,26 @@
         "Aynı taslağa birden fazla kez 'onayla' önerisi kaydı var; benim kurallarıma göre taslaklarda yalnızca somut gerekçeyle 'incele' veya 'reddet' notu düşülmeli."
       ],
       "eylem_sayisi": 0
+    },
+    {
+      "zaman": "2026-11-23 09:35",
+      "kademe": 3,
+      "model": "OpenAI (gpt-5.4)",
+      "rapor": [
+        "Acil değil ama son 24 saatte Nöbetçi ve Trend ajanında 1’er başarısızlık görünüyor; sağlık şu an iyi, tekrar tetikleme için veri yetersiz olduğu için bekledim.",
+        "Otomatik hat deneme modunda ve bugün tur görünmüyor; bu modu ben değiştiremem, sadece izlemeyi sürdürüyorum.",
+        "Onay bekleyen 1 taslak var: Bambu Lab A1’de ilk katman yapışması konusu. Son iyi izlenen içeriklerle tematik olarak yakın olduğu için tekrar riski görüyorum.",
+        "Bu taslakta sahne tiplerinde kontrol_listesi tekrarı var ve konu, son yüksek performanslı ilk katman/yapışma videolarına benziyor; bu yüzden sahibi olarak senin incelemen için not düşmeyi uygun buldum.",
+        "Hikâye tarafı stabil: günlük sayı 6, kuyrukta 7 planlı hikâye var; hedefle uyumlu olduğu için değişiklik yapmadım.",
+        "Yorum tarafında bekleyen yanıt yok; bu turda onay gerektiren işlem çıkmadı."
+      ],
+      "oneriler": [
+        "A1 odaklı içeriklerde tekrar hissini azaltmak için sıradaki videoda ilk katman yerine nem, bakım veya yeni başlayan hataları konusunu öne alman daha güvenli olabilir.",
+        "Trend ajanı başarısızlığı tekrar ederse, gereksiz sık çalıştırmadan tek seferlik kontrol planlayabilirsin.",
+        "Bambu Lab geçen içeriklerde açıklamaya bağımsızlık notu eklenmesi kuralını kontrol etmeni öneririm."
+      ],
+      "uyarilar": [],
+      "eylem_sayisi": 1
     }
   ],
   "defter": [
@@ -216,6 +236,19 @@
       "neden": "Konu çeşitliliğini korumak ve tekrar riskini işaretlemek için.",
       "durum": "yapildi",
       "ayrinti": "s20261122-215123: incele önerisi"
+    },
+    {
+      "zaman": "2026-11-23 09:35",
+      "kademe": 3,
+      "eylem": "taslak_isaretle",
+      "params": {
+        "id": "s20261122-185523",
+        "oneri": "incele",
+        "not": "Konu son iyi izlenen ilk katman/yapışma videolarına çok yakın; tekrar riski ve sahne çeşitliliği sınırlı görünüyor."
+      },
+      "neden": "Çeşitlilik ve tekrar riskini işaretlemek",
+      "durum": "yapildi",
+      "ayrinti": "s20261122-185523: incele önerisi"
     }
   ]
 }
