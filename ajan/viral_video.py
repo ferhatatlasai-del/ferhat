@@ -15,6 +15,7 @@ Kullanım:
 import argparse
 import base64
 import datetime
+import difflib
 import hashlib
 import io
 import json
@@ -576,6 +577,62 @@ def sessizlikler(x, en_az=0.09):
     return sonuc
 
 
+def _norm(t):
+    t = str(t).replace("İ", "i").replace("I", "ı").lower()
+    return re.sub(r"[^0-9a-zçğıöşü]", "", t)
+
+
+def whisper_kelimeleri(x):
+    """Konuşmayı (np.array, SES.SR) OpenAI ses tanımaya (whisper-1) gönderip KELİME ZAMANLARINI alır: [(kelime, başlangıç_sn, bitiş_sn)] ya da None (anahtar/ağ yoksa)."""
+    anahtar = os.environ.get("OPENAI_API_KEY")
+    if not anahtar or os.environ.get("WHISPER_KAPALI"):
+        return None
+    try:
+        tampon = io.BytesIO()
+        with wave.open(tampon, "wb") as w:
+            w.setnchannels(1)
+            w.setsampwidth(2)
+            w.setframerate(SES.SR)
+            w.writeframes((np.clip(x, -1, 1) * 32767).astype("<i2").tobytes())
+        sinir = "----yz" + hashlib.md5(tampon.getvalue()[:2000]).hexdigest()[:12]
+        parca = []
+        for ad, deger in (("model", os.environ.get("WHISPER_MODELI") or "whisper-1"), ("response_format", "verbose_json"), ("timestamp_granularities[]", "word"), ("language", "tr")):
+            parca.append(f'--{sinir}\r\nContent-Disposition: form-data; name="{ad}"\r\n\r\n{deger}\r\n'.encode())
+        parca.append(f'--{sinir}\r\nContent-Disposition: form-data; name="file"; filename="konusma.wav"\r\nContent-Type: audio/wav\r\n\r\n'.encode() + tampon.getvalue() + b"\r\n")
+        parca.append(f"--{sinir}--\r\n".encode())
+        r = urllib.request.Request(f"{OPENAI}/audio/transcriptions", data=b"".join(parca), method="POST",
+                                   headers={"Content-Type": f"multipart/form-data; boundary={sinir}", "Authorization": f"Bearer {anahtar}"})
+        with urllib.request.urlopen(r, timeout=180) as y:
+            j = json.load(y)
+        return [(str(w.get("word", "")), float(w["start"]), float(w.get("end", w["start"]))) for w in (j.get("words") or []) if "start" in w] or None
+    except Exception as e:
+        print(f"UYARI: ses tanıma zamanlaması alınamadı ({type(e).__name__}: {str(e)[:100]}); tahmini zamanlama kullanılacak.")
+        return None
+
+
+def hizala(kel, w):
+    """Betikteki kelimeleri (kel) ses tanımanın kelimeleriyle (w: [(kelime, t0, t1)]) eşleştirip kelime başlangıçlarını verir; eşleşmeyenler None. Dönen: (bas, eşleşme_oranı)."""
+    okunan, harita = [], []   # betik kelimesinin okunuşundaki sözcükler (ör. PLA → "pi el ey")
+    for i, k in enumerate(kel):
+        for tok in okunus_uygula(k).split():
+            n = _norm(tok)
+            if n:
+                okunan.append(n)
+                harita.append(i)
+    tani = [_norm(a) for a, _, _ in w]
+    sm = difflib.SequenceMatcher(None, okunan, tani, autojunk=False)
+    bas = [None] * len(kel)
+    esles = 0
+    for op, a0, a1, b0, b1 in sm.get_opcodes():
+        if op == "equal" or (op == "replace" and a1 - a0 == b1 - b0):
+            for da in range(a1 - a0):
+                i = harita[a0 + da]
+                if bas[i] is None:
+                    bas[i] = w[b0 + da][1]
+                    esles += op == "equal"
+    return bas, esles / max(1, len(okunan))
+
+
 def gemini_zamanla(x, kel):
     """Kelime zamanı vermeyen TTS için: konuşma baş/son sessizliğini kırp, noktalama sonrası gerçek duraklamalara çapa at, kalanını uzunlukla dağıt.
     Dönen: (kırpılmış ses, kelime başlangıçları)"""
@@ -584,8 +641,17 @@ def gemini_zamanla(x, kel):
     son_kirp = sess[-1][0] if sess and sess[-1][1] > len(x) / SES.SR - 0.03 else len(x) / SES.SR
     a, b = int(max(bas_kirp - 0.04, 0) * SES.SR), int(min(son_kirp + 0.12, len(x) / SES.SR) * SES.SR)
     x = x[a:b]
-    sess = sessizlikler(x)
     sure = len(x) / SES.SR
+    wk = whisper_kelimeleri(x)
+    if wk:
+        bas_w, oran = hizala(kel, wk)
+        if oran >= 0.6 and bas_w[0] is not None or oran >= 0.75:
+            if bas_w[0] is None:
+                bas_w[0] = 0.0
+            print(f"Kelime zamanları ses tanımadan alındı (eşleşme %{oran * 100:.0f}).")
+            return x, tamamla(bas_w, sure, kel)
+        print(f"UYARI: ses tanıma eşleşmesi düşük (%{oran * 100:.0f}); tahmini zamanlama kullanılacak.")
+    sess = sessizlikler(x)
     tah, toplam = tahmini_sure(kel)
     olcek = sure / toplam if toplam else 1.0
     bas = [None] * len(kel)
@@ -879,20 +945,22 @@ def resimli_gorselleri(plan, senaryo, dizin, kalite, hazir_dizin=None):
 
 
 def resim_kontrol(plan, senaryo, dizin, kalite):
-    """Üretilen görselleri tek çağrıda görsel modele gösterir (yazı/logo/bozuk/konuya uymayan); sorunlu olanları bir kez yeniden üretir. Dönen: yeniden üretilen sayı."""
+    """Üretilen görselleri tek çağrıda görsel modele gösterir: (1) yazı/logo/bozuk/konuya uymayan görselleri bulur (bir kez yeniden üretilir),
+    (2) her görsel için GERÇEK odak noktalarını (ana nesne, yakın çekim detayı) ve görünen nesnelerin konumlarını verir (zoom ve animasyon katmanı doğru yere gelsin). Dönen: yeniden üretilen sayı."""
     anahtar = os.environ.get("OPENAI_API_KEY")
     idx = [i for i, sh in enumerate(plan["sahneler"]) if sh["tip"] == "resim" and str(sh["params"].get("gorsel", "")).startswith("file://")]
     if not anahtar or not idx:
         return 0
-    icerik = [{"type": "text", "text": "Bu görseller bir bilgi videosunun sahneleri (sırayla). Her biri için denetle: okunabilir/anlamsız yazı-harf-rakam, logo ya da marka, bozuk anatomi (el/yüz/uzuv) ya da bozuk nesne, konuya UYMAYAN içerik, sahne tarifiyle çelişki. Konu: " + senaryo["konu"][:100]
-              + ". Sahne tarifleri: " + " | ".join(f"{k + 1}) {str(plan['sahneler'][i].get('nokta') or '')[:60]}" for k, i in enumerate(idx))
-              + ' Yalnızca JSON: {"sorunlu": [{"no": görsel_sırası_1den, "sorun": "kısa"}]} (sorun yoksa boş liste). Küçük kusurlar için sorunlu yazma.'}]
+    icerik = [{"type": "text", "text": "Bu görseller bir bilgi videosunun sahneleri (sırayla). Her biri için: (a) sorun: okunabilir/anlamsız yazı-harf-rakam, logo ya da marka, bozuk anatomi ya da bozuk nesne, konuya UYMAYAN içerik varsa kısa açıklama, yoksa boş metin (küçük kusurlar sorun değil); "
+              "(b) odak: ana öznenin merkezi [x,y] (0-1, soldan/üstten); (c) odak2: yakın çekimde gösterilecek en ilginç DETAYIN merkezi [x,y] (ana özneden farklı bir yer: yüz, el, tabela, ışık…); (d) nesneler: görünen en fazla 3 önemli nesne {ad (Türkçe, kısa), x, y} (0-1). Konu: " + senaryo["konu"][:100]
+              + ". Sahne notları: " + " | ".join(f"{k + 1}) {str(plan['sahneler'][i].get('nokta') or '')[:60]}" for k, i in enumerate(idx))
+              + ' Yalnızca JSON: {"sonuc": [{"no": 1, "sorun": "", "odak": [0.5, 0.5], "odak2": [0.4, 0.4], "nesneler": [{"ad": "aslan", "x": 0.4, "y": 0.6}]}]}'}]
     gecici = pathlib.Path(dizin) / "kucuk"
     gecici.mkdir(exist_ok=True)
     for k, i in enumerate(idx):
         kaynak = plan["sahneler"][i]["params"]["gorsel"][7:]
         kucuk = gecici / f"{k}.jpg"
-        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", kaynak, "-vf", "scale=320:-1", str(kucuk)], capture_output=True)
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", kaynak, "-vf", "scale=384:-1", str(kucuk)], capture_output=True)
         if kucuk.exists():
             icerik.append({"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + base64.b64encode(kucuk.read_bytes()).decode(), "detail": "low"}})
     try:
@@ -901,27 +969,79 @@ def resim_kontrol(plan, senaryo, dizin, kalite):
         with urllib.request.urlopen(rq, timeout=150) as y:
             j = json.loads(json.load(y)["choices"][0]["message"]["content"])
     except Exception as e:
-        print(f"UYARI: görsel kontrolü yapılamadı ({type(e).__name__}); görseller korunuyor.")
+        print(f"UYARI: görsel analizi yapılamadı ({type(e).__name__}); varsayılan odaklar kullanılacak.")
         return 0
     stil = senaryo.get("stil") or "warm flat vector illustration"
     yeni = 0
-    for q in (j.get("sorunlu") or [])[:6]:
+
+    def nok(v, d):
+        try:
+            return [min(0.85, max(0.15, float(v[0]))), min(0.8, max(0.2, float(v[1])))]
+        except Exception:
+            return d
+    for q in (j.get("sonuc") or [])[:12]:
         try:
             k = int(q.get("no")) - 1
             i = idx[k]
         except (TypeError, ValueError, IndexError):
             continue
         sh = plan["sahneler"][i]
-        print(f"Görsel {k + 1} sorunlu ({str(q.get('sorun'))[:80]}) → yeniden üretiliyor")
-        try:
-            b64 = U.gorsel_uret(RESIM_SABLONU.format(stil=stil, sahne=(sh["params"].get("gorsel_tarif") or (sh.get("nokta") or senaryo["konu"])) + ", clean composition, absolutely no text or letters anywhere"), kalite)
-            yol = pathlib.Path(dizin) / f"r{i}_yeni.png"
-            yol.write_bytes(base64.b64decode(b64))
-            sh["params"]["gorsel"] = "file://" + str(yol.resolve())
-            yeni += 1
-        except Exception as e:
-            print(f"UYARI: yeniden üretim başarısız ({type(e).__name__}); eski görsel kalıyor.")
+        sorun = str(q.get("sorun") or "").strip()
+        if sorun:
+            print(f"Görsel {k + 1} sorunlu ({sorun[:80]}) → yeniden üretiliyor")
+            try:
+                b64 = U.gorsel_uret(RESIM_SABLONU.format(stil=stil, sahne=(sh["params"].get("gorsel_tarif") or (sh.get("nokta") or senaryo["konu"])) + ", clean composition, absolutely no text or letters anywhere"), kalite)
+                yol = pathlib.Path(dizin) / f"r{i}_yeni.png"
+                yol.write_bytes(base64.b64decode(b64))
+                sh["params"]["gorsel"] = "file://" + str(yol.resolve())
+                yeni += 1
+                continue   # yeni görselin odakları bilinmiyor: varsayılan kalır
+            except Exception as e:
+                print(f"UYARI: yeniden üretim başarısız ({type(e).__name__}); eski görsel kalıyor.")
+        sh["params"]["odak"] = nok(q.get("odak"), sh["params"].get("odak") or [0.5, 0.45])
+        if q.get("odak2"):
+            sh["params"]["odak2"] = nok(q.get("odak2"), sh["params"]["odak"])
+        sh["params"]["nesneler"] = [{"ad": str(n.get("ad"))[:30], "x": float(n.get("x")), "y": float(n.get("y"))} for n in (q.get("nesneler") or [])[:3] if isinstance(n, dict) and n.get("ad") and isinstance(n.get("x"), (int, float)) and isinstance(n.get("y"), (int, float))]
     return yeni
+
+
+def katman_tasarla(sh, konu, kelimeler, sure):
+    """Bir 'resim' sahnesi için görsele yapışık animasyonlu katmanı (oklar, halkalar, etiketler…) ayrı bir ressam çağrısıyla yazar. Başarısızsa None (sahne katmansız kalır)."""
+    anahtar = os.environ.get("OPENAI_API_KEY")
+    p = sh["params"]
+    if not anahtar or not p.get("katman_notu"):
+        return None
+    od, od2 = p.get("odak") or [0.5, 0.45], p.get("odak2") or [0.4, 0.4]
+    nes = "; ".join(f"{n['ad']} ({int(n['x'] * 1024)}, {int(n['y'] * 1536)})" for n in (p.get("nesneler") or [])) or "bilinmiyor (odak noktasına göre yerleştir)"
+    istem = AN.ISTEM_KATMAN.format(konu=konu, anlati=" ".join(f"{w['k']}({w['t0'] - sh['t0']:.1f})" for w in kelimeler) or sh.get("anlati", ""), gorsel=str(p.get("gorsel_tarif") or "")[:300], nesneler=nes,
+                                   ox=int(od[0] * 1024), oy=int(od[1] * 1536), ox2=int(od2[0] * 1024), oy2=int(od2[1] * 1536), sure=int(round(sure))) + "\nBu sahnede eklenecek animasyon: " + str(p["katman_notu"])
+    govde = {"model": MODEL, "response_format": {"type": "json_object"}, "temperature": 0.6, "messages": [
+        {"role": "system", "content": "Sen videoların üstüne animasyonlu işaret katmanları tasarlayan bir hareketli grafik ressamısın. Yalnızca geçerli JSON döndür."}, {"role": "user", "content": istem}]}
+    for deneme in range(2):
+        try:
+            r = urllib.request.Request(f"{OPENAI}/chat/completions", data=json.dumps(govde).encode(), method="POST", headers={"Content-Type": "application/json", "Authorization": f"Bearer {anahtar}"})
+            with urllib.request.urlopen(r, timeout=200) as y:
+                j = json.loads(json.load(y)["choices"][0]["message"]["content"])
+            return AN.katman_params(j)
+        except Exception as e:
+            print(f"UYARI: animasyon katmanı yazılamadı ({deneme + 1}/2): {type(e).__name__}: {str(e)[:120]}")
+    return None
+
+
+def resim_katmanlari(plan, senaryo):
+    """Her 'resim' sahnesine animasyonlu katman ekler (kelime zamanlarına bağlı). Dönen: katman eklenen sahne sayısı."""
+    kel = [w for p in plan.get("altyazi", []) for w in p.get("kelimeler", [])]
+    n = 0
+    idx = [i for i, sh in enumerate(plan["sahneler"]) if sh["tip"] == "resim"]
+    for a, i in enumerate(idx):
+        sh = plan["sahneler"][i]
+        ilerleme("Animasyon katmanları tasarlanıyor", 23 + int(3 * a / max(1, len(idx))), f"{a + 1}/{len(idx)}", zorla=True)
+        kk = [w for w in kel if sh["t0"] - 0.05 <= w["t0"] < sh["t1"]]
+        k = katman_tasarla(sh, senaryo["konu"], kk, sh["t1"] - sh["t0"])
+        if k:
+            sh["params"]["katman"] = k
+            n += 1
+    return n
 
 
 def genel_liste(sh):
@@ -1207,6 +1327,7 @@ def calis(a):
             kalite = ayar.get("gorsel_kalitesi") or "medium"
             RESIM_SAYISI["adet"] = resimli_gorselleri(plan, senaryo, g, kalite, a.gorsel_dizin)
             RESIM_SAYISI["adet"] += resim_kontrol(plan, senaryo, g, kalite)
+            print(f"Animasyon katmanı eklenen sahne: {resim_katmanlari(plan, senaryo)}")
             RESIM_SAYISI["kalite"] = kalite
         yaz(g / "plan.json", plan)
         if plan.get("bicim") == "anlat" and any(sh["tip"] == "ozel" for sh in plan["sahneler"]):

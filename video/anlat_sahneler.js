@@ -389,24 +389,41 @@
     }
     c.restore();
   }
-  /* ---------- RESİM: yapay zekâ görseli + sinematik kamera hareketi (her konuda çalışır) ---------- */
+  /* ---------- RESİM: yapay zekâ görseli + sinematik kamera (iki plan: geniş → yakın kesme), toz/ışık parçacıkları, görsele yapışık animasyonlu katman ---------- */
   S.resim = function (c) {
     const { x, W, H, lt, d, t, p, i } = c, im = (A.gorseller || [])[i];
     if (!im) { c.arka(p.tema || 'mavi'); return; }
-    const q = sm(lt / d), mod = p.hareket || 'yakin', od = p.odak || [0.5, 0.45];
-    const z0 = mod === 'uzak' ? 1.22 : 1.04, z1 = mod === 'uzak' ? 1.02 : (mod === 'yakin' ? 1.24 : 1.14), z = lerp(z0, z1, q);
-    const kayX = mod === 'sol' ? lerp(0.06, -0.06, q) : mod === 'sag' ? lerp(-0.06, 0.06, q) : 0, kayY = mod === 'yukari' ? lerp(0.05, -0.05, q) : mod === 'asagi' ? lerp(-0.05, 0.05, q) : 0;
+    const od = p.odak || [0.5, 0.45];
+    let od2 = p.odak2 || [cl(od[0] + (od[0] < 0.5 ? 0.16 : -0.16), 0.2, 0.8), cl(od[1] - 0.05, 0.25, 0.7)];
+    if (p.katman && p.katman.length) {   // yakın çekim, animasyon katmanının ağırlık merkezine de bakar (etiketler kadraja girsin)
+      let sx = 0, sy = 0, n = 0; p.katman.forEach(function (e) { if (e.tur === 'grup' || e.tur === 'parcacik') return; const ex = e.x != null ? e.x : ((e.x1 || 0) + (e.x2 || 0)) / 2, ey = e.y != null ? e.y : ((e.y1 || 0) + (e.y2 || 0)) / 2; if (ex || ey) { sx += ex; sy += ey; n++; } });
+      if (n) od2 = [cl(0.65 * (sx / n / im.width) + 0.35 * od2[0], 0.25, 0.75), cl(0.65 * (sy / n / im.height) + 0.35 * od2[1], 0.3, 0.65)];
+    }
+    const kesme = d > 3.2 ? Math.min(d * 0.5, d - 1.4) : 1e9;   // sahnenin ortasında ikinci plana (yakın çekim) kesilir
+    const ikinci = lt >= kesme, mod = p.hareket || 'yakin';
+    const q = ikinci ? sm((lt - kesme) / Math.max(0.5, d - kesme)) : sm(lt / Math.min(d, kesme));
+    let z, fx, fy, kx = 0, ky = 0;
+    if (!ikinci) {
+      z = mod === 'uzak' ? lerp(1.24, 1.06, q) : lerp(1.06, mod === 'yakin' ? 1.24 : 1.16, q);
+      fx = od[0]; fy = od[1];
+      kx = mod === 'sol' ? lerp(0.10, -0.10, q) : mod === 'sag' ? lerp(-0.10, 0.10, q) : 0; ky = mod === 'yukari' ? lerp(0.08, -0.08, q) : mod === 'asagi' ? lerp(-0.08, 0.08, q) : 0;
+    } else { z = lerp(1.3, 1.46, q); fx = od2[0]; fy = od2[1]; kx = lerp(0.03, -0.03, q); }
+    // kesme anında kısa sarsıntı + beyaz parlama
+    const vur = ikinci ? cl(1 - (lt - kesme) / 0.22) : 0; z += vur * 0.06;
+    const el = [Math.sin(t * 2.3) * 4 + Math.sin(t * 5.1) * 2, Math.cos(t * 1.9) * 4 + Math.cos(t * 4.3) * 2];   // hafif el kamerası
     const sc = Math.max(W / im.width, H / im.height) * z, w = im.width * sc, h = im.height * sc;
-    // odak noktası ekranın merkezine doğru yaklaşır; taşma sınırlı
-    let ox = W / 2 - (od[0] * w) + (od[0] - 0.5) * w * 0.0 + kayX * W, oy = H * 0.46 - (od[1] * h) + kayY * H;
+    let ox = W / 2 - fx * w + kx * W + el[0], oy = H * 0.46 - fy * h + ky * H + el[1];
     ox = Math.min(0, Math.max(W - w, ox)); oy = Math.min(0, Math.max(H - h, oy));
     x.fillStyle = '#000'; x.fillRect(0, 0, W, H); x.drawImage(im, ox, oy, w, h);
-    // sinematik finiş: alt yazı için alt karartma, köşe karartma, hafif ışık süpürmesi, taneli doku
+    // görsele yapışık animasyonlu katman (oklar, halkalar, etiketler, sayılar…; görsel pikseli 1024x1536 koordinatında)
+    if (p.katman && p.katman.length) { x.save(); x.translate(ox, oy); x.scale(sc, sc); p.katman.forEach(function (e, k) { ozelEleman(x, e, lt, t, k + 7); }); x.restore(); }
+    // sinematik finiş: alt yazı için alt karartma, köşe karartma, ışık süpürmesi, uçuşan toz/ışık parçacıkları
     let g = x.createLinearGradient(0, H * 0.58, 0, H); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,0.72)'); x.fillStyle = g; x.fillRect(0, H * 0.58, W, H * 0.42);
     g = x.createRadialGradient(W / 2, H * 0.45, 380, W / 2, H * 0.45, 1250); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,0.38)'); x.fillStyle = g; x.fillRect(0, 0, W, H);
-    const sw = ((t * 0.18) % 1.6 - 0.3) * W * 1.4; g = x.createLinearGradient(sw - 260, 0, sw + 260, 0); g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(0.5, 'rgba(255,255,255,0.07)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, W, H);
-    const gir = back(lt / 0.5); if (lt < 0.5) { x.fillStyle = 'rgba(0,0,0,' + (0.35 * (1 - cl(lt / 0.5))) + ')'; x.fillRect(0, 0, W, H); }
-    c.etiket(0, W * od[0] * 0.8 + W * 0.1, H * od[1] * 0.8 + H * 0.06, 1.1, od[0] > 0.5 ? -1 : 1);
+    const sw = ((t * 0.22) % 1.6 - 0.3) * W * 1.4; g = x.createLinearGradient(sw - 260, 0, sw + 260, 0); g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(0.5, 'rgba(255,255,255,0.08)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, W, H);
+    for (let k = 0; k < 26; k++) { const px = (k * 211 + t * (14 + (k % 5) * 6)) % (W + 60) - 30, py = ((k * 397 - t * (22 + (k % 7) * 8)) % (H + 60) + H + 60) % (H + 60) - 30, r = 2 + (k % 4) * 1.6; x.fillStyle = 'rgba(255,240,210,' + (0.10 + 0.16 * Math.abs(Math.sin(t * 1.4 + k))) + ')'; x.beginPath(); x.arc(px, py, r, 0, 6.3); x.fill(); }
+    if (vur > 0) { x.fillStyle = 'rgba(255,255,255,' + (0.30 * vur) + ')'; x.fillRect(0, 0, W, H); }
+    if (lt < 0.4) { x.fillStyle = 'rgba(0,0,0,' + (0.35 * (1 - cl(lt / 0.4))) + ')'; x.fillRect(0, 0, W, H); }
   };
 
   S.ozel = function (c) {
