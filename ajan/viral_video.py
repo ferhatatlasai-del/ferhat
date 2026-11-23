@@ -807,7 +807,7 @@ def anlat_cizelge_kur(senaryo, sesler, alt_kelime=5, alt_harf=30):
             kelimeler.append({"k": w, "t0": v0 + b, "t1": v0 + max(bitis - 0.02, b + 0.08), "sahne": i, "v": s["isaret"][k] if k < len(s["isaret"]) else 0})
         if v["ses"] is not None:
             parcalar_ses.append((v0, v["ses"]))
-        sahneler.append({"tip": s["tip"], "t0": round(t, 3), "t1": round(t1, 3), "params": dict(s.get("params") or {}), "etiketler": list(s.get("etiketler") or []),
+        sahneler.append({"tip": s["tip"], "t0": round(t, 3), "t1": round(t1, 3), "params": dict(s.get("params") or {}), "etiketler": list(s.get("etiketler") or []), "anlati": s.get("anlati", ""), "nokta": s.get("nokta", ""),
                          "gecis": GECISLER[(tohum + i * 2) % 5] if i else "kay", "ses_son": round(ses_son, 3)})
         if s.get("bolum"):
             if bolumler:
@@ -827,49 +827,122 @@ def anlat_cizelge_kur(senaryo, sesler, alt_kelime=5, alt_harf=30):
     ix = tohum % len(TONLAR)
     if TONLAR[ix] == son_ton:
         ix = (ix + 3) % len(TONLAR)   # art arda iki videoda aynı renk tonu olmasın
-    plan = {"genislik": GENISLIK, "yukseklik": YUKSEKLIK, "fps": FPS, "sure": round(t, 3), "sahneler": sahneler, "bolumler": bolumler, "basliklar": basliklar,
+    plan = {"konu": senaryo.get("konu", ""), "genislik": GENISLIK, "yukseklik": YUKSEKLIK, "fps": FPS, "sure": round(t, 3), "sahneler": sahneler, "bolumler": bolumler, "basliklar": basliklar,
             "altyazi": parcala_altyazi(kelimeler, alt_kelime, alt_harf), "olaylar": sorted(olaylar), "ton": TONLAR[ix], "tema_kaydir": (tohum >> 4) % 5}
     return plan, parcalar_ses
 
 
+def genel_liste(sh):
+    """Çizim kullanılamazsa serbest konudaki özel sahne yerine, anlatıdan çıkarılan 3 maddelik genel liste sahnesi."""
+    parca = [x.strip(" ,;") for x in re.split(r"[.,;!?]", str(sh.get("anlati") or "")) if len(x.strip()) > 3][:3]
+    return {"maddeler": [q[:28] for q in parca] if len(parca) >= 2 else [str(sh.get("nokta") or "Önemli nokta")[:28], "Dikkat et"]}
+
+
+def ozel_tasarla(sahne, konu, sure, elestiri="", onceki=None):
+    """Serbest konudaki bir özel sahnenin DETAYLI çizimini ayrı bir 'ressam' çağrısıyla yazar (ozel_params biçiminde); elestiri verilirse önceki çizimi düzeltir. Başarısızsa None."""
+    anahtar = os.environ.get("OPENAI_API_KEY")
+    if not anahtar:
+        return None
+    istem = AN.ISTEM_TASARIM.format(konu=konu, anlati=sahne.get("anlati", ""), tasarim=(sahne.get("params") or {}).get("tasarim_notu", "") or sahne.get("nokta", ""), sure=int(round(sure)))
+    if elestiri and onceki:
+        istem += "\n\nÖNCEKİ ÇİZİMİN ELEŞTİRİSİ (düzelt, daha DETAYLI ve katmanlı yap; ögeler okunur, ekran içinde olsun): " + str(elestiri)[:300] + "\nÖnceki çizim (özet): " + json.dumps({"elemanlar": [{k: v for k, v in e.items() if k in ("tur", "x", "y", "metin", "ad")} for e in (onceki.get("elemanlar") or [])[:30]]}, ensure_ascii=False)[:1500]
+    govde = {"model": MODEL, "response_format": {"type": "json_object"}, "temperature": 0.7, "messages": [
+        {"role": "system", "content": "Sen detaylı, katmanlı düz illüstrasyon tarzında hareketli grafik tasarlayan bir ressamsın. Yalnızca geçerli JSON döndür."}, {"role": "user", "content": istem}]}
+    for deneme in range(2):
+        try:
+            r = urllib.request.Request(f"{OPENAI}/chat/completions", data=json.dumps(govde).encode(), method="POST", headers={"Content-Type": "application/json", "Authorization": f"Bearer {anahtar}"})
+            with urllib.request.urlopen(r, timeout=240) as y:
+                j = json.loads(json.load(y)["choices"][0]["message"]["content"])
+            p = AN.ozel_params({**j, "yedek": "kontrol_listesi"})
+            if p["eleman_sayisi"] < 16:
+                raise ValueError(f"çizim yetersiz detaylı ({p['eleman_sayisi']} eleman; en az 16 gerekli)")
+            p["tasarim_notu"] = (sahne.get("params") or {}).get("tasarim_notu", "")
+            return p
+        except Exception as e:
+            print(f"UYARI: özel sahne çizimi başarısız ({deneme + 1}/2): {type(e).__name__}: {str(e)[:140]}")
+            if deneme == 0:
+                govde["messages"].append({"role": "user", "content": "Önceki yanıt kullanılamadı: " + str(e)[:200] + ". Biçime uyarak JSON'u yeniden yaz; en az 24 eleman."})
+    return None
+
+
+def serbest_tasarla(senaryo):
+    """Serbest konuda her özel sahne için çizimi (ressam çağrısı) üretir; olmazsa o sahne genel listeye döner. Dönen: yedeğe düşen sahne sayısı."""
+    dusen = 0
+    ozeller = [i for i, x in enumerate(senaryo["sahneler"]) if x["tip"] == "ozel"]
+    for n, i in enumerate(ozeller):
+        sh = senaryo["sahneler"][i]
+        ilerleme("Özel sahneler çiziliyor", 6 + int(2 * n / max(1, len(ozeller))), f"{n + 1}/{len(ozeller)}", zorla=True)
+        sure = max(6.0, len(sh["anlati"].split()) / 2.3 + 1.0)
+        p = ozel_tasarla(sh, senaryo["konu"], sure)
+        if p:
+            sh["params"] = p
+            print(f"Özel sahne {i + 1} çizildi: {p['eleman_sayisi']} eleman")
+        else:
+            sh["tip"], sh["params"] = "kontrol_listesi", genel_liste(sh)
+            dusen += 1
+            print(f"Özel sahne {i + 1}: çizim üretilemedi → genel liste sahnesi")
+    # ardışık aynı tip oluşmasın (düşen sahne komşusuyla aynı tip olabilir)
+    for i in range(1, len(senaryo["sahneler"])):
+        if senaryo["sahneler"][i]["tip"] == senaryo["sahneler"][i - 1]["tip"] == "kontrol_listesi":
+            senaryo["sahneler"][i]["tip"], senaryo["sahneler"][i]["params"] = "sayi", {"deger": 100, "maks": 100, "birim": "%", "etiket": str(senaryo["sahneler"][i].get("nokta") or "")[:34]}
+    return dusen
+
+
 def ozel_kontrol(plan, dizin, plan_yolu):
-    """Özel (yapay zekâ tarifli) sahnelerden birkaç kare çizip görsel modele gösterir; boş/bozuk/okunmaz ise sahneyi 'yedek' hazır tiple değiştirir."""
+    """Özel (yapay zekâ tarifli) sahnelerden birkaç kare çizip görsel modele gösterir; boş/bozuk/okunmaz ise sahneyi 'yedek' hazır tiple değiştirir.
+    Serbest konuda ayrıca DETAY puanı istenir; yetersizse ressam çağrısı eleştiriyle bir kez yeniden çizer."""
     anahtar = os.environ.get("OPENAI_API_KEY")
     degisen = 0
-    for i, sh in enumerate(plan["sahneler"]):
-        if sh["tip"] != "ozel":
-            continue
-        if not anahtar:
-            continue
+    if not anahtar:
+        return 0
+
+    def bak(i, sh, tur):
         d = sh["t1"] - sh["t0"]
         ts = [round(sh["t0"] + d * f, 2) for f in (0.3, 0.6, 0.95)]
-        klasor = pathlib.Path(dizin) / f"onizleme{i}"
+        klasor = pathlib.Path(dizin) / f"onizleme{i}_{tur}"
         r = subprocess.run([os.environ.get("NODE") or "node", str(VIDEO / "render.js"), str(plan_yolu), "--kareler", ",".join(map(str, ts)), "--dizin", str(klasor), "--olcek", "0.3"],
                            cwd=str(VIDEO), capture_output=True, text=True)
         kareler = sorted(klasor.glob("k_*.jpg"), key=lambda f: float(f.stem[2:].replace("_", ".")))
-        gecti, sorun = True, ""
         if r.returncode != 0 or len(kareler) < 3:
-            gecti, sorun = False, "önizleme çizilemedi: " + (r.stderr or "")[-120:]
-        else:
+            return False, "önizleme çizilemedi: " + (r.stderr or "")[-120:], 0
+        try:
+            soru = ("Bu 3 kare, " + ("bir bilgi videosundaki" if SERBEST else "3D yazıcı hakkında bir") + " animasyon sahnesinin farklı anlarıdır (dikey video). Sahne: " + str(sh.get("params", {}).get("yedek", "")) + ". Değerlendir: sahne boş ya da neredeyse boş mu, yazılar okunamıyor ya da üst üste biniyor mu, ögeler ekran dışına taşıyor ya da çok küçük/bozuk mu, kareler arasında hareket var mı?"
+                    + (" AYRICA DETAY: arka plan, ana nesnelerin ayrıntıları (parçalar, gölge, renk geçişi), katmanlar ve süreç hareketi var mı (1-10; 6 altı = çok sade/boş/genel)? Sahne anlatısı: " + str(sh.get("anlati", ""))[:200] if SERBEST else "")
+                    + " Yalnızca JSON: {\"gecti\": true/false, \"sorun\": \"kısa, somut\"" + (", \"detay\": 1-10" if SERBEST else "") + "}. Küçük kusurlar için true de.")
+            icerik = [{"type": "text", "text": soru}]
+            for k in kareler:
+                icerik.append({"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + base64.b64encode(k.read_bytes()).decode()}})
+            govde = {"model": MODEL, "response_format": {"type": "json_object"}, "messages": [{"role": "user", "content": icerik}]}
+            rq = urllib.request.Request(f"{OPENAI}/chat/completions", data=json.dumps(govde).encode(), method="POST", headers={"Content-Type": "application/json", "Authorization": f"Bearer {anahtar}"})
+            with urllib.request.urlopen(rq, timeout=120) as y:
+                j = json.loads(json.load(y)["choices"][0]["message"]["content"])
             try:
-                icerik = [{"type": "text", "text": "Bu 3 kare, " + ("bir bilgi videosundaki" if SERBEST else "3D yazıcı hakkında bir") + " animasyon sahnesinin farklı anlarıdır (dikey video). Sahne: " + str(plan["sahneler"][i].get("params", {}).get("yedek", "")) + ". Değerlendir: sahne boş ya da neredeyse boş mu, yazılar okunamıyor ya da üst üste biniyor mu, ögeler ekran dışına taşıyor ya da çok küçük/bozuk mu, kareler arasında hareket var mı? Yalnızca JSON: {\"gecti\": true/false, \"sorun\": \"kısa\"}. Küçük kusurlar için true de."}]
-                for k in kareler:
-                    icerik.append({"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + base64.b64encode(k.read_bytes()).decode()}})
-                govde = {"model": MODEL, "response_format": {"type": "json_object"}, "messages": [{"role": "user", "content": icerik}]}
-                rq = urllib.request.Request(f"{OPENAI}/chat/completions", data=json.dumps(govde).encode(), method="POST", headers={"Content-Type": "application/json", "Authorization": f"Bearer {anahtar}"})
-                with urllib.request.urlopen(rq, timeout=120) as y:
-                    j = json.loads(json.load(y)["choices"][0]["message"]["content"])
-                gecti, sorun = bool(j.get("gecti")), str(j.get("sorun") or "")[:100]
-            except Exception as e:
-                print(f"UYARI: özel sahne kontrolü yapılamadı ({type(e).__name__}); sahne korunuyor.")
+                detay = float(j.get("detay"))
+            except (TypeError, ValueError):
+                detay = 10.0
+            gecti = bool(j.get("gecti")) and (detay >= 6 or not SERBEST)
+            return gecti, str(j.get("sorun") or "")[:140] + (f" (detay {detay:g}/10)" if SERBEST else ""), detay
+        except Exception as e:
+            print(f"UYARI: özel sahne kontrolü yapılamadı ({type(e).__name__}); sahne korunuyor.")
+            return True, "", 10.0
+
+    for i, sh in enumerate(plan["sahneler"]):
+        if sh["tip"] != "ozel":
+            continue
+        gecti, sorun, _ = bak(i, sh, "a")
+        if not gecti and SERBEST:   # bir kez eleştiriyle yeniden çiz
+            yeni = ozel_tasarla(sh, plan.get("konu", ""), sh["t1"] - sh["t0"], elestiri=sorun, onceki=sh.get("params"))
+            if yeni:
+                sh["params"] = yeni
+                yaz(plan_yolu, plan)
+                gecti, sorun, _ = bak(i, sh, "b")
+                print(f"Özel sahne {i + 1}: yeniden çizildi ({yeni['eleman_sayisi']} eleman)")
         print(f"Özel sahne {i + 1}: {'GEÇTİ' if gecti else 'GEÇMEDİ → yedek sahne'} {sorun}")
         if not gecti:
-            yedek = (sh.get("params") or {}).get("yedek") or "ekstruder"
-            if SERBEST:   # genel kalıp: anlatıdan 3 kısa madde
-                parca = [x.strip(" ,;") for x in re.split(r"[.,;!?]", str(sh.get("anlati") or "")) if len(x.strip()) > 3][:3]
-                sh["tip"], sh["params"] = "kontrol_listesi", {"maddeler": [p[:28] for p in parca] if len(parca) >= 2 else [str(sh.get("nokta") or "Önemli nokta")[:28], "Dikkat et"]}
+            if SERBEST:
+                sh["tip"], sh["params"] = "kontrol_listesi", genel_liste(sh)
             else:
-                sh["tip"], sh["params"] = yedek, {}
+                sh["tip"], sh["params"] = (sh.get("params") or {}).get("yedek") or "ekstruder", {}
             degisen += 1
     return degisen
 
@@ -984,6 +1057,8 @@ def calis(a):
         return 0
     print(f"Konu: {senaryo['konu']} ({kaynak}); {len(senaryo['sahneler'])} sahne")
     ilerleme("Senaryo hazır", 5, senaryo["konu"][:100], zorla=True)
+    if SERBEST and senaryo.get("bicim") == "anlat":
+        serbest_tasarla(senaryo)
     H.ffmpeg_hazir()
     sesler = []
     if gemini and not anahtar and not a.sessiz and not a.tts_dizin:
