@@ -27,7 +27,22 @@
         "Yumurtlama kaslarla gerçekleşir",
         "Yumurta rengi ayrı bir konu"
       ]
+    },
+    {
+      "id": "s20261123-070639",
+      "konu": "Bambu Lab A1'de filament nemi ve kurutma",
+      "noktalar": [
+        "nemli filament baskıyı bozar",
+        "nem nozulda buharlaşır",
+        "su içeride ses yapar",
+        "yumuşayan filament zor akar",
+        "ipliklenme ve kabarcık artar",
+        "yüksek nem risk demek",
+        "kapalı kutu ve kurutucu",
+        "kurutma ayarı malzemeye bağlı",
+        "yorumla bir sonraki konu"
+      ]
     }
   ],
-  "son_ton": 38
+  "son_ton": 190
 }
