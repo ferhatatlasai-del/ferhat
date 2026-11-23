@@ -358,3 +358,11 @@ Instagram hikâye videosu en çok 60 sn olabildiği için (resimli/serbest video
 ## 60 sn sınırı (tüm videolar)
 
 Instagram hikâye/Reels ve Shorts için videolar **en çok 58-59,5 sn** üretilir. Önlemler: (1) hikâye tahtası komutları "en çok 58 sn, 95-120 kelime" ister; `anlat_senaryo.dogrula` anlatıyı sayar (serbest/resimli 85-125, 3D baskı 90-135 kelime; ≈0,44 sn/kelime + kuyruk) ve uzunsa yapay zekâya "kısalt" diyerek yeniden yazdırır; (2) seslendirmeden sonra süre ölçülür (`viral_video.MAKS_SURE = 59,5`): 59,5-64 sn arası görüntü ve ses aynı oranda hafifçe hızlandırılır (senkron korunur), daha uzunsa video üretilmez ve nedeni panelde yazar. Böylece hikâye parçalama yalnızca elle yüklenen uzun videolar içindir.
+
+### Resimli videoda hareket ve senkron (aslan videosu geri bildirimi)
+
+- **Senkron:** Gemini TTS kelime zamanı vermediği için eskiden zamanlar tahmin ediliyordu (anlatı uzadıkça kayma). Artık konuşma OpenAI ses tanımaya (`whisper-1`, kelime zamanları) gönderilir, betikle hizalanır (`viral_video.whisper_kelimeleri` + `hizala`; "PLA" gibi özel okunuşlar dahil) ve sahne kesimleri de bu gerçek zamanlara göre yapılır. Eşleşme %60'ın altındaysa ya da ses tanıma yoksa eski tahmini yöntem kullanılır (log: "Kelime zamanları ses tanımadan alındı"). Maliyet: video başına ~0,01 $.
+- **Hareket:** her `resim` sahnesi ikiye bölünür: geniş plan (yakınlaşma/kayma) → ortada kesme (sarsıntı + parlama) → yakın çekim; hafif el kamerası, uçuşan toz/ışık parçacıkları, ışık süpürmesi. Sahneler kısaldı (7-9 sahne, tek kısa cümle).
+- **Animasyon katmanı:** her resim sahnesi için ayrı bir "katman ressamı" çağrısı, görselin üstüne **görsele yapışık** animasyonlu oklar, nabız atan halkalar, kısa etiketler, simgeler yazar; öğeler anlatıdaki kelime zamanlarına bağlıdır. Görsel analizi (tek vision çağrısı) her görsel için gerçek odak noktalarını ve nesne konumlarını verir; böylece zoom ve işaretler doğru yere gelir (eskiden odak tahmindi, etiket boş gökyüzünü gösteriyordu).
+- Yazılar kamera kırpmasında kesilmesin diye güvenli alana sıkıştırılır (görsel koordinatı x 230-800, boyut ≤ 64).
+- Sınır: görseller hâlâ durağan resimlerdir; gerçek hareket (görüntü üreten video modelleri) pahalıdır (saniyede ~0,1-0,4 $) ve aylık 7 $ bütçeye sığmaz.

@@ -405,11 +405,11 @@ def katman_params(j):
         raise ValueError(f"katmanda en az 3 geçerli eleman gerekli ({len(els)})")
     if not any(e["tur"] in ("yazi", "yol", "ok", "daire", "ikon", "grup") for e in els):
         raise ValueError("katmanda işaret/etiket ögesi yok")
-    for e in els:   # yazılar kamera kırpmasında kesilmesin: yazının tamamı görsel koordinatında x 170-860 içinde kalsın
+    for e in els:   # yazılar kamera kırpmasında kesilmesin: yazının tamamı görsel koordinatında x 230-800 içinde kalsın
         if e["tur"] == "yazi":
             e["boyut"] = min(e.get("boyut", 56), 64)
             gen = max(40, len(e["metin"]) * e["boyut"] * 0.62)
-            e["x"] = max(170 + gen / 2, min(860 - gen / 2, e.get("x", 512))) if gen < 690 else 512
+            e["x"] = max(230 + gen / 2, min(800 - gen / 2, e.get("x", 512))) if gen < 560 else 512
             e["y"] = max(300, min(1180, e.get("y", 700)))
     return els
 
@@ -424,7 +424,7 @@ Sahne süresi: yaklaşık {sure} sn. Ögeler anlatıdaki ilgili kelime söylenir
 
 KURALLAR:
 - 5-12 eleman. Görseli örtme: tam ekran dolgu, büyük yarı saydam bloklar YOK. Ögeler küçük/orta olsun, nesnelerin ÜSTÜNDE ya da YANINDA, yukarıda verilen konumlara göre yerleştirilsin (ok ucu gerçekten o nesneyi göstersin).
-- Güvenli alan: x 170-860, y 300-1180 (görsel koordinatı); alt kısım altyazıya ayrılmıştır, oraya yazı koyma. Yazı genişliği ≈ harf sayısı × boyut × 0.62 piksel ve yazının TAMAMI x 170-860 içinde kalmalı (kamera yakınlaşınca kenarlar kesilir).
+- Güvenli alan: x 230-800, y 300-1180 (görsel koordinatı); alt kısım altyazıya ayrılmıştır, oraya yazı koyma. Yazı genişliği ≈ harf sayısı × boyut × 0.62 piksel ve yazının TAMAMI x 230-800 içinde kalmalı (kamera yakınlaşınca kenarlar kesilir); halka/ok/ikonlar da bu alanda olsun.
 - Yazılar kısa (en çok 14 harf), boyut 46-64, okunur renk (beyaz/sarı + koyu kontur otomatik), üst üste binmesin.
 - Her an biraz hareket olsun: "dongu" (nabiz/yuz/salin/titre), "hareket" (olcek, opaklik, cizim 0→1 ile oklar çizilsin, x/y kayma).
 - Bilgiye hizmet et: tehlike/uyarı ise kırmızı/sarı, güvenli yön ise yeşil; sayı varsa sayıyı göster.

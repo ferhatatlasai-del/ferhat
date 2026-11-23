@@ -404,10 +404,10 @@
     const q = ikinci ? sm((lt - kesme) / Math.max(0.5, d - kesme)) : sm(lt / Math.min(d, kesme));
     let z, fx, fy, kx = 0, ky = 0;
     if (!ikinci) {
-      z = mod === 'uzak' ? lerp(1.32, 1.08, q) : lerp(1.06, mod === 'yakin' ? 1.34 : 1.2, q);
+      z = mod === 'uzak' ? lerp(1.24, 1.06, q) : lerp(1.06, mod === 'yakin' ? 1.24 : 1.16, q);
       fx = od[0]; fy = od[1];
       kx = mod === 'sol' ? lerp(0.10, -0.10, q) : mod === 'sag' ? lerp(-0.10, 0.10, q) : 0; ky = mod === 'yukari' ? lerp(0.08, -0.08, q) : mod === 'asagi' ? lerp(-0.08, 0.08, q) : 0;
-    } else { z = lerp(1.42, 1.62, q); fx = od2[0]; fy = od2[1]; kx = lerp(0.03, -0.03, q); }
+    } else { z = lerp(1.3, 1.46, q); fx = od2[0]; fy = od2[1]; kx = lerp(0.03, -0.03, q); }
     // kesme anında kısa sarsıntı + beyaz parlama
     const vur = ikinci ? cl(1 - (lt - kesme) / 0.22) : 0; z += vur * 0.06;
     const el = [Math.sin(t * 2.3) * 4 + Math.sin(t * 5.1) * 2, Math.cos(t * 1.9) * 4 + Math.cos(t * 4.3) * 2];   // hafif el kamerası
