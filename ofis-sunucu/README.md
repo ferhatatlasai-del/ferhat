@@ -339,3 +339,14 @@ Panel → Üret → "Şimdi viral video üret" satırında konu yazarken **tür*
 - **Görsel eleştiri döngüsü:** çizilen her özel sahneden 3 kare görsel modele gösterilir; *detay puanı* 6'nın altındaysa ya da sorun varsa ressam eleştiriyle bir kez yeniden çizer; yine geçemezse sahne anlatıdan çıkarılan genel listeyle değişir.
 - **Renk:** serbest videolarda renk tonu kayması kapalıdır (çim yeşil, gökyüzü mavi kalsın).
 - Maliyet/süre: video başına ek ~4-10 model çağrısı ve birkaç dakika (üretim zaten 15-40 dk). Modeli panelde *Yapay zekâ seviyesi → Viral video senaryosu* ile güçlendirebilirsin (`gpt-5.4` çizim ayrıntısını belirgin artırır).
+
+## Resimli anlatım (yapay zekâ resimleri + sinematik hareket; her konu)
+
+Panel → Üret → konu yaz → tür: **Resimli anlatım**. Yeni içerik türleri için sahne kodlamak gerekmez: hikâye tahtası (`ISTEM_RESIMLI`) tek bir görsel stil ve her sahne için İngilizce görsel tarifi yazar; resimleri `gpt-image` üretir; geri kalanı ortak hat yapar.
+
+- **Sahneler:** 5-9 `resim` sahnesi (tam ekran görsel, 6 kamera hareketi: yakın/uzak/sol/sağ/yukarı/aşağı, odak noktası, sinematik alt karartma, köşe karartma, ışık süpürmesi, taneli doku) + isteğe bağlı `sayi`, `karsilastir`, `kontrol_listesi` ve `kapanis`.
+- **Ortak finiş:** anlatıcı sesi (Gemini/Google TTS), renk vurgulu alt yazı, bölüm etiketi, 5 geçiş efekti, ses efektleri + kodla sentezlenen müzik, −14 LUFS, marka, 9:16 çıkış.
+- **Görsel güvenliği:** tarifte yazı/logo/tanınmış kişi istenmez; üretilen görseller tek çağrıda görsel modele gösterilip yazı/logo/bozuk anatomi/konuya uymama için denetlenir, sorunlular bir kez yeniden üretilir; moderasyonla reddedilen görsel sade tarifle yeniden denenir, olmazsa önceki görsel başka kamera hareketiyle kullanılır.
+- **Maliyet:** video başına ~6-9 görsel (`shorts/viral_ayar.json` → `gorsel_kalitesi`, varsayılan `medium`); taslakta `gorsel_maliyeti` (adet, kalite) kayıtlıdır.
+- **Doğruluk:** güvenlik/acil durum ve haber konularında yalnızca genel kabul gören resmî tavsiyeler (ör. 112, güvenli kapalı alana çekil, uzak dur), olay gerçekmiş gibi anlatılmaz ("diyelim ki / eğer karşılaşırsan"), esprili ton isteniyorsa kimseyle alay etmeyen espriler.
+- Yönetici incelemesi `serbest` taslak gibi davranır (3D baskı aralıkları uygulanmaz).
