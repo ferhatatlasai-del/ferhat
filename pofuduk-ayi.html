@@ -585,6 +585,8 @@ const QUESTS = [
   { id: 'room', name: 'Birlikte Oynayalım', desc: 'Bir oda kur ya da bir odaya katıl', stat: 'room', goal: 1, reward: 30 },
   { id: 'visit', name: 'Misafirlik', desc: "Odadaki bir arkadaşının evine git (Oda panelinde 'Evine git')", stat: 'visit', goal: 1, reward: 30 },
   { id: 'chest5', name: 'Sandık Avcısı', desc: '5 sandık aç', stat: 'chest', goal: 5, reward: 35 },
+  { id: 'chest10', name: 'Sandık Ustası', desc: '10 sandık aç', stat: 'chest', goal: 10, reward: 35 },
+  { id: 'chest15', name: 'Sandık Efendisi', desc: '15 sandık aç', stat: 'chest', goal: 15, reward: 35 },
   { id: 'cloud3', name: 'Gökyüzü Ustası', desc: "Bal Köyü'ndeki üç bulut parkurunun hepsini tamamla", stat: 'cloud', goal: 3, reward: 80 },
 ];
 const statOf = q => { const v = (save.stats || {})[q.stat]; return Array.isArray(v) ? v.length : v || 0; };
