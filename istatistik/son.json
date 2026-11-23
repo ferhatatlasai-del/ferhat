@@ -1,17 +1,17 @@
 {
- "tarih": "2026-11-23T09:00:45Z",
- "tr_saat": "23.11.2026 12:00",
+ "tarih": "2026-11-23T12:00:46Z",
+ "tr_saat": "23.11.2026 15:00",
  "toplam": {
-  "reels": 18099,
+  "reels": 18255,
   "gonderi": 0,
-  "short": 11272,
+  "short": 11274,
   "youtube_video": 0,
-  "hikaye": 870,
-  "toplam": 30241,
+  "hikaye": 889,
+  "toplam": 30418,
   "begeni": 288,
   "yorum": 29
  },
- "fark": 48,
+ "fark": 177,
  "instagram": {
   "durum": "tamam",
   "izin": true,
@@ -26,8 +26,8 @@
     "begeni": 6,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgD94j1CjjG/",
-    "izlenme": 596,
-    "erisim": 524
+    "izlenme": 723,
+    "erisim": 650
    },
    {
     "id": "18132478334487242",
@@ -37,8 +37,8 @@
     "begeni": 5,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/DgDWYKBE8DF/",
-    "izlenme": 1409,
-    "erisim": 1253
+    "izlenme": 1416,
+    "erisim": 1256
    },
    {
     "id": "18362708170216349",
@@ -48,8 +48,8 @@
     "begeni": 10,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/DgCmX1zj1CJ/",
-    "izlenme": 1272,
-    "erisim": 1147
+    "izlenme": 1278,
+    "erisim": 1152
    },
    {
     "id": "17945283843388099",
@@ -59,7 +59,7 @@
     "begeni": 10,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgAjP11DCGR/",
-    "izlenme": 1538,
+    "izlenme": 1539,
     "erisim": 1438
    },
    {
@@ -70,8 +70,8 @@
     "begeni": 8,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/DgAjINVCTkY/",
-    "izlenme": 837,
-    "erisim": 753
+    "izlenme": 838,
+    "erisim": 754
    },
    {
     "id": "17956070562049609",
@@ -81,8 +81,8 @@
     "begeni": 10,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgAaonlkhF3/",
-    "izlenme": 1669,
-    "erisim": 1514
+    "izlenme": 1672,
+    "erisim": 1516
    },
    {
     "id": "18193230361409051",
@@ -103,7 +103,7 @@
     "begeni": 10,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df-02JrFMVG/",
-    "izlenme": 1737,
+    "izlenme": 1738,
     "erisim": 1578
    },
    {
@@ -114,8 +114,8 @@
     "begeni": 30,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": 4034,
-    "erisim": 3583
+    "izlenme": 4044,
+    "erisim": 3601
    },
    {
     "id": "18289759651292671",
@@ -341,11 +341,19 @@
  "hikaye_izin": true,
  "hikayeler": [
   {
+   "id": "18137430658662819",
+   "tarih": "2026-11-23T09:48:03Z",
+   "baslik": "Bag hook for IKEA Bekant",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
    "id": "17899536333420895",
    "tarih": "2026-11-22T23:19:48Z",
    "baslik": "Video hikayesi",
-   "izlenme": 13,
-   "erisim": 7,
+   "izlenme": 18,
+   "erisim": 11,
    "okundu": true,
    "yanit": 0
   },
@@ -353,8 +361,8 @@
    "id": "17994366561069708",
    "tarih": "2026-11-22T23:17:35Z",
    "baslik": "Bag hook",
-   "izlenme": 13,
-   "erisim": 8,
+   "izlenme": 19,
+   "erisim": 13,
    "okundu": true,
    "yanit": 0
   },
@@ -362,8 +370,8 @@
    "id": "18121336967329729",
    "tarih": "2026-11-22T17:34:36Z",
    "baslik": "Video hikayesi",
-   "izlenme": 23,
-   "erisim": 17,
+   "izlenme": 25,
+   "erisim": 19,
    "okundu": true,
    "yanit": 0
   },
@@ -371,8 +379,8 @@
    "id": "18226143586340944",
    "tarih": "2026-11-22T13:27:11Z",
    "baslik": "Video hikayesi",
-   "izlenme": 21,
-   "erisim": 18,
+   "izlenme": 23,
+   "erisim": 19,
    "okundu": true,
    "yanit": 0
   },
@@ -380,8 +388,8 @@
    "id": "18352225648254861",
    "tarih": "2026-11-22T12:07:24Z",
    "baslik": "Shopping Bags Hook - Gancho para bolsas de la compra",
-   "izlenme": 22,
-   "erisim": 20,
+   "izlenme": 26,
+   "erisim": 23,
    "okundu": true,
    "yanit": 0
   },
@@ -681,14 +689,6 @@
    "izlenme": 0,
    "erisim": 0,
    "okundu": false
-  },
-  {
-   "id": "18471818374191827",
-   "tarih": "2026-11-19T15:06:59Z",
-   "baslik": "Fast-Operation Vise",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
   }
  ],
  "youtube": {
@@ -700,7 +700,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T23:17:16",
     "baslik": "Bambu Lab A1 Combo AMS lite filament değişim sorunları",
-    "izlenme": 55,
+    "izlenme": 56,
     "begeni": 0,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=Vt_lyaaFBOo"
@@ -740,7 +740,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T19:16:49",
     "baslik": "3D baskıda katman kayması neden olur?",
-    "izlenme": 1204,
+    "izlenme": 1205,
     "begeni": 4,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=yGVzYJN-m6o"
@@ -870,7 +870,7 @@
  },
  "eksikler": [],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 12:00",
-  "govde": "Toplam 30.241 (+48) · Reels 18.099 · Short 11.272 · Hikaye 870 · Takipçi 434 · En iyi Reels: Baskın tabladan kalkı 4.034"
+  "baslik": "📊 İzlenme raporu 15:00",
+  "govde": "Toplam 30.418 (+177) · Reels 18.255 · Short 11.274 · Hikaye 889 (1 bugün) · Takipçi 434 · En iyi Reels: Baskın tabladan kalkı 4.044"
  }
 }
