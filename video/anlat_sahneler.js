@@ -394,7 +394,11 @@
     const { x, W, H, lt, d, t, p, i } = c, im = (A.gorseller || [])[i];
     if (!im) { c.arka(p.tema || 'mavi'); return; }
     const od = p.odak || [0.5, 0.45];
-    const od2 = p.odak2 || [cl(od[0] + (od[0] < 0.5 ? 0.16 : -0.16), 0.2, 0.8), cl(od[1] - 0.05, 0.25, 0.7)];
+    let od2 = p.odak2 || [cl(od[0] + (od[0] < 0.5 ? 0.16 : -0.16), 0.2, 0.8), cl(od[1] - 0.05, 0.25, 0.7)];
+    if (p.katman && p.katman.length) {   // yakın çekim, animasyon katmanının ağırlık merkezine de bakar (etiketler kadraja girsin)
+      let sx = 0, sy = 0, n = 0; p.katman.forEach(function (e) { if (e.tur === 'grup' || e.tur === 'parcacik') return; const ex = e.x != null ? e.x : ((e.x1 || 0) + (e.x2 || 0)) / 2, ey = e.y != null ? e.y : ((e.y1 || 0) + (e.y2 || 0)) / 2; if (ex || ey) { sx += ex; sy += ey; n++; } });
+      if (n) od2 = [cl(0.65 * (sx / n / im.width) + 0.35 * od2[0], 0.25, 0.75), cl(0.65 * (sy / n / im.height) + 0.35 * od2[1], 0.3, 0.65)];
+    }
     const kesme = d > 3.2 ? Math.min(d * 0.5, d - 1.4) : 1e9;   // sahnenin ortasında ikinci plana (yakın çekim) kesilir
     const ikinci = lt >= kesme, mod = p.hareket || 'yakin';
     const q = ikinci ? sm((lt - kesme) / Math.max(0.5, d - kesme)) : sm(lt / Math.min(d, kesme));
@@ -403,7 +407,7 @@
       z = mod === 'uzak' ? lerp(1.32, 1.08, q) : lerp(1.06, mod === 'yakin' ? 1.34 : 1.2, q);
       fx = od[0]; fy = od[1];
       kx = mod === 'sol' ? lerp(0.10, -0.10, q) : mod === 'sag' ? lerp(-0.10, 0.10, q) : 0; ky = mod === 'yukari' ? lerp(0.08, -0.08, q) : mod === 'asagi' ? lerp(-0.08, 0.08, q) : 0;
-    } else { z = lerp(1.55, 1.82, q); fx = od2[0]; fy = od2[1]; kx = lerp(0.03, -0.03, q); }
+    } else { z = lerp(1.42, 1.62, q); fx = od2[0]; fy = od2[1]; kx = lerp(0.03, -0.03, q); }
     // kesme anında kısa sarsıntı + beyaz parlama
     const vur = ikinci ? cl(1 - (lt - kesme) / 0.22) : 0; z += vur * 0.06;
     const el = [Math.sin(t * 2.3) * 4 + Math.sin(t * 5.1) * 2, Math.cos(t * 1.9) * 4 + Math.cos(t * 4.3) * 2];   // hafif el kamerası
