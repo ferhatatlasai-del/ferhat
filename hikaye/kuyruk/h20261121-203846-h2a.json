@@ -1,7 +1,7 @@
 {
   "id": "h20261121-203846-h2a",
   "kaynak": "uretim",
-  "durum": "planli",
+  "durum": "yayinlaniyor",
   "olusturma": "2026-11-21T20:38:47.000Z",
   "gorsel": "hikaye/gorseller/h20261121-203846-h2a.mp4",
   "baslik": "Bar handle hook",
@@ -20,7 +20,9 @@
     "deneme": 1,
     "sorunlar": []
   },
-  "yayin": null,
+  "yayin": {
+    "tarih": "2026-11-23T12:05:45Z"
+  },
   "hata": "",
   "deneme": 0,
   "tur": "video",
