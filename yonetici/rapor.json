@@ -105,6 +105,30 @@
         "Son karar kayıtlarında s20261122-185523 için birden fazla kez 'onayla önerisi' görünüyor; bu eylem izinli değil ve tekrar kayıt anomalisine işaret ediyor."
       ],
       "eylem_sayisi": 1
+    },
+    {
+      "zaman": "2026-11-23 08:30",
+      "kademe": 3,
+      "model": "OpenAI (gpt-5.4)",
+      "rapor": [
+        "Acil: otomatik yayın hattında son 24 saatte 15 başarısız iş akışı var; mod deneme olduğu için yayın riski yok ama sistem sağlığı için takip etmen iyi olur.",
+        "Sağlık tarafında ana servisler iyi görünüyor; Instagram, YouTube, OpenAI ve ofis sunucusunda şu an belirgin sorun yok.",
+        "Hikâye tarafı dengeli: günlük sayı 6, kuyrukta 7 planlı hikâye var; bugün 1 görsel üretilmiş.",
+        "İzlenmede ilk katman, yapışma, stringing ve nem konuları öne çıkıyor; bu kalıba yakın yeni konu seçmek mantıklı.",
+        "Onay bekleyen A1 ilk katman taslağına tekrar not düşmedim; aynı taslak için zaten önceki kayıtlarda işlem var ve tekrar yazmam doğru olmaz.",
+        "Yorum tarafında bekleyen yanıt yok; bu turda yorum onayı gerekmiyor."
+      ],
+      "oneriler": [
+        "Otomatik-yayın iş akışındaki 15 hatanın nedenini panel veya loglardan kontrol et; artarsa sahibi olarak hattı gözden geçirmen iyi olur.",
+        "Yeni öncelik eklemeden önce mevcut 4 öncelikli konudan birini eritmek daha doğru; bekleyen öncelik sayısı sınırın üstünde.",
+        "A1 odaklı içeriklerde marka bağlantısı izlenimi riskine karşı açıklamada bağımsızlık notunu net tutmanı öneririm.",
+        "İlk katman ve nem temaları iyi çalıştığı için sonraki üretimlerde aynı kalıbı tekrar etmeden kontrol listesi veya hata-ayırma formatı deneyebilirsin."
+      ],
+      "uyarilar": [
+        "Geçmiş kayıtlarda s20261122-185523 için 'onayla önerisi' görünüyor; bu eylem kurala aykırıydı. Bu yüzden aynı taslağa yeni işlem yapmadım.",
+        "Nöbetçi son 24 saatte 1 kez başarısız olmuş; şu an sağlık iyi görünse de tekrar ederse ayrıca incelemek gerekir."
+      ],
+      "eylem_sayisi": 0
     }
   ],
   "defter": [
