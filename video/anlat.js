@@ -139,6 +139,9 @@
     plan = p; olcek = o || 1; cv = document.getElementById('c2'); cv.width = Math.round(W * olcek); cv.height = Math.round(H * olcek); x = cv.getContext('2d');
     ca = document.createElement('canvas'); cb = document.createElement('canvas'); ca.width = cb.width = cv.width; ca.height = cb.height = cv.height; xa = ca.getContext('2d'); xb = cb.getContext('2d');
     try { await Promise.all([document.fonts.load('800 40px IB'), document.fonts.load('600 40px IS')]); } catch (e) { /* yazı tipi yoksa Inter/sans-serif */ }
+    A.gorseller = await Promise.all((p.sahneler || []).map(async function (s) {   // 'resim' sahneleri için yapay zekâ görselleri
+      if (!(s.params && s.params.gorsel)) return null; const im = new Image(); im.src = s.params.gorsel; try { await im.decode(); return im; } catch (e) { console.error('görsel yüklenemedi: ' + s.params.gorsel); return null; }
+    }));
     ciz(0);
   };
   window.kare = function (t, q) { ciz(t); return cv.toDataURL('image/jpeg', q || 0.9).split(',')[1]; };

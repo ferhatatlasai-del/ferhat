@@ -389,6 +389,26 @@
     }
     c.restore();
   }
+  /* ---------- RESİM: yapay zekâ görseli + sinematik kamera hareketi (her konuda çalışır) ---------- */
+  S.resim = function (c) {
+    const { x, W, H, lt, d, t, p, i } = c, im = (A.gorseller || [])[i];
+    if (!im) { c.arka(p.tema || 'mavi'); return; }
+    const q = sm(lt / d), mod = p.hareket || 'yakin', od = p.odak || [0.5, 0.45];
+    const z0 = mod === 'uzak' ? 1.22 : 1.04, z1 = mod === 'uzak' ? 1.02 : (mod === 'yakin' ? 1.24 : 1.14), z = lerp(z0, z1, q);
+    const kayX = mod === 'sol' ? lerp(0.06, -0.06, q) : mod === 'sag' ? lerp(-0.06, 0.06, q) : 0, kayY = mod === 'yukari' ? lerp(0.05, -0.05, q) : mod === 'asagi' ? lerp(-0.05, 0.05, q) : 0;
+    const sc = Math.max(W / im.width, H / im.height) * z, w = im.width * sc, h = im.height * sc;
+    // odak noktası ekranın merkezine doğru yaklaşır; taşma sınırlı
+    let ox = W / 2 - (od[0] * w) + (od[0] - 0.5) * w * 0.0 + kayX * W, oy = H * 0.46 - (od[1] * h) + kayY * H;
+    ox = Math.min(0, Math.max(W - w, ox)); oy = Math.min(0, Math.max(H - h, oy));
+    x.fillStyle = '#000'; x.fillRect(0, 0, W, H); x.drawImage(im, ox, oy, w, h);
+    // sinematik finiş: alt yazı için alt karartma, köşe karartma, hafif ışık süpürmesi, taneli doku
+    let g = x.createLinearGradient(0, H * 0.58, 0, H); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,0.72)'); x.fillStyle = g; x.fillRect(0, H * 0.58, W, H * 0.42);
+    g = x.createRadialGradient(W / 2, H * 0.45, 380, W / 2, H * 0.45, 1250); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,0.38)'); x.fillStyle = g; x.fillRect(0, 0, W, H);
+    const sw = ((t * 0.18) % 1.6 - 0.3) * W * 1.4; g = x.createLinearGradient(sw - 260, 0, sw + 260, 0); g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(0.5, 'rgba(255,255,255,0.07)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, W, H);
+    const gir = back(lt / 0.5); if (lt < 0.5) { x.fillStyle = 'rgba(0,0,0,' + (0.35 * (1 - cl(lt / 0.5))) + ')'; x.fillRect(0, 0, W, H); }
+    c.etiket(0, W * od[0] * 0.8 + W * 0.1, H * od[1] * 0.8 + H * 0.06, 1.1, od[0] > 0.5 ? -1 : 1);
+  };
+
   S.ozel = function (c) {
     const { x, t, lt, d, p } = c; c.arka(p.tema || 'mavi'); const els = (p.elemanlar || []).slice(0, 60), cam = p.kamera || [[540, 760, 1.0], [540, 760, 1.08]];
     c.dunya(cam[0], cam[1] || cam[0], function () { els.forEach(function (e, i) { ozelEleman(x, e, lt, t, i); }); });

@@ -15,9 +15,9 @@ try:
 except Exception:   # pragma: no cover
     B = None
 
-TIPLER = ["ozel", "kanca", "ekstruder", "sicak_uc", "katman", "tikanma", "ilk_katman", "sogutma", "nem", "stringing", "warping",
+TIPLER = ["ozel", "resim", "kanca", "ekstruder", "sicak_uc", "katman", "tikanma", "ilk_katman", "sogutma", "nem", "stringing", "warping",
           "karsilastir", "sayi", "kontrol_listesi", "dolgu", "hiz", "destek", "kapanis"]
-EN_AZ_SURE = {"ozel": 4.2, "tikanma": 5.0, "katman": 4.6, "sicak_uc": 4.0, "ilk_katman": 4.0, "sogutma": 4.0, "nem": 4.0, "stringing": 4.4, "warping": 4.4, "destek": 4.2,
+EN_AZ_SURE = {"resim": 3.6, "ozel": 4.2, "tikanma": 5.0, "katman": 4.6, "sicak_uc": 4.0, "ilk_katman": 4.0, "sogutma": 4.0, "nem": 4.0, "stringing": 4.4, "warping": 4.4, "destek": 4.2,
               "karsilastir": 3.6, "sayi": 3.4, "kontrol_listesi": 4.0, "dolgu": 3.6, "hiz": 3.8, "ekstruder": 3.4, "kanca": 3.0, "kapanis": 3.4}
 
 ISTEM = """3D yazıcı ve 3D baskı konusunda, YouTube Shorts / Instagram Reels için ~50-60 saniyelik, ANİMASYONLU ve görsel olarak ÇEŞİTLİ, TÜRKÇE bir bilgi videosunun HİKÂYE TAHTASINI yaz.
@@ -89,9 +89,11 @@ RENKLER = {"turuncu", "mavi", "yesil", "kirmizi", "sari", "mor", "pembe", "beyaz
 GENEL_IKONLAR = {"yumurta", "kalp", "ampul", "dunya", "kitap", "ev", "yaprak", "para", "gunes", "bulut", "insan", "tavuk"}
 IKONLAR = {"nozul", "nozul_tikali", "makara", "disli", "fan", "termometre", "damla", "alev", "duman", "tik", "carpi", "uyari", "saat", "lupa", "yildiz", "parca", "filament", "yatak", "kilit"} | GENEL_IKONLAR
 SERBEST_TIPLER = ["ozel", "kanca", "karsilastir", "sayi", "kontrol_listesi", "kapanis"]
+RESIMLI_TIPLER = ["resim", "sayi", "karsilastir", "kontrol_listesi", "kapanis"]
+HAREKETLER = ("yakin", "uzak", "sol", "sag", "yukari", "asagi")
 TURLER = {"dikdortgen", "daire", "cizgi", "ok", "yazi", "ikon", "parcacik", "elips", "yol", "yay", "grup"}
 OZELLIKLER = {"x", "y", "olcek", "donus", "opaklik", "w", "h", "doluluk", "cizim", "r", "x1", "y1", "x2", "y2", "boyut", "kalinlik", "rx", "ry", "a0", "a1"}
-YEDEKLER = [t for t in TIPLER if t not in ("ozel", "kanca", "kapanis")]
+YEDEKLER = [t for t in TIPLER if t not in ("ozel", "resim", "kanca", "kapanis")]
 
 
 def _renk(v, varsayilan="beyaz"):
@@ -196,6 +198,12 @@ def params_temizle(tip, p):
     p = p if isinstance(p, dict) else {}
     if tip == "ozel":
         return ozel_params(p)
+    if tip == "resim":
+        g = _kisa(p.get("gorsel"), 420)
+        if len(g) < 25:
+            raise ValueError("'resim' sahnesi için İngilizce görsel tarifi (params.gorsel, 25+ karakter) gerekli")
+        od = p.get("odak") if isinstance(p.get("odak"), list) and len(p.get("odak")) == 2 else [0.5, 0.45]
+        return {"gorsel": g, "hareket": p.get("hareket") if p.get("hareket") in HAREKETLER else "yakin", "odak": [_sayi(od[0], 0.5, 0.15, 0.85), _sayi(od[1], 0.45, 0.2, 0.75)]}
     if tip in ("kanca", "kapanis"):
         return {"ikon": p["ikon"]} if p.get("ikon") in IKONLAR else {}
     if tip == "sicak_uc":
@@ -229,7 +237,7 @@ def serbest_ozel_params(p):
     return {"yedek": "kontrol_listesi", "tema": p.get("tema") if p.get("tema") in ("mavi", "mor", "yesil", "turuncu", "gri") else "mavi", "tasarim_notu": not_, "elemanlar": []}
 
 
-def dogrula(s, temizle=lambda x: x, gecmis=(), serbest=False):
+def dogrula(s, temizle=lambda x: x, gecmis=(), serbest=False, resimli=False):
     """Hikâye tahtasını temizler; sorun varsa ValueError. temizle: metin temizleyici (U.yazi_temizle)."""
     sah = [x for x in (s.get("sahneler") or []) if isinstance(x, dict)]
     if not 5 <= len(sah) <= 12:
@@ -237,12 +245,12 @@ def dogrula(s, temizle=lambda x: x, gecmis=(), serbest=False):
     temiz, onceki, sayac = [], None, {}
     for i, x in enumerate(sah):
         tip = x.get("tip")
-        if tip not in (SERBEST_TIPLER if serbest else TIPLER):
-            raise ValueError(f"{i + 1}. sahne tipi geçersiz: {tip}" + (" (serbest konuda yalnızca " + ", ".join(SERBEST_TIPLER) + " kullanılır)" if serbest else ""))
-        if tip == onceki:
+        if tip not in (RESIMLI_TIPLER if resimli else SERBEST_TIPLER if serbest else TIPLER):
+            raise ValueError(f"{i + 1}. sahne tipi geçersiz: {tip}" + (" (bu modda yalnızca " + ", ".join(RESIMLI_TIPLER if resimli else SERBEST_TIPLER) + " kullanılır)" if (serbest or resimli) else ""))
+        if tip == onceki and not (resimli and tip == "resim"):
             raise ValueError(f"{i + 1}. sahne bir öncekiyle aynı tip ({tip}); çeşitlilik gerekli")
         sayac[tip] = sayac.get(tip, 0) + 1
-        if sayac[tip] > ((6 if serbest else 3) if tip == "ozel" else 2):
+        if sayac[tip] > (10 if (resimli and tip == "resim") else (6 if serbest else 3) if tip == "ozel" else 2):
             raise ValueError(f"'{tip}' tipi çok fazla kullanılmış")
         onceki = tip
         kel, bayrak = isaretle(" ".join(str(x.get("anlati") or "").split()))
@@ -252,16 +260,18 @@ def dogrula(s, temizle=lambda x: x, gecmis=(), serbest=False):
         nokta = _kisa(x.get("nokta"), 70) or " ".join(kel[:7])
         temiz.append({"tip": tip, "anlati": " ".join(kel), "isaret": bayrak, "nokta": nokta, "params": (serbest_ozel_params(x.get("params")) if (serbest and tip == "ozel") else params_temizle(tip, x.get("params"))), "etiketler": et,
                       "bolum": _kisa(temizle(str(x.get("bolum") or "")), 28) if i > 0 and tip != "kanca" else "", "baslik": _kisa(temizle(str(x.get("baslik") or "")), 10) if tip != "kanca" else ""})
-    if temiz[0]["tip"] != "kanca":
-        raise ValueError("ilk sahne 'kanca' olmalı")
+    if temiz[0]["tip"] != ("resim" if resimli else "kanca"):
+        raise ValueError("ilk sahne '" + ("resim" if resimli else "kanca") + "' olmalı")
     if temiz[-1]["tip"] != "kapanis":
         raise ValueError("son sahne 'kapanis' olmalı")
-    if serbest and sayac.get("ozel", 0) < 3:
+    if resimli and sayac.get("resim", 0) < 5:
+        raise ValueError("resimli modda en az 5 'resim' sahnesi gerekli")
+    if serbest and not resimli and sayac.get("ozel", 0) < 3:
         raise ValueError("serbest konuda en az 3 'ozel' sahne gerekli")
-    if not sayac.get("ozel"):
+    if not resimli and not sayac.get("ozel"):
         raise ValueError("en az bir 'ozel' (konuya özel tasarlanmış) sahne gerekli; yalnızca hazır tipler kullanılmış")
-    if len(sayac) < (4 if serbest else 5):
-        raise ValueError(f"en az {4 if serbest else 5} farklı sahne tipi gerekli ({len(sayac)})")
+    if len(sayac) < (3 if resimli else 4 if serbest else 5):
+        raise ValueError(f"en az {3 if resimli else 4 if serbest else 5} farklı sahne tipi gerekli ({len(sayac)})")
     kelime = sum(len(x["anlati"].split()) for x in temiz)
     if not (150 if serbest else 90) <= kelime <= (270 if serbest else 190):
         raise ValueError(f"anlatı {kelime} kelime; {150 if serbest else 90}-{270 if serbest else 190} olmalı")
@@ -280,7 +290,8 @@ def dogrula(s, temizle=lambda x: x, gecmis=(), serbest=False):
         x["baslik"] = ""
     return {"bicim": "anlat", "konu": str(s.get("konu") or "")[:140], "baslik": temizle(str(s.get("baslik") or ""))[:90],
             "aciklama": str(s.get("aciklama") or "")[:900].replace("http", ""),
-            "etiketler": [re.sub(r"[^a-z0-9ığüşöç]", "", str(e).lower()) for e in (s.get("etiketler") or [])][:8], "sahneler": temiz}
+            "etiketler": [re.sub(r"[^a-z0-9ığüşöç]", "", str(e).lower()) for e in (s.get("etiketler") or [])][:8], "sahneler": temiz,
+            "stil": _kisa(s.get("stil"), 220)}
 
 
 def onceki_metni(noktalar, konular):
@@ -352,3 +363,28 @@ TASARIM İLKELERİ (24-48 eleman; gruplardaki çocuklar da sayılır):
 ÇOK ÖNEMLİ: Çıktı geçerli JSON olsun; sayılar sayı, metinler kısa olsun.
 Mini örnek (yalnızca biçim için): {{"tema":"mavi","kamera":[[540,760,1.0],[540,740,1.1]],"elemanlar":[{{"tur":"dikdortgen","x":540,"y":560,"w":1080,"h":420,"renk":"#2a6fb8","renk2":"#8fd0ff","gradyan":"dikey"}},{{"tur":"yol","x":0,"y":0,"kapali":true,"yumusak":true,"renk":"#3d8f4a","renk2":"#2a6b36","noktalar":[[0,900],[300,850],[650,890],[1080,850],[1080,1200],[0,1200]]}},{{"tur":"grup","x":540,"y":900,"golge":true,"dongu":{{"yuz":4}},"cocuklar":[{{"tur":"elips","x":0,"y":0,"rx":110,"ry":80,"renk":"#fff8e6","renk2":"#e8d9b8","gradyan":"dikey"}},{{"tur":"daire","x":90,"y":-70,"r":42,"renk":"#fff8e6"}},{{"tur":"daire","x":104,"y":-80,"r":6,"renk":"#10161f"}}]}},{{"tur":"yazi","x":540,"y":420,"metin":"ETİKET","boyut":56,"renk":"beyaz","t":[1,99]}},{{"tur":"ok","x1":300,"y1":700,"x2":420,"y2":800,"renk":"sari","t":[2,99],"hareket":[{{"o":"cizim","den":0,"a":1,"t0":2,"t1":3}}]}}],"etiket_noktalari":[]}}
 YALNIZCA JSON döndür: {{"tema":"...","kamera":[[x,y,zoom],[x,y,zoom]],"elemanlar":[...],"etiket_noktalari":[]}}"""
+
+
+# ---------------- RESİMLİ ANLATIM (yapay zekâ resimleri + sinematik hareket; her konu) ----------------
+ISTEM_RESIMLI = """YouTube Shorts / Instagram Reels için ~60-85 saniyelik, SİNEMATİK, görsel olarak zengin, TÜRKÇE, merak uyandıran bir bilgi videosunun HİKÂYE TAHTASINI yaz. Görseller yapay zekâ tarafından RESİM olarak üretilecek ve üzerlerine yavaş kamera hareketi, altyazı, ses ve müzik eklenecek. Konu serbesttir (3D baskıyla ilgili olmak zorunda değil, zorla bağlama).
+Konu: {konu}
+İpucu: {ipucu}
+KONU UYGUN DEĞİLSE (nefret/hakaret, siyaset, kişi hedefleme, sağlık/hukuk/yatırım TAVSİYESİ, şiddet, yetişkin içerik, tehlikeli talimat) hikâye yazma; yalnızca {{"uygunsuz": "kısa neden"}} döndür.
+
+VİDEO TÜM SAHNELER İÇİN TEK BİR GÖRSEL STİL kullanır: "stil" alanına İngilizce, konuya uygun tutarlı bir stil yaz (ör. "warm flat vector illustration, soft gradients, rich detail, consistent color palette" ya da "cinematic documentary photograph, natural light, shallow depth of field"). İnsan gerekiyorsa sade stilize figürler (detaylı yüz yok) tercih et.
+7 ile 12 sahne yaz. SAHNE TİPLERİ:
+- resim: tam ekran yapay zekâ görseli (videonun ana sahnesi; 5-9 tane). params: {{"gorsel": "İNGİLİZCE, 25-60 kelimelik DETAYLI görsel tarifi: ana nesne/olay, mekân, arka plan, ışık, renkler, kompozisyon; metin/yazı/logo YOK", "hareket": "yakin|uzak|sol|sag|yukari|asagi", "odak": [0.5, 0.45]}}
+  Görsel tarifleri HER SAHNEDE FARKLI olsun (farklı mekân, plan ve açı: geniş plan, yakın plan, üstten, kesit, karşılaştırma...). Görselin alt üçte biri sade/koyu kalsın (altyazı için). Ana nesne ekranın ortasının biraz üstünde. "odak": ana nesnenin görseldeki yeri [yatay 0-1, dikey 0-1].
+- sayi: büyük halka sayaç (önemli bir sayı için; en çok 1). params: {{"deger": 65, "maks": 100, "birim": "%", "etiket": "kısa açıklama"}}
+- karsilastir: iki değeri sütunla karşılaştırır (en çok 1). params: {{"a": {{"ad": "Yaz", "deger": 5}}, "b": {{"ad": "Kış", "deger": 3}}, "birim": "adet"}}
+- kontrol_listesi: onay işaretli özet listesi (en çok 1, sondan bir önce). params: {{"maddeler": ["en çok 28 harf", "...", "..."]}}
+- kapanis: son sahne (takip et). ZORUNLU son. params: {{"ikon": "kalp"}}
+İlk sahne "resim" olsun (güçlü kanca görseli). Aynı kompozisyonu tekrarlama.
+TEKRARA DÜŞME: Her sahnenin "nokta" alanına o sahnede anlattığın TEK somut bilgiyi 3-8 kelimeyle yaz. Aşağıdaki, daha önceki videolarda ZATEN anlatılmış noktaları ve konuları TEKRAR ETME.
+{onceki}
+ANLATI: toplam 150-230 kelime; sahne başına 1-3 kısa cümle (10-28 kelime). İlk sahne güçlü kanca (soru ya da yaygın yanılgı). Cümleler kısa, konuşma dili, "sen" hitabı. Her sahnenin anlatısı o sahnenin görselini anlatsın. Son sahne yoruma davet + takip et.
+VURGU: önemli kelimeleri işaretle: *kelime* turuncu, ~kelime~ mavi. Her sahnede en çok 2 vurgu.
+EK ALANLAR (isteğe bağlı): "bolum": yeni bölüm başlığı (en çok 28 harf; ilk sahnede olmasın; 3-5 bölüm); "baslik": ekrana büyük yazı olarak zıplayan TEK kısa kelime (en çok 10 harf, tüm videoda en çok 2 sahnede); "etiketler": ["en çok 24 harflik kısa görsel etiketi"] (en çok 3 sahnede, görselin ana nesnesini adlandırır).
+DOĞRULUK: Yalnızca yaygın kabul gören, doğru bilgileri yaz. Emin olmadığın sayıyı verme; "yaklaşık", "genellikle" kullan. İstatistik, fiyat, marka karşılaştırması, kişisel deneyim, bilimsel iddia UYDURMA. Tartışmalı konuda dengeli konuş. Yasak sözcükler: mükemmel, harika, muhteşem, inanılmaz. Sayıları anlatıda yazıyla yaz.
+YALNIZCA JSON döndür: {{"konu":"...","stil":"...","baslik":"arama odaklı en çok 70 karakter","aciklama":"2-3 kısa satır, son satır yorum daveti","etiketler":["konuyla ilgili","3-6 etiket"],
+"sahneler":[{{"tip":"resim","anlati":"...","nokta":"3-8 kelimelik tek bilgi","bolum":"","baslik":"","etiketler":[],"params":{{"gorsel":"...","hareket":"yakin","odak":[0.5,0.45]}}}}]}}"""

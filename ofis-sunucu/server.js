@@ -730,7 +730,7 @@ async function api(req, res, url) {
     viralOnbellek.t = 0;
     try { const d = await viralDurum(); if (d.calisiyor) return json(res, 409, { hata: 'Zaten bir viral video üretiliyor (ilerleme kutusundan izle). İkincisi, aynı anda başlayıp aynı konuyu seçmesin diye engellendi.' }); } catch (e) { /* durum okunamazsa devam */ }
     let konu = '', konuTuru = 'otomatik';
-    try { const b = await govde(req); konu = String(b.konu || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 120); if (['otomatik', '3d', 'serbest'].includes(b.konu_turu)) konuTuru = b.konu_turu; } catch (e) { /* konu isteğe bağlı */ }
+    try { const b = await govde(req); konu = String(b.konu || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 120); if (['otomatik', '3d', 'serbest', 'resimli'].includes(b.konu_turu)) konuTuru = b.konu_turu; } catch (e) { /* konu isteğe bağlı */ }
     const dal = await varsayilanDal();
     const r = await gh(`/repos/${REPO}/actions/workflows/${AKIS_VIRAL}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: { hemen: 'EVET', konu, konu_turu: konuTuru } }) });
     if (r.status !== 204) return json(res, 502, { hata: 'GitHub kabul etmedi (' + r.status + ').' });
