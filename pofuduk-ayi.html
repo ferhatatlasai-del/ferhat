@@ -1137,7 +1137,7 @@ function init3D() {
   G.cam = new THREE.PerspectiveCamera(40, VW / VH, 0.5, 300);
   G.hemi = new THREE.HemisphereLight(0xffffff, 0x445544, 0.62); G.scene.add(G.hemi);
   G.sun = new THREE.DirectionalLight(0xffffff, 0.72);
-  G.sun.castShadow = true; G.sun.shadow.mapSize.set(1024, 1024);
+  G.sun.castShadow = true; G.sun.shadow.mapSize.set(isTouch ? 1024 : 2048, isTouch ? 1024 : 2048); G.sun.shadow.bias = -0.0004; G.sun.shadow.normalBias = 0.03;
   Object.assign(G.sun.shadow.camera, { left: -20, right: 20, top: 13, bottom: -13, near: 1, far: 70 });
   G.sun.shadow.bias = -0.0015;
   G.scene.add(G.sun); G.scene.add(G.sun.target);
@@ -3159,9 +3159,9 @@ function buildScene() {
   const th = L.def, rnd = rng(77 + lvlIdx * 31);
   if (G.scene.background) G.scene.background.dispose();
   G.scene.background = canvasTex(4, 256, (c, w, h) => { const gr = c.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, th.sky[0]); gr.addColorStop(1, th.sky[1]); c.fillStyle = gr; c.fillRect(0, 0, w, h); });
-  G.scene.fog = new THREE.Fog(th.sky[1], th.mist ? 14 : 32, th.mist ? 85 : 130); G.fogBase = [G.scene.fog.near, G.scene.fog.far]; applyView();
-  G.hemi.color.set(th.cave ? '#b9a6ff' : th.night ? '#9fb4ff' : '#ffffff'); G.hemi.groundColor.set(th.mid); G.hemi.intensity = th.cave ? 0.6 : th.night ? 0.45 : 0.62;
-  G.sun.color.set(th.weather === 'ember' ? '#ffcf9a' : th.night ? '#bcd0ff' : '#fff6e0'); G.sun.intensity = th.cave ? 0.5 : th.night ? 0.5 : 0.75;
+  G.scene.fog = new THREE.Fog(th.sky[1], th.mist ? 14 : 26, th.mist ? 85 : 115); G.fogBase = [G.scene.fog.near, G.scene.fog.far]; applyView();
+  G.hemi.color.set(th.cave ? '#b9a6ff' : th.night ? '#9fb4ff' : '#ffffff'); G.hemi.groundColor.set(th.mid); G.hemi.intensity = th.cave ? 0.55 : th.night ? 0.42 : 0.5;
+  G.sun.color.set(th.weather === 'ember' ? '#ffcf9a' : th.night ? '#bcd0ff' : '#fff0d0'); G.sun.intensity = th.cave ? 0.55 : th.night ? 0.5 : 0.98;
   G.lamp.intensity = 0; G.nightN = -1; G.stars = null; G.homeFlag = null;
   G.day = { hemi: G.hemi.intensity, sun: G.sun.intensity, hemiC: G.hemi.color.clone(), sunC: G.sun.color.clone(), fog: G.scene.fog.color.clone(), sky0: new THREE.Color(th.sky[0]), sky1: new THREE.Color(th.sky[1]) };
   if (L.hub) { // the village has a clock: repaint its sky as night falls
