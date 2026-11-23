@@ -89,8 +89,8 @@ RENKLER = {"turuncu", "mavi", "yesil", "kirmizi", "sari", "mor", "pembe", "beyaz
 GENEL_IKONLAR = {"yumurta", "kalp", "ampul", "dunya", "kitap", "ev", "yaprak", "para", "gunes", "bulut", "insan", "tavuk"}
 IKONLAR = {"nozul", "nozul_tikali", "makara", "disli", "fan", "termometre", "damla", "alev", "duman", "tik", "carpi", "uyari", "saat", "lupa", "yildiz", "parca", "filament", "yatak", "kilit"} | GENEL_IKONLAR
 SERBEST_TIPLER = ["ozel", "kanca", "karsilastir", "sayi", "kontrol_listesi", "kapanis"]
-TURLER = {"dikdortgen", "daire", "cizgi", "ok", "yazi", "ikon", "parcacik"}
-OZELLIKLER = {"x", "y", "olcek", "donus", "opaklik", "w", "h", "doluluk", "cizim", "r", "x1", "y1", "x2", "y2", "boyut", "kalinlik"}
+TURLER = {"dikdortgen", "daire", "cizgi", "ok", "yazi", "ikon", "parcacik", "elips", "yol", "yay", "grup"}
+OZELLIKLER = {"x", "y", "olcek", "donus", "opaklik", "w", "h", "doluluk", "cizim", "r", "x1", "y1", "x2", "y2", "boyut", "kalinlik", "rx", "ry", "a0", "a1"}
 YEDEKLER = [t for t in TIPLER if t not in ("ozel", "kanca", "kapanis")]
 
 
@@ -107,22 +107,39 @@ def _sayi_alan(v, lo=-900, hi=2300):
     return max(lo, min(hi, f)) if f == f else None
 
 
-def ozel_eleman(e):
-    """Yapay zekânın yazdığı bir çizim elemanını güvenli, sınırlı bir biçime indirger; kullanılamazsa None."""
-    if not isinstance(e, dict) or e.get("tur") not in TURLER:
+def ozel_eleman(e, ic=False):
+    """Yapay zekânın yazdığı bir çizim elemanını güvenli, sınırlı bir biçime indirger; kullanılamazsa None. ic: grup içi (iç içe grup yok)."""
+    if not isinstance(e, dict) or e.get("tur") not in TURLER or (ic and e.get("tur") == "grup"):
         return None
     t = e["tur"]
     c = {"tur": t}
-    for k in ("x", "y", "w", "h", "r", "x1", "y1", "x2", "y2", "olcek", "donus", "opaklik", "doluluk", "cizim", "boyut", "kalinlik", "sayi", "hiz", "halka"):
+    for k in ("x", "y", "w", "h", "r", "x1", "y1", "x2", "y2", "olcek", "donus", "opaklik", "doluluk", "cizim", "boyut", "kalinlik", "sayi", "hiz", "halka", "rx", "ry", "a0", "a1"):
         if k in e:
-            v = _sayi_alan(e[k], -900, 2300 if k not in ("opaklik", "doluluk", "cizim", "olcek", "hiz") else 12)
+            v = _sayi_alan(e[k], -900, 2300 if k not in ("opaklik", "doluluk", "cizim", "olcek", "hiz") else 12) if k not in ("a0", "a1") else _sayi_alan(e[k], -720, 720)
             if v is not None:
                 c[k] = v
-    for k in ("renk", "kenar", "doluluk_zemin"):
+    for k in ("renk", "kenar", "doluluk_zemin", "renk2"):
         if k in e:
             c[k] = _renk(e[k])
     if e.get("yon") in ("yatay", "dikey", "yukari", "asagi", "sag", "sol", "daire"):
         c["yon"] = e["yon"]
+    if e.get("gradyan") in ("dikey", "yatay", "radyal"):
+        c["gradyan"] = e["gradyan"]
+    for k in ("golge", "kapali", "yumusak", "sadece_kenar"):
+        if e.get(k):
+            c[k] = True
+    if t == "yol":
+        q = [[_sayi_alan(n[0], -900, 2300), _sayi_alan(n[1], -900, 2300)] for n in (e.get("noktalar") if isinstance(e.get("noktalar"), list) else [])[:28] if isinstance(n, list) and len(n) >= 2]
+        q = [n for n in q if n[0] is not None and n[1] is not None]
+        if len(q) < 3:
+            return None
+        c["noktalar"] = q
+    if t == "grup":
+        ch = [ozel_eleman(x, True) for x in (e.get("cocuklar") if isinstance(e.get("cocuklar"), list) else [])[:30]]
+        ch = [x for x in ch if x]
+        if len(ch) < 2:
+            return None
+        c["cocuklar"] = ch
     if t == "yazi":
         m = _kisa(e.get("metin"), 30)
         if not m:
@@ -159,11 +176,12 @@ def ozel_eleman(e):
 
 
 def ozel_params(p):
-    els = [ozel_eleman(e) for e in (p.get("elemanlar") if isinstance(p.get("elemanlar"), list) else [])[:30]]
+    els = [ozel_eleman(e) for e in (p.get("elemanlar") if isinstance(p.get("elemanlar"), list) else [])[:48]]
     els = [e for e in els if e]
-    if len(els) < 5:
-        raise ValueError(f"özel sahnede en az 5 geçerli eleman gerekli ({len(els)})")
-    if not any(e["tur"] in ("yazi", "ikon") for e in els):
+    tum = els + [x for e in els for x in e.get("cocuklar", [])]
+    if len(tum) < 5:
+        raise ValueError(f"özel sahnede en az 5 geçerli eleman gerekli ({len(tum)})")
+    if not any(e["tur"] in ("yazi", "ikon") for e in tum):
         raise ValueError("özel sahnede en az bir yazı ya da ikon olmalı")
     kam = []
     for k in (p.get("kamera") if isinstance(p.get("kamera"), list) else [])[:2]:
@@ -171,7 +189,7 @@ def ozel_params(p):
             kam.append([_sayi_alan(k[0], 300, 780), _sayi_alan(k[1], 400, 1100), _sayi_alan(k[2], 0.7, 1.6)])
     tema = p.get("tema") if p.get("tema") in ("mavi", "mor", "yesil", "turuncu", "gri") else "mavi"
     noktalar = [[_sayi_alan(q[0], 0, 1080), _sayi_alan(q[1], 300, 1400), _sayi_alan(q[2] if len(q) > 2 else 1.4, 0.3, 8)] for q in (p.get("etiket_noktalari") or [])[:2] if isinstance(q, list) and len(q) >= 2 and _sayi_alan(q[0]) is not None and _sayi_alan(q[1]) is not None]
-    return {"yedek": p.get("yedek") if p.get("yedek") in YEDEKLER else "ekstruder", "tema": tema, "kamera": kam or [[540, 760, 1.0], [540, 760, 1.08]], "elemanlar": els, "etiket_noktalari": noktalar}
+    return {"yedek": p.get("yedek") if p.get("yedek") in YEDEKLER else "ekstruder", "tema": tema, "kamera": kam or [[540, 760, 1.0], [540, 760, 1.08]], "elemanlar": els, "etiket_noktalari": noktalar, "eleman_sayisi": len(tum)}
 
 
 def params_temizle(tip, p):
@@ -202,6 +220,15 @@ def params_temizle(tip, p):
     return {}
 
 
+def serbest_ozel_params(p):
+    """Serbest konuda özel sahnenin çizimi ayrı bir 'tasarımcı' çağrısında yazılır; hikâye tahtasında yalnızca tasarım notu bulunur."""
+    p = p if isinstance(p, dict) else {}
+    not_ = _kisa(p.get("tasarim_notu"), 700)
+    if len(not_) < 30:
+        raise ValueError("özel sahne için 'tasarim_notu' (sahnede ne görünecek, 3-5 cümle) yazılmalı")
+    return {"yedek": "kontrol_listesi", "tema": p.get("tema") if p.get("tema") in ("mavi", "mor", "yesil", "turuncu", "gri") else "mavi", "tasarim_notu": not_, "elemanlar": []}
+
+
 def dogrula(s, temizle=lambda x: x, gecmis=(), serbest=False):
     """Hikâye tahtasını temizler; sorun varsa ValueError. temizle: metin temizleyici (U.yazi_temizle)."""
     sah = [x for x in (s.get("sahneler") or []) if isinstance(x, dict)]
@@ -215,7 +242,7 @@ def dogrula(s, temizle=lambda x: x, gecmis=(), serbest=False):
         if tip == onceki:
             raise ValueError(f"{i + 1}. sahne bir öncekiyle aynı tip ({tip}); çeşitlilik gerekli")
         sayac[tip] = sayac.get(tip, 0) + 1
-        if sayac[tip] > ((5 if serbest else 3) if tip == "ozel" else 2):
+        if sayac[tip] > ((6 if serbest else 3) if tip == "ozel" else 2):
             raise ValueError(f"'{tip}' tipi çok fazla kullanılmış")
         onceki = tip
         kel, bayrak = isaretle(" ".join(str(x.get("anlati") or "").split()))
@@ -223,21 +250,21 @@ def dogrula(s, temizle=lambda x: x, gecmis=(), serbest=False):
             raise ValueError(f"{i + 1}. sahnede anlatı yok ya da çok kısa")
         et = [_kisa(e, 24) for e in (x.get("etiketler") or []) if _kisa(e, 24)][:2] if isinstance(x.get("etiketler"), list) else []
         nokta = _kisa(x.get("nokta"), 70) or " ".join(kel[:7])
-        temiz.append({"tip": tip, "anlati": " ".join(kel), "isaret": bayrak, "nokta": nokta, "params": params_temizle(tip, x.get("params")), "etiketler": et,
+        temiz.append({"tip": tip, "anlati": " ".join(kel), "isaret": bayrak, "nokta": nokta, "params": (serbest_ozel_params(x.get("params")) if (serbest and tip == "ozel") else params_temizle(tip, x.get("params"))), "etiketler": et,
                       "bolum": _kisa(temizle(str(x.get("bolum") or "")), 28) if i > 0 and tip != "kanca" else "", "baslik": _kisa(temizle(str(x.get("baslik") or "")), 10) if tip != "kanca" else ""})
     if temiz[0]["tip"] != "kanca":
         raise ValueError("ilk sahne 'kanca' olmalı")
     if temiz[-1]["tip"] != "kapanis":
         raise ValueError("son sahne 'kapanis' olmalı")
-    if serbest and sayac.get("ozel", 0) < 2:
-        raise ValueError("serbest konuda en az 2 'ozel' sahne gerekli")
+    if serbest and sayac.get("ozel", 0) < 3:
+        raise ValueError("serbest konuda en az 3 'ozel' sahne gerekli")
     if not sayac.get("ozel"):
         raise ValueError("en az bir 'ozel' (konuya özel tasarlanmış) sahne gerekli; yalnızca hazır tipler kullanılmış")
     if len(sayac) < (4 if serbest else 5):
         raise ValueError(f"en az {4 if serbest else 5} farklı sahne tipi gerekli ({len(sayac)})")
     kelime = sum(len(x["anlati"].split()) for x in temiz)
-    if not 90 <= kelime <= 190:
-        raise ValueError(f"anlatı {kelime} kelime; 90-190 olmalı")
+    if not (150 if serbest else 90) <= kelime <= (270 if serbest else 190):
+        raise ValueError(f"anlatı {kelime} kelime; {150 if serbest else 90}-{270 if serbest else 190} olmalı")
     # içerik tekrarı: bu videonun noktaları önceki videolarda zaten anlatıldıysa ya da kendi içinde tekrar ediyorsa reddet
     if B is not None:
         eskiler = [g for g in gecmis if g]
@@ -270,29 +297,58 @@ def onceki_metni(noktalar, konular):
 
 
 # ---------------- SERBEST KONU (3D baskı dışı) ----------------
-_OZEL_BLOK = ISTEM[ISTEM.index("- ozel:"):ISTEM.index("ÇEŞİTLİLİK KURALLARI")]
-_OZEL_BLOK = (_OZEL_BLOK.replace('"yedek": "ekstruder"', '"yedek": "kontrol_listesi"')
-              .replace("ikon adları: nozul, nozul_tikali, makara, disli, fan, termometre, damla, alev, duman, tik, carpi, uyari, saat, lupa, yildiz, parca, filament, yatak, kilit.",
-                       "ikon adları (yalnızca bunları kullan): yumurta, tavuk, kalp, ampul, dunya, kitap, ev, yaprak, para, gunes, bulut, insan, termometre, damla, alev, tik, carpi, uyari, saat, lupa, yildiz, kilit. Başka bir şeyi şekillerle (daire, dikdörtgen, çizgi, ok) kendin çiz.")
-              .replace('"ad":"termometre"', '"ad":"termometre"'))
-ISTEM_SERBEST = """YouTube Shorts / Instagram Reels için ~50-60 saniyelik, ANİMASYONLU ve görsel olarak ÇEŞİTLİ, TÜRKÇE, merak uyandıran bir bilgi videosunun HİKÂYE TAHTASINI yaz. Kanal 3D baskı ağırlıklıdır ama bu video SERBEST bir konudadır: konu 3D baskıyla ilgili olmak zorunda DEĞİL, ona zorla bağlama; ama video yine de genel bir kitleye yönelik, sakin, güvenilir ve eğlenceli olsun.
+SERBEST_IKONLAR = "yumurta, tavuk, kalp, ampul, dunya, kitap, ev, yaprak, para, gunes, bulut, insan, termometre, damla, alev, tik, carpi, uyari, saat, lupa, yildiz, kilit"
+ISTEM_SERBEST = """YouTube Shorts / Instagram Reels için ~70-90 saniyelik, ANİMASYONLU, görsel olarak DETAYLI ve ÇEŞİTLİ, TÜRKÇE, merak uyandıran bir bilgi videosunun HİKÂYE TAHTASINI yaz. Kanal 3D baskı ağırlıklıdır ama bu video SERBEST bir konudadır: konu 3D baskıyla ilgili olmak zorunda DEĞİL, ona zorla bağlama; ama video genel bir kitleye yönelik, sakin, güvenilir ve eğlenceli olsun.
 Konu: {konu}
 İpucu: {ipucu}
 KONU UYGUN DEĞİLSE (nefret/hakaret, siyaset, kişi hedefleme, sağlık/hukuk/yatırım TAVSİYESİ, şiddet, yetişkin içerik, tehlikeli talimat) hikâye yazma; yalnızca {{"uygunsuz": "kısa neden"}} döndür.
 
-Video, her biri bir ANİMASYON SAHNESİ olan sahnelerden oluşur. Sahne sayısını konunun gerektirdiği kadar seç (5 ile 10 arası).
-SAHNE TİPLERİ (yalnızca bunlar; animasyon; params alanları):
-- kanca: açılış (merkezde büyük bir ikon, ışınlar, soru işaretleri). ZORUNLU ilk sahne. params: {{"ikon": "yumurta"}}  (konuyu en iyi anlatan ikon: yumurta, tavuk, kalp, ampul, dunya, kitap, ev, yaprak, para, gunes, bulut, insan, termometre, damla, alev, saat, lupa, yildiz)
+Video, her biri bir ANİMASYON SAHNESİ olan 7 ile 11 sahneden oluşur. Konuyu adım adım, sebep-sonuç ve süreç olarak anlat.
+SAHNE TİPLERİ (yalnızca bunlar):
+- kanca: açılış (merkezde büyük bir ikon, ışınlar, soru işaretleri). ZORUNLU ilk sahne. params: {{"ikon": "yumurta"}}  (ikon: """ + SERBEST_IKONLAR + """)
 - karsilastir: iki değeri sütunla karşılaştırır. params: {{"a": {{"ad": "Yaz", "deger": 5}}, "b": {{"ad": "Kış", "deger": 3}}, "birim": "adet"}}
 - sayi: büyük halka sayaç. params: {{"deger": 65, "maks": 100, "birim": "%", "etiket": "kısa açıklama"}}
 - kontrol_listesi: onay işaretli madde listesi (özet için). params: {{"maddeler": ["en çok 28 harf", "...", "..."]}}  (3-4 madde)
 - kapanis: son sahne (takip et). ZORUNLU son sahne. params: {{"ikon": "kalp"}}
-""" + _OZEL_BLOK + """ÇEŞİTLİLİK KURALLARI: Hikâyenin ana görsel yükünü "ozel" sahneler taşır: videoda EN AZ 2, en çok 5 "ozel" sahne tasarla (ZORUNLU); konunun kendine özgü kavramlarını (süreç, döngü, karşılaştırma, ölçek, neden-sonuç) şekil, ok, ikon ve hareketle çiz. Aynı tip arka arkaya gelmesin, ozel dışındaki tipler en çok 2 kez, en az 4 farklı tip olsun.
+- ozel: DETAYLI, konuya özel çizilmiş animasyon sahnesi. Videonun ANA görsel yükünü bu sahneler taşır: 3-6 tane yaz. Çizimi ayrı bir ressam yapacak; sen yalnızca ne görüneceğini anlat: params: {{"yedek": "kontrol_listesi", "tema": "mavi|mor|yesil|turuncu|gri", "tasarim_notu": "sahnede NE görünecek: mekân/arka plan, ana nesneler ve parçaları, hareket sırası (önce ne belirir, sonra ne olur), gösterilecek sayı/etiketler. 3-5 somut cümle."}}
+ÇEŞİTLİLİK KURALLARI: Aynı tip arka arkaya gelmesin; ozel dışındaki tipler en çok 2 kez; en az 4 farklı tip. Her özel sahne farklı bir mekân/nesne/kavram göstersin (aynı kompozisyonu tekrarlama).
 TEKRARA DÜŞME: Her sahnenin "nokta" alanına o sahnede anlattığın TEK somut bilgiyi 3-8 kelimeyle yaz. Aşağıdaki, daha önceki videolarda ZATEN anlatılmış noktaları ve konuları TEKRAR ETME. Bu videonun noktaları da birbirinden farklı olsun.
 {onceki}
-ANLATI: sahne başına 1-2 kısa cümle (8-22 kelime), toplam 110-150 kelime. İlk sahne güçlü kanca (soru ya da yaygın yanılgı). Cümleler kısa, konuşma dili, "sen" hitabı. Son sahne yoruma davet + takip et.
+ANLATI: toplam 160-230 kelime. Özel sahnelerde 20-36 kelime (2-3 kısa cümle; ressamın çizeceği şeyi anlat), diğerlerinde 8-22 kelime. İlk sahne güçlü kanca (soru ya da yaygın yanılgı). Cümleler kısa, konuşma dili, "sen" hitabı. Son sahne yoruma davet + takip et.
 VURGU: anlatıda önemli kelimeleri işaretle: *kelime* turuncu, ~kelime~ mavi. Her sahnede en çok 2 vurgu; çok kelimeli vurguda HER kelimeyi ayrı işaretle.
-EK ALANLAR (isteğe bağlı): "bolum": yeni bölüm başlığı (en çok 28 harf; ilk sahnede olmasın, "kanca"ya yazma); "baslik": ekrana büyük yazı olarak zıplayan TEK kısa kelime (en çok 10 harf, tüm videoda en çok 2 sahnede); "etiketler": sahnedeki animasyon parçalarına bağlanan en çok 2 kısa etiket.
+EK ALANLAR (isteğe bağlı): "bolum": yeni bölüm başlığı (en çok 28 harf; ilk sahnede olmasın, "kanca"ya yazma; 3-5 bölüm); "baslik": ekrana büyük yazı olarak zıplayan TEK kısa kelime (en çok 10 harf, tüm videoda en çok 2 sahnede); "etiketler": [] bırak.
 DOĞRULUK: Yalnızca yaygın kabul gören, doğru bilgileri yaz. Emin olmadığın sayıyı verme; tipik değer ya da aralık kullan ("yaklaşık", "genellikle"). İstatistik, fiyat, marka karşılaştırması, kişisel deneyim, bilimsel iddia UYDURMA. Tartışmalı ya da kesin olmayan konuda dengeli konuş. Yasak sözcükler: mükemmel, harika, muhteşem, inanılmaz. Sayıları anlatıda yazıyla yaz ("yüz yirmi gün").
 YALNIZCA JSON döndür: {{"konu":"...","baslik":"arama odaklı en çok 70 karakter","aciklama":"2-3 kısa satır, son satır yorum daveti","etiketler":["konuyla ilgili","3-6 etiket"],
 "sahneler":[{{"tip":"kanca","anlati":"...","nokta":"3-8 kelimelik tek bilgi","bolum":"","baslik":"","etiketler":[],"params":{{"ikon":"yumurta"}}}}]}}"""
+
+ISTEM_TASARIM = """Sen bir hareketli grafik ressamısın. Aşağıdaki bilgi videosu sahnesi için DETAYLI, katmanlı, sürekli hareketli bir animasyon sahnesini JSON olarak tarif et.
+Video konusu: {konu}
+Sahne anlatısı (spiker bunu okuyacak, animasyon aynı sırayla ilerlemeli): {anlati}
+Tasarım notu: {tasarim}
+Sahne süresi: yaklaşık {sure} sn (t değerleri 0 ile {sure} arasında olsun; elemanlar anlatıyla aynı sırada belirsin).
+
+KOORDİNAT: yatay 0-1080, dikey 350-1250 görünür alan (merkez 540,760); sahnenin altında alt yazı olduğu için dikeyde 360-1150 arasını kullan. Elemanlar listede alttan üste sırayla çizilir.
+ORTAK ALANLAR (hepsinde isteğe bağlı): "t":[giriş_sn, çıkış_sn], "renk" ve "renk2"+"gradyan":"dikey|yatay|radyal" (renk geçişi), "golge":true, "opaklik", "olcek", "donus" (radyan), "hareket":[{{"o":"x|y|olcek|donus|opaklik|w|h|rx|ry|doluluk|cizim","den":a,"a":b,"t0":sn,"t1":sn,"egri":"yumusak|ziplama|cikis|lineer"}}] (en çok 4), "dongu":{{"titre":n,"yuz":n,"dondur":n,"salin":n,"nabiz":n}} (sürekli hareket).
+TÜRLER:
+- dikdortgen {{x,y,w,h,r(köşe yuvarlama),renk,renk2,gradyan,kenar,kalinlik,doluluk(0-1 dolum çubuğu),yon:"yatay|dikey"}}
+- daire {{x,y,r,renk,renk2,gradyan,halka(kalınlık: yalnızca çember çizer),cizim(0-1),kenar}}
+- elips {{x,y,rx,ry,renk,renk2,gradyan,kenar,kalinlik}}
+- yol {{x,y,noktalar:[[x,y],...],kapali,yumusak,renk,renk2,gradyan,kenar,kalinlik,cizim}}: HERHANGİ bir biçimi çizersin (dağ, yaprak, gövde, kanat, dalga, bina, bulut, bitki...). noktalar 3-28 adet ve (x,y) başlangıcına GÖRELİ; kapali:true doldurur; yumusak:true köşeleri yuvarlar; açık yolda cizim 0-1 yolun çizilme oranıdır.
+- yay {{x,y,r,a0,a1 (derece),renk,kalinlik,cizim}}
+- cizgi / ok {{x1,y1,x2,y2,renk,kalinlik,kesikli,cizim(0-1: çizilerek belirir)}}
+- yazi {{x,y,metin (en çok 30 harf),boyut (40-110),renk,hiza}}
+- ikon {{x,y,ad,olcek,renk,doluluk}}: ad yalnızca şunlardan: """ + SERBEST_IKONLAR + """
+- parcacik {{x,y,w,h,sayi,yon:"yukari|asagi|sag|sol|daire",renk,boyut,hiz}}
+- grup {{x,y,cocuklar:[2-30 eleman, iç içe grup yok]}}: bir nesnenin parçalarını birleştirir. Grubun x,y,olcek,donus,opaklik,hareket,dongu,golge değerleri çocuklara BİRLİKTE uygulanır (ör. tavuk = gövde+kafa+gaga+ibik+göz+kanat+bacaklar tek grup → birlikte sallanır, yürür). Çocukların koordinatları grubun merkezine göredir.
+Renkler: turuncu, mavi, yesil, kirmizi, sari, mor, pembe, beyaz, koyu, gri, kahve, siyah ya da #rrggbb.
+
+TASARIM İLKELERİ (24-48 eleman; gruplardaki çocuklar da sayılır):
+1) ARKA PLAN (4-8 eleman): zemin/gökyüzü/oda, gradyanlı büyük şekiller, ufuk, derinlik ögeleri (bulut, ağaç, raf, pencere, tepe...). Arka plan x 0-1080, y 300-1300 alanını TAMAMEN kaplasın (ilk eleman tam ekran gradyanlı dikdörtgen). Boş arka plan YOK. Renkleri gerçekçi seç (çim yeşil, gökyüzü mavi...); renk tonu sonradan değişmez.
+2) ANA NESNELER: her biri 6-14 parçalı grup; ayrıntılar (göz, parlama noktası, gölge, desen, çizgi), ikinci ton renk (renk2) ve gölge kullan. Tek şekilden oluşan nesne YOK; gerçekçi/sevimli düz illüstrasyon tarzı.
+3) SÜREÇ ANİMASYONU: parçalar anlatıyla aynı sırada belirsin ("t"), büyüsün, yer değiştirsin ("hareket"), oklar çizilsin ("cizim" 0→1), çubuk/sayaç dolsun ("doluluk"), parçacıklar aksın. Sahne boyunca HER an bir şey hareket etsin ("dongu").
+4) ETİKET ve SAYILAR: 3-6 kısa yazı; üst üste binmesin, ekran dışına taşmasın, okunur olsun (boyut ≥ 40), nesneleri örtmesin.
+5) KAMERA: "kamera":[[540,760,1.0],[540,740,1.12]] gibi yavaş bir yakınlaşma/kayma.
+6) 4-6 uyumlu renk; ana nesne arka plandan net ayrışsın.
+ÇOK ÖNEMLİ: Çıktı geçerli JSON olsun; sayılar sayı, metinler kısa olsun.
+Mini örnek (yalnızca biçim için): {{"tema":"mavi","kamera":[[540,760,1.0],[540,740,1.1]],"elemanlar":[{{"tur":"dikdortgen","x":540,"y":560,"w":1080,"h":420,"renk":"#2a6fb8","renk2":"#8fd0ff","gradyan":"dikey"}},{{"tur":"yol","x":0,"y":0,"kapali":true,"yumusak":true,"renk":"#3d8f4a","renk2":"#2a6b36","noktalar":[[0,900],[300,850],[650,890],[1080,850],[1080,1200],[0,1200]]}},{{"tur":"grup","x":540,"y":900,"golge":true,"dongu":{{"yuz":4}},"cocuklar":[{{"tur":"elips","x":0,"y":0,"rx":110,"ry":80,"renk":"#fff8e6","renk2":"#e8d9b8","gradyan":"dikey"}},{{"tur":"daire","x":90,"y":-70,"r":42,"renk":"#fff8e6"}},{{"tur":"daire","x":104,"y":-80,"r":6,"renk":"#10161f"}}]}},{{"tur":"yazi","x":540,"y":420,"metin":"ETİKET","boyut":56,"renk":"beyaz","t":[1,99]}},{{"tur":"ok","x1":300,"y1":700,"x2":420,"y2":800,"renk":"sari","t":[2,99],"hareket":[{{"o":"cizim","den":0,"a":1,"t0":2,"t1":3}}]}}],"etiket_noktalari":[]}}
+YALNIZCA JSON döndür: {{"tema":"...","kamera":[[x,y,zoom],[x,y,zoom]],"elemanlar":[...],"etiket_noktalari":[]}}"""
