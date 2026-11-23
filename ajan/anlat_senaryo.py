@@ -203,7 +203,11 @@ def params_temizle(tip, p):
         if len(g) < 25:
             raise ValueError("'resim' sahnesi için İngilizce görsel tarifi (params.gorsel, 25+ karakter) gerekli")
         od = p.get("odak") if isinstance(p.get("odak"), list) and len(p.get("odak")) == 2 else [0.5, 0.45]
-        return {"gorsel": g, "hareket": p.get("hareket") if p.get("hareket") in HAREKETLER else "yakin", "odak": [_sayi(od[0], 0.5, 0.15, 0.85), _sayi(od[1], 0.45, 0.2, 0.75)]}
+        r = {"gorsel": g, "hareket": p.get("hareket") if p.get("hareket") in HAREKETLER else "yakin", "odak": [_sayi(od[0], 0.5, 0.15, 0.85), _sayi(od[1], 0.45, 0.2, 0.75)]}
+        if isinstance(p.get("odak2"), list) and len(p.get("odak2")) == 2:
+            r["odak2"] = [_sayi(p["odak2"][0], 0.5, 0.15, 0.85), _sayi(p["odak2"][1], 0.45, 0.2, 0.75)]
+        r["katman_notu"] = _kisa(p.get("katman_notu"), 240)
+        return r
     if tip in ("kanca", "kapanis"):
         return {"ikon": p["ikon"]} if p.get("ikon") in IKONLAR else {}
     if tip == "sicak_uc":
@@ -374,8 +378,8 @@ Konu: {konu}
 KONU UYGUN DEĞİLSE (nefret/hakaret, siyaset, kişi hedefleme, sağlık/hukuk/yatırım TAVSİYESİ, şiddet, yetişkin içerik, tehlikeli talimat) hikâye yazma; yalnızca {{"uygunsuz": "kısa neden"}} döndür.
 
 VİDEO TÜM SAHNELER İÇİN TEK BİR GÖRSEL STİL kullanır: "stil" alanına İngilizce, konuya uygun tutarlı bir stil yaz (ör. "warm flat vector illustration, soft gradients, rich detail, consistent color palette" ya da "cinematic documentary photograph, natural light, shallow depth of field"). İnsan gerekiyorsa sade stilize figürler (detaylı yüz yok) tercih et.
-6 ile 9 sahne yaz. SAHNE TİPLERİ:
-- resim: tam ekran yapay zekâ görseli (videonun ana sahnesi; 4-7 tane). params: {{"gorsel": "İNGİLİZCE, 25-60 kelimelik DETAYLI görsel tarifi: ana nesne/olay, mekân, arka plan, ışık, renkler, kompozisyon; metin/yazı/logo YOK", "hareket": "yakin|uzak|sol|sag|yukari|asagi", "odak": [0.5, 0.45]}}
+7 ile 9 sahne yaz (hızlı tempo: her sahne ~5-7 sn). SAHNE TİPLERİ:
+- resim: tam ekran yapay zekâ görseli (videonun ana sahnesi; 5-8 tane; sahne başına TEK kısa cümle, hızlı tempo). params: {{"gorsel": "İNGİLİZCE, 25-60 kelimelik DETAYLI görsel tarifi: ana nesne/olay, mekân, arka plan, ışık, renkler, kompozisyon; metin/yazı/logo YOK", "hareket": "yakin|uzak|sol|sag|yukari|asagi", "odak": [0.5, 0.45], "katman_notu": "Görselin ÜSTÜNE animasyonla ne eklenecek (1 cümle, Türkçe): ör. aslanın üstünde nabız atan kırmızı halka ve 'MESAFE' etiketi; geri çekilmeyi gösteren ok; ev simgesi"}}
   Görsel tarifleri HER SAHNEDE FARKLI olsun (farklı mekân, plan ve açı: geniş plan, yakın plan, üstten, kesit, karşılaştırma...). Görselin alt üçte biri sade/koyu kalsın (altyazı için). Ana nesne ekranın ortasının biraz üstünde. "odak": ana nesnenin görseldeki yeri [yatay 0-1, dikey 0-1].
 - sayi: büyük halka sayaç (önemli bir sayı için; en çok 1). params: {{"deger": 65, "maks": 100, "birim": "%", "etiket": "kısa açıklama"}}
 - karsilastir: iki değeri sütunla karşılaştırır (en çok 1). params: {{"a": {{"ad": "Yaz", "deger": 5}}, "b": {{"ad": "Kış", "deger": 3}}, "birim": "adet"}}
@@ -384,10 +388,41 @@ VİDEO TÜM SAHNELER İÇİN TEK BİR GÖRSEL STİL kullanır: "stil" alanına �
 İlk sahne "resim" olsun (güçlü kanca görseli). Aynı kompozisyonu tekrarlama.
 TEKRARA DÜŞME: Her sahnenin "nokta" alanına o sahnede anlattığın TEK somut bilgiyi 3-8 kelimeyle yaz. Aşağıdaki, daha önceki videolarda ZATEN anlatılmış noktaları ve konuları TEKRAR ETME.
 {onceki}
-ANLATI: toplam 95-120 kelime (KESİN: 125'i geçme, video 58 sn'yi aşmasın); sahne başına 1-2 kısa cümle (8-18 kelime). İlk sahne güçlü kanca (soru ya da yaygın yanılgı). Cümleler kısa, konuşma dili, "sen" hitabı. Her sahnenin anlatısı o sahnenin görselini anlatsın. Son sahne yoruma davet + takip et.
+ANLATI: toplam 95-120 kelime (KESİN: 125'i geçme, video 58 sn'yi aşmasın); sahne başına TEK kısa cümle (8-15 kelime). İlk sahne güçlü kanca (soru ya da yaygın yanılgı). Cümleler kısa, konuşma dili, "sen" hitabı. Her sahnenin anlatısı o sahnenin görselini anlatsın. Son sahne yoruma davet + takip et.
 VURGU: önemli kelimeleri işaretle: *kelime* turuncu, ~kelime~ mavi. Her sahnede en çok 2 vurgu.
-EK ALANLAR (isteğe bağlı): "bolum": yeni bölüm başlığı (en çok 28 harf; ilk sahnede olmasın; 3-5 bölüm); "baslik": ekrana büyük yazı olarak zıplayan TEK kısa kelime (en çok 10 harf, tüm videoda en çok 2 sahnede); "etiketler": ["en çok 24 harflik kısa görsel etiketi"] (en çok 3 sahnede, görselin ana nesnesini adlandırır).
+EK ALANLAR (isteğe bağlı): "bolum": yeni bölüm başlığı (en çok 28 harf; ilk sahnede olmasın; 3-5 bölüm); "baslik": ekrana büyük yazı olarak zıplayan TEK kısa kelime (en çok 10 harf, tüm videoda en çok 2 sahnede); "etiketler": [] bırak (etiketler "resim" sahnelerinde katman_notu ile eklenir).
 GÜVENLİK/ACİL DURUM VE HABER KONULARI: Tehlike, güvenlik ya da güncel olay içeren konularda yalnızca resmî kurumların ve uzmanların GENEL KABUL GÖREN tavsiyelerini ver (yetkililere haber ver: Türkiye'de 112, güvenli kapalı alana çekil, uzak dur, kahramanlık yapma); kesin garanti verme, riskli davranış özendirme. Olayı gerçekmiş gibi anlatma: "diyelim ki / eğer karşılaşırsan" çerçevesi kur; yer, kişi ve kurum adı uydurma. Konu esprili anlatılsın denmişse hafif, zekice, kimseyle alay etmeyen espriler yap; bilgi her zaman doğru ve net kalsın.
 DOĞRULUK: Yalnızca yaygın kabul gören, doğru bilgileri yaz. Emin olmadığın sayıyı verme; "yaklaşık", "genellikle" kullan. İstatistik, fiyat, marka karşılaştırması, kişisel deneyim, bilimsel iddia UYDURMA. Tartışmalı konuda dengeli konuş. Yasak sözcükler: mükemmel, harika, muhteşem, inanılmaz. Sayıları anlatıda yazıyla yaz.
 YALNIZCA JSON döndür: {{"konu":"...","stil":"...","baslik":"arama odaklı en çok 70 karakter","aciklama":"2-3 kısa satır, son satır yorum daveti","etiketler":["konuyla ilgili","3-6 etiket"],
 "sahneler":[{{"tip":"resim","anlati":"...","nokta":"3-8 kelimelik tek bilgi","bolum":"","baslik":"","etiketler":[],"params":{{"gorsel":"...","hareket":"yakin","odak":[0.5,0.45]}}}}]}}"""
+
+
+def katman_params(j):
+    """'Katman ressamı' çıktısını (görsele yapışık animasyonlu ögeler) güvenli biçime indirger. Dönen: eleman listesi (en az 3, en çok 20) ya da ValueError."""
+    els = [ozel_eleman(e) for e in (j.get("elemanlar") if isinstance(j, dict) and isinstance(j.get("elemanlar"), list) else [])[:20]]
+    els = [e for e in els if e]
+    if len(els) < 3:
+        raise ValueError(f"katmanda en az 3 geçerli eleman gerekli ({len(els)})")
+    if not any(e["tur"] in ("yazi", "yol", "ok", "daire", "ikon", "grup") for e in els):
+        raise ValueError("katmanda işaret/etiket ögesi yok")
+    return els
+
+
+ISTEM_KATMAN = """Sen bir hareketli grafik ressamısın. Bir bilgi videosunun tam ekran görselinin ÜSTÜNE binen, animasyonlu bir KATMAN tasarla: oklar, nabız atan halkalar, kısa etiketler, sayılar, parıltılar, simgeler, hız çizgileri, konuşma balonları. Katman görsele YAPIŞIKTIR (kamera hareket ederken nesneyle birlikte hareket eder).
+Video konusu: {konu}
+Sahne anlatısı ve KELİME ZAMANLARI (sahne başından saniye): {anlati}
+Sahnenin görseli: {gorsel}
+Görselde ne nerede (görsel koordinatı; görsel 1024 x 1536 pikseldir, x 0-1024, y 0-1536): {nesneler}
+Ana odak noktası: ({ox}, {oy}); ikinci plan (yakın çekim) odağı: ({ox2}, {oy2}).
+Sahne süresi: yaklaşık {sure} sn. Ögeler anlatıdaki ilgili kelime söylenirken belirsin ("t":[giriş, çıkış] kelime zamanlarına göre; çıkış için 99 yaz ya da sahne süresinden önce bir an).
+
+KURALLAR:
+- 5-12 eleman. Görseli örtme: tam ekran dolgu, büyük yarı saydam bloklar YOK. Ögeler küçük/orta olsun, nesnelerin ÜSTÜNDE ya da YANINDA, yukarıda verilen konumlara göre yerleştirilsin (ok ucu gerçekten o nesneyi göstersin).
+- Güvenli alan: x 130-900, y 280-1250 (görsel koordinatı); alt kısım altyazıya ayrılmıştır, oraya yazı koyma.
+- Yazılar kısa (en çok 18 harf), boyut 46-80, okunur renk (beyaz/sarı + koyu kontur otomatik), üst üste binmesin.
+- Her an biraz hareket olsun: "dongu" (nabiz/yuz/salin/titre), "hareket" (olcek, opaklik, cizim 0→1 ile oklar çizilsin, x/y kayma).
+- Bilgiye hizmet et: tehlike/uyarı ise kırmızı/sarı, güvenli yön ise yeşil; sayı varsa sayıyı göster.
+KOORDİNAT/ALANLAR: ortak: "t":[giriş_sn,çıkış_sn], "renk","renk2"+"gradyan","golge","opaklik","olcek","donus"(radyan),"hareket":[{{"o":"x|y|olcek|donus|opaklik|w|h|rx|ry|doluluk|cizim","den":a,"a":b,"t0":sn,"t1":sn,"egri":"yumusak|ziplama|cikis|lineer"}}],"dongu":{{"titre":n,"yuz":n,"dondur":n,"salin":n,"nabiz":n}}.
+TÜRLER: daire {{x,y,r,renk,halka(kalınlık: yalnızca çember),cizim}}; elips {{x,y,rx,ry,renk,halka}}; yay {{x,y,r,a0,a1,renk,kalinlik,cizim}}; cizgi/ok {{x1,y1,x2,y2,renk,kalinlik,kesikli,cizim}}; yazi {{x,y,metin,boyut,renk,hiza}}; ikon {{x,y,ad,olcek}} ad: """ + SERBEST_IKONLAR + """; yol {{x,y,noktalar:[[x,y],...],kapali,yumusak,renk,kenar,kalinlik,cizim}}; parcacik {{x,y,w,h,sayi,yon,renk,boyut,hiz}}; grup {{x,y,cocuklar:[...]}}. Renkler: turuncu, mavi, yesil, kirmizi, sari, mor, pembe, beyaz, koyu, gri, kahve, siyah ya da #rrggbb.
+Mini örnek (biçim için): {{"elemanlar":[{{"tur":"daire","x":500,"y":900,"r":120,"renk":"kirmizi","halka":10,"t":[0.8,99],"dongu":{{"nabiz":0.08}}}},{{"tur":"ok","x1":700,"y1":600,"x2":560,"y2":800,"renk":"sari","kalinlik":12,"t":[1.2,99],"hareket":[{{"o":"cizim","den":0,"a":1,"t0":1.2,"t1":1.8}}]}},{{"tur":"yazi","x":720,"y":560,"metin":"KOŞMA!","boyut":70,"renk":"sari","t":[1.4,99]}}]}}
+YALNIZCA JSON döndür: {{"elemanlar":[...]}}"""
