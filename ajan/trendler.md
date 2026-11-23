@@ -1,88 +1,100 @@
 # Güncel trendler
 
-- **Araştırma zamanı:** 2026-11-23T03:30:49Z
-- **Doğrulanan öneri:** 0 / 11
+- **Araştırma zamanı:** 2026-11-23T06:36:14Z
+- **Doğrulanan öneri:** 12 / 12
 
-## Hollow flying ring spiral oyuncak
-- **Neden trend:** Printables’ta Toys & Games altında son 30 günde “Hollow Flying Ring” ve benzeri print-in-place oyuncaklar öne çıkıyor; aynı sayfada fidget/oyuncak türleri yüksek görünürlük ve indirme alıyor. Reddit tarafında da oyun/oyuncak ve “top print” dili, kısa video için iyi çalışan görsel döngü ürünlere işaret ediyor.
-- **Basılabilir:** evet. Evet; çoğu FDM yazıcıda küçük destekle ya da desteksiz basılabilen, tek parça mekanik bir oyuncaktır.
-- **Bizim açımız:** “Doktor Filament, bu halkayı atınca neden daha uzağa gidiyor?” diye fizik-mekanik odaklı, testli bir anlatım.
-- **Kategori:** oyuncak/oyun/bulmaca · **Format:** reels · **Güven:** dusuk · **Risk:** yok
-- Kaynak: doğrulanamadı (zayıf öneri)
+## Şişe damlama tepsili balkon saksı askısı
+- **Neden trend:** Printables’ta son 30 gün trend listesindeki dekoratif/ev-odaklı baskılar arasında saksı ve yerleşim çözümleri öne çıkıyor; ayrıca yakın dönemde hidden drip tray’li organizer ve modern plant pot örnekleri görülüyor. Bu, su damlatmayı kontrol eden küçük balkon çözümlerine ilginin sürdüğünü gösteriyor.
+- **Basılabilir:** evet. Evet. Orta boy FDM yazıcıda, destek gerektirmeden veya az destekle basılabilecek basit geometriye uygun; dış mekânda kullanılacağı için PETG/ASA daha uygun olur.
+- **Bizim açımız:** “Balkonunda damlayan su yüzünden alt komşu krizi mi var? Doktor Filament bir saksıyı nasıl iz bırakmadan askıya alır, gösteriyor.”
+- **Kategori:** bahçe/balkon · **Format:** reels · **Güven:** orta · **Risk:** yok
+- Kaynak: https://www.printables.com/model?category=30
+- Kaynak: https://www.printables.com/model/1707795-basim-long-rounded-modern-organizer-with-hidden-dr
 
-## Katlanır masa üstü kablo geçiş klipsi
-- **Neden trend:** r/3dprinting’de son 7 günlük sinyallerde kullanım kolaylığı, başlangıç seviyesi ve pratik baskılar öne çıkıyor; kablo yönetimi/masa düzeni bu dalganın doğal uzantısı. All3DP’de de filament ve üretkenlik araçlarına yönelik yoğun haber akışı var; bu da düzenleyici aksesuar içeriklerinin hâlâ ilgi çektiğini gösteriyor.
-- **Basılabilir:** evet. Evet; küçük, tek malzemeli ve ev tipi yazıcıya uygun bir masa aksesuarı.
-- **Bizim açımız:** “Doktor Filament’in kablo kaosunu tek hamlede sakinleştiren minik çözüm.”
-- **Kategori:** teknoloji aksesuarı (telefon/bilgisayar/kablo) · **Format:** carousel · **Güven:** dusuk · **Risk:** yok
-- Kaynak: doğrulanamadı (zayıf öneri)
+## Köşeye takılan güçlü 90° raf destek braket
+- **Neden trend:** Printables aramasında güçlü köşe destekleri ve 90° bracket’ler aktif sonuçlar veriyor; bu tip parçalar, pratik tamir ve DIY montaj içerikleriyle sık eşleşiyor. Son haftalarda Reddit’te de “print it instead of buying hardware” yaklaşımı öne çıkıyor.
+- **Basılabilir:** evet. Evet. Küçük-orta boy FDM yazıcıyla rahat basılır; ana konu boyut ve malzeme dayanımıdır, köşe taşıyıcıda PETG tercih edilir.
+- **Bizim açımız:** “Bir vida deliği bile kurtarıcı olabilir: kırık rafı çöpe atmadan önce Doktor Filament’in köşe desteği taktiği.”
+- **Kategori:** tamir/yedek parça · **Format:** carousel · **Güven:** orta · **Risk:** yok
+- Kaynak: https://www.printables.com/search/models?q=tag%3Awinkel
 
-## Duvara monte hortum/şişe askısı yerine balkonda saksı damlama klipsi
-- **Neden trend:** Maker ve genel 3D baskı haberlerinde son haftalarda ‘pratik, günlük hayatı kolaylaştıran’ parçalar öne çıkarken, Printables’ta da fonksiyonel nesneler trendin güçlü bir ayağı olmaya devam ediyor. Balkonda sulama ve damlama kontrolü, Türkiye’de mevsimsel kullanım açısından da güçlü bir konu.
-- **Basılabilir:** evet. Evet; açık hava kullanımı için PETG/ASA ile rahat basılabilir.
-- **Bizim açımız:** “Balkonda su damlasını bile yöneten küçük mühendislik.”
-- **Kategori:** bahçe/balkon · **Format:** carousel · **Güven:** dusuk · **Risk:** yok
-- Kaynak: doğrulanamadı (zayıf öneri)
+## Masa altı kablo rotalama rayı
+- **Neden trend:** Reddit’te masa altı kablo yönetimi son aylarda çok güçlü bir paylaşım konusu oldu; paylaşımlar içinde Printables’taki cable management çözümlerine doğrudan referans veriliyor. Bu, kablo kanalı ve rotalama parçalarının hâlâ yüksek ilgi gördüğünü gösteriyor.
+- **Basılabilir:** evet. Evet. Çoğu masa altı kablo rayı tek parça veya modüler FDM baskıya uygundur; uzun parçalar için yatay baskı ve PETG önerilir.
+- **Bizim açımız:** “Kablolarınız görünmüyorsa düzenlisiniz demektir. Doktor Filament masa altını görünmez altyapıya çeviriyor.”
+- **Kategori:** teknoloji aksesuarı · **Format:** carousel · **Güven:** yuksek · **Risk:** yok
+- Kaynak: https://www.reddit.com/r/DeskCableManagement/comments/1t0pubq/i_spent_a_week_3d_printing_cable_channels_for_my/
+- Kaynak: https://www.printables.com/model/1765803-easy-to-install-cable-organizer/related
 
-## Bisiklet için reflektörlü kablo/telefon çantası bağlantı aparatı
-- **Neden trend:** Reddit’te performans, kullanım ve ‘support setting’ gibi teknik konuşmalar yükselirken, bisiklet aksesuarları her zaman görsel ve işlevsel bir kategori olarak öne çıkıyor. Kısa videoda tak-çıkar, titreşim ve gece görünürlüğü gibi çekici anlar üretir.
-- **Basılabilir:** evet. Evet; baskı boyutu küçük ve standart ev tipi yazıcıya uygun.
-- **Bizim açımız:** “Doktor Filament, gece bisikletini görünür kılan mini parça avında.”
-- **Kategori:** araç/bisiklet · **Format:** reels · **Güven:** dusuk · **Risk:** yok
-- Kaynak: doğrulanamadı (zayıf öneri)
+## Çok hafif boomerang oyuncak
+- **Neden trend:** Printables Toys & Games trend listesindeki son 30 gün içinde boomerang V5, Hollow Flying Ring ve Mini Whistle gibi hafif, havada hareket eden oyuncaklar öne çıkıyor. Bu, “izlemesi tatmin edici” kısa video içeriğinin çalıştığını gösteriyor.
+- **Basılabilir:** evet. Evet. Hafif bir FDM baskı olarak kolayca üretilebilir; güvenli kullanım için açık alan gerekir.
+- **Bizim açımız:** “Atölyede en az malzemeyle en büyük etki: Doktor Filament’in havada geri dönen oyuncak hilesi.”
+- **Kategori:** oyuncak/oyun/bulmaca · **Format:** reels · **Güven:** orta · **Risk:** yok
+- Kaynak: https://www.printables.com/model?category=30
 
-## Mama kabı için yavaşlatıcı insert bulmaca
-- **Neden trend:** Printables’ta son 30 günde oyun ve bulmaca türleri güçlü; aynı yaklaşım evcil hayvan aksesuarlarına da çok iyi oturuyor. Bu tür parçalar hem işlevsel hem de görsel olarak ‘önce-sonra’ anlatımı için uygun.
-- **Basılabilir:** evet. Evet; basit geometriyle ev tipi yazıcıda rahat üretilebilir.
-- **Bizim açımız:** “Doktor Filament, mama saatini küçük bir bulmacaya çeviriyor.”
-- **Kategori:** evcil hayvan · **Format:** carousel · **Güven:** dusuk · **Risk:** yok
-- Kaynak: doğrulanamadı (zayıf öneri)
+## Fotoğraf kağıdı için katlanır seyahat kutusu
+- **Neden trend:** Printables’ta Travel Essentials koleksiyonunda seyahat için taşınabilir kutu ve kapaklı düzenleyiciler hâlâ görünür durumda; benzer şekilde ‘easy to open’ ve ‘replacement’ odaklı pratik çözümler ilgi görüyor. Bu tür ürünler kısa videoda “çantaya at ve çık” anlatımına uygun.
+- **Basılabilir:** evet. Evet. Küçük hacimli, tek veya iki parçalı FDM baskıya uygundur; menteşe varsa tolerans ayarı gerekebilir.
+- **Bizim açımız:** “Valizde ezilen kartlar, fişler, fotoğraflar? Doktor Filament bir seyahat kutusunu mini koruma kalkanına çeviriyor.”
+- **Kategori:** kamp/seyahat · **Format:** carousel · **Güven:** orta · **Risk:** yok
+- Kaynak: https://www.printables.com/contest/404-travel-essentials
+- Kaynak: https://www.printables.com/model/1765803-easy-to-install-cable-organizer/related
 
-## Çekmeceye takılan gizli ölçü kağıdı/etiket tutucu
-- **Neden trend:** Pratik masaüstü düzenleyiciler ve üretkenlik odaklı parçalar, Reddit ve model platformlarında sürekli ilgi görüyor; yeni başlayan kitlenin ‘hemen işe yarayan’ çözümlere tepkisi güçlü. Bu konu, organizer klişesine düşmeden daha ince ve işlevsel bir alt kategori sunuyor.
-- **Basılabilir:** evet. Evet; küçük, kolay ve çoğunlukla destek gerektirmeyen bir baskı.
-- **Bizim açımız:** “Doktor Filament’in görünmeyen ama işe yarayan ofis hilesi.”
-- **Kategori:** ofis/okul · **Format:** carousel · **Güven:** dusuk · **Risk:** yok
-- Kaynak: doğrulanamadı (zayıf öneri)
-
-## Kapaklı sürgülü makine anahtarı kilit etiketi
-- **Neden trend:** All3DP ve 3DPrint.com’daki son haber akışı üretim, işlevsellik ve endüstriyel verimlilik etrafında dönüyor; atölye güvenliği ve küçük etiketleyiciler bu havayla uyumlu. Ayrıca Reddit’te teknik çözüm ve kullanım odaklı içerikler yükselişte.
-- **Basılabilir:** evet. Evet; çoğu atölye yazıcısı için uygun, küçük ve dayanıklı bir parça.
-- **Bizim açımız:** “Doktor Filament, atölyede yanlış anahtarı bir daha unutturmuyor.”
+## Kilitlenebilir makine anahtarı etiketi kapağı
+- **Neden trend:** Printables’ta travel ve repair odaklı koleksiyonlarda küçük, işlevsel kapaklar ve etiket/clip çözümleri öne çıkıyor; ayrıca organize etme ve etiketleme teması geniş ilgi görüyor. Bu tip güvenlik-etiket parçaları atölye kitlesine çok iyi oturuyor.
+- **Basılabilir:** evet. Evet. Küçük ölçekte, baskı sonrası kolay monte edilebilir; fakat gerçek makine güvenliği için tasarımın mekanik uyumu kritik.
+- **Bizim açımız:** “Atölyede yanlış anahtar yanlış makineyi açmasın: Doktor Filament, tek parça yerine okunabilir sistem kuruyor.”
 - **Kategori:** atölye/el aleti · **Format:** carousel · **Güven:** dusuk · **Risk:** yok
-- Kaynak: doğrulanamadı (zayıf öneri)
+- Kaynak: https://www.printables.com/contest/404-travel-essentials
 
-## Yılbaşı için kişiselleştirilebilir isimli kar tanesi süsü
-- **Neden trend:** Kasım sonu, yılbaşı süsleri için doğru zaman; kısa video ve carousel’de kişiselleştirme iyi çalışır. Printables’ta trend olan görsel, hızlı tüketilen küçük objeler arasında süsler güçlü bir sezonluk seçenek.
-- **Basılabilir:** evet. Evet; düşük malzeme tüketimiyle hızlı basılır.
-- **Bizim açımız:** “Doktor Filament bu yıl ağacı ‘kendi tasarımın’ hissiyle süslüyor.”
-- **Kategori:** hediye/mevsimsel · **Format:** reels · **Güven:** dusuk · **Risk:** yok
-- Kaynak: doğrulanamadı (zayıf öneri)
+## Telefon için manyetik kablo kilit klipsi
+- **Neden trend:** Printables’ta cable clip / cable organizer aramaları doğrudan sonuç veriyor ve Reddit’te kablo yönetimi paylaşımları yüksek etkileşim alıyor. Masa üstü ve telefon çevresi için tak-çıkar çözümler, genel organizer trendinin en görünür alt kolu.
+- **Basılabilir:** evet. Evet. Küçük FDM baskı için ideal; esnek mandal kısmı varsa malzeme seçimi önemli olabilir.
+- **Bizim açımız:** “Telefon şarjı masadan kaçmasın: Doktor Filament kabloyu tek elle kilitleyen küçük ama zeki parçayı gösteriyor.”
+- **Kategori:** teknoloji aksesuarı · **Format:** reels · **Güven:** yuksek · **Risk:** yok
+- Kaynak: https://www.printables.com/model/1765803-easy-to-install-cable-organizer/related
+- Kaynak: https://www.reddit.com/r/DeskCableManagement/comments/1t0pubq/i_spent_a_week_3d_printing_cable_channels_for_my/
 
-## Kör nokta için kapı kolu arkasına takılan askı aparatı
-- **Neden trend:** Ev içi günlük çözüm parçaları, platformlarda sürekli kalıcı ilgi görüyor; özellikle mutfak ve giriş alanı için küçük askılar yaygın ama hâlâ paylaşılabilir formatta. Daha dar ve “tek problem-tek çözüm” yaklaşımı yeni başlayan izleyicide iyi karşılık bulur.
-- **Basılabilir:** evet. Evet; küçük ve yazıcı dostu bir kullanım parçası.
-- **Bizim açımız:** “Doktor Filament’in eve girerken elindekileri yere düşürmeyen mini çözümü.”
-- **Kategori:** ev/mutfak · **Format:** carousel · **Güven:** dusuk · **Risk:** yok
-- Kaynak: doğrulanamadı (zayıf öneri)
+## Köpek mama kabı için devrilme önleyici halka
+- **Neden trend:** Doğrudan pet-bowl trend listesi yerine, Printables’ta organizer ve hidden drip tray gibi pratik günlük çözümler son dönemde öne çıkıyor; evcil hayvan besleme alanı da bu işlevsel “temiz kullanım” damarına çok uygun. Ancak elimde doğrudan pet-bowl trend sayfası yok, bu yüzden kanıt dolaylıdır.
+- **Basılabilir:** evet. Evet. Basit halka/çerçeve formu nedeniyle kolay basılır; kaymaz taban için TPU veya kauçuk ek faydalı olur.
+- **Bizim açımız:** “Mama kabı kayıp devriliyorsa sorun köpekte değil, zemindedir. Doktor Filament küçük bir halka ile düzeni geri getiriyor.”
+- **Kategori:** evcil hayvan · **Format:** carousel · **Güven:** dusuk · **Risk:** yok
+- Kaynak: https://www.printables.com/model/1707795-basim-long-rounded-modern-organizer-with-hidden-dr
 
-## Kamp termosu için taşınabilir kapak standı
-- **Neden trend:** All3DP’nin son haber akışı ‘pratik, taşınabilir, üretim kolay’ temalı ürünlere yoğunlaşıyor; seyahat/kamp için hafif aparatlar da bu çizgiye uyuyor. Görsel olarak da masa üstünde kısa, anlaşılır bir demo üretir.
-- **Basılabilir:** evet. Evet; küçük, az malzemeli ve ev tipi FDM yazıcı için uygun.
-- **Bizim açımız:** “Doktor Filament, kamp masasında kapağı nereye koyacağını çözüyor.”
-- **Kategori:** kamp/seyahat · **Format:** carousel · **Güven:** dusuk · **Risk:** yok
-- Kaynak: doğrulanamadı (zayıf öneri)
+## Masaüstü mini tirbuşon değil, şişe kapağı açma kolu
+- **Neden trend:** Printables’ta dekoratif ama işlevsel ev objeleri, organizer ve kitchen çözümleriyle beraber yükseliyor; bu tarz basit mekanik parçalar kısa videoda “çok küçük ama çok işe yarıyor” etkisi veriyor. Doğrudan trend sayfasında mutfak objeleri görünür durumda.
+- **Basılabilir:** evet. Evet. Küçük FDM baskı olarak basılabilir; ancak gıda temasından çok yardımcı araç olarak konumlamak daha güvenlidir.
+- **Bizim açımız:** “Birkaç gram plastik, birkaç saniyelik kol hareketi: Doktor Filament mutfakta minik mekanik sihir yapıyor.”
+- **Kategori:** ev/mutfak · **Format:** reels · **Güven:** dusuk · **Risk:** yok
+- Kaynak: https://www.printables.com/tag/decorative
+- Kaynak: https://www.printables.com/model/1707795-basim-long-rounded-modern-organizer-with-hidden-dr
 
-## Kırılan düğme yerine takılan modüler vestiyer kancası kapağı
-- **Neden trend:** 3D printing haber sitelerinde tamir, yedek parça ve modüler çözüm temaları güçlü; Reddit’te de kullanım odaklı problem çözme yüksek etkileşim alıyor. Bu tip parçalar ‘evde kurtarıcı’ anlatımıyla iyi performans gösterir.
-- **Basılabilir:** evet. Evet; ölçüye göre uyarlanır ve çoğu yazıcıda basılabilir.
-- **Bizim açımız:** “Doktor Filament, bozulan parçayı çöpe değil tekrar eve döndürüyor.”
-- **Kategori:** tamir/yedek parça · **Format:** reels · **Güven:** dusuk · **Risk:** yok
-- Kaynak: doğrulanamadı (zayıf öneri)
+## Kapı kolu arkasına gizlenen ceket askısı
+- **Neden trend:** Bu fikir geçmişte çok kullanıldı, fakat şu an elimdeki taze kanıtlar daha çok organizer ve custom hook/clip tipinde yoğunlaşıyor; kapı arkası askı, bu genel kullanımın içinde hâlâ uygulanabilir bir alt konu. Arama sonuçlarında custom ve travel/organizer çizgisi güçlü.
+- **Basılabilir:** evet. Evet. Büyük hacim istemez; kapı boşluğuna göre ölçü ayarı yapılırsa FDM ile basılabilir.
+- **Bizim açımız:** “Sınıfta/evde çanta nereye asılacak derdi? Doktor Filament görünmez askıyı kapı kolunun arkasına saklıyor.”
+- **Kategori:** ofis/okul · **Format:** carousel · **Güven:** dusuk · **Risk:** yok
+- Kaynak: https://www.printables.com/contest/404-travel-essentials
+
+## Kayar kapaklı filament örnek kutusu
+- **Neden trend:** Printables’ta organizer, spool ve custom modüler sistemler son dönemde öne çıkıyor; filament örneklerini düzenleyen kutular bu ekosistemin doğal uzantısı. Özellikle spool ve atölye düzeniyle ilgili contest ve modeller bunu destekliyor.
+- **Basılabilir:** evet. Evet. Kutu formu FDM için çok uygun; baskı süresi orta olabilir ama teknik olarak zor değil.
+- **Bizim açımız:** “Filament artık sadece malzeme değil, koleksiyon. Doktor Filament numuneleri vitrinde değil, kullanılabilir düzende tutuyor.”
+- **Kategori:** atölye/el aleti · **Format:** carousel · **Güven:** orta · **Risk:** yok
+- Kaynak: https://www.printables.com/contest/500-upcycling-new-prusament-spools
+
+## Saksı için damlama kontrollü sulama hunisi
+- **Neden trend:** Balkon ve ev içi bitki çözümleri Printables’ta görünür; hidden drip tray’li organizer ve modern planter örnekleri su yönetimi temasının canlı olduğunu gösteriyor. Bu parça, klasik saksı aksesuarından daha ilginç ve görsel olarak anlatılabilir.
+- **Basılabilir:** evet. Evet. Basit tek parça geometriyle basılabilir; dış ortamda dayanım için PETG önerilir.
+- **Bizim açımız:** “Sulama yaparken etrafı batıranlara çözüm: Doktor Filament suyu kökten değil, kontrollü bir huniden indiriyor.”
+- **Kategori:** bahçe/balkon · **Format:** reels · **Güven:** dusuk · **Risk:** yok
+- Kaynak: https://www.printables.com/model/1707795-basim-long-rounded-modern-organizer-with-hidden-dr
 
 ## Aşırı kullanılan (kaçın)
-- articulated dragon / flexi dragon
-- dummy 13 / flexi fidget anahtarlık
-- kutu organizer / masa üstü çekmece
-- whistle anahtarlık
-- basit cable clip / spool holder
+- hollow flying ring spiral oyuncak
+- catapult/fidget silah benzeri oyuncaklar
+- gridfinity kutular
+- klasik cable clip / cable holder
+- sıradan Benchy varyasyonları
