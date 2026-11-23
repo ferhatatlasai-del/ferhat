@@ -316,7 +316,7 @@ def calis(a):
     rapor_d = rapor_d or {}
     bugun = simdi_tr().strftime("%Y-%m-%d")
     kalan = GUNLUK_ISLEM - sum(1 for d in rapor_d.get("defter", []) if str(d.get("zaman", ""))[:10] == bugun and d.get("durum") == "yapildi")
-    hafiza = [f"{d.get('zaman', '')[:10]} {d.get('eylem')} → {d.get('durum')}: {str(d.get('ayrinti'))[:60]}" for d in rapor_d.get("defter", [])[-8:]]
+    hafiza = [f"{d.get('zaman', '')[:10]} {d.get('eylem')} → {d.get('durum')}: {str(d.get('ayrinti'))[:60]}" for d in rapor_d.get("defter", [])[-14:] if "onayla önerisi" not in str(d.get("ayrinti"))][-8:]   # eski hatalı "onayla" kayıtları anomali alarmı üretmesin
     eylemler = EYLEM_2 + ("\n" + EYLEM_3 if kademe >= 3 else "")
     bilgi_dosyasi = pathlib.Path(__file__).resolve().parent.parent / "yonetici" / "bilgi.md"
     sistem = SISTEM.format(kademe=kademe, kademe_aciklama=KADEME_ACIKLAMA[kademe], eylemler=eylemler, bilgi=(bilgi_dosyasi.read_text(encoding="utf-8")[:4500] if bilgi_dosyasi.exists() else "(yok)"))
