@@ -193,6 +193,31 @@
         "Yorum modu otomatik görünüyor; senin sınırına göre bunu ben değiştiremem, sadece riskli yanıtlar için ara sıra kontrol etmeni öneririm."
       ],
       "eylem_sayisi": 0
+    },
+    {
+      "zaman": "2026-11-23 18:31",
+      "kademe": 2,
+      "model": "OpenAI (gpt-5.4)",
+      "rapor": [
+        "Acil: otomatik hat bugün art arda 4 video reddetmiş; gerekçeler teknik tutarsızlık, anlatı-görüntü uyumsuzluğu ve tekrar. Mod açık ama bunu ben değiştiremiyorum.",
+        "Acil: kanal odağı dışına çıkan içerikler var; 'Tavuk yumurtayı nasıl üretir?' onay bekliyor, 'Şehirde aslan görürsen ne yapmalısın?' ise bugün yayınlanmış görünüyor. Bu, 3D baskı odağı ve itibar için risk.",
+        "Sağlık tarafında genel durum iyi görünüyor; Instagram, YouTube, OpenAI ve ofis sunucusu çalışıyor. Son 24 saatte Nöbetçi için 1 başarısız iş akışı kaydı var; ayrıntı veri yok.",
+        "Hikâye sistemi aktif ve günlük sayı 6; kuyrukta 8 planlı hikâye var. Bütçe tavanı 7 USD, şu özette aşım bilgisi yok.",
+        "Yorum sistemi otomatik modda çalışıyor görünüyor; bu modu ben değiştirmedim. Bugün 5 yorum gönderilmiş, bekleyen yok.",
+        "Onay bekleyen tek taslak kanal dışı konu olduğu için sahibin incelemesi için işaretledim; yanlış onay riskini azaltmak istedim."
+      ],
+      "oneriler": [
+        "Panelden otomatik hat açık kaldığı için bugün 20:05 turunda da benzer hata riski var; bu akşam üretimleri özellikle kontrol et.",
+        "Üretim istemine kanal dışı konu sızmasını engelleyecek net bir filtre ekle: yalnızca 3D yazıcı, filament, baskı sorunları, bakım ve başlangıç rehberleri.",
+        "Bambu Lab başlıklı içeriklerde marka/ürün bağlantı izlenimini azaltmak için açıklamaya bağımsızlık notu eklenmesini değerlendir.",
+        "Son iyi performans veren kalıplara yakın ama yeni konular seç: ilk katman, tabla temizliği, stringing, nemli filament gibi; A1'e özel deniyorsa gerçekten modele özgü nokta olsun.",
+        "Nöbetçi'nin son başarısız çalışmasının nedenini loglardan kontrol et; tekrar ederse ben yeniden tetiklemeyi önerebilirim."
+      ],
+      "uyarilar": [
+        "Bugün yayınlanmış görünen 'Şehirde aslan görürsen ne yapmalısın?' içeriği kanal amacıyla uyumsuz ve güven/konumlandırma riski taşıyor.",
+        "Otomatik hat modunu ben değiştiremem; art arda ret sürerse panelden deneme veya kapalı moda almayı sen değerlendirmelisin."
+      ],
+      "eylem_sayisi": 1
     }
   ],
   "defter": [
@@ -271,6 +296,19 @@
       "neden": "Çeşitlilik ve tekrar riskini işaretlemek",
       "durum": "yapildi",
       "ayrinti": "s20261122-185523: incele önerisi"
+    },
+    {
+      "zaman": "2026-11-23 18:31",
+      "kademe": 2,
+      "eylem": "taslak_isaretle",
+      "params": {
+        "id": "s20261123-064337",
+        "oneri": "reddet",
+        "not": "Konu 3D baskı kanalı odağı dışında; başlık ve içerik kanal amacıyla uyumsuz."
+      },
+      "neden": "Kanal odağını korumak ve itibar riskini azaltmak",
+      "durum": "yapildi",
+      "ayrinti": "s20261123-064337: reddet önerisi"
     }
   ]
 }
