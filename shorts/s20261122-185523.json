@@ -15,13 +15,55 @@
     "tur": "seri"
   },
   "zamanlama": [
-    {"tip": "kanca", "t0": 0.0, "t1": 6.52, "ses_son": 6.02},
-    {"tip": "kontrol_listesi", "t0": 6.52, "t1": 11.47, "ses_son": 10.97},
-    {"tip": "ilk_katman", "t0": 11.47, "t1": 19.68, "ses_son": 19.18},
-    {"tip": "sayi", "t0": 19.68, "t1": 25.67, "ses_son": 25.17},
-    {"tip": "warping", "t0": 25.67, "t1": 33.34, "ses_son": 32.84},
-    {"tip": "katman", "t0": 33.34, "t1": 39.48, "ses_son": 38.98},
-    {"tip": "kontrol_listesi", "t0": 39.48, "t1": 47.45, "ses_son": 46.95},
-    {"tip": "kapanis", "t0": 47.45, "t1": 55.06, "ses_son": 52.66}
-  ]
+    {
+      "tip": "kanca",
+      "t0": 0.0,
+      "t1": 6.52,
+      "ses_son": 6.02
+    },
+    {
+      "tip": "kontrol_listesi",
+      "t0": 6.52,
+      "t1": 11.47,
+      "ses_son": 10.97
+    },
+    {
+      "tip": "ilk_katman",
+      "t0": 11.47,
+      "t1": 19.68,
+      "ses_son": 19.18
+    },
+    {
+      "tip": "sayi",
+      "t0": 19.68,
+      "t1": 25.67,
+      "ses_son": 25.17
+    },
+    {
+      "tip": "warping",
+      "t0": 25.67,
+      "t1": 33.34,
+      "ses_son": 32.84
+    },
+    {
+      "tip": "katman",
+      "t0": 33.34,
+      "t1": 39.48,
+      "ses_son": 38.98
+    },
+    {
+      "tip": "kontrol_listesi",
+      "t0": 39.48,
+      "t1": 47.45,
+      "ses_son": 46.95
+    },
+    {
+      "tip": "kapanis",
+      "t0": 47.45,
+      "t1": 55.06,
+      "ses_son": 52.66
+    }
+  ],
+  "admin_notu": "Konu son iyi izlenen ilk katman/yapışma videolarına çok yakın; tekrar riski ve sahne çeşitliliği sınırlı görünüyor.",
+  "admin_oneri": "incele"
 }
