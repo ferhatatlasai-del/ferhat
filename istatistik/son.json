@@ -1,17 +1,17 @@
 {
- "tarih": "2026-11-23T06:00:30Z",
- "tr_saat": "23.11.2026 09:00",
+ "tarih": "2026-11-23T06:35:05Z",
+ "tr_saat": "23.11.2026 09:35",
  "toplam": {
-  "reels": 17929,
+  "reels": 17977,
   "gonderi": 0,
   "short": 11254,
   "youtube_video": 0,
   "hikaye": 869,
-  "toplam": 30052,
+  "toplam": 30100,
   "begeni": 283,
   "yorum": 29
  },
- "fark": 203,
+ "fark": 48,
  "instagram": {
   "durum": "tamam",
   "izin": true,
@@ -26,8 +26,8 @@
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgD94j1CjjG/",
-    "izlenme": 457,
-    "erisim": 406
+    "izlenme": 495,
+    "erisim": 428
    },
    {
     "id": "18132478334487242",
@@ -37,8 +37,8 @@
     "begeni": 5,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/DgDWYKBE8DF/",
-    "izlenme": 1403,
-    "erisim": 1247
+    "izlenme": 1406,
+    "erisim": 1249
    },
    {
     "id": "18362708170216349",
@@ -48,8 +48,8 @@
     "begeni": 10,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/DgCmX1zj1CJ/",
-    "izlenme": 1261,
-    "erisim": 1136
+    "izlenme": 1267,
+    "erisim": 1143
    },
    {
     "id": "17945283843388099",
@@ -114,8 +114,8 @@
     "begeni": 30,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": 4022,
-    "erisim": 3572
+    "izlenme": 4023,
+    "erisim": 3578
    },
    {
     "id": "18289759651292671",
@@ -870,7 +870,7 @@
  },
  "eksikler": [],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 09:00",
-  "govde": "Toplam 30.052 (+203) · Reels 17.929 · Short 11.254 · Hikaye 869 · Takipçi 434 · En iyi Reels: Baskın tabladan kalkı 4.022"
+  "baslik": "📊 İzlenme raporu 09:35",
+  "govde": "Toplam 30.100 (+48) · Reels 17.977 · Short 11.254 · Hikaye 869 · Takipçi 434 · En iyi Reels: Baskın tabladan kalkı 4.023"
  }
 }
