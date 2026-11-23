@@ -24,8 +24,10 @@ import os
 import pathlib
 import re
 import shutil
+import math
 import subprocess
 import sys
+import tempfile
 import time
 import urllib.error
 import urllib.parse
@@ -41,6 +43,7 @@ GORSELLER = KOK / "hikaye" / "gorseller"
 ARSIV = KOK / "hikaye" / "arsiv.jsonl"
 MEDYA_RE = re.compile(r"^hikaye/gorseller/h[\w.-]+\.(jpg|mp4)$")
 MAKS_VIDEO_SN, MIN_VIDEO_SN = 60, 3
+MAKS_PARCA_SN, EN_COK_PARCA = 58.5, 4   # uzun video: en çok 4 hikaye parçası, her biri ≤ 58,5 sn
 VARSAYILAN = {"aktif": False, "mod": "otomatik", "gunluk_sayi": 4, "baslangic_saat": 10, "bitis_saat": 22,
               "gunler": [1, 2, 3, 4, 5, 6, 7], "min_aralik_dk": 60, "ardisik_hata": 0, "hata_siniri": 3, "son_not": "",
               "saklama_gun": 3}
@@ -269,16 +272,64 @@ def video_hazirla(o):
         print(f"Video hikayeye uygun ({b['g']}x{b['y']}, {b['sure']:.0f} sn); olduğu gibi kullanılacak.")
         return None
     cikti = GORSELLER / f"{o['id']}_hazir.mp4"
-    filtre = ("[0:v]split[a][b];[a]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=30:6,eq=brightness=-0.18[bg];"
-              "[b]scale=1080:1920:force_original_aspect_ratio=decrease[fg];[bg][fg]overlay=(W-w)/2:(H-h)/2,format=yuv420p[v]")
-    komut = ["ffmpeg", "-y", "-loglevel", "error", "-i", str(kaynak), "-filter_complex", filtre, "-map", "[v]"]
-    komut += ["-map", "0:a:0", "-c:a", "aac", "-b:a", "128k", "-ar", "44100", "-ac", "2"] if b["ses"] else ["-an"]
-    komut += ["-c:v", "libx264", "-preset", "veryfast", "-crf", "26", "-r", "30", "-movflags", "+faststart", "-t", str(MAKS_VIDEO_SN), str(cikti)]
-    r = subprocess.run(komut, capture_output=True, text=True)
-    if r.returncode != 0 or not cikti.exists():
-        raise IcerikHatasi("video dönüştürülemedi: " + (r.stderr or "")[-160:])
+    video_cevir(kaynak, cikti, b, 0, MAKS_VIDEO_SN)
     print(f"Video hikaye biçimine çevrildi: {b['g']}x{b['y']} -> 1080x1920 ({cikti.stat().st_size // 1024} KB).")
     return str(cikti.relative_to(KOK))
+
+
+def video_cevir(kaynak, cikti, b, bas, sure):
+    """kaynak videonun [bas, bas+sure] aralığını 1080x1920 H.264/AAC hikaye biçimine çevirir (dikey değilse bulanık arka planla)."""
+    filtre = ("[0:v]split[a][b];[a]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=30:6,eq=brightness=-0.18[bg];"
+              "[b]scale=1080:1920:force_original_aspect_ratio=decrease[fg];[bg][fg]overlay=(W-w)/2:(H-h)/2,format=yuv420p[v]")
+    komut = ["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{bas:.3f}", "-i", str(kaynak), "-t", f"{sure:.3f}", "-filter_complex", filtre, "-map", "[v]"]
+    komut += ["-map", "0:a:0", "-c:a", "aac", "-b:a", "128k", "-ar", "44100", "-ac", "2"] if b["ses"] else ["-an"]
+    komut += ["-c:v", "libx264", "-preset", "veryfast", "-crf", "26", "-r", "30", "-movflags", "+faststart", str(cikti)]
+    r = subprocess.run(komut, capture_output=True, text=True)
+    if r.returncode != 0 or not pathlib.Path(cikti).exists():
+        raise IcerikHatasi("video dönüştürülemedi: " + (r.stderr or "")[-160:])
+
+
+def kesim_noktalari(o, sure):
+    """>60 sn videoyu ≤ MAKS_PARCA_SN'lik parçalara bölen kesim zamanları; mümkünse taslaktaki sahne sınırlarında (konuşma ortasında kesilmesin)."""
+    sinirlar = []
+    for f in sorted((KOK / "shorts").glob("s*.json")):
+        try:
+            d = json.loads(f.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        if d.get("video") == o["gorsel"] and d.get("zamanlama"):
+            sinirlar = sorted(float(z["t1"]) for z in d["zamanlama"] if z.get("t1"))[:-1]
+            break
+    kes, son = [], 0.0
+    while sure - son > MAKS_PARCA_SN:
+        aday = [x for x in sinirlar if son + 15 <= x <= son + MAKS_PARCA_SN and sure - x >= 6]
+        if aday:
+            kes.append(max(aday))
+        else:
+            kalan = sure - son
+            kes.append(son + kalan / math.ceil(kalan / (MAKS_PARCA_SN - 0.5)))
+        son = kes[-1]
+    return kes
+
+
+def video_parcala(o):
+    """>60 sn video için hikaye parçaları (geçici dizinde 1080x1920 mp4 listesi); 60 sn ve altıysa None. 4 parçadan fazlası IcerikHatasi."""
+    kaynak = KOK / o["gorsel"]
+    b = video_bilgi(kaynak)
+    if b["sure"] <= MAKS_VIDEO_SN + 0.5:
+        return None
+    kes = kesim_noktalari(o, b["sure"])
+    if len(kes) + 1 > EN_COK_PARCA:
+        raise IcerikHatasi(f"video {b['sure']:.0f} sn; hikaye için en çok {EN_COK_PARCA} parçaya ({EN_COK_PARCA * 58} sn) bölünebilir")
+    sinirlar = [0.0] + kes + [b["sure"]]
+    dizin = pathlib.Path(tempfile.mkdtemp())
+    parcalar = []
+    for i in range(len(sinirlar) - 1):
+        cikti = dizin / f"p{i + 1}.mp4"
+        video_cevir(kaynak, cikti, b, sinirlar[i], sinirlar[i + 1] - sinirlar[i])
+        parcalar.append(cikti)
+    print(f"Uzun video {b['sure']:.0f} sn: {len(parcalar)} hikaye parçasına bölündü (kesimler: {', '.join(f'{x:.1f}' for x in kes)} sn).")
+    return parcalar
 
 
 def adres_hazir_mi(adres, sn=90):
@@ -305,13 +356,38 @@ def gorsel_adresi(o):
     return os.environ.get("HIKAYE_GORSEL_ADRESI") or f"https://raw.githubusercontent.com/{depo}/{sha}/{yol}"
 
 
-def hikaye_yayinla(o):
-    """Görseli hikaye olarak yayınlar. (medya_kimligi, link) döndürür."""
+def hikaye_yayinla(o, parcalar=None):
+    """Görseli hikaye olarak yayınlar. (medya_kimligi, link) döndürür. parcalar: uzun videonun hikaye parçaları (sırayla ayrı hikayeler olarak yayınlanır)."""
+    if parcalar:
+        return parcali_hikaye_yayinla(parcalar)
     kimlik = ig_ortak.kimlik()
     video = o.get("tur") == "video"
     adres = gorsel_adresi(o)
     if not os.environ.get("HIKAYE_GORSEL_ADRESI") and not adres_hazir_mi(adres):
         raise RuntimeError("Dosya adresi 90 sn içinde erişilebilir olmadı")
+    return hikaye_gonder(kimlik, adres, video)
+
+
+def parcali_hikaye_yayinla(parcalar):
+    """Uzun videonun parçalarını geçici dala yükler, sırayla hikaye olarak yayınlar, dalı siler. Son parçanın (medya_kimligi, link) değeri döner."""
+    import gecici_dal as GD
+    dal = "hikaye-gecici"
+    kimlik = ig_ortak.kimlik()
+    g = GD.yukle({p.name: p for p in parcalar}, dal)
+    try:
+        son = ("", "")
+        for p in parcalar:
+            adres = GD.raw_adres(p.name, dal)
+            if not GD.hazir_mi(adres):
+                raise RuntimeError(f"Parça adresi 90 sn içinde erişilebilir olmadı ({p.name})")
+            son = hikaye_gonder(kimlik, adres, True)
+            print(f"Hikaye parçası yayınlandı: {p.name} → {son[0]}")
+        return son
+    finally:
+        GD.sil(g, dal)
+
+
+def hikaye_gonder(kimlik, adres, video):
     anahtar = "video_url" if video else "image_url"
     kap = api("POST", f"{kimlik}/media", media_type="STORIES", **{anahtar: adres})["id"]
     deneme, aralik = (36, 10) if video else (12, 5)   # video işleme birkaç dakika sürebilir
@@ -397,9 +473,11 @@ def yayinla_komutu(a):
         return 1
 
     # 0) Video ise denetle/gerekirse dönüştür (içerik sorunu ajanı duraklatmaz, yalnızca o hikaye "hata" olur)
+    parcalar = None
     if oge.get("tur") == "video":
         try:
-            hazir = video_hazirla(oge)
+            parcalar = video_parcala(oge)
+            hazir = None if parcalar else video_hazirla(oge)
             if hazir:
                 oge["hazir"] = hazir
         except IcerikHatasi as e:
@@ -426,7 +504,7 @@ def yayinla_komutu(a):
 
     # 2) Yayınla
     try:
-        medya, link = hikaye_yayinla(oge)
+        medya, link = hikaye_yayinla(oge, parcalar)
     except Exception as e:
         ozet = hata_ozeti(e) if isinstance(e, urllib.error.HTTPError) else f"{type(e).__name__}: {str(e)[:200]}"
         print(f"Instagram hikaye hatası: {ozet}")

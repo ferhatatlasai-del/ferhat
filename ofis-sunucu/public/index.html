@@ -1265,7 +1265,8 @@ $('#pDosya').addEventListener('change',function(){
 });
 $('#pOnizle').addEventListener('loadedmetadata',function(){
   var d=this.duration, n=$('#pHkNot');
-  if(isFinite(d)&&d>60.5){ $('#pHk').checked=false; $('#pHk').disabled=true; n.textContent='Bu video '+Math.round(d)+' sn. Instagram hikayesi en fazla 60 sn olabilir, hikaye seçeneği kapatıldı (Reels ve Shorts için uygun).'; n.hidden=false; }
+  if(isFinite(d)&&d>60.5&&d<=230){ n.textContent='Bu video '+Math.round(d)+' sn. Instagram hikayesi en fazla 60 sn olabildiği için hikaye '+Math.ceil(d/58.5)+' parça olarak (art arda) yayınlanır.'; n.hidden=false; }
+  else if(isFinite(d)&&d>230){ $('#pHk').checked=false; $('#pHk').disabled=true; n.textContent='Bu video '+Math.round(d)+' sn; hikaye için çok uzun (en çok yaklaşık 230 sn), hikaye seçeneği kapatıldı.'; n.hidden=false; }
 });
 $('#pYukle').addEventListener('click',function(){
   if(!pDosya) return; pHata('');
@@ -2325,12 +2326,12 @@ function videoKartiGorunur(x){
 }
 function yayinDugmesi(x,y,d,alanlar){
   var bitti=yayinlandiMi(x,y.k), onay=false;
-  var etiket=y.ik+' '+(bitti?y.ad+'’de yayında ✓':y.ad+' olarak yayınla');
+  var etiket=y.ik+' '+(bitti?y.ad+'’de yayında ✓':y.ad+' olarak yayınla'+(y.k==='hikaye'&&(x.sure||0)>60.5?' ('+Math.ceil((x.sure||0)/58.5)+' parça)':''));
   var b=dom('button',bitti?'yayinda':'ana',etiket); b.type='button'; b.style.cssText='display:block;width:100%;margin-top:8px;text-align:left';
   if(bitti){ b.style.background='#1f9d55'; b.style.borderColor='#1f9d55'; b.style.color='#fff'; }
   b.addEventListener('click',function(){
     if(!hSifreKontrol()) return;
-    if(y.k==='hikaye'&&(x.sure||0)>60.5){ skMesaj(d,'Bu video '+Math.round(x.sure)+' sn; hikâye videosu en fazla 60 sn olabilir.',true); return; }
+    if(y.k==='hikaye'&&(x.sure||0)>60.5*4-6){ skMesaj(d,'Bu video '+Math.round(x.sure)+' sn; hikâye için en çok 4 parçaya (yaklaşık 230 sn) bölünebilir.',true); return; }
     if(!onay){ onay=true; b.textContent=y.ik+' '+(bitti?'Zaten yayınlandı. Yine de yayınla?':'Emin misin? Evet, '+y.ad+'’de yayınla'); setTimeout(function(){ onay=false; b.textContent=etiket; },6000); return; }
     onay=false; b.disabled=true;
     var g={yol:x.video,hedefler:[y.k],onay:true,tekrar:bitti};

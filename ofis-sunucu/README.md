@@ -350,3 +350,7 @@ Panel → Üret → konu yaz → tür: **Resimli anlatım**. Yeni içerik türle
 - **Maliyet:** video başına ~6-9 görsel (`shorts/viral_ayar.json` → `gorsel_kalitesi`, varsayılan `medium`); taslakta `gorsel_maliyeti` (adet, kalite) kayıtlıdır.
 - **Doğruluk:** güvenlik/acil durum ve haber konularında yalnızca genel kabul gören resmî tavsiyeler (ör. 112, güvenli kapalı alana çekil, uzak dur), olay gerçekmiş gibi anlatılmaz ("diyelim ki / eğer karşılaşırsan"), esprili ton isteniyorsa kimseyle alay etmeyen espriler.
 - Yönetici incelemesi `serbest` taslak gibi davranır (3D baskı aralıkları uygulanmaz).
+
+## Uzun videolar Instagram hikâyesinde (60 sn üstü)
+
+Instagram hikâye videosu en çok 60 sn olabildiği için (resimli/serbest videolar 70-90 sn sürer) hikâye ajanı `>60 sn` videoyu **parçalara** böler (`ajan/hikaye.py` → `video_parcala`): kesimler taslaktaki sahne sınırlarına (`zamanlama`) göre seçilir (konuşma ortasında kesilmez; yoksa eşit bölünür), her parça ≤58,5 sn ve 1080x1920 H.264/AAC'dir, en çok 4 parça. Parçalar geçici yetim dala (`hikaye-gecici`, `ajan/gecici_dal.py`) yüklenir, **sırayla** art arda hikâye olarak yayınlanır ve dal silinir (depo şişmez). Panelde buton "(2 parça)" gibi yazar. Otomatik hat 60 sn üstü videoda hikâyeyi hâlâ atlar.
