@@ -1,17 +1,17 @@
 {
- "tarih": "2026-11-23T08:08:04Z",
- "tr_saat": "23.11.2026 11:08",
+ "tarih": "2026-11-23T09:00:45Z",
+ "tr_saat": "23.11.2026 12:00",
  "toplam": {
-  "reels": 18054,
+  "reels": 18099,
   "gonderi": 0,
-  "short": 11269,
+  "short": 11272,
   "youtube_video": 0,
   "hikaye": 870,
-  "toplam": 30193,
-  "begeni": 284,
+  "toplam": 30241,
+  "begeni": 288,
   "yorum": 29
  },
- "fark": 93,
+ "fark": 48,
  "instagram": {
   "durum": "tamam",
   "izin": true,
@@ -23,11 +23,11 @@
     "tur": "Reels",
     "tarih": "2026-11-22T23:18:35",
     "baslik": "AMS lite ile filament değişiminde en sık takılma noktaları b",
-    "begeni": 3,
+    "begeni": 6,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgD94j1CjjG/",
-    "izlenme": 558,
-    "erisim": 495
+    "izlenme": 596,
+    "erisim": 524
    },
    {
     "id": "18132478334487242",
@@ -37,7 +37,7 @@
     "begeni": 5,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/DgDWYKBE8DF/",
-    "izlenme": 1408,
+    "izlenme": 1409,
     "erisim": 1253
    },
    {
@@ -48,8 +48,8 @@
     "begeni": 10,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/DgCmX1zj1CJ/",
-    "izlenme": 1271,
-    "erisim": 1145
+    "izlenme": 1272,
+    "erisim": 1147
    },
    {
     "id": "17945283843388099",
@@ -81,7 +81,7 @@
     "begeni": 10,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgAaonlkhF3/",
-    "izlenme": 1668,
+    "izlenme": 1669,
     "erisim": 1514
    },
    {
@@ -114,8 +114,8 @@
     "begeni": 30,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": 4030,
-    "erisim": 3578
+    "izlenme": 4034,
+    "erisim": 3583
    },
    {
     "id": "18289759651292671",
@@ -354,7 +354,7 @@
    "tarih": "2026-11-22T23:17:35Z",
    "baslik": "Bag hook",
    "izlenme": 13,
-   "erisim": 7,
+   "erisim": 8,
    "okundu": true,
    "yanit": 0
   },
@@ -721,7 +721,7 @@
     "tarih": "2026-11-22T10:33:51",
     "baslik": "Baskısı en kolay filamentler: 5'ten 1'e",
     "izlenme": 315,
-    "begeni": 0,
+    "begeni": 1,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=czKPQgTqQrw"
    },
@@ -790,7 +790,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T22:17:19",
     "baslik": "3D Baskı Tablaya Yapışmıyor mu? 5 Pratik Çözüm",
-    "izlenme": 1234,
+    "izlenme": 1237,
     "begeni": 18,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=qcWHhTeaEHs"
@@ -870,7 +870,7 @@
  },
  "eksikler": [],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 11:08",
-  "govde": "Toplam 30.193 (+93) · Reels 18.054 · Short 11.269 · Hikaye 870 · Takipçi 434 · En iyi Reels: Baskın tabladan kalkı 4.030"
+  "baslik": "📊 İzlenme raporu 12:00",
+  "govde": "Toplam 30.241 (+48) · Reels 18.099 · Short 11.272 · Hikaye 870 · Takipçi 434 · En iyi Reels: Baskın tabladan kalkı 4.034"
  }
 }
