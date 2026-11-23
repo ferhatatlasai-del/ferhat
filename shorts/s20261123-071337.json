@@ -1,7 +1,7 @@
 {
   "id": "s20261123-071337",
   "olusturma": "2026-11-23T07:13:37Z",
-  "durum": "otomatik",
+  "durum": "reddedildi",
   "tur": "viral",
   "video": "",
   "sure": 54.0,
@@ -71,5 +71,30 @@
     }
   ],
   "otomatik": true,
-  "anlati": "Nozul tıkandıysa suç hep yazıcıda mı? Çoğu zaman küçük bir bakım detayı kaçıyor. İçeride birikmiş yanık parça, akışı yavaşlatır. Sen bunu görmeden baskı bozulur. Yanlış ısı da sorun çıkarır; filament tam erimez ya da gereksizce yapışır. Önce ucu gözle kontrol et. Sonra üreticinin önerdiği temizlik adımını uygula. Kısa bir soğuk çekme bazen kalıntıyı söker. Sert bastırma yerine nazik ilerle. Filament kuru kalırsa nozul daha sakin çalışır. Nem, tıkanma riskini büyütür. Aşırı ipliklenme görürsen geri çekme ve sıcaklık ayarını kontrol et. Bu, uca yük bindirir. Düzenli bakım, sürpriz tıkanmayı azaltır. Sen de baskıdan önce kısa bir rutin yap. Sen hangi tıkanmayı yaşadın? Yoruma yaz, daha fazla kısa rehber için takip et."
+  "anlati": "Nozul tıkandıysa suç hep yazıcıda mı? Çoğu zaman küçük bir bakım detayı kaçıyor. İçeride birikmiş yanık parça, akışı yavaşlatır. Sen bunu görmeden baskı bozulur. Yanlış ısı da sorun çıkarır; filament tam erimez ya da gereksizce yapışır. Önce ucu gözle kontrol et. Sonra üreticinin önerdiği temizlik adımını uygula. Kısa bir soğuk çekme bazen kalıntıyı söker. Sert bastırma yerine nazik ilerle. Filament kuru kalırsa nozul daha sakin çalışır. Nem, tıkanma riskini büyütür. Aşırı ipliklenme görürsen geri çekme ve sıcaklık ayarını kontrol et. Bu, uca yük bindirir. Düzenli bakım, sürpriz tıkanmayı azaltır. Sen de baskıdan önce kısa bir rutin yap. Sen hangi tıkanmayı yaşadın? Yoruma yaz, daha fazla kısa rehber için takip et.",
+  "red_tarihi": "2026-11-23T07:19:46.000Z",
+  "admin_inceleme": {
+    "karar": "reddet",
+    "puan": 5.0,
+    "sorunlar": [
+      "Soğuk çekme adımı görselde yeterince gösterilmiyor; anlatı-görüntü uyumu zayıf",
+      "'nem riski %62/%65' gibi sayılar bağlamsız ve teknik olarak temelsiz görünüyor",
+      "İğne ile temizleme görseli üretici önerisi vurgusuyla çelişebilecek kadar muğlak",
+      "Bazı alt yazılar kesik/kadraj dışında ve okunurluk düşük",
+      "Kapanışta aynı 'Takip et' sahnesi tekrar ediyor",
+      "Bambu Lab A1'e özel denmesine rağmen içerik büyük ölçüde genel nozul bakımı, modele özgü bağlam zayıf"
+    ],
+    "gerekce": "Genel mesaj büyük ölçüde doğru olsa da temelsiz sayısal görseller, okunurluk sorunları ve anlatı-görüntü uyumsuzluğu güvenilir eğitim içeriği standardını düşürüyor.",
+    "model": "OpenAI (gpt-5.4)",
+    "iddialar": [
+      "Nozul tıkanması çoğu zaman küçük bakım detaylarından kaynaklanabilir → doğru",
+      "İçeride birikmiş yanık parça akışı yavaşlatır → doğru",
+      "Yanlış ısı filamenti tam eritmeyebilir veya akışı bozabilir → doğru",
+      "Önce ucu gözle kontrol et → doğru",
+      "Üreticinin önerdiği temizlik adımını uygula → doğru",
+      "Kısa bir soğuk çekme bazen kalıntıyı söker → doğru",
+      "Filament kuru kalırsa nozul daha sakin çalışır / nem tıkanma riskini artırır → doğru",
+      "Aşırı ipliklenmede geri çekme ve sıcaklık ayarı kontrol edilmelidir → doğru"
+    ]
+  }
 }
