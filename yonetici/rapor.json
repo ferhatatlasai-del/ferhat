@@ -129,6 +129,28 @@
         "Nöbetçi son 24 saatte 1 kez başarısız olmuş; şu an sağlık iyi görünse de tekrar ederse ayrıca incelemek gerekir."
       ],
       "eylem_sayisi": 0
+    },
+    {
+      "zaman": "2026-11-23 08:31",
+      "kademe": 3,
+      "model": "OpenAI (gpt-5.4)",
+      "rapor": [
+        "Acil: son 24 saatte otomatik-yayın iş akışı 13 kez başarısız görünüyor; otomatik hat deneme modunda olsa da bu tekrar sistem sağlığı açısından izlenmeli.",
+        "Nöbetçi daha önce bugün bir kez tetiklenmiş; sağlık kalemleri şu an iyi görünüyor, bu yüzden gereksiz ek tetikleme yapmadım.",
+        "Onay bekleyen tek taslak s20261122-185523; bu taslağa daha önce zaten not düşülmüş görünüyor, aynı taslağa tekrar not yazmadım.",
+        "Yorum tarafında onay bekleyen yanıt yok; bu yüzden yorum onayı yapmadım.",
+        "Hikâye akışı aktif, günlük sayı 6 ve kuyrukta 7 planlı hikâye var; hedefinle uyumlu, değişiklik önermedim.",
+        "Öncelikli konu listesi zaten 4 adet ve sınırın üstünde; bu yüzden yeni konu eklemedim."
+      ],
+      "oneriler": [
+        "otomatik-yayin.yml için hata nedenini panel/log tarafında kontrol et; art arda 13 başarısızlık varsa içerik üretim hattında sessiz bir kırılma olabilir.",
+        "s20261122-185523 taslağındaki önceki 'onayla' notları süreç kuralına aykırı görünüyor; not geçmişini temizleyemem ama bundan sonra bu taslak için sahibi olarak senin manuel incelemen daha güvenli olur.",
+        "Bambu Lab odaklı içeriklerde açıklamaya bağımsızlık notu eklenip eklenmediğini kontrol et; marka bağlantısı izlenimi riskini azaltır."
+      ],
+      "uyarilar": [
+        "Aynı taslağa birden fazla kez 'onayla' önerisi kaydı var; benim kurallarıma göre taslaklarda yalnızca somut gerekçeyle 'incele' veya 'reddet' notu düşülmeli."
+      ],
+      "eylem_sayisi": 0
     }
   ],
   "defter": [
