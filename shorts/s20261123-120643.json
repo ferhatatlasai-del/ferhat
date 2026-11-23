@@ -1,7 +1,7 @@
 {
   "id": "s20261123-120643",
   "olusturma": "2026-11-23T12:06:43Z",
-  "durum": "otomatik",
+  "durum": "reddedildi",
   "tur": "viral",
   "video": "",
   "sure": 49.3,
@@ -65,5 +65,30 @@
     }
   ],
   "otomatik": true,
-  "anlati": "Tabla yüzeyini atlayıp direkt basıyor musun? İşte çoğu sorun burada başlıyor. İlk katman fazla uzak kalırsa parça tutunmaz; çok yakınsa yüzey ezilir. Filament türünü yanlış seçersen, yazıcı doğru ısı ile çalışmaz. Sen malzemeyi mutlaka üretici önerisine göre ayarla. Kalibrasyonu bir kez yapıp unutma. Tabla eğimi ve akış kontrolü baskıdan önce tekrar bakılmalı. Her modeli aynı hızda basma. Çok hızlı gidersen titreşim ve detay kaybı artar. Tabla temiz değilse köşeler kalkar. Yapışma zayıflayınca parça kenardan ayrılır. Kısa kontrol yeterli: yüzeyi temizle, ayarı doğrula, hızı sakin tut, bakımını aksatma. Senin en sık yaptığın hata hangisi? Yorumlara yaz, daha fazla kısa 3D baskı ipucu için takip et."
+  "anlati": "Tabla yüzeyini atlayıp direkt basıyor musun? İşte çoğu sorun burada başlıyor. İlk katman fazla uzak kalırsa parça tutunmaz; çok yakınsa yüzey ezilir. Filament türünü yanlış seçersen, yazıcı doğru ısı ile çalışmaz. Sen malzemeyi mutlaka üretici önerisine göre ayarla. Kalibrasyonu bir kez yapıp unutma. Tabla eğimi ve akış kontrolü baskıdan önce tekrar bakılmalı. Her modeli aynı hızda basma. Çok hızlı gidersen titreşim ve detay kaybı artar. Tabla temiz değilse köşeler kalkar. Yapışma zayıflayınca parça kenardan ayrılır. Kısa kontrol yeterli: yüzeyi temizle, ayarı doğrula, hızı sakin tut, bakımını aksatma. Senin en sık yaptığın hata hangisi? Yorumlara yaz, daha fazla kısa 3D baskı ipucu için takip et.",
+  "red_tarihi": "2026-11-23T12:12:32.000Z",
+  "admin_inceleme": {
+    "karar": "reddet",
+    "puan": 5.0,
+    "sorunlar": [
+      "Anlatı 5 sık hata diyor ama görsel ve kontrol listesinde 4 madde net; sayı tutarsız",
+      "A1'e özgü denip çoğu öneri genel 3D baskı tavsiyesi, konu-vaat uyumu zayıf",
+      "Kalibrasyon için yüzde göstergeleri (57%, 100%) açıklamasız ve muhtemelen uydurma/yanıltıcı görsel",
+      "Sahne etiketleri tutarsız tekrar ediyor; 2 ve 3 numaralı başlıklar birkaç farklı konuya yayılmış",
+      "Bazı alt yazılar bölünmüş/kırpılmış görünüyor ve okunabilirlik düşüyor",
+      "Hız sahnesindeki 130 mm/s örneği bağlamsız; A1 için kesin eşik gibi algılanabilir"
+    ],
+    "gerekce": "Temel teknik anlatım çoğunlukla doğru olsa da ana sayı vaadi, A1 özgüllüğü ve bazı yanıltıcı görsel göstergeler yeterince güvenilir değil.",
+    "model": "OpenAI (gpt-5.4)",
+    "iddialar": [
+      "İlk katman fazla uzak kalırsa parça tutunmaz → doğru",
+      "Çok yakın ilk katman yüzeyi ezer → doğru",
+      "Filament türünü yanlış seçmek yazıcının yanlış ısıyla çalışmasına yol açar → doğru",
+      "Malzemeyi üretici önerisine göre ayarlamak gerekir → doğru",
+      "Kalibrasyonu bir kez yapıp unutmamak gerekir → doğru/genel",
+      "Tabla eğimi ve akış kontrolü baskıdan önce tekrar bakılmalı → doğru ama A1 için fazla genel",
+      "Çok hızlı baskıda titreşim ve detay kaybı artar → doğru",
+      "Tabla temiz değilse köşeler kalkar → doğru"
+    ]
+  }
 }
