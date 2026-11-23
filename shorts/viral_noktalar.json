@@ -57,7 +57,21 @@
         "rutin bakım sürprizi azaltır",
         "yorumda deneyimini yaz"
       ]
+    },
+    {
+      "id": "s20261123-120643",
+      "konu": "Bambu Lab A1'de yeni başlayanların sık yaptığı 5 hata",
+      "noktalar": [
+        "tabla hazırlığı çoğu hatayı belirler",
+        "ilk katman mesafesi tutunmayı etkiler",
+        "malzeme ayarı ısıyı değiştirir",
+        "kalibrasyon baskıdan önce kontrol edilir",
+        "yüksek hız detay ve kaliteyi düşürür",
+        "kirli tabla köşe kalkmasını artırır",
+        "dört kısa kontrol sorunu azaltır",
+        "yorum ve takip çağrısı"
+      ]
     }
   ],
-  "son_ton": 72
+  "son_ton": 305
 }
