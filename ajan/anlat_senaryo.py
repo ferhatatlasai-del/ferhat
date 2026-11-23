@@ -343,7 +343,7 @@ TÜRLER:
 Renkler: turuncu, mavi, yesil, kirmizi, sari, mor, pembe, beyaz, koyu, gri, kahve, siyah ya da #rrggbb.
 
 TASARIM İLKELERİ (24-48 eleman; gruplardaki çocuklar da sayılır):
-1) ARKA PLAN (4-8 eleman): zemin/gökyüzü/oda, gradyanlı büyük şekiller, ufuk, derinlik ögeleri (bulut, ağaç, raf, pencere, tepe...). Boş arka plan YOK.
+1) ARKA PLAN (4-8 eleman): zemin/gökyüzü/oda, gradyanlı büyük şekiller, ufuk, derinlik ögeleri (bulut, ağaç, raf, pencere, tepe...). Arka plan x 0-1080, y 300-1300 alanını TAMAMEN kaplasın (ilk eleman tam ekran gradyanlı dikdörtgen). Boş arka plan YOK. Renkleri gerçekçi seç (çim yeşil, gökyüzü mavi...); renk tonu sonradan değişmez.
 2) ANA NESNELER: her biri 6-14 parçalı grup; ayrıntılar (göz, parlama noktası, gölge, desen, çizgi), ikinci ton renk (renk2) ve gölge kullan. Tek şekilden oluşan nesne YOK; gerçekçi/sevimli düz illüstrasyon tarzı.
 3) SÜREÇ ANİMASYONU: parçalar anlatıyla aynı sırada belirsin ("t"), büyüsün, yer değiştirsin ("hareket"), oklar çizilsin ("cizim" 0→1), çubuk/sayaç dolsun ("doluluk"), parçacıklar aksın. Sahne boyunca HER an bir şey hareket etsin ("dongu").
 4) ETİKET ve SAYILAR: 3-6 kısa yazı; üst üste binmesin, ekran dışına taşmasın, okunur olsun (boyut ≥ 40), nesneleri örtmesin.

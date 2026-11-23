@@ -1077,6 +1077,8 @@ def calis(a):
     elif senaryo.get("bicim") == "anlat":
         plan, parcalar = anlat_cizelge_kur(senaryo, sesler)
         plan.update(sayfa="anlat.html", bicim="anlat", tohum=int(hashlib.md5(senaryo["konu"].encode()).hexdigest()[:6], 16))
+        if SERBEST:   # gerçekçi renkler (tavuk, çim, gökyüzü) renk tonu kaymasıyla bozulmasın
+            plan["ton"], plan["tema_kaydir"] = 0, 0
     else:
         plan, parcalar = cizelge_kur(senaryo, sesler)
     print(f"Süre: {plan['sure']:.1f} sn, {len(plan['altyazi'])} alt yazı parçası")
