@@ -218,6 +218,29 @@
         "Otomatik hat modunu ben değiştiremem; art arda ret sürerse panelden deneme veya kapalı moda almayı sen değerlendirmelisin."
       ],
       "eylem_sayisi": 1
+    },
+    {
+      "zaman": "2026-11-23 18:31",
+      "kademe": 2,
+      "model": "OpenAI (gpt-5.4)",
+      "rapor": [
+        "Acil: otomatik hat bugün art arda 4 video reddetti; hepsinde tekrar, sayı tutarsızlığı ya da anlatı-görüntü uyumsuzluğu var, bu yüzden itibar riski gördüm.",
+        "Acil: 12:50’de 3D baskı dışı bir video yayınlanmış görünüyor: \"Şehirde aslan görürsen ne yapmalısın?\" Kanal amacıyla uyumsuz; ben bunu geri alamam, senin panelden kontrol etmen gerekir.",
+        "Sağlık tarafında genel durum iyi görünüyor; Instagram, YouTube, OpenAI ve ofis sunucusu çalışıyor.",
+        "Son 24 saatte Nöbetçi akışında 1 başarısızlık kaydı var; neden bilgisi veri yok, tekrar tetiklemeyi uygun gördüm.",
+        "Hikâye tarafı dengeli: günlük sayı 6, kuyrukta 8 planlı hikâye var; bu yüzden hikâye ayarında değişiklik yapmadım.",
+        "Öncelikli konu kuyruğu boştu; tekrar etmeyen ve son iyi performans kalıbına yakın 2 yeni 3D baskı konusu ekledim."
+      ],
+      "oneriler": [
+        "Sen panelden otomatik hattın bugünkü üretim promptlarını gözden geçir; özellikle A1’e özel başlık atılıp genel içerik üretilmesi engellenmeli.",
+        "Bugün yayınlanan 3D baskı dışı videonun kaynağını kontrol et; konu filtresi ya da kaynak beslemesi bozulmuş olabilir.",
+        "Yorum modu otomatik görünüyor; bu senin sınırına aykırıysa panelden manuel/onaylı akışa almayı değerlendir."
+      ],
+      "uyarilar": [
+        "Otomatik hat açıkken bugün 20:05 turunda da benzer düşük kalite üretim riski var.",
+        "Kanal amacı dışı içerik yayınlanması itibar riski oluşturuyor."
+      ],
+      "eylem_sayisi": 3
     }
   ],
   "defter": [
@@ -309,6 +332,41 @@
       "neden": "Kanal odağını korumak ve itibar riskini azaltmak",
       "durum": "yapildi",
       "ayrinti": "s20261123-064337: reddet önerisi"
+    },
+    {
+      "zaman": "2026-11-23 18:31",
+      "kademe": 2,
+      "eylem": "workflow_tetikle",
+      "params": {
+        "akis": "nobetci.yml"
+      },
+      "neden": "Son 24 saatte 1 başarısız Nöbetçi kaydı var; servis/anahtar sağlığını yeniden yoklamak için.",
+      "durum": "yapildi",
+      "ayrinti": "nobetci.yml tetiklendi"
+    },
+    {
+      "zaman": "2026-11-23 18:31",
+      "kademe": 2,
+      "eylem": "konu_oncelik_ekle",
+      "params": {
+        "konu": "İlk katman neden fazla yassı ya da fazla yüksek olur?",
+        "ipucu": "Yeni başlayanlara sade anlat; nozzle-table mesafesi, yapışma belirtileri ve kısa kontrol listesi ver; sayı uydurma, marka özel vaat yok."
+      },
+      "neden": "En çok izlenen içerikler ilk katman/yapışma etrafında; tekrar etmeden yakın kalıp.",
+      "durum": "yapildi",
+      "ayrinti": "İlk katman neden fazla yassı ya da fazla yüksek olur?"
+    },
+    {
+      "zaman": "2026-11-23 18:31",
+      "kademe": 2,
+      "eylem": "konu_oncelik_ekle",
+      "params": {
+        "konu": "Warping neden olur, brim ne zaman işe yarar?",
+        "ipucu": "Köşe kalkmasını basit örneklerle anlat; tabla temizliği, sıcaklık, kabin ve brim ilişkisini genel düzeyde ver; kesin çözüm dili kullanma."
+      },
+      "neden": "Başarılı konularla uyumlu, yeni başlayan için faydalı ve mevcut tekrar sorununu azaltır.",
+      "durum": "yapildi",
+      "ayrinti": "Warping neden olur, brim ne zaman işe yarar?"
     }
   ]
 }
