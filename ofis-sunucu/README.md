@@ -319,3 +319,14 @@ Panel → Yönetici → **Yapay zekâ seviyesi**: üç iş için ayrı OpenAI mo
 - **yonetici:** yönetici ajan ve video izleme · **video:** viral video senaryosu · **genel:** hikâye metni, yorum yanıtları, trend, akademi, başarı, günlük taslak.
 - Seçenekler: Varsayılan (`gpt-5.4-mini`), `gpt-5.4-mini`, `gpt-5.4` ya da elle yazılan model adı (harf, rakam, nokta, tire). Öncelik: panel seçimi > `OPENAI_MODEL` GitHub variable > koddaki varsayılan (`ajan/yz_model.py`).
 - Yanlış yazılan model adı 404 verir: hikâye/taslak üreticileri `gpt-4o-mini`'ye düşer, diğerleri o çalışmada hata verir (yönetici güvenli tarafta "yayınlama" der). Görsel (resim) modeli bu ayarın dışındadır.
+
+## Serbest konu (3D baskı dışı videolar)
+
+Panel → Üret → "Şimdi viral video üret" satırında konu yazarken **tür** seçilir: *Otomatik tür* (varsayılan), *3D baskı*, *Serbest konu*.
+
+- **Otomatik tür:** konuda 3D baskı sözcüğü (yazıcı, filament, nozul, baskı, PLA/PETG, Bambu…) varsa 3D baskı kalıbı; yoksa serbest konu. Yanlış tahmin olursa türü elle seç.
+- **Serbest konuda ne değişir:** komut `ISTEM_SERBEST` (`ajan/anlat_senaryo.py`) olur: konuyu 3D baskıya bağlamaz; hazır yazıcı sahneleri (ekstruder, nozul, katman…) kullanılmaz. Kalan genel tipler: `kanca`, `sayi`, `karsilastir`, `kontrol_listesi`, `kapanis` + en az 2, en çok 5 yapay zekâ tasarımlı `ozel` sahne. `kanca`/`kapanis` merkezde konuya uygun ikon gösterir (`params.ikon`); ikon kütüphanesine yumurta, tavuk, kalp, ampul, dünya, kitap, ev, yaprak, para, güneş, bulut, insan eklendi (`video/anlat_sahneler.js`).
+- **Etiketler:** `#3dprinting #3dbaski` eklenmez; konuya uygun etiketler yazılır.
+- **Güvenlik:** model konuyu uygunsuz bulursa (nefret/hakaret, siyaset, kişi hedefleme, sağlık-hukuk-yatırım tavsiyesi, şiddet, yetişkin içerik) video üretilmez, panelde nedeni yazar. Doğruluk kuralı: uydurma istatistik/kişisel deneyim yok, emin olunmayan sayı verilmez.
+- **Yönetici incelemesi:** taslak `serbest: true` ise yönetici konu dışılığı sorun saymaz, 3D baskı değer aralıklarını uygulamaz; genel bilgiyle doğruluğu denetler. Otomatik hat yalnızca kendi konu havuzundan (3D baskı) üretir; serbest konu sadece panelden elle yazılan konuda çalışır ve taslak onayını bekler.
+- Özel sahne kalite kontrolü serbest konuda başarısız olursa sahne, anlatıdan çıkarılan 3 maddelik genel bir listeyle değişir (3D yazıcı sahnesi asla gelmez).

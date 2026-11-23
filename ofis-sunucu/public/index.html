@@ -435,8 +435,8 @@ body.tam .hint{display:none}
     <div class="kolon">
       <div class="card pub" id="vrKart">
         <h2>Video üret</h2>
-        <p class="alt">3D animasyonlu, Türkçe seslendirmeli ~60 sn bilgi videosu. Konu yazmazsan ajan, en çok izlenenlere benzer bir konu seçer. Hazırlanması 15-40 dk sürer; hazır olunca "Yayın" bölümünde onayını bekler.</p>
-        <div class="satir"><input type="text" id="skKonu" maxlength="120" placeholder="İsteğe bağlı konu (boşsa sıradaki konu)" style="flex:1;min-width:160px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px"><button type="button" id="skViral">Şimdi viral video üret</button></div>
+        <p class="alt">Animasyonlu, Türkçe seslendirmeli ~60 sn bilgi videosu. Konu yazmazsan ajan, en çok izlenenlere benzer bir konu seçer. Konu 3D baskı dışında da olabilir (ör. "tavuklar yumurtayı nasıl üretir"): "Otomatik tür" 3D baskı sözcüğü yoksa serbest konu kabul eder; istersen elle "Serbest konu" ya da "3D baskı" seç. Serbest konuda hazır 3D yazıcı sahneleri yerine genel animasyonlar kullanılır. Hazırlanması 15-40 dk sürer; hazır olunca "Yayın" bölümünde onayını bekler.</p>
+        <div class="satir"><input type="text" id="skKonu" maxlength="120" placeholder="İsteğe bağlı konu (boşsa sıradaki konu)" style="flex:1;min-width:160px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px"><select id="skKonuTuru" title="Konu türü" style="font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px"><option value="otomatik">Otomatik tür</option><option value="3d">3D baskı</option><option value="serbest">Serbest konu</option></select><button type="button" id="skViral">Şimdi viral video üret</button></div>
         <div id="skViralDurum" hidden style="margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg)"></div>
       </div>
       <div class="card pub" id="zKart">
@@ -2423,7 +2423,7 @@ $('#skViral').addEventListener('click',function(){
   if(!hSifreKontrol()) return; var btn=this, et='Şimdi viral video üret';
   if(!skvOnay){ skvOnay=true; btn.textContent='Emin misin? Evet, üret'; setTimeout(function(){ skvOnay=false; btn.textContent=et; },6000); return; }
   skvOnay=false; btn.textContent=et; btn.disabled=true;
-  hPost('/api/viral-calistir',{konu:$('#skKonu').value||''}).then(function(){ $('#skDurum').textContent='3D video üretimi başlatıldı (yaklaşık 40 dk). İlerlemeyi aşağıdaki kutudan izleyebilirsin; sayfayı kapatsan da devam eder.'; btn.disabled=false; viralDurumCiz({var:true,calisiyor:true,durum:'queued',baslangic:new Date().toISOString()}); VD.onceki=true; clearTimeout(VD.zam); VD.zam=setTimeout(viralDurumCek,6000); }).catch(function(e){ $('#skDurum').textContent=String(e.message||e); btn.disabled=false; });
+  hPost('/api/viral-calistir',{konu:$('#skKonu').value||'',konu_turu:$('#skKonuTuru').value}).then(function(){ $('#skDurum').textContent='3D video üretimi başlatıldı (yaklaşık 40 dk). İlerlemeyi aşağıdaki kutudan izleyebilirsin; sayfayı kapatsan da devam eder.'; btn.disabled=false; viralDurumCiz({var:true,calisiyor:true,durum:'queued',baslangic:new Date().toISOString()}); VD.onceki=true; clearTimeout(VD.zam); VD.zam=setTimeout(viralDurumCek,6000); }).catch(function(e){ $('#skDurum').textContent=String(e.message||e); btn.disabled=false; });
 });
 shortsCek(); setInterval(shortsCek,300000);
 
