@@ -349,6 +349,8 @@ def liste_senaryo_sec(a):
     return None, "kullanılmamış liste konusu kalmadı (video/liste_konulari.json'a yeni konu ekle)"
 
 
+RESIM_SAYISI = {"adet": 0, "kalite": ""}
+RESIMLI = False      # yapay zekâ resimleri + sinematik hareket (her konu)
 SERBEST = False      # bu çalışmada 3D baskı dışı serbest konu mu (yalnızca elle yazılan konuda)
 SON_HATA = ""        # senaryo üretilemediyse kullanıcıya gösterilecek neden (ör. konu uygunsuz)
 UYGUNSUZ = RuntimeError
@@ -376,19 +378,19 @@ def anlat_senaryo_uret(konu, ipucu):
             gecmis_konular.append(str(o.get("konu") or o.get("baslik")))
     govde = {"model": MODEL, "response_format": {"type": "json_object"}, "temperature": 0.8,
              "messages": [{"role": "system", "content": ("Sen Türkçe kısa bilgi videoları yazan, animasyonla anlatan, doğruluğa önem veren bir içerik editörüsün. Yalnızca geçerli JSON döndür." if SERBEST else "Sen Türkçe 3D baskı eğitim videoları yazan, animasyonla anlatan, doğruluğa önem veren bir içerik editörüsün. Yalnızca geçerli JSON döndür.")},
-                          {"role": "user", "content": ilham_ekle((AN.ISTEM_SERBEST if SERBEST else AN.ISTEM).format(konu=konu, ipucu=ipucu or "-", onceki=AN.onceki_metni(gecmis_kayit, gecmis_konular)))}]}
+                          {"role": "user", "content": ilham_ekle((AN.ISTEM_RESIMLI if RESIMLI else AN.ISTEM_SERBEST if SERBEST else AN.ISTEM).format(konu=konu, ipucu=ipucu or "-", onceki=AN.onceki_metni(gecmis_kayit, gecmis_konular)))}]}
     for deneme in range(3):
         try:
             r = urllib.request.Request(f"{OPENAI}/chat/completions", data=json.dumps(govde).encode(), method="POST",
                                        headers={"Content-Type": "application/json", "Authorization": f"Bearer {anahtar}"})
             with urllib.request.urlopen(r, timeout=150) as y:
                 j = json.loads(json.load(y)["choices"][0]["message"]["content"])
-            if SERBEST and j.get("uygunsuz"):
+            if (SERBEST or RESIMLI) and j.get("uygunsuz"):
                 SON_HATA = "konu uygun değil: " + str(j.get("uygunsuz"))[:120]
                 print("Karar: " + SON_HATA)
                 return None
             j["konu"] = j.get("konu") or konu
-            return AN.dogrula(j, U.yazi_temizle, gecmis_noktalar, serbest=SERBEST)
+            return AN.dogrula(j, U.yazi_temizle, gecmis_noktalar, serbest=SERBEST, resimli=RESIMLI)
         except Exception as e:
             print(f"UYARI: anlat hikâye tahtası üretimi/doğrulaması başarısız ({deneme + 1}/3): {type(e).__name__}: {str(e)[:160]}")
             if deneme == 1:
@@ -400,7 +402,7 @@ def anlat_senaryo_sec(a):
     kullanilan = set(json_oku(KULLANILAN, []))
     if a.senaryo:
         SECIM.update(tur="elle")
-        return AN.dogrula(json_oku(a.senaryo, {}), U.yazi_temizle, serbest=SERBEST), pathlib.Path(a.senaryo).stem
+        return AN.dogrula(json_oku(a.senaryo, {}), U.yazi_temizle, serbest=SERBEST, resimli=RESIMLI), pathlib.Path(a.senaryo).stem
     if a.konu:
         SECIM.update(tur="elle")
         s = anlat_senaryo_uret(a.konu, "")
@@ -832,6 +834,94 @@ def anlat_cizelge_kur(senaryo, sesler, alt_kelime=5, alt_harf=30):
     return plan, parcalar_ses
 
 
+RESIM_SABLONU = ("{stil}. {sahne}. Vertical 9:16 composition, main subject centered slightly above the middle of the frame, calm and simple darker area in the lower third. "
+                 "No text, no letters, no numbers, no logos, no watermark, no brand names, no recognizable real people.")
+
+
+def resimli_gorselleri(plan, senaryo, dizin, kalite, hazir_dizin=None):
+    """Her 'resim' sahnesi için yapay zekâ görseli üretir (stil tutarlı); yol params.gorsel'e yazılır. Moderasyon/hata olursa sade tarifle bir kez daha dener, olmazsa önceki sahnenin görselini başka kamera hareketiyle kullanır."""
+    dizin = pathlib.Path(dizin)
+    stil = senaryo.get("stil") or "warm flat vector illustration, soft gradients, rich detail, consistent color palette"
+    idx = [i for i, sh in enumerate(plan["sahneler"]) if sh["tip"] == "resim"]
+    onceki, uretilen = None, 0
+    for n, i in enumerate(idx):
+        sh = plan["sahneler"][i]
+        ilerleme("Görseller üretiliyor", 10 + int(12 * n / max(1, len(idx))), f"{n + 1}/{len(idx)}", zorla=True)
+        yol = dizin / f"r{i}.png"
+        sh["params"]["gorsel_tarif"] = sh["params"]["gorsel"]
+        if hazir_dizin:
+            aday = sorted(pathlib.Path(hazir_dizin).glob("*.jpg")) + sorted(pathlib.Path(hazir_dizin).glob("*.png"))
+            sh["params"]["gorsel"] = "file://" + str(aday[n % len(aday)].resolve())
+            onceki = sh["params"]["gorsel"]
+            continue
+        ok = False
+        for deneme, tarif in enumerate([sh["params"]["gorsel"], (sh.get("nokta") or senaryo["konu"]) + ", simple illustration"]):
+            try:
+                b64 = U.gorsel_uret(RESIM_SABLONU.format(stil=stil, sahne=tarif), kalite)
+                yol.write_bytes(base64.b64decode(b64))
+                ok = True
+                uretilen += 1
+                break
+            except Exception as e:
+                print(f"UYARI: görsel üretilemedi sahne {i + 1} ({deneme + 1}/2): {type(e).__name__}: {str(e)[:120]}")
+        if ok:
+            sh["params"]["gorsel"] = "file://" + str(yol.resolve())
+            onceki = sh["params"]["gorsel"]
+        elif onceki:
+            sh["params"]["gorsel"] = onceki
+            sh["params"]["hareket"] = "sol" if sh["params"].get("hareket") != "sol" else "sag"
+            print(f"Sahne {i + 1}: önceki görsel yeniden kullanılıyor")
+        else:
+            raise RuntimeError("ilk görsel üretilemedi (OpenAI görsel erişimi/limiti kontrol edilmeli)")
+    return uretilen
+
+
+def resim_kontrol(plan, senaryo, dizin, kalite):
+    """Üretilen görselleri tek çağrıda görsel modele gösterir (yazı/logo/bozuk/konuya uymayan); sorunlu olanları bir kez yeniden üretir. Dönen: yeniden üretilen sayı."""
+    anahtar = os.environ.get("OPENAI_API_KEY")
+    idx = [i for i, sh in enumerate(plan["sahneler"]) if sh["tip"] == "resim" and str(sh["params"].get("gorsel", "")).startswith("file://")]
+    if not anahtar or not idx:
+        return 0
+    icerik = [{"type": "text", "text": "Bu görseller bir bilgi videosunun sahneleri (sırayla). Her biri için denetle: okunabilir/anlamsız yazı-harf-rakam, logo ya da marka, bozuk anatomi (el/yüz/uzuv) ya da bozuk nesne, konuya UYMAYAN içerik, sahne tarifiyle çelişki. Konu: " + senaryo["konu"][:100]
+              + ". Sahne tarifleri: " + " | ".join(f"{k + 1}) {str(plan['sahneler'][i].get('nokta') or '')[:60]}" for k, i in enumerate(idx))
+              + ' Yalnızca JSON: {"sorunlu": [{"no": görsel_sırası_1den, "sorun": "kısa"}]} (sorun yoksa boş liste). Küçük kusurlar için sorunlu yazma.'}]
+    gecici = pathlib.Path(dizin) / "kucuk"
+    gecici.mkdir(exist_ok=True)
+    for k, i in enumerate(idx):
+        kaynak = plan["sahneler"][i]["params"]["gorsel"][7:]
+        kucuk = gecici / f"{k}.jpg"
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", kaynak, "-vf", "scale=320:-1", str(kucuk)], capture_output=True)
+        if kucuk.exists():
+            icerik.append({"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + base64.b64encode(kucuk.read_bytes()).decode(), "detail": "low"}})
+    try:
+        govde = {"model": MODEL, "response_format": {"type": "json_object"}, "messages": [{"role": "user", "content": icerik}]}
+        rq = urllib.request.Request(f"{OPENAI}/chat/completions", data=json.dumps(govde).encode(), method="POST", headers={"Content-Type": "application/json", "Authorization": f"Bearer {anahtar}"})
+        with urllib.request.urlopen(rq, timeout=150) as y:
+            j = json.loads(json.load(y)["choices"][0]["message"]["content"])
+    except Exception as e:
+        print(f"UYARI: görsel kontrolü yapılamadı ({type(e).__name__}); görseller korunuyor.")
+        return 0
+    stil = senaryo.get("stil") or "warm flat vector illustration"
+    yeni = 0
+    for q in (j.get("sorunlu") or [])[:6]:
+        try:
+            k = int(q.get("no")) - 1
+            i = idx[k]
+        except (TypeError, ValueError, IndexError):
+            continue
+        sh = plan["sahneler"][i]
+        print(f"Görsel {k + 1} sorunlu ({str(q.get('sorun'))[:80]}) → yeniden üretiliyor")
+        try:
+            b64 = U.gorsel_uret(RESIM_SABLONU.format(stil=stil, sahne=(sh["params"].get("gorsel_tarif") or (sh.get("nokta") or senaryo["konu"])) + ", clean composition, absolutely no text or letters anywhere"), kalite)
+            yol = pathlib.Path(dizin) / f"r{i}_yeni.png"
+            yol.write_bytes(base64.b64decode(b64))
+            sh["params"]["gorsel"] = "file://" + str(yol.resolve())
+            yeni += 1
+        except Exception as e:
+            print(f"UYARI: yeniden üretim başarısız ({type(e).__name__}); eski görsel kalıyor.")
+    return yeni
+
+
 def genel_liste(sh):
     """Çizim kullanılamazsa serbest konudaki özel sahne yerine, anlatıdan çıkarılan 3 maddelik genel liste sahnesi."""
     parca = [x.strip(" ,;") for x in re.split(r"[.,;!?]", str(sh.get("anlati") or "")) if len(x.strip()) > 3][:3]
@@ -1030,9 +1120,14 @@ def calis(a):
     gemini = os.environ.get("GEMINI_API_KEY")
     if not (anahtar or gemini) and not (a.tts_dizin or a.sessiz):
         return hata("seslendirme anahtarı yok. İkisinden biri gerekli (GitHub Secrets): 'GEMINI_API_KEY' (aistudio.google.com/apikey, kart gerekmez) ya da 'GOOGLE_TTS_API_KEY' (Google Cloud Text-to-Speech).")
-    global SERBEST
-    SERBEST = a.konu_turu == "serbest" or (bool(a.konu) and a.konu_turu in (None, "", "otomatik") and not konu_3d_mu(a.konu))
-    if SERBEST:
+    global SERBEST, RESIMLI
+    RESIMLI = a.konu_turu == "resimli"
+    if RESIMLI and not (a.konu or a.senaryo):
+        return hata("resimli mod için bir konu yazmalısın.")
+    SERBEST = RESIMLI or a.konu_turu == "serbest" or (bool(a.konu) and a.konu_turu in (None, "", "otomatik") and not konu_3d_mu(a.konu))
+    if RESIMLI:
+        print("Konu türü: RESİMLİ (yapay zekâ resimleri + sinematik hareket)")
+    elif SERBEST:
         print("Konu türü: SERBEST (3D baskı dışı); genel sahne kalıpları kullanılacak")
     bicim = a.bicim or ayar.get("bicim") or "anlat"
     if SERBEST and bicim != "anlat":
@@ -1094,6 +1189,11 @@ def calis(a):
             gorseller = liste_gorselleri(senaryo["sahneler"], g, ayar.get("gorsel_kalitesi") or "medium", a.gorsel_dizin)
             for sh, (yol, odak) in zip(plan["sahneler"], gorseller):
                 sh["params"]["gorsel"], sh["params"]["odak"] = "file://" + yol, odak
+        if RESIMLI and plan.get("bicim") == "anlat":
+            kalite = ayar.get("gorsel_kalitesi") or "medium"
+            RESIM_SAYISI["adet"] = resimli_gorselleri(plan, senaryo, g, kalite, a.gorsel_dizin)
+            RESIM_SAYISI["adet"] += resim_kontrol(plan, senaryo, g, kalite)
+            RESIM_SAYISI["kalite"] = kalite
         yaz(g / "plan.json", plan)
         if plan.get("bicim") == "anlat" and any(sh["tip"] == "ozel" for sh in plan["sahneler"]):
             ilerleme("Özel sahneler kontrol ediliyor", 23, "", zorla=True)
@@ -1118,6 +1218,9 @@ def calis(a):
         taslak = {"id": kimlik, "olusturma": z.strftime("%Y-%m-%dT%H:%M:%SZ"), "durum": "otomatik" if a.otomatik else "onay_bekliyor", "tur": "viral", "video": "" if a.otomatik else f"videolar/{cikti.name}", "sure": round(plan["sure"], 1),
                   "baslik": senaryo["baslik"], "aciklama": aciklama_olustur(senaryo, gercek), "muzik": "Sentez (kodla üretildi)", "konu": senaryo["konu"], "tasarimlar": [], "hikayeler": [], "secim": dict(SECIM),
                   "zamanlama": [{"tip": x["tip"], "t0": x["t0"], "t1": x["t1"], "ses_son": x.get("ses_son")} for x in plan["sahneler"]]}   # sahne/konuşma zamanları: ses sorunlarını sonradan ayıklamak için
+        if RESIMLI:
+            taslak["resimli"] = True
+            taslak["gorsel_maliyeti"] = {"adet": RESIM_SAYISI["adet"], "kalite": RESIM_SAYISI["kalite"]}
         if SERBEST:
             taslak["serbest"] = True
             taslak["anlati"] = " ".join(x["anlati"] for x in senaryo["sahneler"])[:1500]
@@ -1148,7 +1251,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--konu", help="belirli bir konu (hazır senaryo yoksa yapay zekâ yazar)")
     ap.add_argument("--senaryo", help="senaryo JSON dosyası")
-    ap.add_argument("--konu-turu", dest="konu_turu", choices=["otomatik", "3d", "serbest"], help="elle yazılan konunun türü: otomatik (3D baskı sözcükleri varsa 3d, yoksa serbest), 3d ya da serbest (3D baskı dışı)")
+    ap.add_argument("--konu-turu", dest="konu_turu", choices=["otomatik", "3d", "serbest", "resimli"], help="elle yazılan konunun türü: otomatik (3D baskı sözcükleri varsa 3d, yoksa serbest), 3d, serbest (3D baskı dışı animasyon) ya da resimli (yapay zekâ resimleri + sinematik hareket, her konu)")
     ap.add_argument("--hemen", action="store_true", help="kapalı ya da taslak limiti dolu olsa bile bir kez üret")
     ap.add_argument("--git", action="store_true", help="sonucu depoya yaz ve it")
     ap.add_argument("--olcek", type=float, default=1.0, help="çizim ölçeği (test için 0.5)")
