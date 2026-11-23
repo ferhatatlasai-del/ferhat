@@ -432,6 +432,8 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 (() => {
 'use strict';
 const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+window.open = () => null; // the game never opens another tab or site
+document.addEventListener('click', e => { const a = e.target && e.target.closest && e.target.closest('a[href]'); if (a && /^(https?:)?\/\//.test(a.getAttribute('href') || '')) e.preventDefault(); }, true);
 const VW = 960, VH = 540;
 
 /* ---------- scaling ---------- */
@@ -579,6 +581,10 @@ const QUESTS = [
   { id: 'boss', name: 'Kahraman', desc: '2 boss yen', stat: 'boss', goal: 2, reward: 50 },
   { id: 'cloud', name: 'Bulut Tırmanıcısı', desc: "Bal Köyü'ndeki bir bulut parkurunun tepesindeki sandığa ulaş", stat: 'cloud', goal: 1, reward: 30 },
   { id: 'diamond', name: 'Elmas Usta', desc: "Demirciden Elmas Balta'yı al", stat: 'diamond', goal: 1, reward: 40 },
+  { id: 'lobby', name: 'Oda Merkezi', desc: "Bal Köyü'ndeki Oda Merkezi'nin zeminine bas", stat: 'lobby', goal: 1, reward: 15 },
+  { id: 'room', name: 'Birlikte Oynayalım', desc: 'Bir oda kur ya da bir odaya katıl', stat: 'room', goal: 1, reward: 30 },
+  { id: 'visit', name: 'Misafirlik', desc: "Odadaki bir arkadaşının evine git (Oda panelinde 'Evine git')", stat: 'visit', goal: 1, reward: 30 },
+  { id: 'chest5', name: 'Sandık Avcısı', desc: '5 sandık aç', stat: 'chest', goal: 5, reward: 35 },
   { id: 'cloud3', name: 'Gökyüzü Ustası', desc: "Bal Köyü'ndeki üç bulut parkurunun hepsini tamamla", stat: 'cloud', goal: 3, reward: 80 },
 ];
 const statOf = q => { const v = (save.stats || {})[q.stat]; return Array.isArray(v) ? v.length : v || 0; };
@@ -2006,6 +2012,8 @@ function buildHub() {
   const smith = { x: 0, y: 0, z: -16, yaw: 0 }; smith.tx = 0; smith.tz = -16 + 2.4; smith.armed = true;
   const board = { x: 4.2, z: 45, tx: 4.2, tz: 46.3, armed: true }; // map board beside the spawn point, facing it
   const tutGate = { x: -4.4, z: 45 }; // wooden arch that leads to the tutorial
+  const roomHub = { x: 5.6, z: 45, armed: false }; // the room pavilion: step on the pad to create or join a room
+  for (const sx of [-1.7, 1.7]) for (const sz of [-1.7, 1.7]) boxes.push({ x0: roomHub.x + sx - 0.2, x1: roomHub.x + sx + 0.2, z0: roomHub.z + sz - 0.2, z1: roomHub.z + sz + 0.2, y0: 0, y1: 3.4, kind: 'deco', on: true });
   for (const sx of [-1.45, 1.45]) boxes.push({ x0: tutGate.x + sx - 0.22, x1: tutGate.x + sx + 0.22, z0: tutGate.z - 0.22, z1: tutGate.z + 0.22, y0: 0, y1: 3.3, kind: 'deco', on: true });
   boxes.push({ x0: board.x - 1.5, x1: board.x + 1.5, z0: board.z - 0.25, z1: board.z + 0.25, y0: 0, y1: 3.1, kind: 'deco', on: true });
   const shop = { x: 24, y: 0, z: 32 }; shop.yaw = Math.atan2(-shop.x, 42 - shop.z);
@@ -2086,7 +2094,7 @@ function buildHub() {
         if (Math.abs(x) > R - rad - 1 || Math.abs(z) > R - rad - 1) continue;
         if (mts.some(m => Math.hypot(x - m.cx, z - m.cz) < m.r + rad + 1) || spots.some(sp => Math.hypot(x - sp.x, z - sp.z) < rad + 8)) continue;
         if (parks.some(pk => Math.hypot(x - pk.cx, z - pk.cz) < pk.rad + rad + 2.5)) continue;
-        if ([goal, board, tutGate, { x: 0, z: 50 }, { x: 0, z: 32 }].some(o => Math.hypot(x - o.x, z - o.z) < rad + 4)) continue;
+        if ([goal, board, tutGate, roomHub, { x: 0, z: 50 }, { x: 0, z: 32 }].some(o => Math.hypot(x - o.x, z - o.z) < rad + 4)) continue;
         if (stores.some(s => Math.hypot(x - s.x, z - s.z) < rad + SR + 2) || bigs.some(o => Math.hypot(x - o.x, z - o.z) < rad + o.rad + 2)) continue;
         const gone = houses.filter(o => Math.hypot(o.x - x, o.z - z) < rad + 4.2).length;
         const score = r + gone * goneCost + (paths.some(pa => segDist(x, z, pa) < rad + 1) ? pathCost : 0);
@@ -2114,7 +2122,7 @@ function buildHub() {
         if (Math.abs(x) > R - rad - 1 || Math.abs(z) > R - rad - 1) continue;
         if (mts.some(m => Math.hypot(x - m.cx, z - m.cz) < m.r + rad + 1) || spots.some(sp => Math.hypot(x - sp.x, z - sp.z) < rad + 8)) continue;
         if (parks.some(pk => Math.hypot(x - pk.cx, z - pk.cz) < pk.rad + rad + 2.5)) continue;
-        if ([goal, board, tutGate, { x: 0, z: 50 }, { x: 0, z: 32 }].some(o => Math.hypot(x - o.x, z - o.z) < rad + 4) || stores.some(s => Math.hypot(x - s.x, z - s.z) < rad + SR + 2)) continue;
+        if ([goal, board, tutGate, roomHub, { x: 0, z: 50 }, { x: 0, z: 32 }].some(o => Math.hypot(x - o.x, z - o.z) < rad + 4) || stores.some(s => Math.hypot(x - s.x, z - s.z) < rad + SR + 2)) continue;
         const gone = houses.filter((o, j) => j !== save.home && Math.hypot(o.x - x, o.z - z) < rad + 4.2).length;
         const score = r + gone * 8 + (paths.some(pa => sd(x, z, pa) < rad + 1) ? 25 : 0);
         if (!best || score < best.score) best = { x, z, score };
@@ -2136,6 +2144,7 @@ function buildHub() {
     if (remotes.some(o => Math.hypot(rm.x - o.x, rm.z - o.z) < 2 * MR)) continue;
     remotes.push(rm); houses.forEach(o => { if (Math.hypot(o.x - rm.x, o.z - rm.z) < MR + 4.2) o.gone = true; });
   }
+  houses.forEach(o => { if (Math.hypot(o.x - roomHub.x, o.z - roomHub.z) < 9) o.gone = true; });
   // hollow houses: four walls with a doorway at the front, and a few coins inside
   const hitems = [], got = save.houseCoins || [];
   houses.forEach((h, hi) => {
@@ -2161,7 +2170,7 @@ function buildHub() {
   for (const rm of remotes) { for (const b of mansionShell(rm)) boxes.push(b); for (const b of mansionBoxes(rm)) boxes.push(b); } // no door: a friend's house is always open
   const clear = (x, z) => !nearAny(x, z) && houses.every(h => Math.hypot(x - h.x, z - h.z) > 5.8);
   const segD = (x, z, pa) => { const dx = pa.x1 - pa.x0, dz = pa.z1 - pa.z0, t = Math.max(0, Math.min(1, ((x - pa.x0) * dx + (z - pa.z0) * dz) / (dx * dx + dz * dz))); return Math.hypot(x - pa.x0 - dx * t, z - pa.z0 - dz * t); };
-  const offPath = (x, z) => paths.every(pa => segD(x, z, pa) > 2.4) && Math.hypot(x - tutGate.x, z - tutGate.z) > 4;
+  const offPath = (x, z) => paths.every(pa => segD(x, z, pa) > 2.4) && Math.hypot(x - tutGate.x, z - tutGate.z) > 4 && Math.hypot(x - roomHub.x, z - roomHub.z) > 5;
   for (let i = 0; i < 620; i++) { const x = (rnd() - 0.5) * 2 * (R - 2), z = (rnd() - 0.5) * 2 * (R - 2); if (clear(x, z) && offPath(x, z)) trees.push({ x, y: 0, z, s: 0.7 + rnd() * 0.5 }); }
   const offMan = (x, z) => (!mansion || Math.hypot(x - mansion.x, z - mansion.z) > Math.hypot(MAN.hw, MAN.hd) + 5) && remotes.every(rm => Math.hypot(x - rm.x, z - rm.z) > MR + 5) && stores.every(s => Math.hypot(x - s.x, z - s.z) > SR + 5.5); // a clear yard all around
   for (const t of trees) if (!offMan(t.x, t.z)) t.gone = true;
@@ -2204,7 +2213,7 @@ function buildHub() {
     const a = burrow.yaw + (id - 2) * 0.62, hx = burrow.x + Math.sin(a) * 2.1, hz = burrow.z + Math.cos(a) * 2.1, ok = home.includes(id);
     babies.push({ id, lx: x, lz: z, hx, hz, x: ok ? hx : x, y: 0, z: ok ? hz : z, yaw: ok ? a : rr2() * 6.28, st: ok ? 'home' : 'lost', t: rr2() * 5, hop: 0 });
   }
-  return { def: HUB, hub: true, R, boxes, items: hitems, enemies: [], trees, paths, start: { x: 0, y: 0, z: 50 }, checkpoints: [], cpActive: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, ward, smith, board, tutGate, houses, turtles, parks, mts, burrow, rabbits, babies, mansion, remotes, stores, honeyShop };
+  return { def: HUB, hub: true, R, boxes, items: hitems, enemies: [], trees, paths, start: { x: 0, y: 0, z: 50 }, checkpoints: [], cpActive: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, ward, smith, board, tutGate, roomHub, houses, turtles, parks, mts, burrow, rabbits, babies, mansion, remotes, stores, honeyShop };
 }
 function mkBoss(type, c) {
   const base = { type, c, x: c.x, z: c.zc - 3, y: c.y, vx: 0, vz: 0, vy: 0, t: 0, inv: 0, active: false, defeated: false, deadT: 0, yaw: 0, tx: 0, tz: 0, state: type === 'mush' ? 'walk' : type === 'queen' ? 'hover' : 'aim' };
@@ -2778,7 +2787,7 @@ function momText() {
 const CHEST_MS = 5 * 60 * 1000;
 const chestLeft = key => Math.max(0, Math.min(CHEST_MS, ((save.chestT || {})[key] || 0) - Date.now()));
 const mmss = ms => { const t = Math.ceil(ms / 1000); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); };
-function openChest(key) { (save.chestT = save.chestT || {})[key] = Date.now() + CHEST_MS; }
+function openChest(key) { (save.chestT = save.chestT || {})[key] = Date.now() + CHEST_MS; bump('chest'); }
 function hubStep() {
   if (net.homesDirty) { rebuildHub(); return; }
   turtleStep(); rabbitStep(); wolfStep(); sleepStep(); doorStep();
@@ -2823,6 +2832,8 @@ function hubStep() {
   if (dsh > 2.2) sh.armed = true; else if (dsh < 1.1 && sh.armed && Math.abs(P.y - sh.y) < 1) { sh.armed = false; saveGame(); openShop(); return; }
   const tg = L.tutGate, dtx = Math.abs(P.x - tg.x), dtz = Math.abs(P.z - tg.z);
   if (Math.hypot(dtx, dtz) > 2.6) tg.armed = true; else if (tg.armed && dtx < 1.1 && dtz < 0.45 && P.y < 1) { tg.armed = false; saveGame(); sfx.flag(); startLevel(TUT); return; }
+  const rh = L.roomHub, drh = Math.hypot(P.x - rh.x, P.z - rh.z);
+  if (drh > 2.8) rh.armed = true; else if (drh < 1.3 && rh.armed && P.y < 1) { rh.armed = false; sfx.flag(); bump('lobby'); openNet(); return; }
   const bd = L.board, dbd = Math.hypot(P.x - bd.tx, P.z - bd.tz);
   if (dbd > 2.2) bd.armed = true; else if (dbd < 1.0 && bd.armed && P.y < 1) { bd.armed = false; openMap(); return; }
   const wd = L.ward, dw = Math.hypot(P.x - wd.tx, P.z - wd.tz);
@@ -3331,6 +3342,13 @@ function buildScene() {
       for (const sd of [1, -1]) { const pl = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 0.6), new THREE.MeshLambertMaterial({ map: tt, emissive: '#3a2a00' })); pl.position.set(0, 2.85, sd * 0.06); if (sd < 0) pl.rotation.y = Math.PI; g3.add(pl); }
       mk('box', '#ffd23f', [2.5, 0.7, 0.06], [0, 2.85, 0], g3);
       for (const sx of [-1.45, 1.45]) mk('sph', '#ffd23f', [0.25, 0.25, 0.25], [sx, 3.55, 0], g3, { emissive: '#8a6a00' }); }
+    { const rh = L.roomHub, g4 = grp(W, rh.x, 0, rh.z);
+      mk('cyl', '#3b6fb0', [2.3, 0.12, 2.3], [0, 0.06, 0], g4); mk('cyl', '#ffd23f', [1.5, 0.14, 1.5], [0, 0.1, 0], g4, { emissive: '#6a5000' });
+      for (const sx of [-1.7, 1.7]) for (const sz of [-1.7, 1.7]) { mk('box', '#7a4a24', [0.4, 3.4, 0.4], [sx, 1.7, sz], g4); mk('sph', '#ffd23f', [0.2, 0.2, 0.2], [sx, 3.55, sz], g4, { emissive: '#8a6a00' }); }
+      mk('cone', '#c9503c', [2.9, 1.4, 2.9], [0, 4.15, 0], g4); mk('box', '#5c3a1c', [4.0, 0.25, 4.0], [0, 3.5, 0], g4);
+      const rt = canvasTex(256, 64, (c, w, hh) => { c.fillStyle = '#3b6fb0'; c.fillRect(0, 0, w, hh); c.fillStyle = '#fff4dc'; c.font = '40px "Lilita One", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('ODA KUR / KATIL', w / 2, hh / 2 + 2, w - 16); });
+      for (const sd of [1, -1]) { const pl = new THREE.Mesh(new THREE.PlaneGeometry(2.8, 0.7), new THREE.MeshLambertMaterial({ map: rt, emissive: '#10243d' })); pl.position.set(0, 2.9, sd * 1.72); if (sd < 0) pl.rotation.y = Math.PI; g4.add(pl); }
+      for (const sx of [-1, 1]) mk('box', '#8a5a2b', [0.5, 0.45, 1.6], [sx * 2.6, 0.25, 0], g4); }
     { const bd = L.board, g2 = grp(W, bd.x, 0, bd.z);
       for (const sx of [-1.35, 1.35]) mk('box', '#6b4220', [0.18, 3.0, 0.18], [sx, 1.5, 0], g2);
       mk('box', '#8a5a2b', [2.9, 2.0, 0.16], [0, 1.85, 0], g2);
@@ -3751,6 +3769,7 @@ function draw3(alpha, dtMs) {
       if (qc) txt(left ? `⏱ ${mmss(left)}` : `Hazine Sandığı · ${pk.reward} para`, qc.x, qc.y, 18, left ? '#bfe6ff' : '#ffd23f', 'center');
     }
     for (const s of L.stores) { const qs = Math.hypot(s.x - P.x, s.z - P.z) < 60 ? scr(s.x, (s.D || STORE).h + (s.D || STORE).rise + 1.1, s.z) : null; if (qs) txt(s.name, qs.x, qs.y, 20, '#ffd23f', 'center'); }
+    { const rq = Math.hypot(L.roomHub.x - P.x, L.roomHub.z - P.z) < 20 ? scr(L.roomHub.x, 6.0, L.roomHub.z) : null; if (rq) txt('Oda Merkezi', rq.x, rq.y, 20, '#9fd0ff', 'center'); }
     const qt = Math.hypot(L.tutGate.x - P.x, L.tutGate.z - P.z) < 18 ? scr(L.tutGate.x, 4.3, L.tutGate.z) : null; if (qt) txt(save.tutDone ? 'Öğretici ✓' : 'Öğretici', qt.x, qt.y, 20, '#ffd23f', 'center');
 
   }
@@ -4097,7 +4116,7 @@ async function goClaude(lobby, roomTxt, pass, create) {
   net.unsub.push(r.onPeers(sync, () => { netReset(); netMsg('Oda bağlantısı koptu.'); }));
   startTicker(() => { r.presence(Object.assign(myState(), { h: create })).catch(() => {}); });
   lobby.presence({ c: save.code, n: save.name, r: roomTxt }).catch(() => {});
-  netMsg(create ? 'Oda kuruldu! Arkadaşlarına oda adını ve şifreyi söyle.' : 'Odaya katıldın!', true); renderNet();
+  bump('room'); netMsg(create ? 'Oda kuruldu! Arkadaşlarına oda adını ve şifreyi söyle.' : 'Odaya katıldın!', true); renderNet();
 }
 const srvErr = m => Object.assign(new Error(m), { srv: true });
 const wait = ms => new Promise(f => setTimeout(f, ms));
@@ -4162,7 +4181,7 @@ async function goRelay(roomTxt, pass, create) {
     }
     if (net.tok !== tok) throw new Error('Vazgeçildi.');
     if (!net.players.size) throw new Error(`"${roomTxt}" odası bulunamadı (bağlı sunucu: ${liveNames() || 'yok'}). Oda adı ve şifre ikinizde de aynı mı? Odayı kuran kişi oyunda mı? İkiniz de aynı linkten girin.`);
-    net.on = true;
+    net.on = true; bump('room');
     netMsg('Odaya katıldın!', true);
   }
   renderNet();
@@ -4181,7 +4200,7 @@ function visitHome(id) {
   if (!L.hub) return netMsg('Önce köye dön, sonra arkadaşının evine gidebilirsin.');
   if (!rm || !P) return netMsg('Bu evi köyde göremiyoruz: aynı evi seçtiniz ya da ev henüz yüklenmedi. Biraz bekleyip tekrar dene.');
   const d = MAN.hd + 4; P.x = rm.x + Math.sin(rm.yaw) * d; P.z = rm.z + Math.cos(rm.yaw) * d; P.y = 0; P.vx = P.vy = P.vz = 0; P.yaw = rm.yaw + Math.PI;
-  G.camYaw = rm.yaw; G.camYaw += 0; G.ct = null; G.manualT = 120; closeNet();
+  G.camYaw = rm.yaw; G.camYaw += 0; G.ct = null; G.manualT = 120; bump('visit'); closeNet();
 }
 function teleportTo(p) { if (!P || p.lv !== lvKey()) return; P.x = p.x + 1.2; P.y = p.y + 0.5; P.z = p.z; P.vx = P.vy = P.vz = 0; G.ct = null; closeNet(); }
 function addFriend(code, name) {
