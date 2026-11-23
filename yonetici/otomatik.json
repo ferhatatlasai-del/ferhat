@@ -95,6 +95,37 @@
       },
       "mod": "deneme",
       "durum": "reddedildi"
+    },
+    {
+      "zaman": "2026-11-23 15:19",
+      "id": "s20261123-121307",
+      "konu": "Bambu Lab A1 Combo için baskı öncesi kontrol listesi",
+      "baslik": "Bambu Lab A1 Combo baskı öncesi kontrol listesi",
+      "inceleme": {
+        "karar": "reddet",
+        "puan": 6.0,
+        "sorunlar": [
+          "Anlatıdaki dört kontrol 'tabla, filament, nozul, kalibrasyon' ama videoda 'Baskıdan önce şu dördünü kapat' deniyor; ifade hatalı ve yanıltıcı.",
+          "Sahne başlığı 7-9. karelerde '3 Nozul kontrolü' iken görüntü ve anlatı ilk katman/nozul yüksekliği anlatıyor; başlık-görüntü uyumsuz.",
+          "5. karede nozul yanında '140 °C' gösteriliyor; nemli filament sorununu bu sıcaklıkla ilişkilendirmek bağlamsız ve şüpheli.",
+          "Bazı alt yazılar alt kenara fazla yakın/kısmen taşmış görünüyor; 1., 7., 10. ve 12. karelerde okunurluk zayıf.",
+          "Konu tekrar riski yüksek: nemli filament ve nozul kalıntısı önceki videolarda zaten işlenmiş, bu videoda yeni açı sınırlı."
+        ],
+        "gerekce": "Genel mesaj büyük ölçüde doğru olsa da metin hatası, sahne etiket uyumsuzluğu ve şüpheli 140 °C görseli nedeniyle yayın için yeterince güvenilir değil.",
+        "model": "OpenAI (gpt-5.4)",
+        "iddialar": [
+          "'Toz, yağ ya da eski parça kalıntısı tutunmayı zayıflatır' → doğru",
+          "'Nemli malzeme baskıda ses yapar ve yüzeyi bozabilir' → doğru",
+          "'Makaranın rahat döndüğünü ve beslemenin takılmadığını gör' → doğru",
+          "'Yol pürüzsüzse akış da daha stabil olur' → doğru",
+          "'Nozul ucunda yanık artık, iplik ya da sarkma var mı' kontrolü → doğru",
+          "'Çok yüksekse tutunma zayıflar, doğru yükseklikte çizgi net yayılır' → doğru",
+          "'Dört temel kontrol çoğu sürprizi azaltır' → doğru",
+          "'140 °C' görseli nem/nozul bağlamında anlamlı bir teknik değer olarak sunuluyor → şüpheli"
+        ]
+      },
+      "mod": "deneme",
+      "durum": "reddedildi"
     }
   ]
 }
