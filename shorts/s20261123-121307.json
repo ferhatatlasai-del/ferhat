@@ -1,0 +1,69 @@
+{
+  "id": "s20261123-121307",
+  "olusturma": "2026-11-23T12:13:07Z",
+  "durum": "otomatik",
+  "tur": "viral",
+  "video": "",
+  "sure": 56.3,
+  "baslik": "Bambu Lab A1 Combo baskı öncesi kontrol listesi",
+  "aciklama": "Baskıya başlamadan önce bu kısa kontrolü yap.\nTabla, filament, nozul ve kalibrasyon gözden kaçmasın.\nSen baskı öncesi en çok neyi kontrol ediyorsun?\n\nBu içerik bağımsızdır; Bambu Lab ile bir bağlantısı yoktur.\n\nSeslendirme yapay zekâ (Google) ile üretilmiştir. Animasyon ve ses tasarımı yapay zekâ ile kodla üretilmiştir.\n\n#3dprinting #3dbaski #bambulab #fusedfilamentfabrication #reels #shorts",
+  "muzik": "Sentez (kodla üretildi)",
+  "konu": "Bambu Lab A1 Combo için baskı öncesi kontrol listesi",
+  "tasarimlar": [],
+  "hikayeler": [],
+  "secim": {
+    "tur": "seri"
+  },
+  "zamanlama": [
+    {
+      "tip": "kanca",
+      "t0": 0.0,
+      "t1": 7.19,
+      "ses_son": 6.69
+    },
+    {
+      "tip": "ozel",
+      "t0": 7.19,
+      "t1": 13.53,
+      "ses_son": 13.03
+    },
+    {
+      "tip": "sogutma",
+      "t0": 13.53,
+      "t1": 19.41,
+      "ses_son": 18.91
+    },
+    {
+      "tip": "ekstruder",
+      "t0": 19.41,
+      "t1": 26.6,
+      "ses_son": 26.1
+    },
+    {
+      "tip": "ozel",
+      "t0": 26.6,
+      "t1": 33.59,
+      "ses_son": 33.09
+    },
+    {
+      "tip": "ilk_katman",
+      "t0": 33.59,
+      "t1": 40.48,
+      "ses_son": 39.98
+    },
+    {
+      "tip": "kontrol_listesi",
+      "t0": 40.48,
+      "t1": 47.16,
+      "ses_son": 46.66
+    },
+    {
+      "tip": "kapanis",
+      "t0": 47.16,
+      "t1": 56.291,
+      "ses_son": 53.891
+    }
+  ],
+  "otomatik": true,
+  "anlati": "Baskıya basmadan önce, sen en çok nerayı atlıyorsun? Küçük bir kontrol, büyük bir hatayı önler. Önce tabla yüzeyine bak. Toz, yağ ya da eski parça kalıntısı tutunmayı zayıflatır. Filament kuru mu, ona bak. Nemli malzeme baskıda ses yapar ve yüzeyi bozabilir. Makaranın rahat döndüğünü ve beslemenin takılmadığını gör. Yol pürüzsüzse akış da daha stabil olur. Nozul ucunda yanık artık, iplik ya da sarkma var mı, kısa bir bakış at. Sorun büyümeden fark edersin. Sonra ilk katmanı izle. Çok yüksekse tutunma zayıflar, doğru yükseklikte çizgi net yayılır. Baskıdan önce şu dördünü kapat: tabla, filament, nozul, kalibrasyon. Bunlar çoğu sürprizi azaltır. Sen baskıdan önce neyi ilk kontrol ediyorsun? Yoruma yaz, daha fazla kısa ipucu için takip et."
+}

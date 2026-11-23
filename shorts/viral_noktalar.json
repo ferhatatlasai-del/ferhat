@@ -71,7 +71,21 @@
         "dört kısa kontrol sorunu azaltır",
         "yorum ve takip çağrısı"
       ]
+    },
+    {
+      "id": "s20261123-121307",
+      "konu": "Bambu Lab A1 Combo için baskı öncesi kontrol listesi",
+      "noktalar": [
+        "baskı öncesi eksik kontrol",
+        "tabla yüzeyi temiz olmalı",
+        "nemli filament sorun çıkarır",
+        "filament akışı takılmamalı",
+        "nozul ucunu gözle kontrol et",
+        "ilk katman doğru yükseklik",
+        "dört temel kontrol yeterli",
+        "yorum yaz ve takip et"
+      ]
     }
   ],
-  "son_ton": 305
+  "son_ton": 0
 }
