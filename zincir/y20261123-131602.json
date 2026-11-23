@@ -1,0 +1,27 @@
+{
+  "kimlik": "y20261123-131602",
+  "olusturma": "2026-11-23T13:16:02.693Z",
+  "durum": "video",
+  "kaynak": "bagimsiz",
+  "direktif": "",
+  "konu": "Şehirde aslan görürsen ne yapmalısın?",
+  "format": "reels",
+  "seri": "",
+  "kanca": "",
+  "video": {
+    "yol": "videolar/yukleme_20261123125058.mp4",
+    "tarih": "2026-11-23T13:15:56.275Z"
+  },
+  "yayinlar": [
+    {
+      "hedef": "youtube",
+      "platform": "youtube",
+      "tur": "shorts",
+      "durum": "basladi",
+      "baslangic": "2026-11-23T13:15:56.275Z",
+      "video": "videolar/yukleme_20261123125058.mp4"
+    }
+  ],
+  "olcumler": [],
+  "ogrenildi": false
+}
