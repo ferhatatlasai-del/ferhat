@@ -171,6 +171,28 @@
       ],
       "uyarilar": [],
       "eylem_sayisi": 1
+    },
+    {
+      "zaman": "2026-11-23 09:35",
+      "kademe": 3,
+      "model": "OpenAI (gpt-5.4)",
+      "rapor": [
+        "Acil değil ama son 24 saatte Nöbetçi bir kez başarısız olmuş; şu an sağlık satırlarında servisler iyi görünüyor, veri yoksa sebebi net diyemem.",
+        "Otomatik hat deneme modunda ve bugün henüz tur görünmüyor; bu yüzden yayın tarafında aksiyon yok, sadece izleme öneririm.",
+        "Onay bekleyen tek taslak için zaten daha önce 'incele' notu düşülmüş; aynı taslağa tekrar not yazmadım.",
+        "Yorum tarafında onay bekleyen yanıt yok; bu turda yorum onayı gerekmiyor.",
+        "Hikâye sistemi aktif, günlük sayı 6 ve kuyrukta 7 planlı hikâye var; hedefle uyumlu olduğu için ayar değiştirmedim.",
+        "Öncelikli konu listesi dolu görünüyor; yeni konu eklemedim çünkü bekleyen öncelikli konu 3'ten az değil."
+      ],
+      "oneriler": [
+        "Nöbetçi başarısızlığının nedenini panel/logdan kontrol et; tekrar ederse ancak o zaman yeniden tetiklemek mantıklı olur.",
+        "Onay bekleyen 'Bambu Lab A1'de İlk Katman Neden Yapışmaz?' taslağında marka/ürün bağlantı izlenimi için açıklamada bağımsızlık notu olup olmadığını sen kontrol et.",
+        "Son izlenen videolarda Bambu A1 ekseni yoğun; sıradaki üretimlerde çeşitlilik için genel 3D baskı konularına da dönmek iyi olabilir."
+      ],
+      "uyarilar": [
+        "Yorum modu otomatik görünüyor; senin sınırına göre bunu ben değiştiremem, sadece riskli yanıtlar için ara sıra kontrol etmeni öneririm."
+      ],
+      "eylem_sayisi": 0
     }
   ],
   "defter": [
