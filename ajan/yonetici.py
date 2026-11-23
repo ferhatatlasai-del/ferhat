@@ -286,7 +286,7 @@ def bekleyen_video_incele(ozet, kademe, yonerge, bilgi_tabani):
                 urllib.request.urlretrieve((os.environ.get("YONETICI_VIDEO_TABAN") or f"https://raw.githubusercontent.com/{REPO}/{DAL}/") + d["video"], yol)
                 nk, _ = dosya_oku("shorts/viral_noktalar.json")
                 onceki = [n for v in (nk or {}).get("videolar", []) for n in v.get("noktalar", [])]
-                bilgi = {"baslik": d.get("baslik"), "konu": d.get("konu"), "aciklama": d.get("aciklama"), "anlati": d.get("anlati") or "(anlatı metni kayıtlı değil)", "sahneler": [z.get("tip") for z in d.get("zamanlama") or []], "noktalar": []}
+                bilgi = {"baslik": d.get("baslik"), "konu": d.get("konu"), "aciklama": d.get("aciklama"), "anlati": d.get("anlati") or "(anlatı metni kayıtlı değil)", "sahneler": [z.get("tip") for z in d.get("zamanlama") or []], "noktalar": [], "serbest": bool(d.get("serbest"))}
                 inc = VI.incele(yol, bilgi, yonerge, bilgi_tabani, onceki)
             except Exception as e:
                 print(f"UYARI: taslak incelenemedi ({type(e).__name__}: {str(e)[:100]})")

@@ -121,6 +121,7 @@ def incele(video, bilgi, yonerge="", bilgi_tabani="", onceki_noktalar=()):
                      "\n\nANLATI METNİ:\n" + str(bilgi.get("anlati"))[:2200] + "\n\nAÇIKLAMA:\n" + str(bilgi.get("aciklama"))[:700] +
                      "\n\nBu videonun noktaları: " + "; ".join(bilgi.get("noktalar") or []) + "\nÖnceki videolarda anlatılan noktalar (tekrar mı?): " + "; ".join(list(onceki_noktalar)[-25:]) +
                      "\n\nTEKNİK ÖLÇÜMLER: " + json.dumps(olcum, ensure_ascii=False) + ("\nTEKNİK SORUNLAR: " + "; ".join(sorunlar_t) if sorunlar_t else "") +
+                     ("\n\nBU VİDEO SERBEST KONUDA (3D baskı dışı olabilir): konunun 3D baskıyla ilgisiz olması SORUN DEĞİLDİR; 3D baskı değer aralıklarını uygulama, genel bilginle doğruluğu denetle. Uydurma istatistik, kesin bilimsel/sağlık/hukuk/yatırım iddiası, siyaset, kişi hedefleme, tartışmalı ya da yanıltıcı bilgi varsa REDDET." if bilgi.get("serbest") else "") +
                      "\n\nKareler zamanları (sn): " + " | ".join(", ".join(str(t) for t in ts) for _, ts in sayfalar))
         j, kaynak = model_sor(SISTEM, kullanici, [s for s, _ in sayfalar])
     try:

@@ -86,7 +86,9 @@ def _kisa(v, n):
 
 
 RENKLER = {"turuncu", "mavi", "yesil", "kirmizi", "sari", "mor", "pembe", "beyaz", "koyu", "gri", "kahve", "siyah"}
-IKONLAR = {"nozul", "nozul_tikali", "makara", "disli", "fan", "termometre", "damla", "alev", "duman", "tik", "carpi", "uyari", "saat", "lupa", "yildiz", "parca", "filament", "yatak", "kilit"}
+GENEL_IKONLAR = {"yumurta", "kalp", "ampul", "dunya", "kitap", "ev", "yaprak", "para", "gunes", "bulut", "insan", "tavuk"}
+IKONLAR = {"nozul", "nozul_tikali", "makara", "disli", "fan", "termometre", "damla", "alev", "duman", "tik", "carpi", "uyari", "saat", "lupa", "yildiz", "parca", "filament", "yatak", "kilit"} | GENEL_IKONLAR
+SERBEST_TIPLER = ["ozel", "kanca", "karsilastir", "sayi", "kontrol_listesi", "kapanis"]
 TURLER = {"dikdortgen", "daire", "cizgi", "ok", "yazi", "ikon", "parcacik"}
 OZELLIKLER = {"x", "y", "olcek", "donus", "opaklik", "w", "h", "doluluk", "cizim", "r", "x1", "y1", "x2", "y2", "boyut", "kalinlik"}
 YEDEKLER = [t for t in TIPLER if t not in ("ozel", "kanca", "kapanis")]
@@ -176,6 +178,8 @@ def params_temizle(tip, p):
     p = p if isinstance(p, dict) else {}
     if tip == "ozel":
         return ozel_params(p)
+    if tip in ("kanca", "kapanis"):
+        return {"ikon": p["ikon"]} if p.get("ikon") in IKONLAR else {}
     if tip == "sicak_uc":
         return {"derece": int(_sayi(p.get("derece"), 210, 100, 320))}
     if tip == "katman":
@@ -198,7 +202,7 @@ def params_temizle(tip, p):
     return {}
 
 
-def dogrula(s, temizle=lambda x: x, gecmis=()):
+def dogrula(s, temizle=lambda x: x, gecmis=(), serbest=False):
     """Hikâye tahtasını temizler; sorun varsa ValueError. temizle: metin temizleyici (U.yazi_temizle)."""
     sah = [x for x in (s.get("sahneler") or []) if isinstance(x, dict)]
     if not 5 <= len(sah) <= 12:
@@ -206,12 +210,12 @@ def dogrula(s, temizle=lambda x: x, gecmis=()):
     temiz, onceki, sayac = [], None, {}
     for i, x in enumerate(sah):
         tip = x.get("tip")
-        if tip not in TIPLER:
-            raise ValueError(f"{i + 1}. sahne tipi geçersiz: {tip}")
+        if tip not in (SERBEST_TIPLER if serbest else TIPLER):
+            raise ValueError(f"{i + 1}. sahne tipi geçersiz: {tip}" + (" (serbest konuda yalnızca " + ", ".join(SERBEST_TIPLER) + " kullanılır)" if serbest else ""))
         if tip == onceki:
             raise ValueError(f"{i + 1}. sahne bir öncekiyle aynı tip ({tip}); çeşitlilik gerekli")
         sayac[tip] = sayac.get(tip, 0) + 1
-        if sayac[tip] > (3 if tip == "ozel" else 2):
+        if sayac[tip] > ((5 if serbest else 3) if tip == "ozel" else 2):
             raise ValueError(f"'{tip}' tipi çok fazla kullanılmış")
         onceki = tip
         kel, bayrak = isaretle(" ".join(str(x.get("anlati") or "").split()))
@@ -225,10 +229,12 @@ def dogrula(s, temizle=lambda x: x, gecmis=()):
         raise ValueError("ilk sahne 'kanca' olmalı")
     if temiz[-1]["tip"] != "kapanis":
         raise ValueError("son sahne 'kapanis' olmalı")
+    if serbest and sayac.get("ozel", 0) < 2:
+        raise ValueError("serbest konuda en az 2 'ozel' sahne gerekli")
     if not sayac.get("ozel"):
         raise ValueError("en az bir 'ozel' (konuya özel tasarlanmış) sahne gerekli; yalnızca hazır tipler kullanılmış")
-    if len(sayac) < 5:
-        raise ValueError(f"en az 5 farklı sahne tipi gerekli ({len(sayac)})")
+    if len(sayac) < (4 if serbest else 5):
+        raise ValueError(f"en az {4 if serbest else 5} farklı sahne tipi gerekli ({len(sayac)})")
     kelime = sum(len(x["anlati"].split()) for x in temiz)
     if not 90 <= kelime <= 190:
         raise ValueError(f"anlatı {kelime} kelime; 90-190 olmalı")
@@ -261,3 +267,32 @@ def onceki_metni(noktalar, konular):
     if ek:
         sat.append("- Daha önceki video konuları: " + "; ".join(str(k)[:60] for k in ek))
     return "\n".join(sat) + "\n"
+
+
+# ---------------- SERBEST KONU (3D baskı dışı) ----------------
+_OZEL_BLOK = ISTEM[ISTEM.index("- ozel:"):ISTEM.index("ÇEŞİTLİLİK KURALLARI")]
+_OZEL_BLOK = (_OZEL_BLOK.replace('"yedek": "ekstruder"', '"yedek": "kontrol_listesi"')
+              .replace("ikon adları: nozul, nozul_tikali, makara, disli, fan, termometre, damla, alev, duman, tik, carpi, uyari, saat, lupa, yildiz, parca, filament, yatak, kilit.",
+                       "ikon adları (yalnızca bunları kullan): yumurta, tavuk, kalp, ampul, dunya, kitap, ev, yaprak, para, gunes, bulut, insan, termometre, damla, alev, tik, carpi, uyari, saat, lupa, yildiz, kilit. Başka bir şeyi şekillerle (daire, dikdörtgen, çizgi, ok) kendin çiz.")
+              .replace('"ad":"termometre"', '"ad":"termometre"'))
+ISTEM_SERBEST = """YouTube Shorts / Instagram Reels için ~50-60 saniyelik, ANİMASYONLU ve görsel olarak ÇEŞİTLİ, TÜRKÇE, merak uyandıran bir bilgi videosunun HİKÂYE TAHTASINI yaz. Kanal 3D baskı ağırlıklıdır ama bu video SERBEST bir konudadır: konu 3D baskıyla ilgili olmak zorunda DEĞİL, ona zorla bağlama; ama video yine de genel bir kitleye yönelik, sakin, güvenilir ve eğlenceli olsun.
+Konu: {konu}
+İpucu: {ipucu}
+KONU UYGUN DEĞİLSE (nefret/hakaret, siyaset, kişi hedefleme, sağlık/hukuk/yatırım TAVSİYESİ, şiddet, yetişkin içerik, tehlikeli talimat) hikâye yazma; yalnızca {{"uygunsuz": "kısa neden"}} döndür.
+
+Video, her biri bir ANİMASYON SAHNESİ olan sahnelerden oluşur. Sahne sayısını konunun gerektirdiği kadar seç (5 ile 10 arası).
+SAHNE TİPLERİ (yalnızca bunlar; animasyon; params alanları):
+- kanca: açılış (merkezde büyük bir ikon, ışınlar, soru işaretleri). ZORUNLU ilk sahne. params: {{"ikon": "yumurta"}}  (konuyu en iyi anlatan ikon: yumurta, tavuk, kalp, ampul, dunya, kitap, ev, yaprak, para, gunes, bulut, insan, termometre, damla, alev, saat, lupa, yildiz)
+- karsilastir: iki değeri sütunla karşılaştırır. params: {{"a": {{"ad": "Yaz", "deger": 5}}, "b": {{"ad": "Kış", "deger": 3}}, "birim": "adet"}}
+- sayi: büyük halka sayaç. params: {{"deger": 65, "maks": 100, "birim": "%", "etiket": "kısa açıklama"}}
+- kontrol_listesi: onay işaretli madde listesi (özet için). params: {{"maddeler": ["en çok 28 harf", "...", "..."]}}  (3-4 madde)
+- kapanis: son sahne (takip et). ZORUNLU son sahne. params: {{"ikon": "kalp"}}
+""" + _OZEL_BLOK + """ÇEŞİTLİLİK KURALLARI: Hikâyenin ana görsel yükünü "ozel" sahneler taşır: videoda EN AZ 2, en çok 5 "ozel" sahne tasarla (ZORUNLU); konunun kendine özgü kavramlarını (süreç, döngü, karşılaştırma, ölçek, neden-sonuç) şekil, ok, ikon ve hareketle çiz. Aynı tip arka arkaya gelmesin, ozel dışındaki tipler en çok 2 kez, en az 4 farklı tip olsun.
+TEKRARA DÜŞME: Her sahnenin "nokta" alanına o sahnede anlattığın TEK somut bilgiyi 3-8 kelimeyle yaz. Aşağıdaki, daha önceki videolarda ZATEN anlatılmış noktaları ve konuları TEKRAR ETME. Bu videonun noktaları da birbirinden farklı olsun.
+{onceki}
+ANLATI: sahne başına 1-2 kısa cümle (8-22 kelime), toplam 110-150 kelime. İlk sahne güçlü kanca (soru ya da yaygın yanılgı). Cümleler kısa, konuşma dili, "sen" hitabı. Son sahne yoruma davet + takip et.
+VURGU: anlatıda önemli kelimeleri işaretle: *kelime* turuncu, ~kelime~ mavi. Her sahnede en çok 2 vurgu; çok kelimeli vurguda HER kelimeyi ayrı işaretle.
+EK ALANLAR (isteğe bağlı): "bolum": yeni bölüm başlığı (en çok 28 harf; ilk sahnede olmasın, "kanca"ya yazma); "baslik": ekrana büyük yazı olarak zıplayan TEK kısa kelime (en çok 10 harf, tüm videoda en çok 2 sahnede); "etiketler": sahnedeki animasyon parçalarına bağlanan en çok 2 kısa etiket.
+DOĞRULUK: Yalnızca yaygın kabul gören, doğru bilgileri yaz. Emin olmadığın sayıyı verme; tipik değer ya da aralık kullan ("yaklaşık", "genellikle"). İstatistik, fiyat, marka karşılaştırması, kişisel deneyim, bilimsel iddia UYDURMA. Tartışmalı ya da kesin olmayan konuda dengeli konuş. Yasak sözcükler: mükemmel, harika, muhteşem, inanılmaz. Sayıları anlatıda yazıyla yaz ("yüz yirmi gün").
+YALNIZCA JSON döndür: {{"konu":"...","baslik":"arama odaklı en çok 70 karakter","aciklama":"2-3 kısa satır, son satır yorum daveti","etiketler":["konuyla ilgili","3-6 etiket"],
+"sahneler":[{{"tip":"kanca","anlati":"...","nokta":"3-8 kelimelik tek bilgi","bolum":"","baslik":"","etiketler":[],"params":{{"ikon":"yumurta"}}}}]}}"""

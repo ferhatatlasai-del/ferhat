@@ -6,6 +6,9 @@ on:
       konu:
         description: "İsteğe bağlı konu (boşsa sıradaki hazır senaryo ya da konu listesi kullanılır)"
         default: ""
+      konu_turu:
+        description: "Elle yazılan konunun türü: otomatik (3D baskı sözcüğü varsa 3d, yoksa serbest), 3d ya da serbest"
+        default: "otomatik"
       hemen:
         description: "EVET yazarsan taslak limiti dolu olsa bile bir kez üretir"
         default: "HAYIR"
@@ -52,8 +55,10 @@ jobs:
           KONU: ${{ inputs.konu }}
           HEMEN: ${{ inputs.hemen }}
           BICIM: ${{ inputs.bicim }}
+          KONU_TURU: ${{ inputs.konu_turu }}
         run: |
           ARG=""
           if [ "$HEMEN" = "EVET" ]; then ARG="$ARG --hemen"; fi
           if [ "$BICIM" = "anlat" ] || [ "$BICIM" = "liste" ] || [ "$BICIM" = "3d" ]; then ARG="$ARG --bicim $BICIM"; fi
+          if [ "$KONU_TURU" = "3d" ] || [ "$KONU_TURU" = "serbest" ]; then ARG="$ARG --konu-turu $KONU_TURU"; fi
           if [ -n "$KONU" ]; then python3 ajan/viral_video.py --git $ARG --konu "$KONU"; else python3 ajan/viral_video.py --git $ARG; fi

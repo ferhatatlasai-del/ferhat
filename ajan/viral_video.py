@@ -349,7 +349,20 @@ def liste_senaryo_sec(a):
     return None, "kullanılmamış liste konusu kalmadı (video/liste_konulari.json'a yeni konu ekle)"
 
 
+SERBEST = False      # bu çalışmada 3D baskı dışı serbest konu mu (yalnızca elle yazılan konuda)
+SON_HATA = ""        # senaryo üretilemediyse kullanıcıya gösterilecek neden (ör. konu uygunsuz)
+UYGUNSUZ = RuntimeError
+_3D_KOKLER = ("3d", "yazıcı", "yazici", "filament", "nozul", "baskı", "baski", "pla ", "petg", "abs ", "tpu", "bambu", "ender", "prusa", "slicer", "cura", "stl", "reçine", "recine", "fdm", "extruder", "ekstruder", "tabla", "katman", "warping", "stringing", "retraction")
+
+
+def konu_3d_mu(konu):
+    k = " " + str(konu).lower().replace("İ", "i").replace("I", "ı") + " "
+    return any(x in k for x in _3D_KOKLER)
+
+
 def anlat_senaryo_uret(konu, ipucu):
+    global SON_HATA
+    SON_HATA = ""
     """Yapay zekâ hikâye tahtasını (çeşitli animasyon sahneleri) yazar; doğrulama (çeşitlilik kuralları) geçmezse hata ile yeniden dener."""
     anahtar = os.environ.get("OPENAI_API_KEY")
     if not anahtar:
@@ -362,16 +375,20 @@ def anlat_senaryo_uret(konu, ipucu):
         if o.get("tur") == "viral" and (o.get("konu") or o.get("baslik")):
             gecmis_konular.append(str(o.get("konu") or o.get("baslik")))
     govde = {"model": MODEL, "response_format": {"type": "json_object"}, "temperature": 0.8,
-             "messages": [{"role": "system", "content": "Sen Türkçe 3D baskı eğitim videoları yazan, animasyonla anlatan, doğruluğa önem veren bir içerik editörüsün. Yalnızca geçerli JSON döndür."},
-                          {"role": "user", "content": ilham_ekle(AN.ISTEM.format(konu=konu, ipucu=ipucu or "-", onceki=AN.onceki_metni(gecmis_kayit, gecmis_konular)))}]}
+             "messages": [{"role": "system", "content": ("Sen Türkçe kısa bilgi videoları yazan, animasyonla anlatan, doğruluğa önem veren bir içerik editörüsün. Yalnızca geçerli JSON döndür." if SERBEST else "Sen Türkçe 3D baskı eğitim videoları yazan, animasyonla anlatan, doğruluğa önem veren bir içerik editörüsün. Yalnızca geçerli JSON döndür.")},
+                          {"role": "user", "content": ilham_ekle((AN.ISTEM_SERBEST if SERBEST else AN.ISTEM).format(konu=konu, ipucu=ipucu or "-", onceki=AN.onceki_metni(gecmis_kayit, gecmis_konular)))}]}
     for deneme in range(3):
         try:
             r = urllib.request.Request(f"{OPENAI}/chat/completions", data=json.dumps(govde).encode(), method="POST",
                                        headers={"Content-Type": "application/json", "Authorization": f"Bearer {anahtar}"})
             with urllib.request.urlopen(r, timeout=150) as y:
                 j = json.loads(json.load(y)["choices"][0]["message"]["content"])
+            if SERBEST and j.get("uygunsuz"):
+                SON_HATA = "konu uygun değil: " + str(j.get("uygunsuz"))[:120]
+                print("Karar: " + SON_HATA)
+                return None
             j["konu"] = j.get("konu") or konu
-            return AN.dogrula(j, U.yazi_temizle, gecmis_noktalar)
+            return AN.dogrula(j, U.yazi_temizle, gecmis_noktalar, serbest=SERBEST)
         except Exception as e:
             print(f"UYARI: anlat hikâye tahtası üretimi/doğrulaması başarısız ({deneme + 1}/3): {type(e).__name__}: {str(e)[:160]}")
             if deneme == 1:
@@ -383,11 +400,11 @@ def anlat_senaryo_sec(a):
     kullanilan = set(json_oku(KULLANILAN, []))
     if a.senaryo:
         SECIM.update(tur="elle")
-        return AN.dogrula(json_oku(a.senaryo, {}), U.yazi_temizle), pathlib.Path(a.senaryo).stem
+        return AN.dogrula(json_oku(a.senaryo, {}), U.yazi_temizle, serbest=SERBEST), pathlib.Path(a.senaryo).stem
     if a.konu:
         SECIM.update(tur="elle")
         s = anlat_senaryo_uret(a.konu, "")
-        return (s, "anlat-" + slug(a.konu)) if s else (None, "anlat senaryosu üretilemedi (OPENAI_API_KEY yok ya da yanıt geçersiz)")
+        return (s, "anlat-" + slug(a.konu)) if s else (None, SON_HATA or "anlat senaryosu üretilemedi (OPENAI_API_KEY yok ya da yanıt geçersiz)")
     # öncelikli seri: shorts/viral_ayar.json içindeki "oncelikli" konular (sırayla, her biri bir kez) başarı hafızasından ve listeden önce gelir
     for k in (json_oku(AYAR, {}).get("oncelikli") or []):
         kim = "anlat-" + slug(k["konu"])
@@ -835,7 +852,7 @@ def ozel_kontrol(plan, dizin, plan_yolu):
             gecti, sorun = False, "önizleme çizilemedi: " + (r.stderr or "")[-120:]
         else:
             try:
-                icerik = [{"type": "text", "text": "Bu 3 kare, 3D yazıcı hakkında bir animasyon sahnesinin farklı anlarıdır (dikey video). Sahne: " + str(plan["sahneler"][i].get("params", {}).get("yedek", "")) + ". Değerlendir: sahne boş ya da neredeyse boş mu, yazılar okunamıyor ya da üst üste biniyor mu, ögeler ekran dışına taşıyor ya da çok küçük/bozuk mu, kareler arasında hareket var mı? Yalnızca JSON: {\"gecti\": true/false, \"sorun\": \"kısa\"}. Küçük kusurlar için true de."}]
+                icerik = [{"type": "text", "text": "Bu 3 kare, " + ("bir bilgi videosundaki" if SERBEST else "3D yazıcı hakkında bir") + " animasyon sahnesinin farklı anlarıdır (dikey video). Sahne: " + str(plan["sahneler"][i].get("params", {}).get("yedek", "")) + ". Değerlendir: sahne boş ya da neredeyse boş mu, yazılar okunamıyor ya da üst üste biniyor mu, ögeler ekran dışına taşıyor ya da çok küçük/bozuk mu, kareler arasında hareket var mı? Yalnızca JSON: {\"gecti\": true/false, \"sorun\": \"kısa\"}. Küçük kusurlar için true de."}]
                 for k in kareler:
                     icerik.append({"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + base64.b64encode(k.read_bytes()).decode()}})
                 govde = {"model": MODEL, "response_format": {"type": "json_object"}, "messages": [{"role": "user", "content": icerik}]}
@@ -848,7 +865,11 @@ def ozel_kontrol(plan, dizin, plan_yolu):
         print(f"Özel sahne {i + 1}: {'GEÇTİ' if gecti else 'GEÇMEDİ → yedek sahne'} {sorun}")
         if not gecti:
             yedek = (sh.get("params") or {}).get("yedek") or "ekstruder"
-            sh["tip"], sh["params"] = yedek, {}
+            if SERBEST:   # genel kalıp: anlatıdan 3 kısa madde
+                parca = [x.strip(" ,;") for x in re.split(r"[.,;!?]", str(sh.get("anlati") or "")) if len(x.strip()) > 3][:3]
+                sh["tip"], sh["params"] = "kontrol_listesi", {"maddeler": [p[:28] for p in parca] if len(parca) >= 2 else [str(sh.get("nokta") or "Önemli nokta")[:28], "Dikkat et"]}
+            else:
+                sh["tip"], sh["params"] = yedek, {}
             degisen += 1
     return degisen
 
@@ -896,7 +917,7 @@ def birlestir(sessiz, ses, cikti):
 
 
 def aciklama_olustur(s, tts_gercek):
-    etiket = " ".join(f"#{e}" for e in dict.fromkeys(s["etiketler"] + ["3dprinting", "3dbaski", "shorts"]))[:300]
+    etiket = " ".join(f"#{e}" for e in dict.fromkeys(s["etiketler"] + (["shorts"] if SERBEST else ["3dprinting", "3dbaski", "shorts"])))[:300]
     return (s["aciklama"].strip() + "\n\n" + ("Seslendirme yapay zekâ (Google) ile üretilmiştir. " if tts_gercek else "") +
             "Animasyon ve ses tasarımı yapay zekâ ile kodla üretilmiştir.\n\n" + etiket)
 
@@ -936,7 +957,13 @@ def calis(a):
     gemini = os.environ.get("GEMINI_API_KEY")
     if not (anahtar or gemini) and not (a.tts_dizin or a.sessiz):
         return hata("seslendirme anahtarı yok. İkisinden biri gerekli (GitHub Secrets): 'GEMINI_API_KEY' (aistudio.google.com/apikey, kart gerekmez) ya da 'GOOGLE_TTS_API_KEY' (Google Cloud Text-to-Speech).")
+    global SERBEST
+    SERBEST = a.konu_turu == "serbest" or (bool(a.konu) and a.konu_turu in (None, "", "otomatik") and not konu_3d_mu(a.konu))
+    if SERBEST:
+        print("Konu türü: SERBEST (3D baskı dışı); genel sahne kalıpları kullanılacak")
     bicim = a.bicim or ayar.get("bicim") or "anlat"
+    if SERBEST and bicim != "anlat":
+        bicim = "anlat"
     if a.senaryo and "maddeler" in json_oku(a.senaryo, {}):
         bicim = "liste"
     try:
@@ -1014,6 +1041,9 @@ def calis(a):
         taslak = {"id": kimlik, "olusturma": z.strftime("%Y-%m-%dT%H:%M:%SZ"), "durum": "otomatik" if a.otomatik else "onay_bekliyor", "tur": "viral", "video": "" if a.otomatik else f"videolar/{cikti.name}", "sure": round(plan["sure"], 1),
                   "baslik": senaryo["baslik"], "aciklama": aciklama_olustur(senaryo, gercek), "muzik": "Sentez (kodla üretildi)", "konu": senaryo["konu"], "tasarimlar": [], "hikayeler": [], "secim": dict(SECIM),
                   "zamanlama": [{"tip": x["tip"], "t0": x["t0"], "t1": x["t1"], "ses_son": x.get("ses_son")} for x in plan["sahneler"]]}   # sahne/konuşma zamanları: ses sorunlarını sonradan ayıklamak için
+        if SERBEST:
+            taslak["serbest"] = True
+            taslak["anlati"] = " ".join(x["anlati"] for x in senaryo["sahneler"])[:1500]
         if a.otomatik:
             taslak["otomatik"] = True
             taslak["anlati"] = " ".join(x["anlati"] for x in senaryo["sahneler"])[:1500]
@@ -1041,6 +1071,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--konu", help="belirli bir konu (hazır senaryo yoksa yapay zekâ yazar)")
     ap.add_argument("--senaryo", help="senaryo JSON dosyası")
+    ap.add_argument("--konu-turu", dest="konu_turu", choices=["otomatik", "3d", "serbest"], help="elle yazılan konunun türü: otomatik (3D baskı sözcükleri varsa 3d, yoksa serbest), 3d ya da serbest (3D baskı dışı)")
     ap.add_argument("--hemen", action="store_true", help="kapalı ya da taslak limiti dolu olsa bile bir kez üret")
     ap.add_argument("--git", action="store_true", help="sonucu depoya yaz ve it")
     ap.add_argument("--olcek", type=float, default=1.0, help="çizim ölçeği (test için 0.5)")
