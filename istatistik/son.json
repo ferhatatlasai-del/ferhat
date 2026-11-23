@@ -1,17 +1,17 @@
 {
- "tarih": "2026-11-23T15:00:53Z",
- "tr_saat": "23.11.2026 18:00",
+ "tarih": "2026-11-23T18:00:57Z",
+ "tr_saat": "23.11.2026 21:00",
  "toplam": {
-  "reels": 18600,
+  "reels": 18846,
   "gonderi": 0,
-  "short": 11331,
+  "short": 11397,
   "youtube_video": 0,
-  "hikaye": 904,
-  "toplam": 30835,
-  "begeni": 291,
+  "hikaye": 939,
+  "toplam": 31182,
+  "begeni": 294,
   "yorum": 29
  },
- "fark": 417,
+ "fark": 347,
  "instagram": {
   "durum": "tamam",
   "izin": true,
@@ -23,11 +23,11 @@
     "tur": "Reels",
     "tarih": "2026-11-23T13:17:56",
     "baslik": "Diyelim ki şehirde bir aslanla karşılaştın. Panik yok, kahra",
-    "begeni": 2,
+    "begeni": 4,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgFd6danP9K/",
-    "izlenme": 267,
-    "erisim": 221
+    "izlenme": 439,
+    "erisim": 383
    },
    {
     "id": "18184587094447542",
@@ -37,8 +37,8 @@
     "begeni": 6,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgD94j1CjjG/",
-    "izlenme": 778,
-    "erisim": 699
+    "izlenme": 811,
+    "erisim": 731
    },
    {
     "id": "18132478334487242",
@@ -48,8 +48,8 @@
     "begeni": 5,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/DgDWYKBE8DF/",
-    "izlenme": 1423,
-    "erisim": 1264
+    "izlenme": 1427,
+    "erisim": 1267
    },
    {
     "id": "18362708170216349",
@@ -59,7 +59,7 @@
     "begeni": 10,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/DgCmX1zj1CJ/",
-    "izlenme": 1280,
+    "izlenme": 1281,
     "erisim": 1154
    },
    {
@@ -70,7 +70,7 @@
     "begeni": 10,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgAjP11DCGR/",
-    "izlenme": 1539,
+    "izlenme": 1540,
     "erisim": 1438
    },
    {
@@ -92,7 +92,7 @@
     "begeni": 10,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgAaonlkhF3/",
-    "izlenme": 1672,
+    "izlenme": 1678,
     "erisim": 1516
    },
    {
@@ -122,11 +122,11 @@
     "tur": "Reels",
     "tarih": "2026-11-20T23:05:39",
     "baslik": "Baskın tabladan kalkıyor mu? İlk katman yapışmıyorsa çoğu za",
-    "begeni": 30,
+    "begeni": 31,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": 4056,
-    "erisim": 3612
+    "izlenme": 4085,
+    "erisim": 3624
    },
    {
     "id": "18289759651292671",
@@ -352,27 +352,37 @@
  "hikaye_izin": true,
  "hikayeler": [
   {
-   "id": "18381292288242586",
-   "tarih": "2026-11-23T14:30:40Z",
-   "baslik": "Cable Winder",
+   "id": "18394254565225977",
+   "tarih": "2026-11-23T16:47:27Z",
+   "baslik": "Skadis Cable Winder",
    "izlenme": 0,
    "erisim": 0,
    "okundu": false
+  },
+  {
+   "id": "18381292288242586",
+   "tarih": "2026-11-23T14:30:40Z",
+   "baslik": "Cable Winder",
+   "izlenme": 10,
+   "erisim": 8,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "17916673161282657",
    "tarih": "2026-11-23T12:08:04Z",
    "baslik": "Bar handle hook",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 10,
+   "erisim": 8,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "18137430658662819",
    "tarih": "2026-11-23T09:48:03Z",
    "baslik": "Bag hook for IKEA Bekant",
-   "izlenme": 9,
-   "erisim": 6,
+   "izlenme": 15,
+   "erisim": 10,
    "okundu": true,
    "yanit": 0
   },
@@ -380,8 +390,8 @@
    "id": "17899536333420895",
    "tarih": "2026-11-22T23:19:48Z",
    "baslik": "Video hikayesi",
-   "izlenme": 20,
-   "erisim": 13,
+   "izlenme": 24,
+   "erisim": 16,
    "okundu": true,
    "yanit": 0
   },
@@ -389,8 +399,8 @@
    "id": "17994366561069708",
    "tarih": "2026-11-22T23:17:35Z",
    "baslik": "Bag hook",
-   "izlenme": 20,
-   "erisim": 14,
+   "izlenme": 25,
+   "erisim": 17,
    "okundu": true,
    "yanit": 0
   },
@@ -693,14 +703,6 @@
    "izlenme": 0,
    "erisim": 0,
    "okundu": false
-  },
-  {
-   "id": "18172481827478520",
-   "tarih": "2026-11-20T08:07:27Z",
-   "baslik": "Rope Bowl",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
   }
  ],
  "youtube": {
@@ -712,7 +714,7 @@
     "tur": "Short",
     "tarih": "2026-11-23T13:17:07",
     "baslik": "Şehirde aslan görürsen ne yapmalısın?",
-    "izlenme": 1,
+    "izlenme": 12,
     "begeni": 0,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=9sEswOUevrM"
@@ -722,7 +724,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T23:17:16",
     "baslik": "Bambu Lab A1 Combo AMS lite filament değişim sorunları",
-    "izlenme": 67,
+    "izlenme": 85,
     "begeni": 0,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=Vt_lyaaFBOo"
@@ -732,7 +734,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T17:50:11",
     "baslik": "Nozzle Neden Tıkanır? 5 Gerçek Sebep",
-    "izlenme": 132,
+    "izlenme": 136,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=ix-yeSzHv1c"
@@ -742,7 +744,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T10:33:51",
     "baslik": "Baskısı en kolay filamentler: 5'ten 1'e",
-    "izlenme": 333,
+    "izlenme": 363,
     "begeni": 1,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=czKPQgTqQrw"
@@ -802,7 +804,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T23:23:12",
     "baslik": "İlk katman neden bozuluyor? 5 hızlı kontrol",
-    "izlenme": 1124,
+    "izlenme": 1123,
     "begeni": 11,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=JFRO2uhYfwQ"
@@ -812,7 +814,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T22:17:19",
     "baslik": "3D Baskı Tablaya Yapışmıyor mu? 5 Pratik Çözüm",
-    "izlenme": 1240,
+    "izlenme": 1241,
     "begeni": 18,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=qcWHhTeaEHs"
@@ -862,7 +864,7 @@
     "tur": "Short",
     "tarih": "2026-11-18T12:58:52",
     "baslik": "3D baskı ile pratik tasarımlar",
-    "izlenme": 1031,
+    "izlenme": 1034,
     "begeni": 7,
     "yorum": 1,
     "link": "https://www.youtube.com/watch?v=Z3j4VTqgSFM"
@@ -892,7 +894,7 @@
  },
  "eksikler": [],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 18:00",
-  "govde": "Toplam 30.835 (+417) · Reels 18.600 · Short 11.331 · Hikaye 904 (3 bugün) · Takipçi 434 · En iyi Reels: Baskın tabladan kalkı 4.056"
+  "baslik": "📊 İzlenme raporu 21:00",
+  "govde": "Toplam 31.182 (+347) · Reels 18.846 · Short 11.397 · Hikaye 939 (4 bugün) · Takipçi 434 · En iyi Reels: Baskın tabladan kalkı 4.085"
  }
 }
