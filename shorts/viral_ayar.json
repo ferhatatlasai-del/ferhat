@@ -33,6 +33,10 @@
     {
       "konu": "İlk katman neden fazla yassı ya da fazla yüksek olur?",
       "ipucu": "Yeni başlayanlara sade anlat; nozzle-table mesafesi, yapışma belirtileri ve kısa kontrol listesi ver; sayı uydurma, marka özel vaat yok."
+    },
+    {
+      "konu": "Warping neden olur, brim ne zaman işe yarar?",
+      "ipucu": "Köşe kalkmasını basit örneklerle anlat; tabla temizliği, sıcaklık, kabin ve brim ilişkisini genel düzeyde ver; kesin çözüm dili kullanma."
     }
   ]
 }
