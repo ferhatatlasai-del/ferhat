@@ -154,3 +154,9 @@
 {"t": "2026-11-22T10:21:23Z", "tur": "referans_yok", "site": "printables.com", "uygunsuz": 1, "neden": "uygun değil (Ana nesne görünür olsa da görüntüde tüm sayfa arayüzü, menüler ve ikonlar baskın; bu yüzden ana fotoğraf olarak uygun değil.)"}
 {"t": "2026-11-23T05:21:16Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 3.0, "site": "printables.com", "sorunlar": ["Üretilen görselde bisiklet duvar askısı yerine tek parçalı halka/klips benzeri farklı bir ", "Referanstaki bisiklet askı sistemi çoklu bisiklet taşıyan düzenek; üretilen nesne buna ben", "Görselde yazı/logolar var: bisiklet ve lastik markaları okunuyor."]}
 {"t": "2026-11-23T05:21:28Z", "tur": "gorsel_hatasi", "neden": "HTTP 400"}
+{"t": "2026-11-23T10:23:52Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 8.0, "site": "printables.com", "sorunlar": ["Üretim görselinde referanstaki 'FOUR-PART Bonsai Pot' yazısı yok", "Kamera açısı ve arka plan referanstan farklı"]}
+{"t": "2026-11-23T10:24:03Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 8.0}
+{"t": "2026-11-23T10:24:14Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-23T10:24:23Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-23T10:24:35Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 8.0, "site": "printables.com", "sorunlar": ["Arka plan ve çekim stili referanstan farklı", "Nesnenin yüzey parlaklığı ve ışık yansımaları yapay görünüyor"]}
+{"t": "2026-11-23T10:24:44Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 8.0}
