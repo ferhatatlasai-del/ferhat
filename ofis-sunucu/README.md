@@ -330,3 +330,12 @@ Panel → Üret → "Şimdi viral video üret" satırında konu yazarken **tür*
 - **Güvenlik:** model konuyu uygunsuz bulursa (nefret/hakaret, siyaset, kişi hedefleme, sağlık-hukuk-yatırım tavsiyesi, şiddet, yetişkin içerik) video üretilmez, panelde nedeni yazar. Doğruluk kuralı: uydurma istatistik/kişisel deneyim yok, emin olunmayan sayı verilmez.
 - **Yönetici incelemesi:** taslak `serbest: true` ise yönetici konu dışılığı sorun saymaz, 3D baskı değer aralıklarını uygulamaz; genel bilgiyle doğruluğu denetler. Otomatik hat yalnızca kendi konu havuzundan (3D baskı) üretir; serbest konu sadece panelden elle yazılan konuda çalışır ve taslak onayını bekler.
 - Özel sahne kalite kontrolü serbest konuda başarısız olursa sahne, anlatıdan çıkarılan 3 maddelik genel bir listeyle değişir (3D yazıcı sahnesi asla gelmez).
+
+### Serbest konuda detaylı sahne tasarımı ("ressam" aşaması)
+
+- **İki aşamalı yazım:** hikâye tahtası (`ISTEM_SERBEST`) yalnızca her özel sahne için *tasarım notu* yazar; çizimi her özel sahne için ayrı bir "ressam" çağrısı (`ISTEM_TASARIM`, `viral_video.ozel_tasarla`) yapar: katmanlı arka plan, 6-14 parçalı gruplanmış nesneler, gradyan ve gölge, anlatıyla aynı sırada ilerleyen hareket, 24-48 eleman (en az 16 değilse reddedilir ve yeniden yazdırılır).
+- **Yeni çizim araçları** (`video/anlat_sahneler.js`, `ozel_eleman` doğrulaması): `yol` (serbest çokgen/eğri), `elips`, `yay`, `grup` (parçalar birlikte hareket eder), `renk2`+`gradyan`, `golge`. 3D baskı videolarının özel sahneleri de bunları kullanabilir.
+- **Uzunluk:** serbest videolar ~70-90 sn, 7-11 sahne, en az 3 (en çok 6) özel sahne; anlatı 150-270 kelime.
+- **Görsel eleştiri döngüsü:** çizilen her özel sahneden 3 kare görsel modele gösterilir; *detay puanı* 6'nın altındaysa ya da sorun varsa ressam eleştiriyle bir kez yeniden çizer; yine geçemezse sahne anlatıdan çıkarılan genel listeyle değişir.
+- **Renk:** serbest videolarda renk tonu kayması kapalıdır (çim yeşil, gökyüzü mavi kalsın).
+- Maliyet/süre: video başına ek ~4-10 model çağrısı ve birkaç dakika (üretim zaten 15-40 dk). Modeli panelde *Yapay zekâ seviyesi → Viral video senaryosu* ile güçlendirebilirsin (`gpt-5.4` çizim ayrıntısını belirgin artırır).
