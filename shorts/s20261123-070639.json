@@ -1,7 +1,7 @@
 {
   "id": "s20261123-070639",
   "olusturma": "2026-11-23T07:06:39Z",
-  "durum": "otomatik",
+  "durum": "reddedildi",
   "tur": "viral",
   "video": "",
   "sure": 56.1,
@@ -71,5 +71,30 @@
     }
   ],
   "otomatik": true,
-  "anlati": "Filamentin çıtırdıyor ve yüzey pürüzlü mü çıkıyor? Bu ses, içerideki nemin ısınıp buhara dönmesinden gelir. Nozulda minicik patlamalar görürsün. İçeride kalan su, baskıda önce ses olur; sonra yüzeyde iz bırakır. Besleme dişlisi filamenti iter; ama nemli malzeme daha yumuşak davranıp akışı bozabilir. En sık sonuç: ipliklenme ve yüzeyde küçük kabarcıklar. Bu yüzden kalite düşer. Filamenti kuru tutmak için nemi düşük sakla; kaba ve açıkta bekletme. Nem göstergesi yüksekse önlem al. Kullanım arası filamenti kapalı kutuda tut. Mümkünse kurutucu paket ekle, sonra tekrar kapat. Kurutma, nemi geri çeker; ama ayar için her filamentin üretici önerisine bak. İstersen bir sonraki videoda hangi filamentin nasıl saklanacağını da anlatayım. Takip et, yoruma yaz."
+  "anlati": "Filamentin çıtırdıyor ve yüzey pürüzlü mü çıkıyor? Bu ses, içerideki nemin ısınıp buhara dönmesinden gelir. Nozulda minicik patlamalar görürsün. İçeride kalan su, baskıda önce ses olur; sonra yüzeyde iz bırakır. Besleme dişlisi filamenti iter; ama nemli malzeme daha yumuşak davranıp akışı bozabilir. En sık sonuç: ipliklenme ve yüzeyde küçük kabarcıklar. Bu yüzden kalite düşer. Filamenti kuru tutmak için nemi düşük sakla; kaba ve açıkta bekletme. Nem göstergesi yüksekse önlem al. Kullanım arası filamenti kapalı kutuda tut. Mümkünse kurutucu paket ekle, sonra tekrar kapat. Kurutma, nemi geri çeker; ama ayar için her filamentin üretici önerisine bak. İstersen bir sonraki videoda hangi filamentin nasıl saklanacağını da anlatayım. Takip et, yoruma yaz.",
+  "red_tarihi": "2026-11-23T07:13:10.000Z",
+  "admin_inceleme": {
+    "karar": "reddet",
+    "puan": 5.0,
+    "sorunlar": [
+      "Önceki videolarda geçen 'nemli filament ses yapar' noktası burada tekrar ediliyor",
+      "Başlık A1'e özel diyor ama içerik çoğunlukla genel filament nemi; A1'e özgü bir bilgi yok",
+      "'nemli malzeme daha yumuşak davranıp akışı bozabilir' ifadesi fazla genelleyici ve teknik olarak net değil",
+      "Kontrol listesi görselinde 'açıkta bekletme' onay işaretiyle verilmiş; anlatım olarak kafa karıştırıyor",
+      "Son iki kare neredeyse aynı kapanış ekranı; gereksiz tekrar var",
+      "Bazı alt yazılar parçalı/yarım görünüyor ve okunabilirlik zayıf"
+    ],
+    "gerekce": "Video genel olarak doğru bir konu anlatıyor ama tekrar, A1'e özgülük eksikliği ve birkaç kafa karıştırıcı/şüpheli anlatım yüzünden yayın için yeterince güvenli değil.",
+    "model": "OpenAI (gpt-5.4)",
+    "iddialar": [
+      "Nemli filament baskıda çıtırtı/patlama benzeri ses yapabilir → doğru",
+      "Nem nozulda ısınıp buhara dönüşerek yüzey kusurlarına yol açabilir → doğru",
+      "Nemli filament ipliklenmeyi artırabilir → doğru",
+      "Nemli filament yüzeyde küçük kabarcık/pürüz oluşturabilir → doğru",
+      "Filamenti kapalı kutuda ve kurutucu paketle saklamak faydalıdır → doğru",
+      "Kurutma ayarı her filamentin üretici önerisine göre değişir → doğru",
+      "Nemli malzeme daha yumuşak davranıp akışı bozabilir → şüpheli",
+      "Yüksek ortam nemi risk işaretidir → doğru"
+    ]
+  }
 }
