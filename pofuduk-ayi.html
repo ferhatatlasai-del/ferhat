@@ -2012,7 +2012,7 @@ function buildHub() {
   const smith = { x: 0, y: 0, z: -16, yaw: 0 }; smith.tx = 0; smith.tz = -16 + 2.4; smith.armed = true;
   const board = { x: 4.2, z: 45, tx: 4.2, tz: 46.3, armed: true }; // map board beside the spawn point, facing it
   const tutGate = { x: -4.4, z: 45 }; // wooden arch that leads to the tutorial
-  const roomHub = { x: 5.6, z: 45, armed: false }; // the room pavilion: step on the pad to create or join a room
+  const roomHub = { x: 14, z: 46, armed: false }; // the room pavilion: step on the pad to create or join a room
   for (const sx of [-1.7, 1.7]) for (const sz of [-1.7, 1.7]) boxes.push({ x0: roomHub.x + sx - 0.2, x1: roomHub.x + sx + 0.2, z0: roomHub.z + sz - 0.2, z1: roomHub.z + sz + 0.2, y0: 0, y1: 3.4, kind: 'deco', on: true });
   for (const sx of [-1.45, 1.45]) boxes.push({ x0: tutGate.x + sx - 0.22, x1: tutGate.x + sx + 0.22, z0: tutGate.z - 0.22, z1: tutGate.z + 0.22, y0: 0, y1: 3.3, kind: 'deco', on: true });
   boxes.push({ x0: board.x - 1.5, x1: board.x + 1.5, z0: board.z - 0.25, z1: board.z + 0.25, y0: 0, y1: 3.1, kind: 'deco', on: true });
