@@ -3956,6 +3956,13 @@ function mapView(c, bb, [vx, vy, vw, vh], side, me, opt, fs) {
   const rect = (b, col) => { const [ax, ay] = T(b.x0, b.z0), [bx, by] = T(b.x1, b.z1); c.fillStyle = col; c.fillRect(Math.min(ax, bx), Math.min(ay, by), Math.max(1.5, Math.abs(bx - ax)), Math.max(1.5, Math.abs(by - ay))); };
   const dot = (x, z, r, col, edge = '#3d2a1a') => { const [px, py] = T(x, z); c.beginPath(); c.arc(px, py, r, 0, Math.PI * 2); c.fillStyle = col; c.fill(); c.lineWidth = 1.5; c.strokeStyle = edge; c.stroke(); };
   const label = (t, x, z, size, col = '#ffffff', dy = 0) => { const [px, py] = T(x, z); c.font = `800 ${Math.round(size)}px "Baloo 2", system-ui, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.lineWidth = Math.max(3, size / 5); c.strokeStyle = '#3d2a1a'; c.strokeText(t, px, py + dy); c.fillStyle = col; c.fillText(t, px, py + dy); };
+  const used = []; // text boxes already placed, so names never sit on top of each other
+  const nlabel = (t, x, z, size, col, firstDy) => { // a name next to its dot: above, below, or to the side, whichever is free
+    const [px, py] = T(x, z); c.font = `800 ${Math.round(size)}px "Baloo 2", system-ui, sans-serif`; const tw = c.measureText(t).width, th = size * 1.15;
+    const cand = [[0, firstDy], [0, -firstDy], [tw / 2 + size * 0.9, 0], [-tw / 2 - size * 0.9, 0], [0, firstDy * 2], [0, -firstDy * 2], [tw / 2 + size * 0.9, firstDy * 1.8], [-tw / 2 - size * 0.9, -firstDy * 1.8]];
+    for (const [ox, oy] of cand) { const r = { x0: px + ox - tw / 2, x1: px + ox + tw / 2, y0: py + oy - th / 2, y1: py + oy + th / 2 }; if (used.some(u => r.x0 < u.x1 && r.x1 > u.x0 && r.y0 < u.y1 && r.y1 > u.y0)) continue; used.push(r); c.textAlign = 'center'; c.textBaseline = 'middle'; c.lineWidth = Math.max(3, size / 5); c.strokeStyle = '#3d2a1a'; c.strokeText(t, px + ox, py + oy); c.fillStyle = col; c.fillText(t, px + ox, py + oy); return; }
+  };
+  if (!opt.strip) { const [sx, sz] = T(me.x, me.z), sw = fs * (opt.board ? 1.1 : 0.9) * 3, sy = sz - (opt.strip ? fs * 0.45 : fs * 0.6) * 2.6; used.push({ x0: sx - sw / 2, x1: sx + sw / 2, y0: sy - fs * 0.6, y1: sy + fs * 0.6 }); } // 'Sen' keeps its place
   const ground = L.boxes.filter(b => b.kind === 'ground').sort((a, b) => (b.x1 - b.x0) * (b.z1 - b.z0) - (a.x1 - a.x0) * (a.z1 - a.z0));
   for (const b of ground) rect(b, (b.theme || L.def).grass);
   if (L.paths) { c.strokeStyle = '#d9b27a'; c.lineCap = 'round'; c.lineWidth = Math.max(2, 1.7 * sc); for (const pa of L.paths) { const [ax, ay] = T(pa.x0, pa.z0), [bx, by] = T(pa.x1, pa.z1); c.beginPath(); c.moveTo(ax, ay); c.lineTo(bx, by); c.stroke(); } }
@@ -3981,8 +3988,9 @@ function mapView(c, bb, [vx, vy, vw, vh], side, me, opt, fs) {
     if (!opt.board) for (const r of L.rabbits || []) dot(r.x, r.z, 2.6, '#eadfce', '#6b5a48');
     for (const b of L.babies || []) if (b.st !== 'home') dot(b.x, b.z, fs * 0.38, '#ff8fb8', '#8a2d55');
     for (const pt of L.portals) { dot(pt.x, pt.z, fs * 0.62, pt.locked ? '#9a9a9a' : LEVELS[pt.i].grass, pt.locked ? '#555' : '#3d2a1a'); label(String(pt.i + 1), pt.x, pt.z, fs * 0.8, pt.locked ? '#dddddd' : '#ffffff'); }
-    const place = (o, ch, name, col) => { dot(o.x, o.z, fs * 0.6, col); label(ch, o.x, o.z, fs * 0.7); label(name, o.x, o.z, fs * 0.7, '#ffd23f', -fs * 1.05); };
-    place(L.shop, '♥', 'Kalp', '#e63946'); place(L.ward, '★', 'Kıyafet', '#8a5aa8'); place(L.smith, '⚒', 'Demirci', '#5d6670'); place(L.honeyShop, '🍯', 'Bal', '#e89a1a'); if (!opt.board) place(L.board, '▦', 'Harita', '#8a5a2b'); if (L.burrow) place(L.burrow, '✿', 'Anne Tavşan', '#ff8fb8');  { const hs = L.mansion || L.houses[save.home]; if (hs) place(hs, '⌂', L.mansion ? 'Konağım' : 'Evim', '#ffb627'); }
+    const place = (o, ch, name, col) => { dot(o.x, o.z, fs * 0.6, col); label(ch, o.x, o.z, fs * 0.7); if (name) nlabel(name, o.x, o.z, fs * 0.7, '#ffd23f', -fs * 1.05); };
+    place(L.shop, '♥', 'Kalp', '#e63946'); place(L.ward, '★', 'Kıyafet', '#8a5aa8'); place(L.smith, '⚒', 'Demirci', '#5d6670'); place(L.honeyShop, '🍯', 'Bal', '#e89a1a'); if (!opt.board) place(L.board, '▦', '', '#8a5a2b'); if (L.burrow) place(L.burrow, '✿', 'Anne Tavşan', '#ff8fb8');  { const hs = L.mansion || L.houses[save.home]; if (hs) place(hs, '⌂', L.mansion ? 'Konağım' : 'Evim', '#ffb627'); }
+    place(L.roomHub, '◎', 'Oda', '#3b6fb0');
     for (const rm of L.remotes || []) place(rm, '⌂', rm.name, '#7fb8e0');
     if (!opt.board) for (const w of L.wolves || []) if (!w.gone && w.hp > 0) dot(w.x, w.z, 3.4, '#6d7480', '#22252b');
   } else {
