@@ -1,17 +1,17 @@
 {
- "tarih": "2026-11-23T06:35:05Z",
- "tr_saat": "23.11.2026 09:35",
+ "tarih": "2026-11-23T08:08:04Z",
+ "tr_saat": "23.11.2026 11:08",
  "toplam": {
-  "reels": 17977,
+  "reels": 18054,
   "gonderi": 0,
-  "short": 11254,
+  "short": 11269,
   "youtube_video": 0,
-  "hikaye": 869,
-  "toplam": 30100,
-  "begeni": 283,
+  "hikaye": 870,
+  "toplam": 30193,
+  "begeni": 284,
   "yorum": 29
  },
- "fark": 48,
+ "fark": 93,
  "instagram": {
   "durum": "tamam",
   "izin": true,
@@ -23,11 +23,11 @@
     "tur": "Reels",
     "tarih": "2026-11-22T23:18:35",
     "baslik": "AMS lite ile filament değişiminde en sık takılma noktaları b",
-    "begeni": 2,
+    "begeni": 3,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgD94j1CjjG/",
-    "izlenme": 495,
-    "erisim": 428
+    "izlenme": 558,
+    "erisim": 495
    },
    {
     "id": "18132478334487242",
@@ -37,8 +37,8 @@
     "begeni": 5,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/DgDWYKBE8DF/",
-    "izlenme": 1406,
-    "erisim": 1249
+    "izlenme": 1408,
+    "erisim": 1253
    },
    {
     "id": "18362708170216349",
@@ -48,8 +48,8 @@
     "begeni": 10,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/DgCmX1zj1CJ/",
-    "izlenme": 1267,
-    "erisim": 1143
+    "izlenme": 1271,
+    "erisim": 1145
    },
    {
     "id": "17945283843388099",
@@ -81,7 +81,7 @@
     "begeni": 10,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgAaonlkhF3/",
-    "izlenme": 1667,
+    "izlenme": 1668,
     "erisim": 1514
    },
    {
@@ -114,7 +114,7 @@
     "begeni": 30,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": 4023,
+    "izlenme": 4030,
     "erisim": 3578
    },
    {
@@ -353,7 +353,7 @@
    "id": "17994366561069708",
    "tarih": "2026-11-22T23:17:35Z",
    "baslik": "Bag hook",
-   "izlenme": 12,
+   "izlenme": 13,
    "erisim": 7,
    "okundu": true,
    "yanit": 0
@@ -700,7 +700,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T23:17:16",
     "baslik": "Bambu Lab A1 Combo AMS lite filament değişim sorunları",
-    "izlenme": 52,
+    "izlenme": 55,
     "begeni": 0,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=Vt_lyaaFBOo"
@@ -710,7 +710,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T17:50:11",
     "baslik": "Nozzle Neden Tıkanır? 5 Gerçek Sebep",
-    "izlenme": 128,
+    "izlenme": 129,
     "begeni": 1,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=ix-yeSzHv1c"
@@ -750,7 +750,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T15:26:52",
     "baslik": "Isıya en dayanıklı 5 filament | 3D baskı",
-    "izlenme": 326,
+    "izlenme": 331,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=TXcpwaFMx1U"
@@ -760,7 +760,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T14:12:38",
     "baslik": "3D baskıda stringing nasıl azalır?",
-    "izlenme": 1203,
+    "izlenme": 1205,
     "begeni": 10,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=ZzZkzgV1eL4"
@@ -770,7 +770,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T09:57:09",
     "baslik": "Filament nem çekerse ne olur? Belirtiler ve çözüm",
-    "izlenme": 1236,
+    "izlenme": 1237,
     "begeni": 7,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=M9tyEIjEeH8"
@@ -840,7 +840,7 @@
     "tur": "Short",
     "tarih": "2026-11-18T12:58:52",
     "baslik": "3D baskı ile pratik tasarımlar",
-    "izlenme": 1029,
+    "izlenme": 1030,
     "begeni": 7,
     "yorum": 1,
     "link": "https://www.youtube.com/watch?v=Z3j4VTqgSFM"
@@ -860,7 +860,7 @@
     "tur": "Short",
     "tarih": "2026-11-16T07:00:16",
     "baslik": "Doktor Filament ile Tanışın: 3D Baskıyı Katman Katman Anlatı",
-    "izlenme": 1397,
+    "izlenme": 1399,
     "begeni": 12,
     "yorum": 1,
     "link": "https://www.youtube.com/watch?v=q3Un0K1sjbE"
@@ -870,7 +870,7 @@
  },
  "eksikler": [],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 09:35",
-  "govde": "Toplam 30.100 (+48) · Reels 17.977 · Short 11.254 · Hikaye 869 · Takipçi 434 · En iyi Reels: Baskın tabladan kalkı 4.023"
+  "baslik": "📊 İzlenme raporu 11:08",
+  "govde": "Toplam 30.193 (+93) · Reels 18.054 · Short 11.269 · Hikaye 870 · Takipçi 434 · En iyi Reels: Baskın tabladan kalkı 4.030"
  }
 }
