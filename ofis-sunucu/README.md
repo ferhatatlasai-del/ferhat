@@ -354,3 +354,7 @@ Panel → Üret → konu yaz → tür: **Resimli anlatım**. Yeni içerik türle
 ## Uzun videolar Instagram hikâyesinde (60 sn üstü)
 
 Instagram hikâye videosu en çok 60 sn olabildiği için (resimli/serbest videolar 70-90 sn sürer) hikâye ajanı `>60 sn` videoyu **parçalara** böler (`ajan/hikaye.py` → `video_parcala`): kesimler taslaktaki sahne sınırlarına (`zamanlama`) göre seçilir (konuşma ortasında kesilmez; yoksa eşit bölünür), her parça ≤58,5 sn ve 1080x1920 H.264/AAC'dir, en çok 4 parça. Parçalar geçici yetim dala (`hikaye-gecici`, `ajan/gecici_dal.py`) yüklenir, **sırayla** art arda hikâye olarak yayınlanır ve dal silinir (depo şişmez). Panelde buton "(2 parça)" gibi yazar. Otomatik hat 60 sn üstü videoda hikâyeyi hâlâ atlar.
+
+## 60 sn sınırı (tüm videolar)
+
+Instagram hikâye/Reels ve Shorts için videolar **en çok 58-59,5 sn** üretilir. Önlemler: (1) hikâye tahtası komutları "en çok 58 sn, 95-120 kelime" ister; `anlat_senaryo.dogrula` anlatıyı sayar (serbest/resimli 85-125, 3D baskı 90-135 kelime; ≈0,44 sn/kelime + kuyruk) ve uzunsa yapay zekâya "kısalt" diyerek yeniden yazdırır; (2) seslendirmeden sonra süre ölçülür (`viral_video.MAKS_SURE = 59,5`): 59,5-64 sn arası görüntü ve ses aynı oranda hafifçe hızlandırılır (senkron korunur), daha uzunsa video üretilmez ve nedeni panelde yazar. Böylece hikâye parçalama yalnızca elle yüklenen uzun videolar içindir.
