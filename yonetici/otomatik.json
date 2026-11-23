@@ -1,3 +1,36 @@
 {
-  "kayitlar": []
+  "kayitlar": [
+    {
+      "zaman": "2026-11-23 10:13",
+      "id": "s20261123-070639",
+      "konu": "Bambu Lab A1'de filament nemi ve kurutma",
+      "baslik": "Bambu Lab A1'de Nemli Filament Nasıl Anlaşılır ve Kurutulur?",
+      "inceleme": {
+        "karar": "reddet",
+        "puan": 5.0,
+        "sorunlar": [
+          "Önceki videolarda geçen 'nemli filament ses yapar' noktası burada tekrar ediliyor",
+          "Başlık A1'e özel diyor ama içerik çoğunlukla genel filament nemi; A1'e özgü bir bilgi yok",
+          "'nemli malzeme daha yumuşak davranıp akışı bozabilir' ifadesi fazla genelleyici ve teknik olarak net değil",
+          "Kontrol listesi görselinde 'açıkta bekletme' onay işaretiyle verilmiş; anlatım olarak kafa karıştırıyor",
+          "Son iki kare neredeyse aynı kapanış ekranı; gereksiz tekrar var",
+          "Bazı alt yazılar parçalı/yarım görünüyor ve okunabilirlik zayıf"
+        ],
+        "gerekce": "Video genel olarak doğru bir konu anlatıyor ama tekrar, A1'e özgülük eksikliği ve birkaç kafa karıştırıcı/şüpheli anlatım yüzünden yayın için yeterince güvenli değil.",
+        "model": "OpenAI (gpt-5.4)",
+        "iddialar": [
+          "Nemli filament baskıda çıtırtı/patlama benzeri ses yapabilir → doğru",
+          "Nem nozulda ısınıp buhara dönüşerek yüzey kusurlarına yol açabilir → doğru",
+          "Nemli filament ipliklenmeyi artırabilir → doğru",
+          "Nemli filament yüzeyde küçük kabarcık/pürüz oluşturabilir → doğru",
+          "Filamenti kapalı kutuda ve kurutucu paketle saklamak faydalıdır → doğru",
+          "Kurutma ayarı her filamentin üretici önerisine göre değişir → doğru",
+          "Nemli malzeme daha yumuşak davranıp akışı bozabilir → şüpheli",
+          "Yüksek ortam nemi risk işaretidir → doğru"
+        ]
+      },
+      "mod": "deneme",
+      "durum": "reddedildi"
+    }
+  ]
 }
