@@ -42,7 +42,22 @@
         "kurutma ayarı malzemeye bağlı",
         "yorumla bir sonraki konu"
       ]
+    },
+    {
+      "id": "s20261123-071337",
+      "konu": "Bambu Lab A1'de nozul tıkanması ve bakım",
+      "noktalar": [
+        "tıkanma çoğu zaman küçük detay",
+        "yanık artık akışı daraltır",
+        "yanlış ısı akışı zorlaştırır",
+        "göz kontrolü ve doğru adım",
+        "soğuk çekme kalıntıyı söker",
+        "nem tıkanma riskini artırır",
+        "ipliklenme ayar ihtiyacı gösterir",
+        "rutin bakım sürprizi azaltır",
+        "yorumda deneyimini yaz"
+      ]
     }
   ],
-  "son_ton": 190
+  "son_ton": 72
 }
