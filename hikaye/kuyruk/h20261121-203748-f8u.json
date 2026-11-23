@@ -1,7 +1,7 @@
 {
   "id": "h20261121-203748-f8u",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-21T20:37:48.000Z",
   "gorsel": "hikaye/gorseller/h20261121-203748-f8u.mp4",
   "baslik": "Bag hook for IKEA Bekant",
@@ -21,7 +21,9 @@
     "sorunlar": []
   },
   "yayin": {
-    "tarih": "2026-11-23T09:45:45Z"
+    "tarih": "2026-11-23T09:48:03Z",
+    "medya_kimligi": "18137430658662819",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4036658748704557060"
   },
   "hata": "",
   "deneme": 0,
