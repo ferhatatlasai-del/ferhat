@@ -29,6 +29,10 @@
       "konu": "Bambu Lab A1 Combo için baskı öncesi kontrol listesi",
       "ipucu": "Baskıdan önce bakılacak kısa liste: tabla, filament, nozul, kalibrasyon. Yalnızca genel, doğru ve yaygın kabul gören bilgi ver. Modele özel sayı (sıcaklık, hız, aralık) uydurma; emin olmadığın ayrıntıyı genel tut ya da üretici ayarlarına yönlendir. Marka logosu ya da ürün görseli yok.",
       "not": "Bu içerik bağımsızdır; Bambu Lab ile bir bağlantısı yoktur."
+    },
+    {
+      "konu": "İlk katman neden fazla yassı ya da fazla yüksek olur?",
+      "ipucu": "Yeni başlayanlara sade anlat; nozzle-table mesafesi, yapışma belirtileri ve kısa kontrol listesi ver; sayı uydurma, marka özel vaat yok."
     }
   ]
 }
