@@ -1,0 +1,34 @@
+{
+  "id": "h20261123-142218-b0i",
+  "kaynak": "uretim",
+  "durum": "planli",
+  "olusturma": "2026-11-23T14:22:19.000Z",
+  "gorsel": "hikaye/gorseller/h20261123-142218-b0i.mp4",
+  "baslik": "Suction Cup Soap Tray",
+  "atif": {
+    "ad": "Suction Cup Soap Tray",
+    "tasarimci": "Paul",
+    "lisans": "CC0",
+    "url": "https://www.printables.com/model/31620-suction-cup-soap-tray",
+    "site": "printables.com",
+    "lisans_teyit": true,
+    "referansli": true
+  },
+  "trend": "Düz yüzeye vakumlu sabunluk altlığı",
+  "kontrol": {
+    "puan": 8.0,
+    "deneme": 1,
+    "sorunlar": [
+      "Hafif yansımalar ve arka plan dikkat dağıtıyor.",
+      "Üretim görseli referansa göre daha stüdyo tarzı ve kadraj farkı var."
+    ]
+  },
+  "yayin": null,
+  "hata": "",
+  "deneme": 0,
+  "tur": "video",
+  "muzik": "Sentezlenmiş müzik: Vibrafon gece (telifsiz, kodla üretildi)",
+  "muzik_sira": 55,
+  "muzik_stil": "Vibrafon gece",
+  "muzik_ton": -5
+}

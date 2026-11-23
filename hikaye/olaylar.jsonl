@@ -160,3 +160,11 @@
 {"t": "2026-11-23T10:24:23Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
 {"t": "2026-11-23T10:24:35Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 8.0, "site": "printables.com", "sorunlar": ["Arka plan ve çekim stili referanstan farklı", "Nesnenin yüzey parlaklığı ve ışık yansımaları yapay görünüyor"]}
 {"t": "2026-11-23T10:24:44Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 8.0}
+{"t": "2026-11-23T14:22:18Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 8.0, "site": "printables.com", "sorunlar": ["Hafif yansımalar ve arka plan dikkat dağıtıyor.", "Üretim görseli referansa göre daha stüdyo tarzı ve kadraj farkı var."]}
+{"t": "2026-11-23T14:22:28Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 8.0}
+{"t": "2026-11-23T14:22:38Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-23T14:22:48Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-23T14:23:02Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 7.0, "site": "printables.com", "sorunlar": ["Birinci görselde yazı/işaret yok ama referansta marka/etiket var gibi görünüyor.", "Üretilen görselde yalnızca taşıyıcı braket var; referanstaki şişe ve bisiklet üzerindeki k", "Parça düzeni ve oranlar referans montajla tam aynı değil."]}
+{"t": "2026-11-23T14:23:11Z", "tur": "denetim", "gecti": false, "deneme": 2, "puan": 8.0, "site": "printables.com", "sorunlar": ["Görselde az miktarda yazı/logo benzeri işaretler var", "Arka plan ve kurulum referansa göre farklı bir ortamda çekilmiş"]}
+{"t": "2026-11-23T14:23:24Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com", "sorunlar": ["Belirgin bir sorun görünmüyor."]}
+{"t": "2026-11-23T14:23:34Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
