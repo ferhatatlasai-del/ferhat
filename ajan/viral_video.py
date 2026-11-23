@@ -349,6 +349,8 @@ def liste_senaryo_sec(a):
     return None, "kullanılmamış liste konusu kalmadı (video/liste_konulari.json'a yeni konu ekle)"
 
 
+MAKS_SURE = 59.5   # videolar en çok bu kadar sürer (Instagram hikâye/Reels, Shorts: 60 sn)
+HIZ = {"f": 1.0}
 RESIM_SAYISI = {"adet": 0, "kalite": ""}
 RESIMLI = False      # yapay zekâ resimleri + sinematik hareket (her konu)
 SERBEST = False      # bu çalışmada 3D baskı dışı serbest konu mu (yalnızca elle yazılan konuda)
@@ -1072,9 +1074,14 @@ def goruntu_ciz(plan_yolu, cikti, olcek=1.0):
         raise RuntimeError("3D çizim başarısız (render.js)")
 
 
-def birlestir(sessiz, ses, cikti):
-    r = subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(sessiz), "-i", str(ses), "-map", "0:v", "-map", "1:a", "-c:v", "copy",
-                        "-c:a", "aac", "-b:a", "192k", "-shortest", "-movflags", "+faststart", str(cikti)], capture_output=True, text=True)
+def birlestir(sessiz, ses, cikti, hiz=1.0):
+    if hiz > 1.0:   # 60 sn sınırı: görüntü ve sesi aynı oranda hızlandır (senkron korunur)
+        komut = ["ffmpeg", "-y", "-loglevel", "error", "-i", str(sessiz), "-i", str(ses), "-filter_complex", f"[0:v]setpts=PTS/{hiz:.4f}[v];[1:a]atempo={hiz:.4f}[a]", "-map", "[v]", "-map", "[a]",
+                 "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", str(cikti)]
+    else:
+        komut = ["ffmpeg", "-y", "-loglevel", "error", "-i", str(sessiz), "-i", str(ses), "-map", "0:v", "-map", "1:a", "-c:v", "copy",
+                 "-c:a", "aac", "-b:a", "192k", "-shortest", "-movflags", "+faststart", str(cikti)]
+    r = subprocess.run(komut, capture_output=True, text=True)
     if r.returncode != 0:
         raise RuntimeError("birleştirme başarısız: " + (r.stderr or "")[-300:])
 
@@ -1179,6 +1186,13 @@ def calis(a):
     print(f"Süre: {plan['sure']:.1f} sn, {len(plan['altyazi'])} alt yazı parçası")
     if plan["sure"] > 175:
         return hata("video 175 sn'den uzun (Shorts sınırı 3 dk); anlatıyı kısalt.")
+    HIZ["f"] = 1.0
+    if plan["sure"] > MAKS_SURE and (bicim == "anlat"):   # 60 sn sınırı (Instagram hikâye/Reels, Shorts)
+        if plan["sure"] <= MAKS_SURE * 1.075:
+            HIZ["f"] = plan["sure"] / (MAKS_SURE - 0.5)
+            print(f"UYARI: video {plan['sure']:.1f} sn; 60 sn sınırı için %{(HIZ['f'] - 1) * 100:.0f} hızlandırılacak.")
+        else:
+            return hata(f"video {plan['sure']:.0f} sn oldu; 60 sn sınırı korunuyor. Konuyu daraltıp yeniden dene (anlatı çok uzun çıktı).")
     z = H.simdi().astimezone(datetime.timezone.utc)
     damga = z.strftime("%Y%m%d%H%M%S")
     cikti = pathlib.Path(a.cikti) if a.cikti else KOK / f"videolar/yukleme_{damga}.mp4"
@@ -1208,16 +1222,16 @@ def calis(a):
         SES.normalize(g / "ses_ham.wav", g / "ses.wav")
         goruntu_ciz(g / "plan.json", g / "sessiz.mp4", a.olcek)
         ilerleme("Ses ve görüntü birleştiriliyor", 96, "", zorla=True)
-        birlestir(g / "sessiz.mp4", g / "ses.wav", cikti)
+        birlestir(g / "sessiz.mp4", g / "ses.wav", cikti, HIZ["f"])
         if a.plan_kaydet:
             yaz(a.plan_kaydet, plan)
     print(f"Video hazır: {cikti} ({cikti.stat().st_size / 1e6:.1f} MB)")
     if a.git or not a.cikti:
         kimlik = f"s{z.strftime('%Y%m%d-%H%M%S')}"
         gercek = bool(anahtar or gemini) and not a.tts_dizin and not a.sessiz
-        taslak = {"id": kimlik, "olusturma": z.strftime("%Y-%m-%dT%H:%M:%SZ"), "durum": "otomatik" if a.otomatik else "onay_bekliyor", "tur": "viral", "video": "" if a.otomatik else f"videolar/{cikti.name}", "sure": round(plan["sure"], 1),
+        taslak = {"id": kimlik, "olusturma": z.strftime("%Y-%m-%dT%H:%M:%SZ"), "durum": "otomatik" if a.otomatik else "onay_bekliyor", "tur": "viral", "video": "" if a.otomatik else f"videolar/{cikti.name}", "sure": round(plan["sure"] / HIZ["f"], 1),
                   "baslik": senaryo["baslik"], "aciklama": aciklama_olustur(senaryo, gercek), "muzik": "Sentez (kodla üretildi)", "konu": senaryo["konu"], "tasarimlar": [], "hikayeler": [], "secim": dict(SECIM),
-                  "zamanlama": [{"tip": x["tip"], "t0": x["t0"], "t1": x["t1"], "ses_son": x.get("ses_son")} for x in plan["sahneler"]]}   # sahne/konuşma zamanları: ses sorunlarını sonradan ayıklamak için
+                  "zamanlama": [{"tip": x["tip"], "t0": round(x["t0"] / HIZ["f"], 3), "t1": round(x["t1"] / HIZ["f"], 3), "ses_son": (round(x["ses_son"] / HIZ["f"], 3) if x.get("ses_son") is not None else None)} for x in plan["sahneler"]]}   # sahne/konuşma zamanları: ses sorunlarını sonradan ayıklamak için
         if RESIMLI:
             taslak["resimli"] = True
             taslak["gorsel_maliyeti"] = {"adet": RESIM_SAYISI["adet"], "kalite": RESIM_SAYISI["kalite"]}
@@ -1229,7 +1243,7 @@ def calis(a):
             taslak["anlati"] = " ".join(x["anlati"] for x in senaryo["sahneler"])[:1500]
         yaz(DIZIN / f"{kimlik}.json", taslak)
         if a.sonuc_dosyasi:
-            yaz(a.sonuc_dosyasi, {"id": kimlik, "baslik": senaryo["baslik"], "aciklama": taslak["aciklama"], "konu": senaryo["konu"], "sure": round(plan["sure"], 1), "anlati": " ".join(x["anlati"] for x in senaryo["sahneler"]),
+            yaz(a.sonuc_dosyasi, {"id": kimlik, "baslik": senaryo["baslik"], "aciklama": taslak["aciklama"], "konu": senaryo["konu"], "sure": round(plan["sure"] / HIZ["f"], 1), "anlati": " ".join(x["anlati"] for x in senaryo["sahneler"]),
                                   "sahneler": [x["tip"] for x in plan["sahneler"]], "noktalar": [x.get("nokta") for x in senaryo["sahneler"] if x.get("nokta")], "video": str(cikti)})
         yaz(KULLANILAN, sorted(set(json_oku(KULLANILAN, [])) | {kaynak}))
         if plan.get("bicim") == "anlat":

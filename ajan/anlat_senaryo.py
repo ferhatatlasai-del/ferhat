@@ -53,7 +53,7 @@ SAHNE TİPLERİ (animasyon; tipin yanındaki params zorunlu/isteğe bağlı alan
 ÇEŞİTLİLİK KURALLARI: Konuya UYAN tipleri seç ve her sahneyi bir fikre ayır. Aynı tip arka arkaya gelmesin, bir tip en çok 2 kez kullanılsın (ozel en çok 3), en az 5 farklı tip olsun. Konuyla ilgisi olmayan sahneyi zorla koyma. Videoda EN AZ 1, en çok 3 "ozel" sahne tasarla (ZORUNLU): bu konunun kendine özgü kavramını çizen, başka videoda kullanılamayacak sahneler; diğerleri hazır tiplerden olsun. Hazır tiplerin hepsini seçip "ozel" sahne koymazsan yanıt reddedilir.
 TEKRARA DÜŞME: Her sahnenin "nokta" alanına o sahnede anlattığın TEK somut bilgiyi 3-8 kelimeyle yaz (örn. "nem nozulda buharlaşır"). Aşağıdaki, daha önceki videolarda ZATEN anlatılmış noktaları ve konuları TEKRAR ETME; aynı genel fikri farklı bir açıdan, yeni bilgiyle anlat. Bu videonun noktaları da birbirinden farklı olsun (aynı bilgiyi iki sahnede söyleme).
 {onceki}
-ANLATI: sahne başına 1-2 kısa cümle (8-22 kelime), toplam 110-150 kelime. İlk sahne güçlü kanca (soru ya da yaygın hata). Cümleler kısa, konuşma dili, "sen" hitabı. Son sahne yoruma davet + takip et.
+ANLATI: sahne başına 1-2 kısa cümle (8-20 kelime), toplam 100-130 kelime (video en çok 58 sn olmalı). İlk sahne güçlü kanca (soru ya da yaygın hata). Cümleler kısa, konuşma dili, "sen" hitabı. Son sahne yoruma davet + takip et.
 VURGU: anlatıda önemli kelimeleri işaretle: *kelime* turuncu, ~kelime~ mavi. Her sahnede en çok 2 vurgu; çok kelimeli vurguda HER kelimeyi ayrı işaretle (*katman* *katman*). Noktalama işaret dışında kalabilir ("*eritir*.").
 EK ALANLAR (isteğe bağlı): "bolum": yeni bir bölüm başlıyorsa kısa başlık (en çok 28 harf; toplam 3-5 bölüm, ilk sahnede olmasın, "kanca"ya yazma); "baslik": ekrana büyük yazı olarak zıplayan TEK kısa kelime (en çok 10 harf, tüm videoda en çok 2 sahnede, örn. "ERİR!"); "etiketler": sahnedeki animasyon parçasını anlatan 0-2 kısa etiket (en çok 24 harf, örn. "210 °C", "0,4 mm nozul").
 DOĞRULUK: Yalnızca 3D baskı topluluğunda yaygın kabul gören, doğru bilgileri yaz. Emin olmadığın sayı verme; sıcaklık/hızda tipik değer ya da aralık kullan. Marka karşılaştırması, fiyat, istatistik, kişisel deneyim UYDURMA. Yasak sözcükler: mükemmel, harika, muhteşem, inanılmaz. Sayıları anlatıda yazıyla yaz ("iki yüz on derece"); PLA/PETG gibi kısaltmaları büyük harfle yaz.
@@ -264,8 +264,8 @@ def dogrula(s, temizle=lambda x: x, gecmis=(), serbest=False, resimli=False):
         raise ValueError("ilk sahne '" + ("resim" if resimli else "kanca") + "' olmalı")
     if temiz[-1]["tip"] != "kapanis":
         raise ValueError("son sahne 'kapanis' olmalı")
-    if resimli and sayac.get("resim", 0) < 5:
-        raise ValueError("resimli modda en az 5 'resim' sahnesi gerekli")
+    if resimli and sayac.get("resim", 0) < 4:
+        raise ValueError("resimli modda en az 4 'resim' sahnesi gerekli")
     if serbest and not resimli and sayac.get("ozel", 0) < 3:
         raise ValueError("serbest konuda en az 3 'ozel' sahne gerekli")
     if not resimli and not sayac.get("ozel"):
@@ -273,8 +273,9 @@ def dogrula(s, temizle=lambda x: x, gecmis=(), serbest=False, resimli=False):
     if len(sayac) < (3 if resimli else 4 if serbest else 5):
         raise ValueError(f"en az {3 if resimli else 4 if serbest else 5} farklı sahne tipi gerekli ({len(sayac)})")
     kelime = sum(len(x["anlati"].split()) for x in temiz)
-    if not (150 if serbest else 90) <= kelime <= (270 if serbest else 190):
-        raise ValueError(f"anlatı {kelime} kelime; {150 if serbest else 90}-{270 if serbest else 190} olmalı")
+    alt, ust = (85, 125) if (serbest or resimli) else (90, 135)   # ≈0,44 sn/kelime + kuyruk: üst sınır ≈ 58 sn (hikâye/Reels/Shorts 60 sn sınırı)
+    if not alt <= kelime <= ust:
+        raise ValueError(f"anlatı {kelime} kelime; {alt}-{ust} olmalı (video en çok 58 sn: kısalt)" if kelime > ust else f"anlatı {kelime} kelime; {alt}-{ust} olmalı")
     # içerik tekrarı: bu videonun noktaları önceki videolarda zaten anlatıldıysa ya da kendi içinde tekrar ediyorsa reddet
     if B is not None:
         eskiler = [g for g in gecmis if g]
@@ -309,23 +310,23 @@ def onceki_metni(noktalar, konular):
 
 # ---------------- SERBEST KONU (3D baskı dışı) ----------------
 SERBEST_IKONLAR = "yumurta, tavuk, kalp, ampul, dunya, kitap, ev, yaprak, para, gunes, bulut, insan, termometre, damla, alev, tik, carpi, uyari, saat, lupa, yildiz, kilit"
-ISTEM_SERBEST = """YouTube Shorts / Instagram Reels için ~70-90 saniyelik, ANİMASYONLU, görsel olarak DETAYLI ve ÇEŞİTLİ, TÜRKÇE, merak uyandıran bir bilgi videosunun HİKÂYE TAHTASINI yaz. Kanal 3D baskı ağırlıklıdır ama bu video SERBEST bir konudadır: konu 3D baskıyla ilgili olmak zorunda DEĞİL, ona zorla bağlama; ama video genel bir kitleye yönelik, sakin, güvenilir ve eğlenceli olsun.
+ISTEM_SERBEST = """YouTube Shorts / Instagram Reels için EN ÇOK 58 saniyelik (60 sn kesin sınırdır: Instagram hikâyesi, Reels ve Shorts), ANİMASYONLU, görsel olarak DETAYLI ve ÇEŞİTLİ, TÜRKÇE, merak uyandıran bir bilgi videosunun HİKÂYE TAHTASINI yaz. Kanal 3D baskı ağırlıklıdır ama bu video SERBEST bir konudadır: konu 3D baskıyla ilgili olmak zorunda DEĞİL, ona zorla bağlama; ama video genel bir kitleye yönelik, sakin, güvenilir ve eğlenceli olsun.
 Konu: {konu}
 İpucu: {ipucu}
 KONU UYGUN DEĞİLSE (nefret/hakaret, siyaset, kişi hedefleme, sağlık/hukuk/yatırım TAVSİYESİ, şiddet, yetişkin içerik, tehlikeli talimat) hikâye yazma; yalnızca {{"uygunsuz": "kısa neden"}} döndür.
 
-Video, her biri bir ANİMASYON SAHNESİ olan 7 ile 11 sahneden oluşur. Konuyu adım adım, sebep-sonuç ve süreç olarak anlat.
+Video, her biri bir ANİMASYON SAHNESİ olan 6 ile 8 sahneden oluşur. Konuyu adım adım, sebep-sonuç ve süreç olarak anlat.
 SAHNE TİPLERİ (yalnızca bunlar):
 - kanca: açılış (merkezde büyük bir ikon, ışınlar, soru işaretleri). ZORUNLU ilk sahne. params: {{"ikon": "yumurta"}}  (ikon: """ + SERBEST_IKONLAR + """)
 - karsilastir: iki değeri sütunla karşılaştırır. params: {{"a": {{"ad": "Yaz", "deger": 5}}, "b": {{"ad": "Kış", "deger": 3}}, "birim": "adet"}}
 - sayi: büyük halka sayaç. params: {{"deger": 65, "maks": 100, "birim": "%", "etiket": "kısa açıklama"}}
 - kontrol_listesi: onay işaretli madde listesi (özet için). params: {{"maddeler": ["en çok 28 harf", "...", "..."]}}  (3-4 madde)
 - kapanis: son sahne (takip et). ZORUNLU son sahne. params: {{"ikon": "kalp"}}
-- ozel: DETAYLI, konuya özel çizilmiş animasyon sahnesi. Videonun ANA görsel yükünü bu sahneler taşır: 3-6 tane yaz. Çizimi ayrı bir ressam yapacak; sen yalnızca ne görüneceğini anlat: params: {{"yedek": "kontrol_listesi", "tema": "mavi|mor|yesil|turuncu|gri", "tasarim_notu": "sahnede NE görünecek: mekân/arka plan, ana nesneler ve parçaları, hareket sırası (önce ne belirir, sonra ne olur), gösterilecek sayı/etiketler. 3-5 somut cümle."}}
+- ozel: DETAYLI, konuya özel çizilmiş animasyon sahnesi. Videonun ANA görsel yükünü bu sahneler taşır: 3-4 tane yaz. Çizimi ayrı bir ressam yapacak; sen yalnızca ne görüneceğini anlat: params: {{"yedek": "kontrol_listesi", "tema": "mavi|mor|yesil|turuncu|gri", "tasarim_notu": "sahnede NE görünecek: mekân/arka plan, ana nesneler ve parçaları, hareket sırası (önce ne belirir, sonra ne olur), gösterilecek sayı/etiketler. 3-5 somut cümle."}}
 ÇEŞİTLİLİK KURALLARI: Aynı tip arka arkaya gelmesin; ozel dışındaki tipler en çok 2 kez; en az 4 farklı tip. Her özel sahne farklı bir mekân/nesne/kavram göstersin (aynı kompozisyonu tekrarlama).
 TEKRARA DÜŞME: Her sahnenin "nokta" alanına o sahnede anlattığın TEK somut bilgiyi 3-8 kelimeyle yaz. Aşağıdaki, daha önceki videolarda ZATEN anlatılmış noktaları ve konuları TEKRAR ETME. Bu videonun noktaları da birbirinden farklı olsun.
 {onceki}
-ANLATI: toplam 160-230 kelime. Özel sahnelerde 20-36 kelime (2-3 kısa cümle; ressamın çizeceği şeyi anlat), diğerlerinde 8-22 kelime. İlk sahne güçlü kanca (soru ya da yaygın yanılgı). Cümleler kısa, konuşma dili, "sen" hitabı. Son sahne yoruma davet + takip et.
+ANLATI: toplam 95-120 kelime (KESİN: 125'i geçme, video 58 sn'yi aşmasın). Özel sahnelerde 14-22 kelime (1-2 kısa cümle; ressamın çizeceği şeyi anlat), diğerlerinde 8-16 kelime. İlk sahne güçlü kanca (soru ya da yaygın yanılgı). Cümleler kısa, konuşma dili, "sen" hitabı. Son sahne yoruma davet + takip et.
 VURGU: anlatıda önemli kelimeleri işaretle: *kelime* turuncu, ~kelime~ mavi. Her sahnede en çok 2 vurgu; çok kelimeli vurguda HER kelimeyi ayrı işaretle.
 EK ALANLAR (isteğe bağlı): "bolum": yeni bölüm başlığı (en çok 28 harf; ilk sahnede olmasın, "kanca"ya yazma; 3-5 bölüm); "baslik": ekrana büyük yazı olarak zıplayan TEK kısa kelime (en çok 10 harf, tüm videoda en çok 2 sahnede); "etiketler": [] bırak.
 GÜVENLİK/ACİL DURUM VE HABER KONULARI: Tehlike, güvenlik ya da güncel olay içeren konularda yalnızca resmî kurumların ve uzmanların GENEL KABUL GÖREN tavsiyelerini ver (yetkililere haber ver: Türkiye'de 112, güvenli kapalı alana çekil, uzak dur, kahramanlık yapma); kesin garanti verme, riskli davranış özendirme. Olayı gerçekmiş gibi anlatma: "diyelim ki / eğer karşılaşırsan" çerçevesi kur; yer, kişi ve kurum adı uydurma. Konu esprili anlatılsın denmişse hafif, zekice, kimseyle alay etmeyen espriler yap; bilgi her zaman doğru ve net kalsın.
@@ -367,14 +368,14 @@ YALNIZCA JSON döndür: {{"tema":"...","kamera":[[x,y,zoom],[x,y,zoom]],"elemanl
 
 
 # ---------------- RESİMLİ ANLATIM (yapay zekâ resimleri + sinematik hareket; her konu) ----------------
-ISTEM_RESIMLI = """YouTube Shorts / Instagram Reels için ~60-85 saniyelik, SİNEMATİK, görsel olarak zengin, TÜRKÇE, merak uyandıran bir bilgi videosunun HİKÂYE TAHTASINI yaz. Görseller yapay zekâ tarafından RESİM olarak üretilecek ve üzerlerine yavaş kamera hareketi, altyazı, ses ve müzik eklenecek. Konu serbesttir (3D baskıyla ilgili olmak zorunda değil, zorla bağlama).
+ISTEM_RESIMLI = """YouTube Shorts / Instagram Reels için EN ÇOK 58 saniyelik (60 sn kesin sınırdır: Instagram hikâyesi, Reels ve Shorts), SİNEMATİK, görsel olarak zengin, TÜRKÇE, merak uyandıran bir bilgi videosunun HİKÂYE TAHTASINI yaz. Görseller yapay zekâ tarafından RESİM olarak üretilecek ve üzerlerine yavaş kamera hareketi, altyazı, ses ve müzik eklenecek. Konu serbesttir (3D baskıyla ilgili olmak zorunda değil, zorla bağlama).
 Konu: {konu}
 İpucu: {ipucu}
 KONU UYGUN DEĞİLSE (nefret/hakaret, siyaset, kişi hedefleme, sağlık/hukuk/yatırım TAVSİYESİ, şiddet, yetişkin içerik, tehlikeli talimat) hikâye yazma; yalnızca {{"uygunsuz": "kısa neden"}} döndür.
 
 VİDEO TÜM SAHNELER İÇİN TEK BİR GÖRSEL STİL kullanır: "stil" alanına İngilizce, konuya uygun tutarlı bir stil yaz (ör. "warm flat vector illustration, soft gradients, rich detail, consistent color palette" ya da "cinematic documentary photograph, natural light, shallow depth of field"). İnsan gerekiyorsa sade stilize figürler (detaylı yüz yok) tercih et.
-7 ile 12 sahne yaz. SAHNE TİPLERİ:
-- resim: tam ekran yapay zekâ görseli (videonun ana sahnesi; 5-9 tane). params: {{"gorsel": "İNGİLİZCE, 25-60 kelimelik DETAYLI görsel tarifi: ana nesne/olay, mekân, arka plan, ışık, renkler, kompozisyon; metin/yazı/logo YOK", "hareket": "yakin|uzak|sol|sag|yukari|asagi", "odak": [0.5, 0.45]}}
+6 ile 9 sahne yaz. SAHNE TİPLERİ:
+- resim: tam ekran yapay zekâ görseli (videonun ana sahnesi; 4-7 tane). params: {{"gorsel": "İNGİLİZCE, 25-60 kelimelik DETAYLI görsel tarifi: ana nesne/olay, mekân, arka plan, ışık, renkler, kompozisyon; metin/yazı/logo YOK", "hareket": "yakin|uzak|sol|sag|yukari|asagi", "odak": [0.5, 0.45]}}
   Görsel tarifleri HER SAHNEDE FARKLI olsun (farklı mekân, plan ve açı: geniş plan, yakın plan, üstten, kesit, karşılaştırma...). Görselin alt üçte biri sade/koyu kalsın (altyazı için). Ana nesne ekranın ortasının biraz üstünde. "odak": ana nesnenin görseldeki yeri [yatay 0-1, dikey 0-1].
 - sayi: büyük halka sayaç (önemli bir sayı için; en çok 1). params: {{"deger": 65, "maks": 100, "birim": "%", "etiket": "kısa açıklama"}}
 - karsilastir: iki değeri sütunla karşılaştırır (en çok 1). params: {{"a": {{"ad": "Yaz", "deger": 5}}, "b": {{"ad": "Kış", "deger": 3}}, "birim": "adet"}}
@@ -383,7 +384,7 @@ VİDEO TÜM SAHNELER İÇİN TEK BİR GÖRSEL STİL kullanır: "stil" alanına �
 İlk sahne "resim" olsun (güçlü kanca görseli). Aynı kompozisyonu tekrarlama.
 TEKRARA DÜŞME: Her sahnenin "nokta" alanına o sahnede anlattığın TEK somut bilgiyi 3-8 kelimeyle yaz. Aşağıdaki, daha önceki videolarda ZATEN anlatılmış noktaları ve konuları TEKRAR ETME.
 {onceki}
-ANLATI: toplam 150-230 kelime; sahne başına 1-3 kısa cümle (10-28 kelime). İlk sahne güçlü kanca (soru ya da yaygın yanılgı). Cümleler kısa, konuşma dili, "sen" hitabı. Her sahnenin anlatısı o sahnenin görselini anlatsın. Son sahne yoruma davet + takip et.
+ANLATI: toplam 95-120 kelime (KESİN: 125'i geçme, video 58 sn'yi aşmasın); sahne başına 1-2 kısa cümle (8-18 kelime). İlk sahne güçlü kanca (soru ya da yaygın yanılgı). Cümleler kısa, konuşma dili, "sen" hitabı. Her sahnenin anlatısı o sahnenin görselini anlatsın. Son sahne yoruma davet + takip et.
 VURGU: önemli kelimeleri işaretle: *kelime* turuncu, ~kelime~ mavi. Her sahnede en çok 2 vurgu.
 EK ALANLAR (isteğe bağlı): "bolum": yeni bölüm başlığı (en çok 28 harf; ilk sahnede olmasın; 3-5 bölüm); "baslik": ekrana büyük yazı olarak zıplayan TEK kısa kelime (en çok 10 harf, tüm videoda en çok 2 sahnede); "etiketler": ["en çok 24 harflik kısa görsel etiketi"] (en çok 3 sahnede, görselin ana nesnesini adlandırır).
 GÜVENLİK/ACİL DURUM VE HABER KONULARI: Tehlike, güvenlik ya da güncel olay içeren konularda yalnızca resmî kurumların ve uzmanların GENEL KABUL GÖREN tavsiyelerini ver (yetkililere haber ver: Türkiye'de 112, güvenli kapalı alana çekil, uzak dur, kahramanlık yapma); kesin garanti verme, riskli davranış özendirme. Olayı gerçekmiş gibi anlatma: "diyelim ki / eğer karşılaşırsan" çerçevesi kur; yer, kişi ve kurum adı uydurma. Konu esprili anlatılsın denmişse hafif, zekice, kimseyle alay etmeyen espriler yap; bilgi her zaman doğru ve net kalsın.
