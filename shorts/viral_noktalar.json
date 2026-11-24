@@ -101,7 +101,23 @@
         "Dört kısa güvenlik adımı",
         "Yorum ve takip çağrısı"
       ]
+    },
+    {
+      "id": "s20261124-213842",
+      "konu": "Çoklu 3D üretim",
+      "noktalar": [
+        "çoklu üretimde çarpışma riski",
+        "parça akışı baskıyı düzenler",
+        "sıralı üretim gezmeyi azaltır",
+        "parçalar arası boşluk gerekir",
+        "dolgu gereksizse azaltılır",
+        "destek sarkmayı taşır",
+        "yüksek hız titreşim getirir",
+        "soğutma küçük parçada kritik",
+        "başta yerleşim kontrol edilir",
+        "yorum ve takip çağrısı"
+      ]
     }
   ],
-  "son_ton": 0
+  "son_ton": 150
 }
