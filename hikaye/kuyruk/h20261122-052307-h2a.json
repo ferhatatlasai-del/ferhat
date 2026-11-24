@@ -1,7 +1,7 @@
 {
   "id": "h20261122-052307-h2a",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-22T05:23:07.000Z",
   "gorsel": "hikaye/gorseller/h20261122-052307-h2a.mp4",
   "baslik": "Cable Winder Tower",
@@ -21,7 +21,9 @@
     "sorunlar": []
   },
   "yayin": {
-    "tarih": "2026-11-24T09:25:29Z"
+    "tarih": "2026-11-24T09:26:45Z",
+    "medya_kimligi": "18643388155010027",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4037372825798109793"
   },
   "hata": "",
   "deneme": 0,
