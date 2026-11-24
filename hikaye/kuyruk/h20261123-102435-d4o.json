@@ -1,7 +1,7 @@
 {
   "id": "h20261123-102435-d4o",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-23T10:24:35.000Z",
   "gorsel": "hikaye/gorseller/h20261123-102435-d4o.mp4",
   "baslik": "9 Sided Drip Tray for 9 Sided Twisted Planter",
@@ -24,7 +24,9 @@
     ]
   },
   "yayin": {
-    "tarih": "2026-11-24T16:45:24Z"
+    "tarih": "2026-11-24T16:46:44Z",
+    "medya_kimligi": "18091176149300791",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4037594273020536846"
   },
   "hata": "",
   "deneme": 0,
