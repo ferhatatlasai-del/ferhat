@@ -1,7 +1,7 @@
 {
   "id": "h20261122-052307-h2a",
   "kaynak": "uretim",
-  "durum": "planli",
+  "durum": "yayinlaniyor",
   "olusturma": "2026-11-22T05:23:07.000Z",
   "gorsel": "hikaye/gorseller/h20261122-052307-h2a.mp4",
   "baslik": "Cable Winder Tower",
@@ -20,7 +20,9 @@
     "deneme": 1,
     "sorunlar": []
   },
-  "yayin": null,
+  "yayin": {
+    "tarih": "2026-11-24T09:25:29Z"
+  },
   "hata": "",
   "deneme": 0,
   "tur": "video",
