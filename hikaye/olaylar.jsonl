@@ -174,3 +174,12 @@
 {"t": "2026-11-24T05:39:06Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
 {"t": "2026-11-24T05:39:18Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
 {"t": "2026-11-24T05:39:26Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-24T14:20:52Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 8.0, "site": "printables.com", "sorunlar": ["Poop bag poşeti üzerinde okunabilir yazı var", "İlk görselde ürün referansa göre stüdyo sunumlu, kullanım bağlamı yok"]}
+{"t": "2026-11-24T14:21:01Z", "tur": "denetim", "gecti": false, "deneme": 2, "puan": 8.0, "site": "printables.com", "sorunlar": ["Poşet üst kısmı nesnenin içinde net biçimde gösterilmiyor.", "Alt bölümde poşetle kullanım var, tek başına ürün görünümü biraz ikincil kalıyor."]}
+{"t": "2026-11-24T14:21:13Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 9.0, "site": "printables.com", "sorunlar": ["Poşet üzerindeki yazılar okunuyor.", "Arka plan ve yüzey referanstan farklı; ancak ana nesne uyumlu.", "Poşetin çıkış yönü hafif farklı görünüyor."]}
+{"t": "2026-11-24T14:21:22Z", "tur": "denetim", "gecti": false, "deneme": 2, "puan": 9.0, "site": "printables.com", "sorunlar": ["Poşet üzerinde okunabilir yazılar var", "Arka plan ve yüzey referanstan farklı", "Referansla renk/ışıklandırma küçük farklılıklar gösteriyor"]}
+{"t": "2026-11-24T14:21:32Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-24T14:21:42Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-24T14:21:51Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 8.0, "site": "printables.com", "sorunlar": ["Poşet üzerinde okunabilir yazı var", "Referans görsele göre poşet yerleşimi ve görünümü biraz farklı"]}
+{"t": "2026-11-24T14:22:00Z", "tur": "denetim", "gecti": false, "deneme": 2, "puan": 8.0, "site": "printables.com", "sorunlar": ["Poşet üzerinde okunabilir yazı ve yön oku var.", "Referans görselde kabartma/oyma isim detayı daha belirgin; üretimde bu detay görünmüyor."]}
+{"t": "2026-11-24T14:22:12Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 8.0, "site": "printables.com", "sorunlar": ["Poşet üzerinde okunabilir logo/yazı var", "Arka plandaki gerçek ortam biraz dikkat dağıtıyor"]}
