@@ -1,7 +1,7 @@
 {
   "id": "h20261122-102107-b0i",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-22T10:21:07.000Z",
   "gorsel": "hikaye/gorseller/h20261122-102107-b0i.mp4",
   "baslik": "gridfinity cable winder holder",
@@ -21,7 +21,9 @@
     "sorunlar": []
   },
   "yayin": {
-    "tarih": "2026-11-24T10:05:28Z"
+    "tarih": "2026-11-24T10:06:43Z",
+    "medya_kimligi": "17993413083006703",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4037392902941985755"
   },
   "hata": "",
   "deneme": 0,
