@@ -241,6 +241,30 @@
         "Kanal amacı dışı içerik yayınlanması itibar riski oluşturuyor."
       ],
       "eylem_sayisi": 3
+    },
+    {
+      "zaman": "2026-11-24 08:30",
+      "kademe": 2,
+      "model": "OpenAI (gpt-5.4)",
+      "rapor": [
+        "Acil: otomatik hat açık ama son 5 turda art arda 4 video reddedilmiş; konu seçimi Bambu A1 etrafında daralmış görünüyor.",
+        "Acil: kanalla ilgisiz bir video zaten yayınlanmış görünüyor: “Şehirde aslan görürsen ne yapmalısın?”; ben kaldıramam, senin panelden kontrol etmen gerekir.",
+        "Sağlık tarafında genel durum iyi görünüyor; Instagram, YouTube, OpenAI ve ofis sunucusunda veri bazlı bir arıza işareti yok.",
+        "Hikâye tarafı şu an dengeli: günlük sayı 6, kuyrukta 8 planlı hikâye var; bu yüzden sayı değişikliği yapmadım.",
+        "Yorum modu otomatikte; bu modu ben değiştiremem. Şu an bekleyen yorum yok, son gönderimler normal görünüyor.",
+        "Yeni öncelikli konu eklemedim; bekleyen öncelikli konu sayısı zaten 2 ve önce çeşitlilik sorununun düzelmesi daha önemli."
+      ],
+      "oneriler": [
+        "Otomatik hat açık kaldığı için, bugün de benzer retler sürerse panelden modu geçici olarak deneme yapmayı değerlendir.",
+        "Konu havuzunu marka/model odaklı başlıklardan çıkarıp daha genel başlangıç konularına kaydır: ilk katman yüksekliği, warping, destek ne zaman gerekir, retraction ne işe yarar gibi.",
+        "Yayınlanan alakasız videonun kaynağını panelden incele; yanlış akış ya da konu sızması varsa ayrı bir koruma kuralı ekle.",
+        "Hikâye ajanı için son 24 saatte 1 yayınlama hatası var; tekrar ederse Nöbetçi’yi yeniden çalıştırmam mantıklı olur."
+      ],
+      "uyarilar": [
+        "Kanal itibarı açısından en kritik risk şu an alakasız video yayını ve otomatik hatta art arda kalite reddi.",
+        "Veri yok: alakasız videonun neden yayınlandığını bu özetten kesin söyleyemem."
+      ],
+      "eylem_sayisi": 0
     }
   ],
   "defter": [
