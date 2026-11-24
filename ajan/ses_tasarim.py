@@ -466,11 +466,51 @@ def konusma_araliklari(plan, on_pay=0.04, son_pay=0.06):
     return birlesik
 
 
-def olaylar_uret(plan):
+def konusma_etkinligi(ses, n):
+    """Konuşma SESİNDEN (kelime zamanlarına güvenmeden) etkinlik maskesi: (maske[n] 0/1, aralıklar [(baş, son)] sn). 10 ms bloklar, göreli eşik, 120 ms tutma (kelime arası kısa düşüşler boşluk sayılmaz)."""
+    blok = SR // 100
+    m = min(len(ses), n) // blok
+    if m < 10:
+        return np.zeros(n), []
+    r = np.sqrt((ses[:m * blok].reshape(m, blok) ** 2).mean(axis=1))
+    zirve = np.percentile(r, 95)
+    esik = max(zirve * 0.06, 0.004)
+    akt = r > esik
+    tut = 12   # 120 ms
+    kapali = np.zeros(m, bool)
+    son = -10 ** 9
+    for i in range(m):
+        if akt[i]:
+            son = i
+        kapali[i] = (i - son) <= tut and son >= 0
+    maske = np.zeros(n)
+    maske[:m * blok] = np.repeat(kapali.astype(float), blok)
+    aralik, bas = [], None
+    for i in range(m):
+        if kapali[i] and bas is None:
+            bas = i
+        elif not kapali[i] and bas is not None:
+            aralik.append((bas / 100.0, i / 100.0))
+            bas = None
+    if bas is not None:
+        aralik.append((bas / 100.0, m / 100.0))
+    return maske, aralik
+
+
+def olaylar_uret(plan, ses=None):
     """Efekt olayları: konuşma varken (cümle sonu dahil) HİÇBİR efekt başlamaz.
     Konuşma aralığına düşen olay, ±0,7 sn içindeki en yakın sessiz boşluğa kaydırılır; yoksa sayaç tıkları (tik) düşürülür, diğerleri de atlanır."""
     ol = _olaylar_ham(plan)
     ar = konusma_araliklari(plan)
+    if ses is not None:   # gerçek ses etkinliğiyle birleştir: kelime zamanları kaysa bile efekt konuşmaya başlamaz
+        _, ses_ar = konusma_etkinligi(ses, len(ses))
+        tum = sorted([list(a) for a in ar] + [[b - 0.04, e + 0.06] for b, e in ses_ar])
+        ar = []
+        for b, e in tum:
+            if ar and b <= ar[-1][1] + 0.06:
+                ar[-1][1] = max(ar[-1][1], e)
+            else:
+                ar.append([b, e])
     if not ar:
         return ol
     sonuc = []
@@ -570,9 +610,10 @@ def uret(plan, cikti, ses_yolu=None, tohum=7):
     muzik = muzik + _bas_vurus(rng, sure)[:n] + _hihat(rng, sure)[:n]
     atm = _atmosfer(rng, sure)[:n]
 
+    ses = oku_wav(ses_yolu)[:n] if ses_yolu else None
     # efektler
     fx = np.zeros((n, 2))
-    for ev in olaylar_uret(plan):
+    for ev in olaylar_uret(plan, ses):
         zaman, ad = ev[0], ev[1]
         rr = np.random.default_rng(int(zaman * 1000) + len(ad))
         if ad == 'yukselis' and len(ev) > 2:
@@ -582,7 +623,6 @@ def uret(plan, cikti, ses_yolu=None, tohum=7):
         _yerlestir(fx, parca, zaman - tepe)
     fx = _yanki(fx, rng, 0.35, 0.8, 0.12)
 
-    ses = oku_wav(ses_yolu)[:n] if ses_yolu else None
     muzik_g = np.ones(n)
     if ses is not None:
         muzik_g = yan_zincir(ses, sure)
@@ -596,6 +636,20 @@ def uret(plan, cikti, ses_yolu=None, tohum=7):
     kar *= hedef / r_m
     fx *= hedef / r_m * 1.9
     fx *= (0.5 + 0.5 * muzik_g)[:, None]   # konuşma sırasında efektler de (yarı derinlikte) kısılır
+    if ses is not None:
+        # KAPI: efektler yalnızca konuşma boşluklarında duyulur (cümle sonlarında efekt kuyruğu konuşmaya karışmaz). Konuşma başlayınca 25 ms'de, bitince 90 ms'de açılır.
+        maske, _ = konusma_etkinligi(ses, n)
+        kapi = np.ones(n)
+        a_k, r_k = np.exp(-1 / (0.025 * SR)), np.exp(-1 / (0.09 * SR))
+        z = 1.0
+        hedef_k = 1.0 - maske
+        # blok blok (1 ms) hesapla: hızlı ve yeterince ince
+        adim = SR // 1000
+        for i in range(0, n, adim):
+            h = hedef_k[i]
+            z = (a_k ** adim) * z + (1 - a_k ** adim) * h if h < z else (r_k ** adim) * z + (1 - r_k ** adim) * h
+            kapi[i:i + adim] = z
+        fx *= kapi[:, None]
     karisim = kar * muzik_g[:, None] + fx
     # giriş / çıkış yumuşatma
     t = np.arange(n) / SR

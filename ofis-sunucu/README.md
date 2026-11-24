@@ -374,3 +374,7 @@ Panel → Hikâye ayarları → **"Günde kaç hikâye üretilsin ve yayınlans�
 ## Oturum (şifre bir kez, 30 gün)
 
 Ofis şifresi doğrulanınca sunucu **30 günlük, imzalı, HttpOnly, SameSite=Strict `ofis_oturum` çerezi** verir (şifre değişirse çerez geçersiz olur; HTTPS'te `Secure`). Çerez geçerliyken `/api/ping` `oturum: true` döner ve panel şifre sormaz; tarayıcı depolaması (localStorage) silinse, iOS/PWA 7 günlük temizlik yapsa bile giriş sürer. Şifre alanları yalnızca **görünür** olduklarında okunur (gizli alanlara tarayıcının eski şifre doldurması kayıtlı şifreyi bozmasın). Yanlış şifre 8 denemeden sonra 15 dk kilitler (değişmedi).
+
+## Konuşma ve efekt çakışması (cümle sonları)
+
+`ajan/ses_tasarim.py`: efektler önce yalnızca tahmini kelime zamanlarına göre konuşmadan kaçınıyordu; zamanlar kayınca (ya da efekt kuyruğu uzayınca) cümle sonlarında konuşmaya biniyordu. Şimdi: (1) **konuşma sesinden** etkinlik maskesi çıkarılır (`konusma_etkinligi`: 10 ms bloklar, göreli eşik, 120 ms tutma) ve efekt yerleştirme bu gerçek aralıkları da dikkate alır; (2) efekt katmanına **kapı** uygulanır: konuşma başlayınca 25 ms'de kapanır, bitince 90 ms'de açılır, yani efektler yalnızca konuşma boşluklarında duyulur. Sentetik testte konuşma içindeki efekt enerjisi yaklaşık 5 kat (−14 dB) düştü, boşluklardaki efektler değişmedi. Yalnızca YENİ üretilen videolar etkilenir.
