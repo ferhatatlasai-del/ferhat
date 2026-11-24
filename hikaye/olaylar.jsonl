@@ -168,3 +168,9 @@
 {"t": "2026-11-23T14:23:11Z", "tur": "denetim", "gecti": false, "deneme": 2, "puan": 8.0, "site": "printables.com", "sorunlar": ["Görselde az miktarda yazı/logo benzeri işaretler var", "Arka plan ve kurulum referansa göre farklı bir ortamda çekilmiş"]}
 {"t": "2026-11-23T14:23:24Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com", "sorunlar": ["Belirgin bir sorun görünmüyor."]}
 {"t": "2026-11-23T14:23:34Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-24T05:38:33Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-24T05:38:40Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-24T05:39:00Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-24T05:39:06Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-24T05:39:18Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-24T05:39:26Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
