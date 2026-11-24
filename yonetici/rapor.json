@@ -265,6 +265,30 @@
         "Veri yok: alakasız videonun neden yayınlandığını bu özetten kesin söyleyemem."
       ],
       "eylem_sayisi": 0
+    },
+    {
+      "zaman": "2026-11-24 08:31",
+      "kademe": 2,
+      "model": "OpenAI (gpt-5.4)",
+      "rapor": [
+        "Acil: kanalda 3D baskı dışı içerik sızıntısı var; \"Şehirde aslan görürsen ne yapmalısın?\" yayınlanmış, ayrıca tavuk/yumurta konulu taslak da görünüyor. Bu, itibar için risk.",
+        "Otomatik hat açık ama bugün henüz tur görünmüyor; son 5 kayıtta art arda 4 video reddedilmiş. Modu değiştiremiyorum, ama konu üretiminde sapma/kalite sorunu var gibi duruyor.",
+        "Sağlık tarafı genel olarak iyi görünüyor: Instagram, YouTube, OpenAI ve ofis sunucusu çalışıyor; hikâye kuyruğunda 8 planlı hikâye var.",
+        "Hikâye ayarı şu an 6/gün; hedefinle uyumlu olduğu için değiştirmedim.",
+        "Yorum modu otomatik ve 24 saat hedefi açısından işliyor görünüyor; 5 yorum gönderilmiş, bekleyen yok. Modu ben değiştirmem.",
+        "Öncelikli konu kuyruğunda 2 uygun 3D konu var; tekrar riskini azaltmak için yeni ve temel bir konu ekledim."
+      ],
+      "oneriler": [
+        "Panelde konu kaynağı/guardrail kontrol et: 3D baskı dışı başlıkların üretim ve yayın hattına girmemesi için filtreyi sıkılaştır.",
+        "Otomatik hatta art arda ret olduğu için bugün gelecek turlarda özellikle başlık ve konu uygunluğunu yakından izle; gerekirse deneme modunu panelden sen değerlendir.",
+        "Bambu Lab odaklı içeriklerde marka bağlantısı izlenimi riskine karşı açıklamada bağımsızlık notunu standartlaştırmayı düşün.",
+        "Dünkü reddedilen videolarda ortak sorun teknik doğruluk mu, tekrar mı, marka yoğunluğu mu; kısa bir kök neden özeti çıkarmak faydalı olur."
+      ],
+      "uyarilar": [
+        "3D baskı dışı bir video zaten Instagram ve YouTube'da yayınlanmış görünüyor; bu acil itibar riski.",
+        "Son 24 saatte Hikâye ajanı (yayınla) için 1 başarısız iş akışı var; veri yok ama tekrar ederse ayrıca incelemek gerekir."
+      ],
+      "eylem_sayisi": 2
     }
   ],
   "defter": [
@@ -391,6 +415,29 @@
       "neden": "Başarılı konularla uyumlu, yeni başlayan için faydalı ve mevcut tekrar sorununu azaltır.",
       "durum": "yapildi",
       "ayrinti": "Warping neden olur, brim ne zaman işe yarar?"
+    },
+    {
+      "zaman": "2026-11-24 08:31",
+      "kademe": 2,
+      "eylem": "workflow_tetikle",
+      "params": {
+        "akis": "nobetci.yml"
+      },
+      "neden": "3D dışı video yayınlanmış; akış sapması/filtre sorunu için erken kontrol gerekli.",
+      "durum": "yapildi",
+      "ayrinti": "nobetci.yml tetiklendi"
+    },
+    {
+      "zaman": "2026-11-24 08:31",
+      "kademe": 2,
+      "eylem": "konu_oncelik_ekle",
+      "params": {
+        "konu": "PETG neden ipliklenir, nasıl azaltılır?",
+        "ipucu": "Yeni başlayanlara sade anlat; nedenler olarak yüksek nozul ısısı, yetersiz retraction ve nemi genel düzeyde ver; kesin vaat, marka karşılaştırması ve fiyat olmasın."
+      },
+      "neden": "En çok izlenenlerde stringing/nem teması var; benzer kalıpta ama yeni ve temel bir konu.",
+      "durum": "yapildi",
+      "ayrinti": "PETG neden ipliklenir, nasıl azaltılır?"
     }
   ]
 }
