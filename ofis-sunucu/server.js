@@ -60,6 +60,21 @@ function sifreDogru(girilen) {
   return crypto.timingSafeEqual(a, b);
 }
 
+// Oturum çerezi: şifre bir kez doğrulanınca 30 günlük, imzalı, HttpOnly çerez verilir; tarayıcı depolaması silinse bile giriş sürer (şifre değişirse çerez geçersiz olur)
+const OTURUM_MS = 30 * 24 * 3600e3;
+function oturumImza(exp) { return crypto.createHmac('sha256', 'oturum:' + SIFRE).update(String(exp)).digest('hex'); }
+function oturumCerez(req) {
+  const exp = Date.now() + OTURUM_MS, sec = String(req.headers['x-forwarded-proto'] || '').includes('https') ? '; Secure' : '';
+  return `ofis_oturum=${exp}.${oturumImza(exp)}; Max-Age=${OTURUM_MS / 1000}; Path=/; HttpOnly; SameSite=Strict${sec}`;
+}
+function oturumGecerli(req) {
+  if (!SIFRE) return false;
+  const m = /(?:^|;\s*)ofis_oturum=(\d+)\.([0-9a-f]{64})/.exec(req.headers.cookie || '');
+  if (!m || +m[1] < Date.now()) return false;
+  const a = Buffer.from(m[2], 'hex'), b = Buffer.from(oturumImza(m[1]), 'hex');
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+
 // Çok basit hız sınırı: yanlış şifre ve direktif için IP başına
 const yanlis = new Map(), direktifler = [], yayinlar = [], linkler = new Map();
 const videoIzi = new Map();      // yüklenen video yolu -> içerik özeti (aynı videonun iki kez yayınlanmasını önler)
@@ -336,7 +351,7 @@ async function ajanDurumlari() {
 }
 
 async function api(req, res, url) {
-  if (url.pathname === '/api/ping') return json(res, 200, { ok: true, hazir: !!(TOKEN && SIFRE), bildirim: BILDIRIM_ACIK });
+  if (url.pathname === '/api/ping') return json(res, 200, { ok: true, hazir: !!(TOKEN && SIFRE), bildirim: BILDIRIM_ACIK, oturum: oturumGecerli(req) });
   if (url.pathname === '/api/zamanlayici') return json(res, 200, { acik: !ZAM_KAPALI && !!TOKEN, son: zamSon });
   if (url.pathname === '/api/kuru-kayit' && BILDIRIM_KURU) return json(res, 200, kuruKayit);
   if (url.pathname === '/api/vapid') return json(res, 200, { acik: BILDIRIM_ACIK, anahtar: BILDIRIM_ACIK ? VAPID_PUB : null });
@@ -432,7 +447,9 @@ async function api(req, res, url) {
   }
   if (!TOKEN || !SIFRE) return json(res, 503, { hata: 'Sunucuda GITHUB_TOKEN ya da PANEL_SIFRE tanımlı değil.' });
   if (kilitliMi(req)) return json(res, 429, { hata: 'Çok fazla yanlış deneme. 15 dakika sonra tekrar dene.' });
-  if (!sifreDogru(req.headers['x-sifre'])) { yanlisKaydet(req); return json(res, 401, { hata: 'Şifre yanlış.' }); }
+  const sifreOk = sifreDogru(req.headers['x-sifre']);
+  if (!sifreOk && !oturumGecerli(req)) { yanlisKaydet(req); return json(res, 401, { hata: 'Şifre yanlış.' }); }
+  if (sifreOk) res.setHeader('Set-Cookie', oturumCerez(req));   // şifre az önce doğrulandı: oturumu yenile (30 gün)
 
   if (url.pathname === '/api/abone' && req.method === 'POST') {
     if (!BILDIRIM_ACIK) return json(res, 503, { hata: 'Bildirim kapalı (VAPID anahtarları ya da BILDIRIM_SIRRI eksik).' });

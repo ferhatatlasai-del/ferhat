@@ -1159,7 +1159,7 @@ function chk(r){return r.json().then(function(j){ if(!r.ok){ if(r.status===401){
 function apiGet(u){return fetch(u,{headers:{'X-Sifre':SIF}}).then(chk);}
 function apiIcerikUret(metin){var f=$('#zFormat'); return fetch('/api/icerik-uret',{method:'POST',headers:{'X-Sifre':SIF,'Content-Type':'application/json'},body:JSON.stringify({metin:metin||'',format:f?f.value:'reels'})}).then(chk);}
 function apiPost(metin){return fetch('/api/direktif',{method:'POST',headers:{'X-Sifre':SIF,'Content-Type':'application/json'},body:JSON.stringify({metin:metin})}).then(chk);}
-fetch('/api/ping').then(function(r){return r.json();}).then(function(j){ if(j&&j.ok){ MOD=j.hazir?'sunucu':'demo'; if(selId==='icerik') renderInfo(); if(typeof pSifreHazirla==='function') pSifreHazirla(true); } }).catch(function(){});
+fetch('/api/ping').then(function(r){return r.json();}).then(function(j){ if(j&&j.ok){ MOD=j.hazir?'sunucu':'demo'; if(j.oturum&&!SIF) SIF='oturum';   /* geçerli oturum çerezi var: sunucu çerezle tanır, şifre tekrar istenmez */ if(selId==='icerik') renderInfo(); if(typeof pSifreHazirla==='function') pSifreHazirla(true); } }).catch(function(){});
 
 var ADIMLAR=['İstek iletildi','Trend kontrolü','İçerik ajanı','Video paketi','Hazır'];
 function adimlar(n,msg,hata){
@@ -1252,7 +1252,7 @@ async function senaryo(metin){
 var pDosya=null, pYol=null, pBaslangic=null, pBekle=false;
 function pHata(t){var e=$('#pHata'); e.textContent=t||''; e.hidden=!t;}
 function pSifreHazirla(sessiz){var h=!(MOD==='sunucu'&&!SIF)||!!sessiz; $('#pSifre').hidden=true; $('#zSifre').hidden=true; var hs=$('#hSifre'); if(hs) hs.hidden=true; var g=$('#gSifreSerit'); if(g){ g.hidden=h; if(!h){ var gi=$('#gSifre'); if(gi) gi.focus(); } }}
-function pSifreOku(){var hs=$('#hSifre'); var gs=$('#gSifre'); var v=((gs&&gs.value)||$('#pSifre').value||$('#zSifre').value||(hs&&hs.value)||''); if(v){SIF=v; try{localStorage.setItem('ofisSifre',SIF);}catch(x){}}}
+function pSifreOku(){function gor(e){return (e&&e.offsetParent!==null&&e.value)||'';} var v=gor($('#gSifre'))||gor($('#pSifre'))||gor($('#zSifre'))||gor($('#hSifre')); if(v){SIF=v; try{localStorage.setItem('ofisSifre',SIF);}catch(x){}}}   // yalnızca GÖRÜNEN alanlar okunur (gizli alanlara tarayıcı eski şifreyi doldurup kayıtlı şifreyi bozmasın)
 $('#pDosya').addEventListener('change',function(){
   pHata(''); pYol=null; $('#pForm').hidden=true; $('#pSonuc').innerHTML='';
   var f=this.files&&this.files[0]; pDosya=null; $('#pYukle').disabled=true;
@@ -2256,7 +2256,7 @@ function zekaCiz(yz){
     sat.appendChild(sec); sat.appendChild(inp); sat.appendChild(kay); kut.appendChild(sat); kap.appendChild(kut);
   });
 }
-function yoneticiCek(){ try{ pSifreOku(); }catch(e){} if(!SIF){ $('#ynDurum').textContent='Yönetici ajanı görmek için yukarıya ofis şifresini yazıp Kaydet’e bas.'; return; } fetch('/api/yonetici',{headers:{'X-Sifre':SIF}}).then(function(r){return r.ok?r.json():r.json().then(function(j){throw new Error(j.hata||'Hata');});}).then(yoneticiCiz).catch(function(e){ $('#ynDurum').textContent=String(e.message||'Yönetici verisi okunamadı.'); }); }
+function yoneticiCek(){ try{ pSifreOku(); }catch(e){} if(!SIF){ $('#ynDurum').textContent='Yönetici ajanı görmek için yukarıya ofis şifresini yazıp Kaydet’e bas.'; try{ pSifreHazirla(); }catch(e){} return; } fetch('/api/yonetici',{headers:{'X-Sifre':SIF}}).then(function(r){return r.ok?r.json():r.json().then(function(j){throw new Error(j.hata||'Hata');});}).then(yoneticiCiz).catch(function(e){ $('#ynDurum').textContent=String(e.message||'Yönetici verisi okunamadı.'); }); }
 $('#ynAktif').addEventListener('click',function(){ if(!hSifreKontrol()||!YN) return; var yeni=!(YN.ayar&&YN.ayar.aktif), b=this; b.disabled=true; hPost('/api/yonetici-ayar',{aktif:yeni}).then(function(){ b.disabled=false; yoneticiCek(); $('#ynDurum').textContent=yeni?'Açıldı; ilk değerlendirme birkaç dakikada rapora düşer.':'Kapatıldı.'; }).catch(function(e){ var he=$('#ynHata'); he.textContent=String(e.message||e); he.hidden=false; b.disabled=false; }); });
 $('#ynCalistir').addEventListener('click',function(){ if(!hSifreKontrol()) return; var b=this; b.disabled=true; hPost('/api/yonetici-calistir',{}).then(function(){ $('#ynDurum').textContent='Çalıştırıldı; 1-2 dakikada yeni rapor görünür.'; b.disabled=false; var n=0, t=setInterval(function(){ yoneticiCek(); if(++n>8) clearInterval(t); },15000); }).catch(function(e){ var he=$('#ynHata'); he.textContent=String(e.message||e); he.hidden=false; b.disabled=false; }); });
 $('#ynYonergeMetin').addEventListener('input',function(){ this.dataset.kirli='1'; });

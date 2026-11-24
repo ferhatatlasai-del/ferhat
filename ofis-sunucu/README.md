@@ -370,3 +370,7 @@ Instagram hikâye/Reels ve Shorts için videolar **en çok 58-59,5 sn** üretili
 ## Hikâye üretim sınırı (maliyet kontrolü)
 
 Panel → Hikâye ayarları → **"Günde kaç hikâye üretilsin ve yayınlansın?"** tek sayıdır ve hem üretimin hem yayının **kesin günlük üst sınırıdır**: `hikaye_uret.py` her gün üretilen hikâyeleri `hikaye/harcama.json` → `gunler.<gün>.hikaye` olarak sayar; sınıra ulaşınca elle "Şimdi üret" bile üretmez ("Karar: bekle (günlük üretim sınırı…)"), son turda yalnızca kalan kadar üretir. Kuyruk hedefi = günlük sayı + 3. Panel "Bugün üretilen: x / N hikâye" gösterir. Aylık bütçe (örn. 4 $) ayrıca görsel sınırını belirler: düşük kalite görsel ≈ 0,02 $, hikâye başına ~1,5 görsel → günde 6 hikâye ≈ 9 görsel ≈ 0,18 $/gün; 30 gün ≈ 5,4 $ + ~1 $ metin = ~6,5 $. Bütçe bundan düşükse günlük görsel sınırı hikâye sayısını kendiliğinden düşürür.
+
+## Oturum (şifre bir kez, 30 gün)
+
+Ofis şifresi doğrulanınca sunucu **30 günlük, imzalı, HttpOnly, SameSite=Strict `ofis_oturum` çerezi** verir (şifre değişirse çerez geçersiz olur; HTTPS'te `Secure`). Çerez geçerliyken `/api/ping` `oturum: true` döner ve panel şifre sormaz; tarayıcı depolaması (localStorage) silinse, iOS/PWA 7 günlük temizlik yapsa bile giriş sürer. Şifre alanları yalnızca **görünür** olduklarında okunur (gizli alanlara tarayıcının eski şifre doldurması kayıtlı şifreyi bozmasın). Yanlış şifre 8 denemeden sonra 15 dk kilitler (değişmedi).
