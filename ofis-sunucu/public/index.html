@@ -2202,7 +2202,10 @@ function yoneticiCiz(v){
       hPost('/api/yonetici-ayar',{otomatik_yayin:k[0]}).then(function(){ yoneticiCek(); }).catch(function(e){ var he=$('#ynHata'); he.textContent=String(e.message||e); he.hidden=false; });
     }); og.appendChild(b);
   });
-  $('#ynOtoNot').textContent=(oyMod!=='kapali'&&!(a.aktif&&a.kademe===3))?'⚠ Otomatik hat yalnızca ajan AÇIK ve Kademe 3 iken çalışır (şu an çalışmıyor).':(oyMod==='acik'?'Hat açık: bir sonraki tur 10:05, 15:05 ya da 20:05\'te.':'');
+  var hatDurdu=(oyMod!=='kapali'&&!(a.aktif&&a.kademe===3));
+  var on=$('#ynOtoNot'); on.textContent=hatDurdu?('⚠ OTOMATİK HAT ÇALIŞMIYOR: ajan AÇIK ve Kademe 3 olmalı (şu an '+(a.aktif?'Kademe '+a.kademe:'ajan kapalı')+'). Video üretilmez, hiçbir şey yayınlanmaz.'):(oyMod==='acik'?'Hat açık: bir sonraki tur 10:05, 15:05 ya da 20:05\'te.':'');
+  on.style.cssText=hatDurdu?'font-weight:700;color:var(--err)':'';
+  if(hatDurdu) $('#ynDurum').textContent+=' · ⚠ otomatik hat durdu (Kademe 3 gerekli)';
   var hi=$('#ynHatIc'); hi.textContent='';
   var IK={ig_reels:'📸 Reels',ig_hikaye:'📱 Hikâye',yt_shorts:'▶️ Shorts',yt_video:'🎬 Video'};
   (v.otomatik||[]).slice(0,8).forEach(function(k){
