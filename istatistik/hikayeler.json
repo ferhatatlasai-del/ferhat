@@ -410,40 +410,41 @@
  "18137430658662819": {
   "tarih": "2026-11-23T09:48:03Z",
   "baslik": "Bag hook for IKEA Bekant",
-  "izlenme": 26,
-  "erisim": 22,
+  "izlenme": 30,
+  "erisim": 25,
   "okundu": true,
   "yanit": 0
  },
  "17916673161282657": {
   "tarih": "2026-11-23T12:08:04Z",
   "baslik": "Bar handle hook",
-  "izlenme": 20,
-  "erisim": 17,
+  "izlenme": 23,
+  "erisim": 19,
   "okundu": true,
   "yanit": 0
  },
  "18381292288242586": {
   "tarih": "2026-11-23T14:30:40Z",
   "baslik": "Cable Winder",
-  "izlenme": 21,
-  "erisim": 19,
+  "izlenme": 22,
+  "erisim": 21,
   "okundu": true,
   "yanit": 0
  },
  "18394254565225977": {
   "tarih": "2026-11-23T16:47:27Z",
   "baslik": "Skadis Cable Winder",
-  "izlenme": 14,
-  "erisim": 11,
+  "izlenme": 17,
+  "erisim": 14,
   "okundu": true,
   "yanit": 0
  },
  "18133075576842209": {
   "tarih": "2026-11-24T05:06:41Z",
   "baslik": "Wider 20mm Micro Swiss Direct Drive Cable Management (Ender ",
-  "izlenme": 0,
-  "erisim": 0,
-  "okundu": false
+  "izlenme": 7,
+  "erisim": 7,
+  "okundu": true,
+  "yanit": 0
  }
 }
