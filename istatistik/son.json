@@ -1,17 +1,17 @@
 {
- "tarih": "2026-11-24T15:00:28Z",
- "tr_saat": "24.11.2026 18:00",
+ "tarih": "2026-11-24T18:00:27Z",
+ "tr_saat": "24.11.2026 21:00",
  "toplam": {
-  "reels": 19781,
+  "reels": 19797,
   "gonderi": 0,
-  "short": 11521,
+  "short": 11551,
   "youtube_video": 0,
-  "hikaye": 1059,
-  "toplam": 32361,
+  "hikaye": 1088,
+  "toplam": 32436,
   "begeni": 315,
   "yorum": 29
  },
- "fark": 80,
+ "fark": 75,
  "instagram": {
   "durum": "tamam",
   "izin": true,
@@ -26,8 +26,8 @@
     "begeni": 17,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgFd6danP9K/",
-    "izlenme": 1204,
-    "erisim": 1074
+    "izlenme": 1207,
+    "erisim": 1076
    },
    {
     "id": "18184587094447542",
@@ -48,7 +48,7 @@
     "begeni": 5,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/DgDWYKBE8DF/",
-    "izlenme": 1429,
+    "izlenme": 1430,
     "erisim": 1271
    },
    {
@@ -125,8 +125,8 @@
     "begeni": 31,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": 4153,
-    "erisim": 3678
+    "izlenme": 4165,
+    "erisim": 3702
    },
    {
     "id": "18289759651292671",
@@ -352,19 +352,28 @@
  "hikaye_izin": true,
  "hikayeler": [
   {
-   "id": "18117588176605789",
-   "tarih": "2026-11-24T14:27:11Z",
-   "baslik": "plant drip tray, customizable",
+   "id": "18091176149300791",
+   "tarih": "2026-11-24T16:46:44Z",
+   "baslik": "9 Sided Drip Tray for 9 Sided Twisted Planter",
    "izlenme": 0,
    "erisim": 0,
    "okundu": false
   },
   {
+   "id": "18117588176605789",
+   "tarih": "2026-11-24T14:27:11Z",
+   "baslik": "plant drip tray, customizable",
+   "izlenme": 10,
+   "erisim": 9,
+   "okundu": true,
+   "yanit": 0
+  },
+  {
    "id": "17918232561554166",
    "tarih": "2026-11-24T12:06:27Z",
    "baslik": "Bonsai / Plant Pot with Drip Tray, Drainage mesh",
-   "izlenme": 8,
-   "erisim": 6,
+   "izlenme": 16,
+   "erisim": 13,
    "okundu": true,
    "yanit": 0
   },
@@ -372,8 +381,8 @@
    "id": "17993413083006703",
    "tarih": "2026-11-24T10:06:43Z",
    "baslik": "gridfinity cable winder holder",
-   "izlenme": 13,
-   "erisim": 10,
+   "izlenme": 18,
+   "erisim": 15,
    "okundu": true,
    "yanit": 0
   },
@@ -381,8 +390,8 @@
    "id": "18643388155010027",
    "tarih": "2026-11-24T09:26:45Z",
    "baslik": "Cable Winder Tower",
-   "izlenme": 16,
-   "erisim": 13,
+   "izlenme": 19,
+   "erisim": 16,
    "okundu": true,
    "yanit": 0
   },
@@ -390,8 +399,8 @@
    "id": "18133075576842209",
    "tarih": "2026-11-24T05:06:41Z",
    "baslik": "Wider 20mm Micro Swiss Direct Drive Cable Management (Ender ",
-   "izlenme": 16,
-   "erisim": 14,
+   "izlenme": 19,
+   "erisim": 17,
    "okundu": true,
    "yanit": 0
   },
@@ -700,14 +709,6 @@
    "erisim": 40,
    "okundu": true,
    "yanit": 0
-  },
-  {
-   "id": "18203822248383065",
-   "tarih": "2026-11-20T13:07:42Z",
-   "baslik": "Parametric drill depth stop",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
   }
  ],
  "youtube": {
@@ -719,7 +720,7 @@
     "tur": "Short",
     "tarih": "2026-11-23T13:17:07",
     "baslik": "Şehirde aslan görürsen ne yapmalısın?",
-    "izlenme": 20,
+    "izlenme": 21,
     "begeni": 1,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=9sEswOUevrM"
@@ -729,7 +730,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T23:17:16",
     "baslik": "Bambu Lab A1 Combo AMS lite filament değişim sorunları",
-    "izlenme": 113,
+    "izlenme": 137,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=Vt_lyaaFBOo"
@@ -739,7 +740,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T17:50:11",
     "baslik": "Nozzle Neden Tıkanır? 5 Gerçek Sebep",
-    "izlenme": 140,
+    "izlenme": 142,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=ix-yeSzHv1c"
@@ -749,7 +750,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T10:33:51",
     "baslik": "Baskısı en kolay filamentler: 5'ten 1'e",
-    "izlenme": 382,
+    "izlenme": 380,
     "begeni": 3,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=czKPQgTqQrw"
@@ -759,7 +760,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T23:29:15",
     "baslik": "3D baskıda katman kayması neden olur?",
-    "izlenme": 4,
+    "izlenme": 2,
     "begeni": 1,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=bkae5x7GNp4"
@@ -799,7 +800,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T09:57:09",
     "baslik": "Filament nem çekerse ne olur? Belirtiler ve çözüm",
-    "izlenme": 1243,
+    "izlenme": 1245,
     "begeni": 7,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=M9tyEIjEeH8"
@@ -819,7 +820,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T22:17:19",
     "baslik": "3D Baskı Tablaya Yapışmıyor mu? 5 Pratik Çözüm",
-    "izlenme": 1255,
+    "izlenme": 1260,
     "begeni": 18,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=qcWHhTeaEHs"
@@ -899,7 +900,7 @@
  },
  "eksikler": [],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 18:00",
-  "govde": "Toplam 32.361 (+80) · Reels 19.781 · Short 11.521 · Hikaye 1.059 (5 bugün) · Takipçi 433 (-1) · En iyi Reels: Baskın tabladan kalkı 4.153"
+  "baslik": "📊 İzlenme raporu 21:00",
+  "govde": "Toplam 32.436 (+75) · Reels 19.797 · Short 11.551 · Hikaye 1.088 (6 bugün) · Takipçi 433 · En iyi Reels: Baskın tabladan kalkı 4.165"
  }
 }
