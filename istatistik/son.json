@@ -1,17 +1,17 @@
 {
- "tarih": "2026-11-23T18:00:57Z",
- "tr_saat": "23.11.2026 21:00",
+ "tarih": "2026-11-24T06:00:30Z",
+ "tr_saat": "24.11.2026 09:00",
  "toplam": {
-  "reels": 18846,
+  "reels": 19562,
   "gonderi": 0,
-  "short": 11397,
+  "short": 11477,
   "youtube_video": 0,
-  "hikaye": 939,
-  "toplam": 31182,
-  "begeni": 294,
+  "hikaye": 985,
+  "toplam": 32024,
+  "begeni": 305,
   "yorum": 29
  },
- "fark": 347,
+ "fark": 842,
  "instagram": {
   "durum": "tamam",
   "izin": true,
@@ -23,11 +23,11 @@
     "tur": "Reels",
     "tarih": "2026-11-23T13:17:56",
     "baslik": "Diyelim ki şehirde bir aslanla karşılaştın. Panik yok, kahra",
-    "begeni": 4,
+    "begeni": 13,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgFd6danP9K/",
-    "izlenme": 439,
-    "erisim": 383
+    "izlenme": 1025,
+    "erisim": 921
    },
    {
     "id": "18184587094447542",
@@ -37,8 +37,8 @@
     "begeni": 6,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgD94j1CjjG/",
-    "izlenme": 811,
-    "erisim": 731
+    "izlenme": 902,
+    "erisim": 811
    },
    {
     "id": "18132478334487242",
@@ -48,8 +48,8 @@
     "begeni": 5,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/DgDWYKBE8DF/",
-    "izlenme": 1427,
-    "erisim": 1267
+    "izlenme": 1428,
+    "erisim": 1269
    },
    {
     "id": "18362708170216349",
@@ -59,8 +59,8 @@
     "begeni": 10,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/DgCmX1zj1CJ/",
-    "izlenme": 1281,
-    "erisim": 1154
+    "izlenme": 1284,
+    "erisim": 1155
    },
    {
     "id": "17945283843388099",
@@ -78,10 +78,10 @@
     "tur": "Reels",
     "tarih": "2026-11-21T15:27:00",
     "baslik": "Hangi filament sıcağa daha çok dayanır?",
-    "begeni": 8,
+    "begeni": 9,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/DgAjINVCTkY/",
-    "izlenme": 838,
+    "izlenme": 840,
     "erisim": 754
    },
    {
@@ -115,7 +115,7 @@
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df-02JrFMVG/",
     "izlenme": 1739,
-    "erisim": 1578
+    "erisim": 1580
    },
    {
     "id": "18037926155853133",
@@ -125,8 +125,8 @@
     "begeni": 31,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": 4085,
-    "erisim": 3624
+    "izlenme": 4118,
+    "erisim": 3648
    },
    {
     "id": "18289759651292671",
@@ -352,19 +352,28 @@
  "hikaye_izin": true,
  "hikayeler": [
   {
-   "id": "18394254565225977",
-   "tarih": "2026-11-23T16:47:27Z",
-   "baslik": "Skadis Cable Winder",
+   "id": "18133075576842209",
+   "tarih": "2026-11-24T05:06:41Z",
+   "baslik": "Wider 20mm Micro Swiss Direct Drive Cable Management (Ender ",
    "izlenme": 0,
    "erisim": 0,
    "okundu": false
   },
   {
+   "id": "18394254565225977",
+   "tarih": "2026-11-23T16:47:27Z",
+   "baslik": "Skadis Cable Winder",
+   "izlenme": 14,
+   "erisim": 11,
+   "okundu": true,
+   "yanit": 0
+  },
+  {
    "id": "18381292288242586",
    "tarih": "2026-11-23T14:30:40Z",
    "baslik": "Cable Winder",
-   "izlenme": 10,
-   "erisim": 8,
+   "izlenme": 21,
+   "erisim": 19,
    "okundu": true,
    "yanit": 0
   },
@@ -372,8 +381,8 @@
    "id": "17916673161282657",
    "tarih": "2026-11-23T12:08:04Z",
    "baslik": "Bar handle hook",
-   "izlenme": 10,
-   "erisim": 8,
+   "izlenme": 20,
+   "erisim": 17,
    "okundu": true,
    "yanit": 0
   },
@@ -381,8 +390,8 @@
    "id": "18137430658662819",
    "tarih": "2026-11-23T09:48:03Z",
    "baslik": "Bag hook for IKEA Bekant",
-   "izlenme": 15,
-   "erisim": 10,
+   "izlenme": 26,
+   "erisim": 22,
    "okundu": true,
    "yanit": 0
   },
@@ -695,14 +704,6 @@
    "izlenme": 0,
    "erisim": 0,
    "okundu": false
-  },
-  {
-   "id": "18130920760892162",
-   "tarih": "2026-11-20T09:06:52Z",
-   "baslik": "Modern Gridfinity Case",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
   }
  ],
  "youtube": {
@@ -714,7 +715,7 @@
     "tur": "Short",
     "tarih": "2026-11-23T13:17:07",
     "baslik": "Şehirde aslan görürsen ne yapmalısın?",
-    "izlenme": 12,
+    "izlenme": 16,
     "begeni": 0,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=9sEswOUevrM"
@@ -724,8 +725,8 @@
     "tur": "Short",
     "tarih": "2026-11-22T23:17:16",
     "baslik": "Bambu Lab A1 Combo AMS lite filament değişim sorunları",
-    "izlenme": 85,
-    "begeni": 0,
+    "izlenme": 105,
+    "begeni": 1,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=Vt_lyaaFBOo"
    },
@@ -734,7 +735,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T17:50:11",
     "baslik": "Nozzle Neden Tıkanır? 5 Gerçek Sebep",
-    "izlenme": 136,
+    "izlenme": 140,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=ix-yeSzHv1c"
@@ -744,7 +745,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T10:33:51",
     "baslik": "Baskısı en kolay filamentler: 5'ten 1'e",
-    "izlenme": 363,
+    "izlenme": 373,
     "begeni": 1,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=czKPQgTqQrw"
@@ -764,7 +765,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T19:16:49",
     "baslik": "3D baskıda katman kayması neden olur?",
-    "izlenme": 1205,
+    "izlenme": 1207,
     "begeni": 4,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=yGVzYJN-m6o"
@@ -774,7 +775,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T15:26:52",
     "baslik": "Isıya en dayanıklı 5 filament | 3D baskı",
-    "izlenme": 344,
+    "izlenme": 370,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=TXcpwaFMx1U"
@@ -784,7 +785,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T14:12:38",
     "baslik": "3D baskıda stringing nasıl azalır?",
-    "izlenme": 1205,
+    "izlenme": 1206,
     "begeni": 10,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=ZzZkzgV1eL4"
@@ -794,7 +795,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T09:57:09",
     "baslik": "Filament nem çekerse ne olur? Belirtiler ve çözüm",
-    "izlenme": 1239,
+    "izlenme": 1243,
     "begeni": 7,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=M9tyEIjEeH8"
@@ -814,7 +815,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T22:17:19",
     "baslik": "3D Baskı Tablaya Yapışmıyor mu? 5 Pratik Çözüm",
-    "izlenme": 1241,
+    "izlenme": 1245,
     "begeni": 18,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=qcWHhTeaEHs"
@@ -824,7 +825,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T21:56:57",
     "baslik": "3D Baskı ile Araba İçi Pratik Aksesuarlar",
-    "izlenme": 171,
+    "izlenme": 174,
     "begeni": 0,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=DevZ1m13Ku4"
@@ -834,7 +835,7 @@
     "tur": "Short",
     "tarih": "2026-11-19T21:59:26",
     "baslik": "Dr. Filament ile 3D Yazıcılar Nasıl Çalışır? | gurtech3d",
-    "izlenme": 1114,
+    "izlenme": 1116,
     "begeni": 5,
     "yorum": 1,
     "link": "https://www.youtube.com/watch?v=MGVp8xfBUtc"
@@ -894,7 +895,7 @@
  },
  "eksikler": [],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 21:00",
-  "govde": "Toplam 31.182 (+347) · Reels 18.846 · Short 11.397 · Hikaye 939 (4 bugün) · Takipçi 434 · En iyi Reels: Baskın tabladan kalkı 4.085"
+  "baslik": "📊 İzlenme raporu 09:00",
+  "govde": "Toplam 32.024 (+842) · Reels 19.562 · Short 11.477 · Hikaye 985 (1 bugün) · Takipçi 434 · En iyi Reels: Baskın tabladan kalkı 4.118"
  }
 }
