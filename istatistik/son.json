@@ -1,21 +1,21 @@
 {
- "tarih": "2026-11-24T12:00:21Z",
- "tr_saat": "24.11.2026 15:00",
+ "tarih": "2026-11-24T15:00:28Z",
+ "tr_saat": "24.11.2026 18:00",
  "toplam": {
-  "reels": 19748,
+  "reels": 19781,
   "gonderi": 0,
-  "short": 11511,
+  "short": 11521,
   "youtube_video": 0,
-  "hikaye": 1022,
-  "toplam": 32281,
+  "hikaye": 1059,
+  "toplam": 32361,
   "begeni": 315,
   "yorum": 29
  },
- "fark": 94,
+ "fark": 80,
  "instagram": {
   "durum": "tamam",
   "izin": true,
-  "takipci": 434,
+  "takipci": 433,
   "hata": "graph.instagram.com profil: HTTP 400 kod=190 tür=OAuthException: Invalid OAuth access token - Cannot parse access token",
   "gonderiler": [
    {
@@ -26,8 +26,8 @@
     "begeni": 17,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgFd6danP9K/",
-    "izlenme": 1188,
-    "erisim": 1063
+    "izlenme": 1204,
+    "erisim": 1074
    },
    {
     "id": "18184587094447542",
@@ -125,8 +125,8 @@
     "begeni": 31,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": 4136,
-    "erisim": 3654
+    "izlenme": 4153,
+    "erisim": 3678
    },
    {
     "id": "18289759651292671",
@@ -352,19 +352,37 @@
  "hikaye_izin": true,
  "hikayeler": [
   {
-   "id": "17993413083006703",
-   "tarih": "2026-11-24T10:06:43Z",
-   "baslik": "gridfinity cable winder holder",
+   "id": "18117588176605789",
+   "tarih": "2026-11-24T14:27:11Z",
+   "baslik": "plant drip tray, customizable",
    "izlenme": 0,
    "erisim": 0,
    "okundu": false
   },
   {
+   "id": "17918232561554166",
+   "tarih": "2026-11-24T12:06:27Z",
+   "baslik": "Bonsai / Plant Pot with Drip Tray, Drainage mesh",
+   "izlenme": 8,
+   "erisim": 6,
+   "okundu": true,
+   "yanit": 0
+  },
+  {
+   "id": "17993413083006703",
+   "tarih": "2026-11-24T10:06:43Z",
+   "baslik": "gridfinity cable winder holder",
+   "izlenme": 13,
+   "erisim": 10,
+   "okundu": true,
+   "yanit": 0
+  },
+  {
    "id": "18643388155010027",
    "tarih": "2026-11-24T09:26:45Z",
    "baslik": "Cable Winder Tower",
-   "izlenme": 8,
-   "erisim": 6,
+   "izlenme": 16,
+   "erisim": 13,
    "okundu": true,
    "yanit": 0
   },
@@ -372,8 +390,8 @@
    "id": "18133075576842209",
    "tarih": "2026-11-24T05:06:41Z",
    "baslik": "Wider 20mm Micro Swiss Direct Drive Cable Management (Ender ",
-   "izlenme": 11,
-   "erisim": 10,
+   "izlenme": 16,
+   "erisim": 14,
    "okundu": true,
    "yanit": 0
   },
@@ -381,8 +399,8 @@
    "id": "18394254565225977",
    "tarih": "2026-11-23T16:47:27Z",
    "baslik": "Skadis Cable Winder",
-   "izlenme": 19,
-   "erisim": 15,
+   "izlenme": 22,
+   "erisim": 17,
    "okundu": true,
    "yanit": 0
   },
@@ -690,22 +708,6 @@
    "izlenme": 0,
    "erisim": 0,
    "okundu": false
-  },
-  {
-   "id": "18135083410800374",
-   "tarih": "2026-11-20T12:06:55Z",
-   "baslik": "Portable drill press/depth stop attachment for hand drill - ",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
-  },
-  {
-   "id": "18649115119011714",
-   "tarih": "2026-11-20T11:37:19Z",
-   "baslik": "Butterfly Knife - Print in Place - Balisong",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
   }
  ],
  "youtube": {
@@ -727,7 +729,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T23:17:16",
     "baslik": "Bambu Lab A1 Combo AMS lite filament değişim sorunları",
-    "izlenme": 109,
+    "izlenme": 113,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=Vt_lyaaFBOo"
@@ -747,7 +749,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T10:33:51",
     "baslik": "Baskısı en kolay filamentler: 5'ten 1'e",
-    "izlenme": 380,
+    "izlenme": 382,
     "begeni": 3,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=czKPQgTqQrw"
@@ -817,7 +819,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T22:17:19",
     "baslik": "3D Baskı Tablaya Yapışmıyor mu? 5 Pratik Çözüm",
-    "izlenme": 1253,
+    "izlenme": 1255,
     "begeni": 18,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=qcWHhTeaEHs"
@@ -827,7 +829,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T21:56:57",
     "baslik": "3D Baskı ile Araba İçi Pratik Aksesuarlar",
-    "izlenme": 174,
+    "izlenme": 175,
     "begeni": 0,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=DevZ1m13Ku4"
@@ -887,7 +889,7 @@
     "tur": "Short",
     "tarih": "2026-11-16T07:00:16",
     "baslik": "Doktor Filament ile Tanışın: 3D Baskıyı Katman Katman Anlatı",
-    "izlenme": 1403,
+    "izlenme": 1404,
     "begeni": 12,
     "yorum": 1,
     "link": "https://www.youtube.com/watch?v=q3Un0K1sjbE"
@@ -897,7 +899,7 @@
  },
  "eksikler": [],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 15:00",
-  "govde": "Toplam 32.281 (+94) · Reels 19.748 · Short 11.511 · Hikaye 1.022 (3 bugün) · Takipçi 434 · En iyi Reels: Baskın tabladan kalkı 4.136"
+  "baslik": "📊 İzlenme raporu 18:00",
+  "govde": "Toplam 32.361 (+80) · Reels 19.781 · Short 11.521 · Hikaye 1.059 (5 bugün) · Takipçi 433 (-1) · En iyi Reels: Baskın tabladan kalkı 4.153"
  }
 }
