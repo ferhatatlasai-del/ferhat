@@ -271,6 +271,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 .axe .st { font-family: var(--display); font-size: .9rem; letter-spacing: .03em; }
 .set { display: grid; gap: 14px; text-align: left; }
 .set label { display: grid; grid-template-columns: 1fr minmax(0, 14rem); align-items: center; gap: 12px; font-weight: 800; }
+.net textarea { width: 100%; box-sizing: border-box; font: 0.8rem monospace; border: 3px solid var(--bark); border-radius: 10px; padding: 6px; margin: 4px 0; resize: vertical; }
 .set select { font-family: var(--display); font-size: 1rem; color: var(--bark); background: #fff; border: 3px solid var(--bark); border-radius: 10px; padding: 4px 8px; width: 100%; box-sizing: border-box; }
 .set input[type="range"] { width: 100%; accent-color: var(--honey-deep); }
 .set input[type="checkbox"] { width: 28px; height: 28px; accent-color: var(--honey-deep); justify-self: end; }
@@ -450,6 +451,18 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
         <div class="fr2"><input id="nInvite" readonly aria-label="Davet yazısı"><button class="btn" id="nShare" type="button">Daveti kopyala / gönder</button></div>
         <button class="btn alt" id="nLeave" type="button">Odadan çık</button>
       </div>
+      <details class="box" id="direct">
+        <summary><b>Oda sunucusu engelliyse: Kodla bağlan</b></summary>
+        <p class="small">Aynı Wi-Fi ya da okul ağındaki iki bilgisayar için. Hiçbir sunucu gerekmez: iki kısa kodu WhatsApp ya da kâğıtla birbirinize verirsiniz.</p>
+        <button class="btn" id="dHost" type="button">Kurucu: kod al</button>
+        <textarea id="dOffer" rows="3" readonly aria-label="Senin kodun" placeholder="Kodun burada çıkacak, tamamını kopyala"></textarea>
+        <textarea id="dAnsIn" rows="3" aria-label="Arkadaşının cevap kodu" placeholder="Arkadaşının cevap kodunu buraya yapıştır"></textarea>
+        <button class="btn" id="dConnect" type="button">Bağla</button>
+        <h3>Katılan</h3>
+        <textarea id="dOfferIn" rows="3" aria-label="Kurucunun kodu" placeholder="Kurucunun kodunu buraya yapıştır"></textarea>
+        <button class="btn" id="dJoin" type="button">Kodla katıl ve cevap kodu al</button>
+        <textarea id="dAnsOut" rows="3" readonly aria-label="Cevap kodun" placeholder="Cevap kodun burada çıkacak, kurucuya gönder"></textarea>
+      </details>
       <p class="small" id="nTip">İpucu: İkiniz de oyunu <b>aynı linkten</b> açarsanız en iyisi. Odayı kuran kişi oyunun içinde kalmalı; davet gönderdikten sonra hemen oyuna geri dönsün.</p>
       <p class="msg" id="nMsg" role="status"></p>
       <div class="box">
@@ -4222,8 +4235,8 @@ function openRelay(url, willTopic, ms) { // one relay connection; `up` says whet
   const up = new Promise(res => { const to = setTimeout(() => res(false), ms + 1000); c.once('connect', () => { clearTimeout(to); res(true); }); });
   return { c, up };
 }
-async function goRelay(roomTxt, pass, create) {
-  try { await loadMqttLib(); } catch (e) { throw srvErr('Bağlantı kütüphanesi çalışmadı. Sayfayı yenile.'); }
+async function goRelay(roomTxt, pass, create, direct) {
+  if (!direct) try { await loadMqttLib(); } catch (e) { throw srvErr('Bağlantı kütüphanesi çalışmadı. Sayfayı yenile.'); }
   const top = 'pofuduk/v2/' + slug(roomTxt), base = top + '/r/' + hash36(slug(roomTxt) + '|' + pass), me = 'u' + Math.random().toString(36).slice(2, 10), myTopic = base + '/' + me;
   const key = hash36('k|' + slug(roomTxt) + '|' + pass), keyTopic = top + '/k/' + me, otherKeys = new Set(); // lets a wrong password be told apart from a missing room
   const tok = {}; net.tok = tok;
@@ -4241,25 +4254,27 @@ async function goRelay(roomTxt, pass, create) {
     if (fresh && net.on && P && L) pop(`${clip(st.n, 14) || 'Bir oyuncu'} odaya geldi!`, P.x, P.y + 2.4, P.z, '#9ef07a', 110);
   };
   // connect to every relay at once and use all that answer
-  const ups = MQTT_URLS().map(url => {
+  net.wire = onMsg; // direct (server-free) connections hand their messages to the same function
+  const ups = (direct ? [] : MQTT_URLS()).map(url => {
     const o = openRelay(url, myTopic, 9000); o.c.pfName = relayName(url); net.mqs.push(o.c);
     o.c.on('message', onMsg);
     o.c.on('connect', () => { try { o.c.subscribe([base + '/+', top + '/k/+'], { qos: 0 }); } catch (e) {} });
     return o.up;
   });
-  const anyUp = await new Promise(res => { let left = ups.length, done = false; ups.forEach(u => u.then(ok => { if (done) return; if (ok) { done = true; res(true); } else if (--left === 0) { done = true; res(false); } })); });
+  const anyUp = direct || await new Promise(res => { let left = ups.length, done = false; ups.forEach(u => u.then(ok => { if (done) return; if (ok) { done = true; res(true); } else if (--left === 0) { done = true; res(false); } })); });
   if (!anyUp) throw srvErr('Hiçbir oda sunucusuna ulaşılamadı. Okul ya da iş ağı bunları engelliyor olabilir. Telefonun mobil verisini dene; "Bağlantıyı test et" düğmesi hangisine ulaşabildiğini gösterir.');
   const liveNames = () => net.mqs.filter(c => c.connected).map(c => c.pfName).join(', ');
   let last = 0, lastK = 0;
   const send = () => {
     const live = net.mqs.filter(c => c.connected);
-    if (!live.length) { if (net.on && !net.lostMsg) { net.lostMsg = 1; netMsg('Bağlantı koptu, yeniden bağlanılıyor...'); } return; }
+    if (!live.length) { if (net.on && !net.lostMsg && !direct) { net.lostMsg = 1; netMsg('Bağlantı koptu, yeniden bağlanılıyor...'); } return; }
     if (net.lostMsg) { net.lostMsg = 0; netMsg(net.host ? 'Oda açık.' : 'Odadasın.', true); }
     const t = Date.now(); if (t - last < 180) return; last = t;
     const body = JSON.stringify(Object.assign(myState(), { h: net.host ? 1 : 0 })), sendKey = t - lastK > 1500; if (sendKey) lastK = t;
     for (const c of live) { c.publish(myTopic, body); if (sendKey) c.publish(keyTopic, key); }
   };
   startTicker(send);
+  if (direct) { net.on = true; bump('room'); renderNet(); return; }
   await wait(create ? 1800 : 600);
   if (create) {
     if ([...net.players.values()].some(pl => pl.h)) net.host = false; // the room already has a founder: join theirs
@@ -4281,6 +4296,46 @@ async function goRelay(roomTxt, pass, create) {
   }
   renderNet();
 }
+/* ---------- server-free rooms: two computers swap two short codes (WebRTC, no MQTT server) ---------- */
+const b64e = o => btoa(unescape(encodeURIComponent(JSON.stringify(o)))), b64d = s => JSON.parse(decodeURIComponent(escape(atob(String(s).replace(/\s+/g, '')))));
+function bindWire(dc, pc) { // a direct link behaves like one more relay: the host passes everyone's moves on to the other guests
+  const c = { connected: false, pfName: 'doğrudan', publish: (t, p) => { if (dc.readyState === 'open') { try { dc.send(JSON.stringify([t, String(p)])); } catch (e) {} } }, on() {}, end() { try { dc.close(); pc.close(); } catch (e) {} } };
+  dc.onopen = () => { c.connected = true; net.mqs.push(c); netMsg('Bağlandı! Oyunda birbirinizi göreceksiniz.', true); renderNet(); };
+  dc.onclose = () => { c.connected = false; net.mqs = (net.mqs || []).filter(x => x !== c); };
+  dc.onmessage = e => { let m; try { m = JSON.parse(e.data); } catch (x) { return; } if (!Array.isArray(m) || typeof m[0] !== 'string') return; if (net.wire) net.wire(m[0], m[1]); if (net.host) for (const o of net.mqs) if (o !== c && o.connected) o.publish(m[0], m[1]); };
+}
+const newPeer = () => new RTCPeerConnection({ iceServers: [] }); // same network: no outside server is needed
+const iceDone = pc => pc.iceGatheringState === 'complete' ? Promise.resolve() : new Promise(res => { const t = setTimeout(res, 5000); pc.addEventListener('icegatheringstatechange', () => { if (pc.iceGatheringState === 'complete') { clearTimeout(t); res(); } }); });
+async function directHost() {
+  if (!window.RTCPeerConnection) return netMsg('Bu tarayıcı doğrudan bağlantıyı desteklemiyor.');
+  try {
+    if (!net.on) await goRelay('Doğrudan', 'x', true, true);
+    if (!net.host) return netMsg('Önce bulunduğun odadan çık, sonra kod al.');
+    netMsg('Kod hazırlanıyor...', true);
+    const pc = newPeer(), dc = pc.createDataChannel('pf'); bindWire(dc, pc);
+    await pc.setLocalDescription(await pc.createOffer()); await iceDone(pc);
+    net.pend = pc; $('dOffer').value = b64e(pc.localDescription); $('dAnsIn').value = '';
+    netMsg('1) Yukarıdaki kodu arkadaşına gönder. 2) Onun cevap kodunu aşağıya yapıştırıp "Bağla"ya bas.', true);
+  } catch (e) { netMsg('Kod hazırlanamadı: ' + (e && e.message || e)); }
+}
+async function directConnect() {
+  try { if (!net.pend) return netMsg('Önce "Kod al"a bas.'); const d = b64d($('dAnsIn').value); await net.pend.setRemoteDescription(d); netMsg('Bağlanıyor...', true); }
+  catch (e) { netMsg('Cevap kodu geçersiz. Tamamını yapıştırdığından emin ol.'); }
+}
+async function directJoin() {
+  if (!window.RTCPeerConnection) return netMsg('Bu tarayıcı doğrudan bağlantıyı desteklemiyor.');
+  let offer; try { offer = b64d($('dOfferIn').value); } catch (e) { return netMsg('Arkadaşının kodu geçersiz. Tamamını yapıştır.'); }
+  try {
+    if (net.on) return netMsg('Önce bulunduğun odadan çık.');
+    await goRelay('Doğrudan', 'x', false, true);
+    netMsg('Cevap kodu hazırlanıyor...', true);
+    const pc = newPeer(); pc.ondatachannel = e => bindWire(e.channel, pc);
+    await pc.setRemoteDescription(offer); await pc.setLocalDescription(await pc.createAnswer()); await iceDone(pc);
+    $('dAnsOut').value = b64e(pc.localDescription);
+    netMsg('Aşağıdaki cevap kodunu arkadaşına gönder. O "Bağla"ya basınca bağlanırsınız.', true);
+  } catch (e) { netReset(); netMsg('Bağlanılamadı: ' + (e && e.message || e)); }
+}
+$('dHost').onclick = directHost; $('dConnect').onclick = directConnect; $('dJoin').onclick = directJoin;
 // "Bağlantıyı test et": which of the relay servers can this network reach?
 async function testRelays() {
   netMsg('Bağlantı test ediliyor... (10 sn)', true);
