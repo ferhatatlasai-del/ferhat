@@ -277,7 +277,7 @@ def dogrula(s, temizle=lambda x: x, gecmis=(), serbest=False, resimli=False):
     if len(sayac) < (3 if resimli else 4 if serbest else 5):
         raise ValueError(f"en az {3 if resimli else 4 if serbest else 5} farklı sahne tipi gerekli ({len(sayac)})")
     kelime = sum(len(x["anlati"].split()) for x in temiz)
-    alt, ust = (85, 125) if (serbest or resimli) else (90, 135)   # ≈0,44 sn/kelime + kuyruk: üst sınır ≈ 58 sn (hikâye/Reels/Shorts 60 sn sınırı)
+    alt, ust = (85, 140) if (serbest or resimli) else (90, 140)   # ≈0,44 sn/kelime + kuyruk; 140 kelime ≈ 62 sn → seslendirmeden sonra en çok %7,5 hızlandırılarak 60 sn altına çekilir
     if not alt <= kelime <= ust:
         raise ValueError(f"anlatı {kelime} kelime; {alt}-{ust} olmalı (video en çok 58 sn: kısalt)" if kelime > ust else f"anlatı {kelime} kelime; {alt}-{ust} olmalı")
     # içerik tekrarı: bu videonun noktaları önceki videolarda zaten anlatıldıysa ya da kendi içinde tekrar ediyorsa reddet
