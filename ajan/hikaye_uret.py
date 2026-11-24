@@ -79,6 +79,7 @@ def turet_ayar(a, gunluk_sayi):
     a["aylik_gorsel_siniri"] = aylik
     a["gunluk_uretim"] = min(12, -(-hedef // 3) + 1)                   # 3 tur/gün
     a["kuyruk_hedefi"] = min(40, hedef + 3)
+    a["gunluk_toplam_uretim"] = hedef                                  # günde üretilecek hikâye sayısı = günde yayınlanacak sayı (kesin üst sınır)
     a["gunluk_gorsel_siniri"] = max(2, min(40, int(hedef * GORSEL_PER_HIKAYE) + 3, -(-aylik // 30) + 1))   # bütçeyi aya yay: ilk günlerde harcanıp bitmesin
     return a
 
@@ -957,6 +958,10 @@ def harcama_say(h, an):
     return h.get("gunler", {}).get(gun, {}).get("gorsel", 0), h.get("aylar", {}).get(ay, {}).get("gorsel", 0), gun, ay
 
 
+def bugun_hikaye(h, gun):
+    return int(h.get("gunler", {}).get(gun, {}).get("hikaye", 0))
+
+
 def harcama_ekle(h, gun, ay):
     h.setdefault("gunler", {}).setdefault(gun, {"gorsel": 0})["gorsel"] += 1
     h.setdefault("aylar", {}).setdefault(ay, {"gorsel": 0})["gorsel"] += 1
@@ -983,6 +988,11 @@ def calis(a):
         return 0
     harcama = json_oku(HARCAMA, {})
     gun_say, ay_say, gun, ay = harcama_say(harcama, an)
+    tavan = int(ayar.get("gunluk_toplam_uretim") or 0)   # günlük hikâye üretim sınırı (elle "Şimdi üret" dahil)
+    uretilen_bugun = bugun_hikaye(harcama, gun)
+    if tavan and uretilen_bugun >= tavan:
+        print(f"Karar: bekle (günlük üretim sınırı: bugün {uretilen_bugun}/{tavan} hikâye üretildi)")
+        return 0
     # Günde birden fazla üretim turu olabilir (günde 20 hikaye için); çift tetik ve çift harcamayı önlemek için iki tur arasında en az 3 saat
     son_tur = harcama.get("son_tur")
     if son_tur and not a.hemen:
@@ -1008,7 +1018,8 @@ def calis(a):
             kalan = [t for t in onbellek.get("tasarimlar", []) if adres_anahtari(t.get("_adres")) not in kul_anahtar]
     except Exception:
         pass
-    hedef_aday = max(1, min(int(ayar["gunluk_uretim"]), 12)) + 2   # reddedilen/atlanan adaylar için pay
+    tur_hedefi = max(1, min(int(ayar["gunluk_uretim"]), 12, (tavan - uretilen_bugun) if tavan else 12))   # tur başına, günlük sınırın kalanını aşmaz
+    hedef_aday = tur_hedefi + 2   # reddedilen/atlanan adaylar için pay
     pr_adaylar = printables_adaylari(kul_anahtar, hedef_aday)      # ana kaynak: Printables'ın kendi aramasında lisans filtreli popüler tasarımlar
     printables_hedef = max(1, hedef_aday // 2) if TV.hazir() else hedef_aday   # Thingiverse varsa adayların yarısını o tamamlar
     if len(pr_adaylar) >= hedef_aday:
@@ -1056,7 +1067,7 @@ def calis(a):
         print("Uygun tasarım yok; hiçbir şey üretilmedi.")
         return 0
 
-    hedef = max(1, min(int(ayar["gunluk_uretim"]), 12))
+    hedef = tur_hedefi
     uretilen, atlanan = [], []
     gorsel_hatasi = False
     kategoriler = set()
@@ -1179,6 +1190,9 @@ def calis(a):
         kullanilan.append({"url": t["_adres"], "ad": t["ad"], "tarih": H.simdi().strftime("%Y-%m-%d")})
         yaz(KULLANILAN, kullanilan[-200:])
         uretilen.append(t["ad"])
+        harcama.setdefault("gunler", {}).setdefault(gun, {"gorsel": 0}).setdefault("hikaye", 0)
+        harcama["gunler"][gun]["hikaye"] += 1
+        yaz(HARCAMA, harcama)
         olay("uretildi", site=t.get("_site"), trend=bool(t.get("trend_konusu")), deneme=kabul[2], puan=kabul[1]["puan"])
 
     print(f"Üretilen: {len(uretilen)} ({', '.join(uretilen) or '-'}). Atlanan: {len(atlanan)}. Bugün görsel: {gun_say}, bu ay: {ay_say}.")

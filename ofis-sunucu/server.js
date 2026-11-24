@@ -233,7 +233,7 @@ async function hikayeListesi() {
   const uretim = Object.assign({}, URETIM_VARSAYILAN, uretimK ? JSON.parse(uretimK.metin) : {});
   const harcama = harcamaK ? JSON.parse(harcamaK.metin) : {};
   const trGun = new Date(Date.now() + 3 * 3600e3).toISOString();
-  const harcamaOzet = { bugun: ((harcama.gunler || {})[trGun.slice(0, 10)] || {}).gorsel || 0, ay: ((harcama.aylar || {})[trGun.slice(0, 7)] || {}).gorsel || 0 };
+  const harcamaOzet = { bugun: ((harcama.gunler || {})[trGun.slice(0, 10)] || {}).gorsel || 0, ay: ((harcama.aylar || {})[trGun.slice(0, 7)] || {}).gorsel || 0, hikaye_bugun: ((harcama.gunler || {})[trGun.slice(0, 10)] || {}).hikaye || 0 };
   const veri = { depo: REPO, dal, ayar: ayarK ? JSON.parse(ayarK.metin) : null, kuyruk, saglik: saglikK ? JSON.parse(saglikK.metin) : null, bildirim: BILDIRIM_ACIK, uretim, harcama: harcamaOzet };
   hikayeOnbellek = { t: Date.now(), veri };
   return veri;
