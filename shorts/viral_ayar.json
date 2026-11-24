@@ -37,6 +37,10 @@
     {
       "konu": "Warping neden olur, brim ne zaman işe yarar?",
       "ipucu": "Köşe kalkmasını basit örneklerle anlat; tabla temizliği, sıcaklık, kabin ve brim ilişkisini genel düzeyde ver; kesin çözüm dili kullanma."
+    },
+    {
+      "konu": "PETG neden ipliklenir, nasıl azaltılır?",
+      "ipucu": "Yeni başlayanlara sade anlat; nedenler olarak yüksek nozul ısısı, yetersiz retraction ve nemi genel düzeyde ver; kesin vaat, marka karşılaştırması ve fiyat olmasın."
     }
   ]
 }
