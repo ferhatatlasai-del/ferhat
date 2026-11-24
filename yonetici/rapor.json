@@ -289,6 +289,30 @@
         "Son 24 saatte Hikâye ajanı (yayınla) için 1 başarısız iş akışı var; veri yok ama tekrar ederse ayrıca incelemek gerekir."
       ],
       "eylem_sayisi": 2
+    },
+    {
+      "zaman": "2026-11-24 18:30",
+      "kademe": 2,
+      "model": "OpenAI (gpt-5.4)",
+      "rapor": [
+        "Acil: otomatik hat açıkken son 5 turda art arda 4 video reddedilmiş; bu kalite/uygunluk sorunu olabilir, modu ben değiştiremiyorum.",
+        "Bugün otomatik hat tur kaydı görünmüyor; veri yok. Buna rağmen son reddetme zinciri sürdüğü için dikkat istiyor.",
+        "Sistem sağlığı genel olarak iyi görünüyor; ancak son 24 saatte 1 Nöbetçi ve 1 Hikâye ajanı yayınlama hatası kaydı var.",
+        "Hikâye tarafı dengeli: günlük sayı 6, kuyrukta 8 planlı hikâye var; bu yüzden sayı değişikliği yapmadım.",
+        "Taslaklarda konu dışı olan video zaten reddet notu almış; diğer A1 ilk katman taslağı da önceki başarılı içeriklerle fazla benzer olduğu için daha önce incele notu düşülmüş.",
+        "Öncelikli konu kuyruğu şu an 3/3 dolu; çeşitlilik için yeni konu eklemedim."
+      ],
+      "oneriler": [
+        "Sen panelden otomatik hattın son reddedilen videolarının nedenlerini kontrol et; aynı kalıp tekrar ediyorsa prompt/şablon tarafında sadeleştirme gerekebilir.",
+        "A1 odaklı tekrar artmış görünüyor; bir sonraki üretimlerde marka-genel anlatıma kayıp PLA/PETG/warping gibi daha geniş konulara ağırlık vermen iyi olur.",
+        "Hikâye ajanı yayınlama hatası tekrar ederse zaman kaybetmeden log kontrolü yap; tek seferlik mi, bağlantı kaynaklı mı netleştir.",
+        "Bambu Lab geçen içeriklerde bağımsızlık notunun açıklamada yer aldığını doğrula; marka bağlantısı izlenimi riskini azaltır."
+      ],
+      "uyarilar": [
+        "Yorum modu otomatik görünüyor; ben bunu değiştirmem. Hassas yorumlar için ara sıra örnek kontrol yapman iyi olur.",
+        "Art arda ret devam ederse otomatik yayın açık kalsa bile gereksiz üretim maliyeti ve itibar riski büyür."
+      ],
+      "eylem_sayisi": 0
     }
   ],
   "defter": [
