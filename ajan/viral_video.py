@@ -382,11 +382,11 @@ def anlat_senaryo_uret(konu, ipucu):
     govde = {"model": MODEL, "response_format": {"type": "json_object"}, "temperature": 0.8,
              "messages": [{"role": "system", "content": ("Sen Türkçe kısa bilgi videoları yazan, animasyonla anlatan, doğruluğa önem veren bir içerik editörüsün. Yalnızca geçerli JSON döndür." if SERBEST else "Sen Türkçe 3D baskı eğitim videoları yazan, animasyonla anlatan, doğruluğa önem veren bir içerik editörüsün. Yalnızca geçerli JSON döndür.")},
                           {"role": "user", "content": ilham_ekle((AN.ISTEM_RESIMLI if RESIMLI else AN.ISTEM_SERBEST if SERBEST else AN.ISTEM).format(konu=konu, ipucu=ipucu or "-", onceki=AN.onceki_metni(gecmis_kayit, gecmis_konular)))}]}
-    for deneme in range(3):
+    for deneme in range(4):
         try:
             r = urllib.request.Request(f"{OPENAI}/chat/completions", data=json.dumps(govde).encode(), method="POST",
                                        headers={"Content-Type": "application/json", "Authorization": f"Bearer {anahtar}"})
-            with urllib.request.urlopen(r, timeout=150) as y:
+            with urllib.request.urlopen(r, timeout=240) as y:
                 j = json.loads(json.load(y)["choices"][0]["message"]["content"])
             if (SERBEST or RESIMLI) and j.get("uygunsuz"):
                 SON_HATA = "konu uygun değil: " + str(j.get("uygunsuz"))[:120]
@@ -395,8 +395,11 @@ def anlat_senaryo_uret(konu, ipucu):
             j["konu"] = j.get("konu") or konu
             return AN.dogrula(j, U.yazi_temizle, gecmis_noktalar, serbest=SERBEST, resimli=RESIMLI)
         except Exception as e:
-            print(f"UYARI: anlat hikâye tahtası üretimi/doğrulaması başarısız ({deneme + 1}/3): {type(e).__name__}: {str(e)[:160]}")
-            if deneme == 1:
+            SON_HATA = f"senaryo yazılamadı ({deneme + 1} deneme): {type(e).__name__}: {str(e)[:110]}"
+            print(f"UYARI: anlat hikâye tahtası üretimi/doğrulaması başarısız ({deneme + 1}/4): {type(e).__name__}: {str(e)[:160]}")
+            if isinstance(e, TimeoutError) or "timed out" in str(e):
+                time.sleep(5)   # servis yavaş: kısa bekleyip yeniden dene
+            elif isinstance(e, ValueError):   # kural ihlali: nedenini söyleyip HEMEN yeniden yazdır (eskiden yalnızca 2. denemeden sonra söyleniyordu)
                 govde["messages"].append({"role": "user", "content": "Önceki yanıt şu kurala uymadı: " + str(e)[:200] + ". Kuralları düzelterek JSON'u yeniden yaz."})
     return None
 
@@ -421,7 +424,7 @@ def anlat_senaryo_sec(a):
             if k.get("not"):
                 s["aciklama"] = (s["aciklama"].rstrip() + "\n\n" + str(k["not"])[:300]).strip()   # ör. marka bağlantısı olmadığı notu
             return s, kim
-        return None, f"'{k['konu']}' için anlat senaryosu üretilemedi"
+        return None, f"'{k['konu']}' için anlat senaryosu üretilemedi" + (" — " + SON_HATA if SON_HATA else "")
     t = turev_sec()
     if t:
         s = anlat_senaryo_uret(t[0], t[1])
@@ -433,7 +436,7 @@ def anlat_senaryo_sec(a):
         if kim in kullanilan or slug(k["konu"]) in kullanilan:
             continue
         s = anlat_senaryo_uret(k["konu"], k.get("ipucu"))
-        return (s, kim) if s else (None, f"'{k['konu']}' için anlat senaryosu üretilemedi")
+        return (s, kim) if s else (None, f"'{k['konu']}' için anlat senaryosu üretilemedi" + (" — " + SON_HATA if SON_HATA else ""))
     return None, "kullanılmamış konu kalmadı (video/konular.json'a yeni konu ekle)"
 
 
