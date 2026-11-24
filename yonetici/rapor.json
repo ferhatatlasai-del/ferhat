@@ -313,6 +313,30 @@
         "Art arda ret devam ederse otomatik yayın açık kalsa bile gereksiz üretim maliyeti ve itibar riski büyür."
       ],
       "eylem_sayisi": 0
+    },
+    {
+      "zaman": "2026-11-24 18:31",
+      "kademe": 2,
+      "model": "OpenAI (gpt-5.4)",
+      "rapor": [
+        "Acil: otomatik hat açıkken son 5 turun 4’ü art arda reddedilmiş; bugün tur görünmüyor, bu kalite ya da hat akışı sorunu olabilir.",
+        "Sağlık genel olarak iyi görünüyor; Instagram, YouTube, OpenAI ve ofis sunucusu çalışıyor.",
+        "Son 24 saatte 1 Nöbetçi ve 1 Hikâye ajanı yayın hatası var; neden detayı veri yok.",
+        "Hikâye tarafı dengeli: günlük sayı 6, kuyrukta 8 planlı hikâye var; şu an değişiklik gerekmiyor.",
+        "Taslaklarda konu dışı olan video zaten reddet notu almış; diğer A1 ilk katman taslağı önceki başarılı içeriklerle çok yakın ve zaten incele notu var, tekrar işlem yapmadım.",
+        "Öncelikli konu kuyruğu dolu görünüyor (3 konu); bu yüzden yeni konu eklemedim ve gereksiz tetikleme yapmadım."
+      ],
+      "oneriler": [
+        "Otomatik hatta art arda ret için üretim promptunu gözden geçir; özellikle A1 içeriklerinde tekrar ve teknik doğruluk filtresi sıkılaştırılsın.",
+        "Bugün turların neden görünmediğini panel/log üzerinden kontrol et; zamanlama kaçtıysa sen müdahale et, ben mod değiştiremiyorum.",
+        "Hikâye ajanı yayın hatasının tekil mi kalıcı mı olduğunu izleyip sürerse Nöbetçi’yi tekrar çalıştırmayı düşünebilirsin.",
+        "Yeni video seçiminde ilk katman yapışma temasından biraz uzaklaşıp kuyruktaki warping veya PETG ipliklenme konularına öncelik vermen çeşitliliği korur."
+      ],
+      "uyarilar": [
+        "Yorum modu otomatik görünüyor; bu ayarı ben değiştiremem. Riskli yorumlar gelirse ayrıca kontrol et.",
+        "Son 5 otomatik hat sonucunun tamamı reddedilmiş görünüyor; yayın kalitesi düşmüş olabilir."
+      ],
+      "eylem_sayisi": 0
     }
   ],
   "defter": [
