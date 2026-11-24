@@ -1,7 +1,7 @@
 {
   "id": "h20261122-052251-g5x",
   "kaynak": "uretim",
-  "durum": "planli",
+  "durum": "yayinlaniyor",
   "olusturma": "2026-11-22T05:22:51.000Z",
   "gorsel": "hikaye/gorseller/h20261122-052251-g5x.mp4",
   "baslik": "Wider 20mm Micro Swiss Direct Drive Cable Management (Ender 3)",
@@ -20,7 +20,9 @@
     "deneme": 1,
     "sorunlar": []
   },
-  "yayin": null,
+  "yayin": {
+    "tarih": "2026-11-24T05:05:25Z"
+  },
   "hata": "",
   "deneme": 0,
   "tur": "video",
