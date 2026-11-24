@@ -4114,7 +4114,7 @@ $('mapClose').onclick = closeMap;
 // with the room creator's browser as the host that checks the password and relays everyone's moves.
 const MQTT_LIB = ''; // the library is embedded above
 // public relay servers; everyone talks through the same one, so no direct device-to-device link is needed
-const MQTT_URLS = () => window.MQTT_URLS || ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt', 'wss://test.mosquitto.org:8081', 'wss://mqtt.eclipseprojects.io:443/mqtt'];
+const MQTT_URLS = () => window.MQTT_URLS || ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt', 'wss://test.mosquitto.org:8081', 'wss://mqtt.eclipseprojects.io:443/mqtt', 'wss://public:public@public.cloud.shiftr.io'];
 const CODE_CH = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 function ensureCode() { if (!Array.isArray(save.friends)) save.friends = []; if (!save.code) { save.code = Array.from({ length: 6 }, () => CODE_CH[Math.floor(Math.random() * CODE_CH.length)]).join(''); saveGame(); } }
 ensureCode();
@@ -4215,7 +4215,7 @@ async function goClaude(lobby, roomTxt, pass, create) {
 }
 const srvErr = m => Object.assign(new Error(m), { srv: true });
 const wait = ms => new Promise(f => setTimeout(f, ms));
-const relayName = u => { try { return new URL(u.replace(/^ws/, 'http')).hostname.replace(/^(broker|mqtt|test)\./, '').split('.')[0]; } catch (e) { return u; } };
+const relayName = u => { if (/shiftr/.test(u)) return 'shiftr'; try { return new URL(u.replace(/^ws/, 'http')).hostname.replace(/^(broker|mqtt|test)\./, '').split('.')[0]; } catch (e) { return u; } };
 function openRelay(url, willTopic, ms) { // one relay connection; `up` says whether it came up in time (it keeps retrying in the background either way)
   const c = window.mqtt.connect(url, { clientId: 'pf' + Math.random().toString(36).slice(2, 12), keepalive: 25, connectTimeout: ms, reconnectPeriod: 3000, clean: true, will: { topic: willTopic, payload: 'bye', qos: 0, retain: false } });
   c.on('error', () => {});
@@ -4223,7 +4223,7 @@ function openRelay(url, willTopic, ms) { // one relay connection; `up` says whet
   return { c, up };
 }
 async function goRelay(roomTxt, pass, create) {
-  try { await loadMqttLib(); } catch (e) { throw srvErr('Bağlantı kütüphanesi yüklenemedi (cdn.jsdelivr.net). İnternetini kontrol et.'); }
+  try { await loadMqttLib(); } catch (e) { throw srvErr('Bağlantı kütüphanesi çalışmadı. Sayfayı yenile.'); }
   const top = 'pofuduk/v2/' + slug(roomTxt), base = top + '/r/' + hash36(slug(roomTxt) + '|' + pass), me = 'u' + Math.random().toString(36).slice(2, 10), myTopic = base + '/' + me;
   const key = hash36('k|' + slug(roomTxt) + '|' + pass), keyTopic = top + '/k/' + me, otherKeys = new Set(); // lets a wrong password be told apart from a missing room
   const tok = {}; net.tok = tok;
@@ -4248,7 +4248,7 @@ async function goRelay(roomTxt, pass, create) {
     return o.up;
   });
   const anyUp = await new Promise(res => { let left = ups.length, done = false; ups.forEach(u => u.then(ok => { if (done) return; if (ok) { done = true; res(true); } else if (--left === 0) { done = true; res(false); } })); });
-  if (!anyUp) throw srvErr('Hiçbir bağlantı sunucusuna ulaşılamadı. İnternetini kontrol et; "Bağlantıyı test et" düğmesi hangisine ulaşabildiğini gösterir.');
+  if (!anyUp) throw srvErr('Hiçbir oda sunucusuna ulaşılamadı. Okul ya da iş ağı bunları engelliyor olabilir. Telefonun mobil verisini dene; "Bağlantıyı test et" düğmesi hangisine ulaşabildiğini gösterir.');
   const liveNames = () => net.mqs.filter(c => c.connected).map(c => c.pfName).join(', ');
   let last = 0, lastK = 0;
   const send = () => {
@@ -4284,7 +4284,7 @@ async function goRelay(roomTxt, pass, create) {
 // "Bağlantıyı test et": which of the relay servers can this network reach?
 async function testRelays() {
   netMsg('Bağlantı test ediliyor... (10 sn)', true);
-  try { await loadMqttLib(); } catch (e) { return netMsg('✗ Bağlantı kütüphanesi yüklenemedi (cdn.jsdelivr.net). İnternet ya da güvenlik duvarı engelliyor olabilir.'); }
+  try { await loadMqttLib(); } catch (e) { return netMsg('✗ Bağlantı kütüphanesi çalışmadı. Sayfayı yenile.'); }
   const urls = MQTT_URLS(), res = await Promise.all(urls.map(async u => { const o = openRelay(u, 'pofuduk/test', 8000), ok = await o.up; try { o.c.end(true); } catch (e) {} return [relayName(u), ok]; }));
   const good = res.filter(r => r[1]).length;
   netMsg((good ? '' : 'Hiçbirine ulaşılamadı. ') + res.map(r => (r[1] ? '✓ ' : '✗ ') + r[0]).join(' · ') + (good ? ` — ${good} sunucuya ulaşılıyor, oda kurabilirsin.` : ' — Başka bir Wi-Fi ya da mobil veri dene.'), good > 0);
