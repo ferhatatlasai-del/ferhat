@@ -1,17 +1,17 @@
 {
- "tarih": "2026-11-25T09:00:34Z",
- "tr_saat": "25.11.2026 12:00",
+ "tarih": "2026-11-25T12:00:38Z",
+ "tr_saat": "25.11.2026 15:00",
  "toplam": {
-  "reels": 19852,
+  "reels": 19998,
   "gonderi": 0,
-  "short": 11611,
+  "short": 11653,
   "youtube_video": 0,
-  "hikaye": 1170,
-  "toplam": 32633,
-  "begeni": 316,
+  "hikaye": 1207,
+  "toplam": 32858,
+  "begeni": 320,
   "yorum": 31
  },
- "fark": 53,
+ "fark": 225,
  "instagram": {
   "durum": "tamam",
   "izin": true,
@@ -23,11 +23,11 @@
     "tur": "Reels",
     "tarih": "2026-11-25T08:52:13",
     "baslik": "Nozzle tıkanması çoğu zaman küçük birikimden başlar.",
-    "begeni": 0,
+    "begeni": 1,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgKJINptUAu/",
-    "izlenme": 0,
-    "erisim": 0
+    "izlenme": 138,
+    "erisim": 135
    },
    {
     "id": "18150949246585180",
@@ -37,8 +37,8 @@
     "begeni": 17,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/DgFd6danP9K/",
-    "izlenme": 1212,
-    "erisim": 1076
+    "izlenme": 1213,
+    "erisim": 1078
    },
    {
     "id": "18184587094447542",
@@ -136,8 +136,8 @@
     "begeni": 31,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": 4205,
-    "erisim": 3726
+    "izlenme": 4212,
+    "erisim": 3732
    },
    {
     "id": "18289759651292671",
@@ -366,24 +366,26 @@
    "id": "18343824202272064",
    "tarih": "2026-11-25T08:51:47Z",
    "baslik": "Video hikayesi",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 9,
+   "erisim": 9,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "18455197594122303",
    "tarih": "2026-11-25T07:27:39Z",
    "baslik": "Suction Cup Shower Soap / Phone Holder Tray",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 11,
+   "erisim": 9,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "17973842393962383",
    "tarih": "2026-11-25T05:06:46Z",
    "baslik": "Suction Cup Soap Tray",
-   "izlenme": 10,
-   "erisim": 8,
+   "izlenme": 15,
+   "erisim": 13,
    "okundu": true,
    "yanit": 0
   },
@@ -391,8 +393,8 @@
    "id": "18091176149300791",
    "tarih": "2026-11-24T16:46:44Z",
    "baslik": "9 Sided Drip Tray for 9 Sided Twisted Planter",
-   "izlenme": 19,
-   "erisim": 16,
+   "izlenme": 23,
+   "erisim": 20,
    "okundu": true,
    "yanit": 0
   },
@@ -400,8 +402,8 @@
    "id": "18117588176605789",
    "tarih": "2026-11-24T14:27:11Z",
    "baslik": "plant drip tray, customizable",
-   "izlenme": 24,
-   "erisim": 21,
+   "izlenme": 28,
+   "erisim": 25,
    "okundu": true,
    "yanit": 0
   },
@@ -409,8 +411,8 @@
    "id": "17918232561554166",
    "tarih": "2026-11-24T12:06:27Z",
    "baslik": "Bonsai / Plant Pot with Drip Tray, Drainage mesh",
-   "izlenme": 29,
-   "erisim": 22,
+   "izlenme": 33,
+   "erisim": 26,
    "okundu": true,
    "yanit": 0
   },
@@ -730,8 +732,8 @@
     "tur": "Short",
     "tarih": "2026-11-25T08:52:19",
     "baslik": "Nozzle tıkanmadan temizle: 3 kısa işaret",
-    "izlenme": 0,
-    "begeni": 0,
+    "izlenme": 34,
+    "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=YBNIDKMia3Y"
    },
@@ -740,7 +742,7 @@
     "tur": "Short",
     "tarih": "2026-11-23T13:17:07",
     "baslik": "Şehirde aslan görürsen ne yapmalısın?",
-    "izlenme": 23,
+    "izlenme": 25,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=9sEswOUevrM"
@@ -750,7 +752,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T23:17:16",
     "baslik": "Bambu Lab A1 Combo AMS lite filament değişim sorunları",
-    "izlenme": 170,
+    "izlenme": 174,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=Vt_lyaaFBOo"
@@ -810,8 +812,8 @@
     "tur": "Short",
     "tarih": "2026-11-21T14:12:38",
     "baslik": "3D baskıda stringing nasıl azalır?",
-    "izlenme": 1209,
-    "begeni": 10,
+    "izlenme": 1210,
+    "begeni": 11,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=ZzZkzgV1eL4"
    },
@@ -820,7 +822,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T09:57:09",
     "baslik": "Filament nem çekerse ne olur? Belirtiler ve çözüm",
-    "izlenme": 1248,
+    "izlenme": 1249,
     "begeni": 7,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=M9tyEIjEeH8"
@@ -920,7 +922,7 @@
  },
  "eksikler": [],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 12:00",
-  "govde": "Toplam 32.633 (+53) · Reels 19.852 · Short 11.611 · Hikaye 1.170 (3 bugün) · Takipçi 433 · En iyi Reels: Baskın tabladan kalkı 4.205"
+  "baslik": "📊 İzlenme raporu 15:00",
+  "govde": "Toplam 32.858 (+225) · Reels 19.998 · Short 11.653 · Hikaye 1.207 (3 bugün) · Takipçi 433 · En iyi Reels: Baskın tabladan kalkı 4.212"
  }
 }
