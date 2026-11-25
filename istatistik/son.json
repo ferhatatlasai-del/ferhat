@@ -1,23 +1,34 @@
 {
- "tarih": "2026-11-25T06:00:31Z",
- "tr_saat": "25.11.2026 09:00",
+ "tarih": "2026-11-25T09:00:34Z",
+ "tr_saat": "25.11.2026 12:00",
  "toplam": {
-  "reels": 19846,
+  "reels": 19852,
   "gonderi": 0,
-  "short": 11609,
+  "short": 11611,
   "youtube_video": 0,
-  "hikaye": 1125,
-  "toplam": 32580,
-  "begeni": 315,
+  "hikaye": 1170,
+  "toplam": 32633,
+  "begeni": 316,
   "yorum": 31
  },
- "fark": 144,
+ "fark": 53,
  "instagram": {
   "durum": "tamam",
   "izin": true,
   "takipci": 433,
   "hata": "graph.instagram.com profil: HTTP 400 kod=190 tür=OAuthException: Invalid OAuth access token - Cannot parse access token",
   "gonderiler": [
+   {
+    "id": "17914671000663787",
+    "tur": "Reels",
+    "tarih": "2026-11-25T08:52:13",
+    "baslik": "Nozzle tıkanması çoğu zaman küçük birikimden başlar.",
+    "begeni": 0,
+    "yorum": 0,
+    "link": "https://www.instagram.com/reel/DgKJINptUAu/",
+    "izlenme": 0,
+    "erisim": 0
+   },
    {
     "id": "18150949246585180",
     "tur": "Reels",
@@ -81,8 +92,8 @@
     "begeni": 9,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/DgAjINVCTkY/",
-    "izlenme": 840,
-    "erisim": 754
+    "izlenme": 842,
+    "erisim": 756
    },
    {
     "id": "17956070562049609",
@@ -125,7 +136,7 @@
     "begeni": 31,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": 4201,
+    "izlenme": 4205,
     "erisim": 3726
    },
    {
@@ -352,19 +363,36 @@
  "hikaye_izin": true,
  "hikayeler": [
   {
-   "id": "17973842393962383",
-   "tarih": "2026-11-25T05:06:46Z",
-   "baslik": "Suction Cup Soap Tray",
+   "id": "18343824202272064",
+   "tarih": "2026-11-25T08:51:47Z",
+   "baslik": "Video hikayesi",
    "izlenme": 0,
    "erisim": 0,
    "okundu": false
   },
   {
+   "id": "18455197594122303",
+   "tarih": "2026-11-25T07:27:39Z",
+   "baslik": "Suction Cup Shower Soap / Phone Holder Tray",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
+   "id": "17973842393962383",
+   "tarih": "2026-11-25T05:06:46Z",
+   "baslik": "Suction Cup Soap Tray",
+   "izlenme": 10,
+   "erisim": 8,
+   "okundu": true,
+   "yanit": 0
+  },
+  {
    "id": "18091176149300791",
    "tarih": "2026-11-24T16:46:44Z",
    "baslik": "9 Sided Drip Tray for 9 Sided Twisted Planter",
-   "izlenme": 11,
-   "erisim": 10,
+   "izlenme": 19,
+   "erisim": 16,
    "okundu": true,
    "yanit": 0
   },
@@ -372,8 +400,8 @@
    "id": "18117588176605789",
    "tarih": "2026-11-24T14:27:11Z",
    "baslik": "plant drip tray, customizable",
-   "izlenme": 17,
-   "erisim": 16,
+   "izlenme": 24,
+   "erisim": 21,
    "okundu": true,
    "yanit": 0
   },
@@ -381,8 +409,8 @@
    "id": "17918232561554166",
    "tarih": "2026-11-24T12:06:27Z",
    "baslik": "Bonsai / Plant Pot with Drip Tray, Drainage mesh",
-   "izlenme": 22,
-   "erisim": 17,
+   "izlenme": 29,
+   "erisim": 22,
    "okundu": true,
    "yanit": 0
   },
@@ -390,8 +418,8 @@
    "id": "17993413083006703",
    "tarih": "2026-11-24T10:06:43Z",
    "baslik": "gridfinity cable winder holder",
-   "izlenme": 23,
-   "erisim": 18,
+   "izlenme": 28,
+   "erisim": 23,
    "okundu": true,
    "yanit": 0
   },
@@ -399,8 +427,8 @@
    "id": "18643388155010027",
    "tarih": "2026-11-24T09:26:45Z",
    "baslik": "Cable Winder Tower",
-   "izlenme": 27,
-   "erisim": 22,
+   "izlenme": 35,
+   "erisim": 29,
    "okundu": true,
    "yanit": 0
   },
@@ -691,24 +719,6 @@
    "erisim": 33,
    "okundu": true,
    "yanit": 0
-  },
-  {
-   "id": "18119683825820465",
-   "tarih": "2026-11-21T10:21:05Z",
-   "baslik": "Video hikayesi",
-   "izlenme": 44,
-   "erisim": 38,
-   "okundu": true,
-   "yanit": 0
-  },
-  {
-   "id": "18154348378555017",
-   "tarih": "2026-11-20T23:28:11Z",
-   "baslik": "Drill Press Depth Stop Mount for el-cheapo Harbor Freight Ce",
-   "izlenme": 50,
-   "erisim": 39,
-   "okundu": true,
-   "yanit": 0
   }
  ],
  "youtube": {
@@ -716,12 +726,22 @@
   "izin": true,
   "videolar": [
    {
+    "id": "YBNIDKMia3Y",
+    "tur": "Short",
+    "tarih": "2026-11-25T08:52:19",
+    "baslik": "Nozzle tıkanmadan temizle: 3 kısa işaret",
+    "izlenme": 0,
+    "begeni": 0,
+    "yorum": 0,
+    "link": "https://www.youtube.com/watch?v=YBNIDKMia3Y"
+   },
+   {
     "id": "9sEswOUevrM",
     "tur": "Short",
     "tarih": "2026-11-23T13:17:07",
     "baslik": "Şehirde aslan görürsen ne yapmalısın?",
     "izlenme": 23,
-    "begeni": 1,
+    "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=9sEswOUevrM"
    },
@@ -750,7 +770,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T10:33:51",
     "baslik": "Baskısı en kolay filamentler: 5'ten 1'e",
-    "izlenme": 383,
+    "izlenme": 385,
     "begeni": 3,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=czKPQgTqQrw"
@@ -900,7 +920,7 @@
  },
  "eksikler": [],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 09:00",
-  "govde": "Toplam 32.580 (+144) · Reels 19.846 · Short 11.609 · Hikaye 1.125 (1 bugün) · Takipçi 433 · En iyi Reels: Baskın tabladan kalkı 4.201"
+  "baslik": "📊 İzlenme raporu 12:00",
+  "govde": "Toplam 32.633 (+53) · Reels 19.852 · Short 11.611 · Hikaye 1.170 (3 bugün) · Takipçi 433 · En iyi Reels: Baskın tabladan kalkı 4.205"
  }
 }
