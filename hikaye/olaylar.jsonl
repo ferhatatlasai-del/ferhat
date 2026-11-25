@@ -183,3 +183,13 @@
 {"t": "2026-11-24T14:21:51Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 8.0, "site": "printables.com", "sorunlar": ["Poşet üzerinde okunabilir yazı var", "Referans görsele göre poşet yerleşimi ve görünümü biraz farklı"]}
 {"t": "2026-11-24T14:22:00Z", "tur": "denetim", "gecti": false, "deneme": 2, "puan": 8.0, "site": "printables.com", "sorunlar": ["Poşet üzerinde okunabilir yazı ve yön oku var.", "Referans görselde kabartma/oyma isim detayı daha belirgin; üretimde bu detay görünmüyor."]}
 {"t": "2026-11-24T14:22:12Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 8.0, "site": "printables.com", "sorunlar": ["Poşet üzerinde okunabilir logo/yazı var", "Arka plandaki gerçek ortam biraz dikkat dağıtıyor"]}
+{"t": "2026-11-25T05:21:11Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-25T05:21:20Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-25T05:21:35Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 8.0, "site": "printables.com", "sorunlar": ["Rulo ambalajlarında okunabilir marka/yazı var.", "Görüntü referansa benziyor ancak tam fotogerçekçi değil."]}
+{"t": "2026-11-25T05:21:44Z", "tur": "denetim", "gecti": false, "deneme": 2, "puan": 8.0, "site": "printables.com", "sorunlar": ["Görünür yazılar/işaretler var", "Ambalaj üzerinde marka benzeri baskılar görünüyor"]}
+{"t": "2026-11-25T05:21:56Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 9.0, "site": "printables.com", "sorunlar": ["Poşet üzerinde okunabilir yazı var.", "Arka planda bulanık da olsa nesne/alet görüntüleri dikkat dağıtıyor."]}
+{"t": "2026-11-25T05:22:18Z", "tur": "denetim", "gecti": false, "deneme": 2, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-25T05:22:34Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-25T05:22:44Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-25T05:23:00Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-25T05:23:10Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
