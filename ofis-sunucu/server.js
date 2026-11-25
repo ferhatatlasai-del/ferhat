@@ -746,10 +746,10 @@ async function api(req, res, url) {
     if (viralTetikler.length >= 2) return json(res, 429, { hata: 'Saatte en fazla 2 elle viral video üretimi.' });
     viralOnbellek.t = 0;
     try { const d = await viralDurum(); if (d.calisiyor) return json(res, 409, { hata: 'Zaten bir viral video üretiliyor (ilerleme kutusundan izle). İkincisi, aynı anda başlayıp aynı konuyu seçmesin diye engellendi.' }); } catch (e) { /* durum okunamazsa devam */ }
-    let konu = '', konuTuru = 'otomatik';
-    try { const b = await govde(req); konu = String(b.konu || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 120); if (['otomatik', '3d', 'serbest', 'resimli'].includes(b.konu_turu)) konuTuru = b.konu_turu; } catch (e) { /* konu isteğe bağlı */ }
+    let konu = '', konuTuru = 'otomatik', zincirKimlik = '';
+    try { const b = await govde(req); if (/^c\d{8}-\d{6}$/.test(String(b.zincir || ''))) zincirKimlik = b.zincir; konu = String(b.konu || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 120); if (['otomatik', '3d', 'serbest', 'resimli'].includes(b.konu_turu)) konuTuru = b.konu_turu; } catch (e) { /* konu isteğe bağlı */ }
     const dal = await varsayilanDal();
-    const r = await gh(`/repos/${REPO}/actions/workflows/${AKIS_VIRAL}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: { hemen: 'EVET', konu, konu_turu: konuTuru } }) });
+    const r = await gh(`/repos/${REPO}/actions/workflows/${AKIS_VIRAL}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: Object.assign({ hemen: 'EVET', konu, konu_turu: konuTuru }, zincirKimlik ? { zincir: zincirKimlik } : {}) }) });
     if (r.status !== 204) return json(res, 502, { hata: 'GitHub kabul etmedi (' + r.status + ').' });
     viralTetikler.push(simdi); viralOnbellek.t = 0;
     return json(res, 200, { ok: true });

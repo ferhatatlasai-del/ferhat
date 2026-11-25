@@ -241,11 +241,11 @@ def serbest_ozel_params(p):
     return {"yedek": "kontrol_listesi", "tema": p.get("tema") if p.get("tema") in ("mavi", "mor", "yesil", "turuncu", "gri") else "mavi", "tasarim_notu": not_, "elemanlar": []}
 
 
-def dogrula(s, temizle=lambda x: x, gecmis=(), serbest=False, resimli=False):
+def dogrula(s, temizle=lambda x: x, gecmis=(), serbest=False, resimli=False, bagli=False):
     """Hikâye tahtasını temizler; sorun varsa ValueError. temizle: metin temizleyici (U.yazi_temizle)."""
     sah = [x for x in (s.get("sahneler") or []) if isinstance(x, dict)]
-    if not 5 <= len(sah) <= 12:
-        raise ValueError(f"sahne sayısı 5-12 olmalı ({len(sah)})")
+    if not (3 if bagli else 5) <= len(sah) <= 12:
+        raise ValueError(f"sahne sayısı {3 if bagli else 5}-12 olmalı ({len(sah)})")
     temiz, onceki, sayac = [], None, {}
     for i, x in enumerate(sah):
         tip = x.get("tip")
@@ -258,11 +258,11 @@ def dogrula(s, temizle=lambda x: x, gecmis=(), serbest=False, resimli=False):
             raise ValueError(f"'{tip}' tipi çok fazla kullanılmış")
         onceki = tip
         kel, bayrak = isaretle(" ".join(str(x.get("anlati") or "").split()))
-        if len(kel) < 4:
+        if len(kel) < (2 if bagli else 4):
             raise ValueError(f"{i + 1}. sahnede anlatı yok ya da çok kısa")
         et = [_kisa(e, 24) for e in (x.get("etiketler") or []) if _kisa(e, 24)][:2] if isinstance(x.get("etiketler"), list) else []
         nokta = _kisa(x.get("nokta"), 70) or " ".join(kel[:7])
-        temiz.append({"tip": tip, "anlati": " ".join(kel), "isaret": bayrak, "nokta": nokta, "params": (serbest_ozel_params(x.get("params")) if (serbest and tip == "ozel") else params_temizle(tip, x.get("params"))), "etiketler": et,
+        temiz.append({"tip": tip, "anlati": " ".join(kel), "isaret": bayrak, "nokta": nokta, "params": (serbest_ozel_params(x.get("params")) if ((serbest or bagli) and tip == "ozel") else params_temizle(tip, x.get("params"))), "etiketler": et,
                       "bolum": _kisa(temizle(str(x.get("bolum") or "")), 28) if i > 0 and tip != "kanca" else "", "baslik": _kisa(temizle(str(x.get("baslik") or "")), 10) if tip != "kanca" else ""})
     if temiz[0]["tip"] != ("resim" if resimli else "kanca"):
         raise ValueError("ilk sahne '" + ("resim" if resimli else "kanca") + "' olmalı")
@@ -272,12 +272,12 @@ def dogrula(s, temizle=lambda x: x, gecmis=(), serbest=False, resimli=False):
         raise ValueError("resimli modda en az 4 'resim' sahnesi gerekli")
     if serbest and not resimli and sayac.get("ozel", 0) < 3:
         raise ValueError("serbest konuda en az 3 'ozel' sahne gerekli")
-    if not resimli and not sayac.get("ozel"):
+    if not resimli and not bagli and not sayac.get("ozel"):
         raise ValueError("en az bir 'ozel' (konuya özel tasarlanmış) sahne gerekli; yalnızca hazır tipler kullanılmış")
-    if len(sayac) < (3 if resimli else 4 if serbest else 5):
-        raise ValueError(f"en az {3 if resimli else 4 if serbest else 5} farklı sahne tipi gerekli ({len(sayac)})")
+    if len(sayac) < (3 if (resimli or bagli) else 4 if serbest else 5):
+        raise ValueError(f"en az {3 if (resimli or bagli) else 4 if serbest else 5} farklı sahne tipi gerekli ({len(sayac)})")
     kelime = sum(len(x["anlati"].split()) for x in temiz)
-    alt, ust = (85, 140) if (serbest or resimli) else (90, 140)   # ≈0,44 sn/kelime + kuyruk; 140 kelime ≈ 62 sn → seslendirmeden sonra en çok %7,5 hızlandırılarak 60 sn altına çekilir
+    alt, ust = (25, 150) if bagli else (85, 140) if (serbest or resimli) else (90, 140)   # ≈0,44 sn/kelime + kuyruk; 140 kelime ≈ 62 sn → seslendirmeden sonra en çok %7,5 hızlandırılarak 60 sn altına çekilir
     if not alt <= kelime <= ust:
         raise ValueError(f"anlatı {kelime} kelime; {alt}-{ust} olmalı (video en çok 58 sn: kısalt)" if kelime > ust else f"anlatı {kelime} kelime; {alt}-{ust} olmalı")
     # içerik tekrarı: bu videonun noktaları önceki videolarda zaten anlatıldıysa ya da kendi içinde tekrar ediyorsa reddet
@@ -432,3 +432,17 @@ KOORDİNAT/ALANLAR: ortak: "t":[giriş_sn,çıkış_sn], "renk","renk2"+"gradyan
 TÜRLER: daire {{x,y,r,renk,halka(kalınlık: yalnızca çember),cizim}}; elips {{x,y,rx,ry,renk,halka}}; yay {{x,y,r,a0,a1,renk,kalinlik,cizim}}; cizgi/ok {{x1,y1,x2,y2,renk,kalinlik,kesikli,cizim}}; yazi {{x,y,metin,boyut,renk,hiza}}; ikon {{x,y,ad,olcek}} ad: """ + SERBEST_IKONLAR + """; yol {{x,y,noktalar:[[x,y],...],kapali,yumusak,renk,kenar,kalinlik,cizim}}; parcacik {{x,y,w,h,sayi,yon,renk,boyut,hiz}}; grup {{x,y,cocuklar:[...]}}. Renkler: turuncu, mavi, yesil, kirmizi, sari, mor, pembe, beyaz, koyu, gri, kahve, siyah ya da #rrggbb.
 Mini örnek (biçim için): {{"elemanlar":[{{"tur":"daire","x":500,"y":900,"r":120,"renk":"kirmizi","halka":10,"t":[0.8,99],"dongu":{{"nabiz":0.08}}}},{{"tur":"ok","x1":700,"y1":600,"x2":560,"y2":800,"renk":"sari","kalinlik":12,"t":[1.2,99],"hareket":[{{"o":"cizim","den":0,"a":1,"t0":1.2,"t1":1.8}}]}},{{"tur":"yazi","x":720,"y":560,"metin":"KOŞMA!","boyut":70,"renk":"sari","t":[1.4,99]}}]}}
 YALNIZCA JSON döndür: {{"elemanlar":[...]}}"""
+
+
+# ---------------- BAĞLI MOD: içerik ajanının senaryosu AYNEN anlatı olur; yapay zekâ yalnızca sahne animasyonlarını seçer ----------------
+_TIP_BLOK = ISTEM[ISTEM.index("SAHNE TİPLERİ"):ISTEM.index("- ozel:")]
+ISTEM_BAGLI = """Bir 3D baskı bilgi videosu için içerik ajanının yazdığı SENARYO hazır. Anlatı metni (seslendirme) DEĞİŞTİRİLMEYECEK; sen yalnızca her sahne için en uygun ANİMASYON SAHNESİNİ seçeceksin (kendi anlatı yazma).
+Konu: {konu}
+SENARYO SAHNELERİ (sırayla; her biri: seslendirme | ekranda yazı | görsel tarifi):
+{betik}
+
+""" + _TIP_BLOK + """- ozel: konuya özel çizilecek detaylı sahne (YALNIZCA hazır tipler sahneyi anlatmaya yetmiyorsa; en çok 2 tane; tahtadaki nesneyi/olayı gösteren sahne). params: {{"yedek": "kontrol_listesi", "tema": "mavi|mor|yesil|turuncu|gri", "tasarim_notu": "sahnede NE görünecek: mekân/nesneler, hareket sırası, etiketler (3-5 cümle)"}}
+
+KURALLAR: Tam olarak {n} sahne döndür, senaryo sırasıyla (1. sahne "kanca", son sahne "kapanis"). Aynı tip arka arkaya gelmesin, bir tip en çok 2 kez, en az 3 farklı tip. Sahnenin seslendirmesine ve görsel tarifine UYAN tipi seç; uymayan şablonu zorla koyma (ör. konuşulan şey nem değilse "nem" seçme; ürün/parça tanıtımı ise "ozel" ya da "sayi"/"karsilastir"/"kontrol_listesi" kullan). Sayısal params'ı (derece, sayı) seslendirmede geçen değerlerle uyumlu yaz; emin değilsen tipik değer kullan.
+Her sahne için: "nokta" (o sahnede anlatılan TEK bilgi, 3-8 kelime), "vurgu" (seslendirmeden en çok 2 KELİMEYİ AYNEN seç; ekranda renkle vurgulanır; yoksa boş liste), isteğe bağlı "bolum" (yeni bölüm başlığı, en çok 28 harf; ilk sahnede olmasın), "baslik" (zıplayan TEK kısa kelime, en çok 10 harf, tüm videoda en çok 2 sahnede), "etiketler" (sahnedeki parçalara en çok 2 kısa etiket).
+YALNIZCA JSON: {{"sahneler":[{{"tip":"kanca","nokta":"...","vurgu":[],"bolum":"","baslik":"","etiketler":[],"params":{{}}}}]}}"""

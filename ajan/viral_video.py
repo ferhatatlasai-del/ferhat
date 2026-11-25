@@ -404,8 +404,60 @@ def anlat_senaryo_uret(konu, ipucu):
     return None
 
 
+def zincir_senaryosu(kimlik):
+    """İçerik ajanının senaryosunu (zincir/<kimlik>_taslak.json) AYNEN anlatı yaparak anlat biçimine çevirir: yapay zekâ yalnızca sahne tiplerini/parametrelerini seçer. Dönen: doğrulanmış senaryo ya da None (SON_HATA dolu)."""
+    global SON_HATA
+    SON_HATA = ""
+    if not re.fullmatch(r"c\d{8}-\d{6}", str(kimlik)):
+        SON_HATA = "geçersiz senaryo kimliği"
+        return None
+    d = json_oku(KOK / "zincir" / f"{kimlik}_taslak.json", None)
+    sah = [s for s in ((d or {}).get("sahneler") or []) if isinstance(s, dict) and str(s.get("seslendirme") or "").strip()]
+    if not d or len(sah) < 3:
+        SON_HATA = "senaryo bulunamadı ya da sahnesiz (yalnızca Reels senaryoları, en az 3 konuşmalı sahne)"
+        return None
+    betik = [" ".join(str(s["seslendirme"]).split()) for s in sah]
+    anahtar = os.environ.get("OPENAI_API_KEY")
+    if not anahtar:
+        SON_HATA = "OPENAI_API_KEY yok"
+        return None
+    satirlar = "\n".join(f"{i + 1}) {betik[i]} | {str(s.get('ekran_yazisi') or '')[:80]} | {str(s.get('gorsel') or '')[:140]}" for i, s in enumerate(sah))
+    govde = {"model": MODEL, "response_format": {"type": "json_object"}, "temperature": 0.4,
+             "messages": [{"role": "system", "content": "Sen 3D baskı eğitim videolarında hazır bir senaryoya uygun animasyon sahneleri seçen bir yönetmensin. Anlatıyı değiştirmezsin. Yalnızca geçerli JSON döndür."},
+                          {"role": "user", "content": AN.ISTEM_BAGLI.format(konu=str(d.get("konu") or "")[:120], betik=satirlar, n=len(betik))}]}
+    etiketler = [re.sub(r"[^a-z0-9ığüşöç]", "", str(h).lower().lstrip("#")) for h in (d.get("hashtagler") or [])][:8]
+    baslik = U.yazi_temizle(str(d.get("youtube_baslik") or d.get("konu") or ""))[:90]
+    aciklama = "\n".join(" ".join(w for w in l.split() if not w.startswith("#")) for l in str(d.get("instagram_caption") or d.get("youtube_aciklama") or "").splitlines()).strip()
+    for deneme in range(3):
+        try:
+            r = urllib.request.Request(f"{OPENAI}/chat/completions", data=json.dumps(govde).encode(), method="POST", headers={"Content-Type": "application/json", "Authorization": f"Bearer {anahtar}"})
+            with urllib.request.urlopen(r, timeout=240) as y:
+                j = json.loads(json.load(y)["choices"][0]["message"]["content"])
+            yp = [x for x in (j.get("sahneler") or []) if isinstance(x, dict)]
+            if len(yp) != len(betik):
+                raise ValueError(f"{len(betik)} sahne istendi, {len(yp)} geldi")
+            sahneler = []
+            for i, x in enumerate(yp):
+                metin = betik[i]
+                for v in [str(v) for v in (x.get("vurgu") or [])][:2]:   # yalnızca işaretleme: kelimeler değişmez
+                    if v and v in metin.split() and f"*{v}*" not in metin:
+                        metin = re.sub(r"(?<!\S)" + re.escape(v) + r"(?!\S)", f"*{v}*", metin, count=1)
+                sahneler.append({**{k: x.get(k) for k in ("tip", "nokta", "bolum", "baslik", "etiketler", "params")}, "anlati": metin})
+            return AN.dogrula({"konu": str(d.get("konu") or "")[:140], "baslik": baslik, "aciklama": aciklama or baslik, "etiketler": etiketler, "sahneler": sahneler}, U.yazi_temizle, (), bagli=True)
+        except Exception as e:
+            SON_HATA = f"senaryo animasyona çevrilemedi: {type(e).__name__}: {str(e)[:110]}"
+            print(f"UYARI: senaryodan animasyon sahneleri seçilemedi ({deneme + 1}/3): {type(e).__name__}: {str(e)[:160]}")
+            if isinstance(e, ValueError):
+                govde["messages"].append({"role": "user", "content": "Önceki yanıt şu kurala uymadı: " + str(e)[:200] + ". Düzeltip JSON'u yeniden yaz."})
+    return None
+
+
 def anlat_senaryo_sec(a):
     kullanilan = set(json_oku(KULLANILAN, []))
+    if a.zincir:
+        SECIM.update(tur="zincir", zincir=a.zincir)
+        s = zincir_senaryosu(a.zincir)
+        return (s, "zincir-" + a.zincir) if s else (None, SON_HATA or "senaryo animasyona çevrilemedi")
     if a.senaryo:
         SECIM.update(tur="elle")
         return AN.dogrula(json_oku(a.senaryo, {}), U.yazi_temizle, serbest=SERBEST, resimli=RESIMLI), pathlib.Path(a.senaryo).stem
@@ -1154,7 +1206,7 @@ def ozel_kontrol(plan, dizin, plan_yolu):
                 print(f"Özel sahne {i + 1}: yeniden çizildi ({yeni['eleman_sayisi']} eleman)")
         print(f"Özel sahne {i + 1}: {'GEÇTİ' if gecti else 'GEÇMEDİ → yedek sahne'} {sorun}")
         if not gecti:
-            if SERBEST:
+            if SERBEST or (sh.get("params") or {}).get("tasarim_notu"):
                 sh["tip"], sh["params"] = "kontrol_listesi", genel_liste(sh)
             else:
                 sh["tip"], sh["params"] = (sh.get("params") or {}).get("yedek") or "ekstruder", {}
@@ -1224,11 +1276,11 @@ def hata(mesaj):
 def calis(a):
     ayar = dict(VARSAYILAN)
     ayar.update(json_oku(AYAR, {}))
-    if not ayar["aktif"] and not (a.hemen or a.senaryo or a.konu):
+    if not ayar["aktif"] and not (a.hemen or a.senaryo or a.konu or a.zincir):
         print("Karar: bekle (viral video üretimi kapalı)")
         ilerleme("beklemede", 100, "viral video üretimi kapalı", zorla=True)
         return 0
-    if not (a.hemen or a.senaryo or a.konu):
+    if not (a.hemen or a.senaryo or a.konu or a.zincir):
         # zamanlanmış çalışma: sunucu yeniden başlayınca tetik tekrarlanabilir; bugün (TR) zaten bir viral video üretildiyse üretme
         bugun = H.simdi().astimezone(H.TR).strftime("%Y-%m-%d")
         for f in DIZIN.glob("s*.json"):
@@ -1242,7 +1294,7 @@ def calis(a):
                 ilerleme("beklemede", 100, "bugün zaten bir viral video üretildi", zorla=True)
                 return 0
     bekleyen = sum(1 for f in DIZIN.glob("s*.json") if json_oku(f, {}).get("durum") == "onay_bekliyor")
-    if bekleyen >= ayar["en_cok_bekleyen"] and not (a.hemen or a.senaryo or a.konu):
+    if bekleyen >= ayar["en_cok_bekleyen"] and not (a.hemen or a.senaryo or a.konu or a.zincir):
         print(f"Karar: bekle ({bekleyen} taslak onay bekliyor; yenisi üretilmez)")
         ilerleme("beklemede", 100, f"{bekleyen} taslak onay bekliyor; yenisi üretilmedi", zorla=True)
         return 0
@@ -1260,6 +1312,8 @@ def calis(a):
     elif SERBEST:
         print("Konu türü: SERBEST (3D baskı dışı); genel sahne kalıpları kullanılacak")
     bicim = a.bicim or ayar.get("bicim") or "anlat"
+    if a.zincir:
+        bicim = "anlat"
     if SERBEST and bicim != "anlat":
         bicim = "anlat"
     if a.senaryo and "maddeler" in json_oku(a.senaryo, {}):
@@ -1282,7 +1336,7 @@ def calis(a):
         return 0
     print(f"Konu: {senaryo['konu']} ({kaynak}); {len(senaryo['sahneler'])} sahne")
     ilerleme("Senaryo hazır", 5, senaryo["konu"][:100], zorla=True)
-    if SERBEST and senaryo.get("bicim") == "anlat":
+    if (SERBEST or a.zincir) and senaryo.get("bicim") == "anlat" and any(x["tip"] == "ozel" for x in senaryo["sahneler"]):
         serbest_tasarla(senaryo)
     H.ffmpeg_hazir()
     sesler = []
@@ -1359,6 +1413,8 @@ def calis(a):
         if RESIMLI:
             taslak["resimli"] = True
             taslak["gorsel_maliyeti"] = {"adet": RESIM_SAYISI["adet"], "kalite": RESIM_SAYISI["kalite"]}
+        if a.zincir:
+            taslak["zincir"] = a.zincir
         if SERBEST:
             taslak["serbest"] = True
             taslak["anlati"] = " ".join(x["anlati"] for x in senaryo["sahneler"])[:1500]
@@ -1389,6 +1445,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--konu", help="belirli bir konu (hazır senaryo yoksa yapay zekâ yazar)")
     ap.add_argument("--senaryo", help="senaryo JSON dosyası")
+    ap.add_argument("--zincir", help="içerik ajanının Reels senaryosunun kimliği (zincir/<kimlik>_taslak.json): seslendirme AYNEN kullanılır, 3D baskı animasyonları seçilir (ucuz: yalnızca metin)")
     ap.add_argument("--konu-turu", dest="konu_turu", choices=["otomatik", "3d", "serbest", "resimli"], help="elle yazılan konunun türü: otomatik (3D baskı sözcükleri varsa 3d, yoksa serbest), 3d, serbest (3D baskı dışı animasyon) ya da resimli (yapay zekâ resimleri + sinematik hareket, her konu)")
     ap.add_argument("--hemen", action="store_true", help="kapalı ya da taslak limiti dolu olsa bile bir kez üret")
     ap.add_argument("--git", action="store_true", help="sonucu depoya yaz ve it")
