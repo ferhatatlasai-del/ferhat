@@ -1369,6 +1369,7 @@ def calis(a):
             if not str(mp).startswith(str(KOK / "modeller")) or not mp.exists():
                 return hata("model bulunamadı (modeller/ klasöründe .stl olmalı): " + a.model)
             plan["modeller"] = {mp.stem[:60]: "file://" + str(mp)}
+            plan["ton"], plan["tema_kaydir"] = 0, 0   # ürünün gerçek rengi renk tonu kaymasıyla bozulmasın
         if SERBEST:   # gerçekçi renkler (tavuk, çim, gökyüzü) renk tonu kaymasıyla bozulmasın
             plan["ton"], plan["tema_kaydir"] = 0, 0
     else:
