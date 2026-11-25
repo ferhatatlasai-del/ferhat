@@ -130,7 +130,19 @@
         "kısa kontrol baskıyı kurtarır",
         "yorum yaz takip et"
       ]
+    },
+    {
+      "id": "s20261125-094315",
+      "konu": "Dönen mini zeka küpü bulmacası",
+      "noktalar": [
+        "Dönen mini küp tanıtılıyor",
+        "Dış çerçeve ve iç halkalar",
+        "İç halkalar ayrı basılır",
+        "Çevirince iç düzen değişir",
+        "Küçük ama elde uzun kalır",
+        "Yorumlara yaz, yeni baskı seç"
+      ]
     }
   ],
-  "son_ton": 0
+  "son_ton": 305
 }
