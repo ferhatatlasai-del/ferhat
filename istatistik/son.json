@@ -1,17 +1,17 @@
 {
- "tarih": "2026-11-25T15:00:44Z",
- "tr_saat": "25.11.2026 18:00",
+ "tarih": "2026-11-25T18:00:55Z",
+ "tr_saat": "25.11.2026 21:00",
  "toplam": {
-  "reels": 20023,
+  "reels": 20049,
   "gonderi": 0,
-  "short": 11669,
+  "short": 11682,
   "youtube_video": 0,
-  "hikaye": 1238,
-  "toplam": 32930,
+  "hikaye": 1293,
+  "toplam": 33024,
   "begeni": 320,
   "yorum": 31
  },
- "fark": 72,
+ "fark": 94,
  "instagram": {
   "durum": "tamam",
   "izin": true,
@@ -26,8 +26,8 @@
     "begeni": 1,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgKJINptUAu/",
-    "izlenme": 157,
-    "erisim": 150
+    "izlenme": 172,
+    "erisim": 160
    },
    {
     "id": "18150949246585180",
@@ -103,7 +103,7 @@
     "begeni": 10,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgAaonlkhF3/",
-    "izlenme": 1684,
+    "izlenme": 1686,
     "erisim": 1520
    },
    {
@@ -136,8 +136,8 @@
     "begeni": 31,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": 4214,
-    "erisim": 3739
+    "izlenme": 4222,
+    "erisim": 3751
    },
    {
     "id": "18289759651292671",
@@ -147,8 +147,8 @@
     "begeni": 3,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df8Gek5DMrG/",
-    "izlenme": 303,
-    "erisim": 250
+    "izlenme": 304,
+    "erisim": 251
    },
    {
     "id": "18132390508855696",
@@ -363,19 +363,29 @@
  "hikaye_izin": true,
  "hikayeler": [
   {
+   "id": "17987120012900517",
+   "tarih": "2026-11-25T16:47:02Z",
+   "baslik": "Snap-fit Bike Mount Base - Remix - One Part",
+   "izlenme": 7,
+   "erisim": 7,
+   "okundu": true,
+   "yanit": 0
+  },
+  {
    "id": "18137069581741034",
    "tarih": "2026-11-25T14:26:58Z",
    "baslik": "Trek Bike GoPro Mount Base",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 13,
+   "erisim": 11,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "17895554790685215",
    "tarih": "2026-11-25T12:06:52Z",
    "baslik": "Quad Lock compatible Mounting Bracket Base for Bicycle Bike",
-   "izlenme": 7,
-   "erisim": 7,
+   "izlenme": 19,
+   "erisim": 17,
    "okundu": true,
    "yanit": 0
   },
@@ -383,8 +393,8 @@
    "id": "18343824202272064",
    "tarih": "2026-11-25T08:51:47Z",
    "baslik": "Video hikayesi",
-   "izlenme": 15,
-   "erisim": 15,
+   "izlenme": 23,
+   "erisim": 21,
    "okundu": true,
    "yanit": 0
   },
@@ -392,8 +402,8 @@
    "id": "18455197594122303",
    "tarih": "2026-11-25T07:27:39Z",
    "baslik": "Suction Cup Shower Soap / Phone Holder Tray",
-   "izlenme": 17,
-   "erisim": 15,
+   "izlenme": 26,
+   "erisim": 22,
    "okundu": true,
    "yanit": 0
   },
@@ -401,8 +411,8 @@
    "id": "17973842393962383",
    "tarih": "2026-11-25T05:06:46Z",
    "baslik": "Suction Cup Soap Tray",
-   "izlenme": 21,
-   "erisim": 19,
+   "izlenme": 27,
+   "erisim": 23,
    "okundu": true,
    "yanit": 0
   },
@@ -711,15 +721,6 @@
    "erisim": 28,
    "okundu": true,
    "yanit": 0
-  },
-  {
-   "id": "18140981413729268",
-   "tarih": "2026-11-21T12:27:08Z",
-   "baslik": "Otizo Drill Press Depth Stop",
-   "izlenme": 35,
-   "erisim": 31,
-   "okundu": true,
-   "yanit": 0
   }
  ],
  "youtube": {
@@ -731,7 +732,7 @@
     "tur": "Short",
     "tarih": "2026-11-25T08:52:19",
     "baslik": "Nozzle tıkanmadan temizle: 3 kısa işaret",
-    "izlenme": 35,
+    "izlenme": 41,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=YBNIDKMia3Y"
@@ -741,7 +742,7 @@
     "tur": "Short",
     "tarih": "2026-11-23T13:17:07",
     "baslik": "Şehirde aslan görürsen ne yapmalısın?",
-    "izlenme": 25,
+    "izlenme": 26,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=9sEswOUevrM"
@@ -751,7 +752,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T23:17:16",
     "baslik": "Bambu Lab A1 Combo AMS lite filament değişim sorunları",
-    "izlenme": 188,
+    "izlenme": 190,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=Vt_lyaaFBOo"
@@ -801,7 +802,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T15:26:52",
     "baslik": "Isıya en dayanıklı 5 filament | 3D baskı",
-    "izlenme": 371,
+    "izlenme": 372,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=TXcpwaFMx1U"
@@ -821,7 +822,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T09:57:09",
     "baslik": "Filament nem çekerse ne olur? Belirtiler ve çözüm",
-    "izlenme": 1249,
+    "izlenme": 1250,
     "begeni": 7,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=M9tyEIjEeH8"
@@ -891,7 +892,7 @@
     "tur": "Short",
     "tarih": "2026-11-18T12:58:52",
     "baslik": "3D baskı ile pratik tasarımlar",
-    "izlenme": 1036,
+    "izlenme": 1038,
     "begeni": 7,
     "yorum": 1,
     "link": "https://www.youtube.com/watch?v=Z3j4VTqgSFM"
@@ -921,7 +922,7 @@
  },
  "eksikler": [],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 18:00",
-  "govde": "Toplam 32.930 (+72) · Reels 20.023 · Short 11.669 · Hikaye 1.238 (5 bugün) · Takipçi 433 · En iyi Reels: Baskın tabladan kalkı 4.214"
+  "baslik": "📊 İzlenme raporu 21:00",
+  "govde": "Toplam 33.024 (+94) · Reels 20.049 · Short 11.682 · Hikaye 1.293 (6 bugün) · Takipçi 433 · En iyi Reels: Baskın tabladan kalkı 4.222"
  }
 }
