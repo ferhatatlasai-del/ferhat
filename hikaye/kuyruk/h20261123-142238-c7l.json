@@ -1,7 +1,7 @@
 {
   "id": "h20261123-142238-c7l",
   "kaynak": "uretim",
-  "durum": "planli",
+  "durum": "yayinlaniyor",
   "olusturma": "2026-11-23T14:22:38.000Z",
   "gorsel": "hikaye/gorseller/h20261123-142238-c7l.mp4",
   "baslik": "Suction Cup Shower Soap / Phone Holder Tray",
@@ -20,7 +20,9 @@
     "deneme": 1,
     "sorunlar": []
   },
-  "yayin": null,
+  "yayin": {
+    "tarih": "2026-11-25T07:25:36Z"
+  },
   "hata": "",
   "deneme": 0,
   "tur": "video",
