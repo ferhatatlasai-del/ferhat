@@ -1837,6 +1837,14 @@ function zincirCiz(z){
       if(y.link&&/^https:\/\//.test(y.link)){ var l=dom('a',null,'Aç'); l.href=y.link; l.target='_blank'; l.rel='noopener noreferrer'; yx.appendChild(l); }
       g.appendChild(yx);
     });
+    if(k.format==='reels'&&k.taslak){
+      var ab=dom('button','ana','🎬 Bu senaryodan animasyonlu video yap (3D baskı, ucuz)'); ab.type='button'; ab.style.cssText='display:block;width:100%;margin:6px 0;text-align:left';
+      ab.addEventListener('click',function(){
+        if(!hSifreKontrol()) return; ab.disabled=true;
+        hPost('/api/viral-calistir',{zincir:k.kimlik}).then(function(){ ab.textContent='✓ Başlatıldı: yaklaşık 15-30 dk; hazır olunca Yayın bölümünde onayını bekler (ilerleme: Üret bölümü)'; }).catch(function(e){ ab.textContent=String(e.message||e); ab.disabled=false; });
+      });
+      g.appendChild(ab);
+    }
     if(k.durum==='senaryo'||k.durum==='video'){
       var vb=dom('button',null,'Bu içerik için video yükle'); vb.type='button'; vb.addEventListener('click',function(){ zincirSec(k.kimlik); }); g.appendChild(vb);
     }
