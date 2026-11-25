@@ -17,7 +17,7 @@
   "zamanlama": [
     {
       "tip": "kanca",
-      "t0": 0.0,
+      "t0": 0,
       "t1": 7.48,
       "ses_son": 6.98
     },
@@ -57,5 +57,9 @@
       "t1": 52.48,
       "ses_son": 50.08
     }
-  ]
+  ],
+  "yayinlanan": [
+    "instagram"
+  ],
+  "yayin_tarihi": "2026-11-25T08:50:37.734Z"
 }
