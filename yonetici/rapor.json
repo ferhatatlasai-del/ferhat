@@ -383,6 +383,30 @@
         "Otomatik hat açıkken kalite sorunu sürerse gereksiz maliyet oluşabilir; modu ben değiştiremem, gerekirse panelden sen deneme/kapalı değerlendirmesi yap."
       ],
       "eylem_sayisi": 1
+    },
+    {
+      "zaman": "2026-11-25 18:31",
+      "kademe": 2,
+      "model": "OpenAI (gpt-5.4)",
+      "rapor": [
+        "Acil değil ama dikkat: otomatik hat açık ve son 5 turun 4’ü reddedilmiş görünüyor; bugün tur kaydı yok, bu yüzden hattın bugün çalışıp çalışmadığı net değil.",
+        "Sağlık tarafında genel durum iyi görünüyor; Instagram, YouTube, OpenAI ve ofis sunucusu çalışıyor.",
+        "Son 24 saatte Nöbetçi akışında 1 başarısızlık kaydı var; sistem sağlığı önceliğin nedeniyle bunu yeniden kontrol ettirdim.",
+        "Onay bekleyen iki taslak aynı başlık ve aynı konuya sahip; çeşitlilik hedefinle çakışıyor, bu yüzden ikisini de sahibi için inceleme notuyla işaretledim.",
+        "Hikâye tarafında günlük sayı 6 ve kuyrukta 9 planlı hikâye var; şu an değişiklik gerektiren bir işaret yok.",
+        "Yorum modu otomatik görünüyor; bu ayarı ben değiştirmem, sadece not düşüyorum çünkü sınırlarınla çelişebilir."
+      ],
+      "oneriler": [
+        "Otomatik hat bugün boş görünmeye devam ederse panel/log tarafında gün içi tetiklerin çalışıp çalışmadığını kontrol et.",
+        "Art arda retler Bambu Lab A1 odaklı içeriklerde yoğunlaşmış; marka/model ayrıntısına girmeden daha genel 3D baskı konularına ağırlık vermen daha güvenli olabilir.",
+        "Onay bekleyen iki benzer taslaktan en fazla birini ilerlet; diğerini farklı konuya veya farklı açıya çevir.",
+        "Yorum modunun otomatik olması senin sınırlarınla çelişebilir; panelden bu ayarın bilinçli açık olup olmadığını sen doğrula."
+      ],
+      "uyarilar": [
+        "Otomatik hat modunu ben değiştiremem; art arda ret sürerse veya bugün tur üretmezse panelden müdahale etmen gerekebilir.",
+        "Veri yok: bugün 10:05, 15:05, 20:05 turlarının neden boş olduğu durum özetinden anlaşılamıyor."
+      ],
+      "eylem_sayisi": 3
     }
   ],
   "defter": [
@@ -567,6 +591,43 @@
       "neden": "Son 24 saatte Nöbetçi başarısız kaydı var; servis/anahtar tarafını yeniden kontrol etmek için.",
       "durum": "yapildi",
       "ayrinti": "nobetci.yml tetiklendi"
+    },
+    {
+      "zaman": "2026-11-25 18:31",
+      "kademe": 2,
+      "eylem": "workflow_tetikle",
+      "params": {
+        "akis": "nobetci.yml"
+      },
+      "neden": "Son 24 saatte Nöbetçi başarısızlığı var; sağlık kontrolünü tazelemek için.",
+      "durum": "yapildi",
+      "ayrinti": "nobetci.yml tetiklendi"
+    },
+    {
+      "zaman": "2026-11-25 18:31",
+      "kademe": 2,
+      "eylem": "taslak_isaretle",
+      "params": {
+        "id": "s20261125-094315",
+        "oneri": "incele",
+        "not": "Aynı başlık ve konu ile başka bir taslak daha var; tekrar riski yüksek."
+      },
+      "neden": "Çeşitlilik ve tekrar riskini azaltmak için.",
+      "durum": "yapildi",
+      "ayrinti": "s20261125-094315: incele önerisi"
+    },
+    {
+      "zaman": "2026-11-25 18:31",
+      "kademe": 2,
+      "eylem": "taslak_isaretle",
+      "params": {
+        "id": "s20261125-130043",
+        "oneri": "incele",
+        "not": "Aynı başlık ve konu ile başka bir taslak daha var; tekrar riski yüksek."
+      },
+      "neden": "Çeşitlilik ve tekrar riskini azaltmak için.",
+      "durum": "yapildi",
+      "ayrinti": "s20261125-130043: incele önerisi"
     }
   ]
 }
