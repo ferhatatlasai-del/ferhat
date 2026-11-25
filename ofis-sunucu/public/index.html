@@ -450,6 +450,12 @@ body.tam .hint{display:none}
         <p class="not" id="zDurum">Zincir kayıtları yükleniyor…</p>
         <div id="zListe"></div>
       </div>
+      <div class="card pub" id="mdKart">
+        <h2>3D baskı modelleri (STL)</h2>
+        <p class="alt">Baskı modellerinin STL dosyasını buradan yükle (en çok 25 MB). Senaryo kartındaki "animasyonlu video" düğmesinin yanında bu modeli seçersen video, ürünün gerçek 3D modelini ışık ve gölgeyle döndüren vitrin sahneleri içerir. Dosya depoda <b>modeller/</b> klasörüne kaydolur.</p>
+        <div class="satir"><input type="file" id="mdDosya" accept=".stl,model/stl,application/sla" style="flex:1;min-width:160px"><input type="text" id="mdAd" maxlength="50" placeholder="Ad (isteğe bağlı)" style="width:140px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px"><button type="button" class="ana" id="mdYukle">Yükle</button></div>
+        <p class="not" id="mdDurum"></p><p class="not" id="mdListe">…</p>
+      </div>
       <div class="card pub" id="trKart">
         <h2>Trend fikirleri</h2>
         <p class="alt" id="trAlt">Yükleniyor…</p>
@@ -1159,7 +1165,7 @@ function chk(r){return r.json().then(function(j){ if(!r.ok){ if(r.status===401){
 function apiGet(u){return fetch(u,{headers:{'X-Sifre':SIF}}).then(chk);}
 function apiIcerikUret(metin){var f=$('#zFormat'); return fetch('/api/icerik-uret',{method:'POST',headers:{'X-Sifre':SIF,'Content-Type':'application/json'},body:JSON.stringify({metin:metin||'',format:f?f.value:'reels'})}).then(chk);}
 function apiPost(metin){return fetch('/api/direktif',{method:'POST',headers:{'X-Sifre':SIF,'Content-Type':'application/json'},body:JSON.stringify({metin:metin})}).then(chk);}
-fetch('/api/ping').then(function(r){return r.json();}).then(function(j){ if(j&&j.ok){ MOD=j.hazir?'sunucu':'demo'; if(j.oturum&&!SIF) SIF='oturum';   /* geçerli oturum çerezi var: sunucu çerezle tanır, şifre tekrar istenmez */ if(selId==='icerik') renderInfo(); if(typeof pSifreHazirla==='function') pSifreHazirla(true); } }).catch(function(){});
+fetch('/api/ping').then(function(r){return r.json();}).then(function(j){ if(j&&j.ok){ MOD=j.hazir?'sunucu':'demo'; if(j.oturum&&!SIF) SIF='oturum';   /* geçerli oturum çerezi var: sunucu çerezle tanır, şifre tekrar istenmez */ setTimeout(function(){ try{modellerCek();}catch(e){} },0); if(selId==='icerik') renderInfo(); if(typeof pSifreHazirla==='function') pSifreHazirla(true); } }).catch(function(){});
 
 var ADIMLAR=['İstek iletildi','Trend kontrolü','İçerik ajanı','Video paketi','Hazır'];
 function adimlar(n,msg,hata){
@@ -1800,6 +1806,8 @@ function paketCiz(p,kayit){
   var tb=dom('button','mini','Tüm paketi kopyala'); tb.type='button'; tb.addEventListener('click',function(){kopyala(kayit.konu+'\n\n'+tum.join('\n\n'),tb);}); kap.appendChild(tb);
   return kap;
 }
+var MODELLER=[];
+function modellerCek(){ if(!SIF) return; fetch('/api/modeller',{headers:{'X-Sifre':SIF}}).then(function(r){return r.ok?r.json():null;}).then(function(j){ MODELLER=(j&&j.modeller)||[]; var l=$('#mdListe'); if(l){ l.textContent=MODELLER.length?('Yüklü modeller: '+MODELLER.map(function(m){return m.ad;}).join(', ')):'Henüz model yüklenmedi.'; } if(ZINCIR) zincirCiz(ZINCIR); }).catch(function(){}); }
 function zincirCiz(z){
   ZINCIR=z; var kap=$('#zListe'); kap.textContent='';
   var liste=(z&&z.kayitlar)||[];
@@ -1838,10 +1846,12 @@ function zincirCiz(z){
       g.appendChild(yx);
     });
     if(k.format==='reels'&&k.taslak){
+      var ms=document.createElement('select'); ms.style.cssText='display:block;width:100%;margin:6px 0 0;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px'; var o0=document.createElement('option'); o0.value=''; o0.textContent='Model yok (yalnızca baskı animasyonları)'; ms.appendChild(o0);
+      MODELLER.forEach(function(m){ var o=document.createElement('option'); o.value=m.yol; o.textContent='3D vitrin: '+m.ad; ms.appendChild(o); }); if(MODELLER.length) g.appendChild(ms);
       var ab=dom('button','ana','🎬 Bu senaryodan animasyonlu video yap (3D baskı, ucuz)'); ab.type='button'; ab.style.cssText='display:block;width:100%;margin:6px 0;text-align:left';
       ab.addEventListener('click',function(){
         if(!hSifreKontrol()) return; ab.disabled=true;
-        hPost('/api/viral-calistir',{zincir:k.kimlik}).then(function(){ ab.textContent='✓ Başlatıldı: yaklaşık 15-30 dk; hazır olunca Yayın bölümünde onayını bekler (ilerleme: Üret bölümü)'; }).catch(function(e){ ab.textContent=String(e.message||e); ab.disabled=false; });
+        hPost('/api/viral-calistir',{zincir:k.kimlik,model:ms.value||undefined}).then(function(){ ab.textContent='✓ Başlatıldı: yaklaşık 15-30 dk; hazır olunca Yayın bölümünde onayını bekler (ilerleme: Üret bölümü)'; }).catch(function(e){ ab.textContent=String(e.message||e); ab.disabled=false; });
       });
       g.appendChild(ab);
     }
@@ -2483,7 +2493,13 @@ function sekme(ad,kaydirma){
 }
 document.querySelector('#nav').addEventListener('click',function(e){ var b=e.target.closest('button[data-v]'); if(b) sekme(b.dataset.v); });
 window.addEventListener('hashchange',function(){ sekme((location.hash||'').slice(1),false); });
-$('#gSifreKaydet').addEventListener('click',function(){ var v=($('#gSifre').value||'').trim(); if(!v) return; SIF=v; try{localStorage.setItem('ofisSifre',SIF);}catch(x){} $('#gSifre').value=''; $('#gSifreSerit').hidden=true; toastGoster('Şifre kaydedildi. İşlemi tekrar dene.'); });
+$('#gSifreKaydet').addEventListener('click',function(){ var v=($('#gSifre').value||'').trim(); if(!v) return; SIF=v; try{localStorage.setItem('ofisSifre',SIF);}catch(x){} $('#gSifre').value=''; $('#gSifreSerit').hidden=true; toastGoster('Şifre kaydedildi. İşlemi tekrar dene.'); try{modellerCek();}catch(e){} });
+$('#mdYukle').addEventListener('click',function(){
+  if(!hSifreKontrol()) return; var f=$('#mdDosya').files&&$('#mdDosya').files[0], d=$('#mdDurum'); if(!f){ d.textContent='Önce bir STL dosyası seç.'; return; }
+  if(!/\.stl$/i.test(f.name)){ d.textContent='Yalnızca .stl dosyası.'; return; } if(f.size>25*1024*1024){ d.textContent='Dosya 25 MB’tan büyük ('+(f.size/1048576).toFixed(1)+' MB).'; return; }
+  var btn=this, ad=($('#mdAd').value||f.name).replace(/\.stl$/i,''); btn.disabled=true; d.textContent='Yükleniyor…';
+  fetch('/api/model-yukle?ad='+encodeURIComponent(ad),{method:'POST',headers:{'X-Sifre':SIF,'Content-Type':'application/octet-stream'},body:f}).then(chk).then(function(j){ d.textContent='✓ Yüklendi: '+j.yol+' ('+(j.boyut/1048576).toFixed(1)+' MB)'; $('#mdDosya').value=''; $('#mdAd').value=''; btn.disabled=false; modellerCek(); }).catch(function(e){ d.textContent=String(e.message||e); btn.disabled=false; });
+});
 $('#gSifre').addEventListener('keydown',function(e){ if(e.key==='Enter') $('#gSifreKaydet').click(); });
 
 function bugunTR(){ return trGun(new Date().toISOString()); }

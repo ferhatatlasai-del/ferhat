@@ -746,10 +746,10 @@ async function api(req, res, url) {
     if (viralTetikler.length >= 2) return json(res, 429, { hata: 'Saatte en fazla 2 elle viral video üretimi.' });
     viralOnbellek.t = 0;
     try { const d = await viralDurum(); if (d.calisiyor) return json(res, 409, { hata: 'Zaten bir viral video üretiliyor (ilerleme kutusundan izle). İkincisi, aynı anda başlayıp aynı konuyu seçmesin diye engellendi.' }); } catch (e) { /* durum okunamazsa devam */ }
-    let konu = '', konuTuru = 'otomatik', zincirKimlik = '';
-    try { const b = await govde(req); if (/^c\d{8}-\d{6}$/.test(String(b.zincir || ''))) zincirKimlik = b.zincir; konu = String(b.konu || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 120); if (['otomatik', '3d', 'serbest', 'resimli'].includes(b.konu_turu)) konuTuru = b.konu_turu; } catch (e) { /* konu isteğe bağlı */ }
+    let konu = '', konuTuru = 'otomatik', zincirKimlik = '', modelYolu = '';
+    try { const b = await govde(req); if (/^c\d{8}-\d{6}$/.test(String(b.zincir || ''))) zincirKimlik = b.zincir; if (/^modeller\/[A-Za-z0-9_.-]{1,60}\.stl$/.test(String(b.model || ''))) modelYolu = b.model; konu = String(b.konu || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 120); if (['otomatik', '3d', 'serbest', 'resimli'].includes(b.konu_turu)) konuTuru = b.konu_turu; } catch (e) { /* konu isteğe bağlı */ }
     const dal = await varsayilanDal();
-    const r = await gh(`/repos/${REPO}/actions/workflows/${AKIS_VIRAL}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: Object.assign({ hemen: 'EVET', konu, konu_turu: konuTuru }, zincirKimlik ? { zincir: zincirKimlik } : {}) }) });
+    const r = await gh(`/repos/${REPO}/actions/workflows/${AKIS_VIRAL}/dispatches`, { method: 'POST', body: JSON.stringify({ ref: dal, inputs: Object.assign({ hemen: 'EVET', konu, konu_turu: konuTuru }, zincirKimlik ? Object.assign({ zincir: zincirKimlik }, modelYolu ? { model: modelYolu } : {}) : {}) }) });
     if (r.status !== 204) return json(res, 502, { hata: 'GitHub kabul etmedi (' + r.status + ').' });
     viralTetikler.push(simdi); viralOnbellek.t = 0;
     return json(res, 200, { ok: true });
@@ -790,6 +790,26 @@ async function api(req, res, url) {
     if (r.status !== 204) return json(res, 502, { hata: 'GitHub kabul etmedi (' + r.status + '). Önce iş akışının birleştirildiğinden emin ol.' });
     uretimTetikler.push(simdi);
     return json(res, 200, { ok: true });
+  }
+  if (url.pathname === '/api/modeller' && req.method === 'GET') {   // yüklü 3D baskı modelleri (STL)
+    try {
+      const dal = await varsayilanDal(), g = await gh(`/repos/${REPO}/contents/modeller?ref=${encodeURIComponent(dal)}`);
+      const liste = g.ok ? (await g.json()).filter(d => d.type === 'file' && /\.stl$/i.test(d.name)).map(d => ({ ad: d.name.replace(/\.stl$/i, ''), yol: d.path, boyut: d.size })) : [];
+      return json(res, 200, { modeller: liste });
+    } catch (e) { return json(res, 502, { hata: 'Model listesi okunamadı.' }); }
+  }
+  if (url.pathname === '/api/model-yukle' && req.method === 'POST') {   // STL yükle: modeller/<ad>.stl (en çok 25 MB)
+    const LIM = 25 * 1024 * 1024;
+    if (+req.headers['content-length'] > LIM) return json(res, 413, { hata: 'Model 25 MB’tan büyük olamaz (daha az üçgenli ya da daha düşük çözünürlüklü dışa aktar).' });
+    let tampon; try { tampon = await govdeIkili(req, LIM); } catch (e) { return json(res, 413, { hata: 'Model çok büyük.' }); }
+    const ad = String(url.searchParams.get('ad') || '').replace(/\.stl$/i, '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9_-]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 50);
+    if (ad.length < 2) return json(res, 400, { hata: 'Model adı en az 2 harf/rakam olmalı.' });
+    const ikili = tampon.length > 84 && tampon.length === 84 + tampon.readUInt32LE(80) * 50, ascii = !ikili && /^\s*solid[\s\S]*facet normal/i.test(tampon.slice(0, 2000).toString('latin1'));
+    if (!ikili && !ascii) return json(res, 400, { hata: 'Bu geçerli bir STL dosyası gibi görünmüyor (ikili ya da ASCII STL olmalı).' });
+    const yol = `modeller/${ad}.stl`;
+    let sha = null; try { const g = await gh(`/repos/${REPO}/contents/${yol}?ref=${encodeURIComponent(await varsayilanDal())}`); if (g.ok) sha = (await g.json()).sha; } catch (e) { /* yeni dosya */ }
+    const r = await depoYaz(yol, tampon, sha, 'Panel: 3D baskı modeli yüklendi (' + ad + ')');
+    return r.ok ? json(res, 200, { ok: true, ad, yol, boyut: tampon.length }) : json(res, 502, { hata: 'Model kaydedilemedi (' + r.status + ').' });
   }
   if (url.pathname === '/api/hikaye-foto' && req.method === 'POST') {
     if (+req.headers['content-length'] > 3 * 1024 * 1024) return json(res, 413, { hata: 'Fotoğraf 3 MB’tan büyük olamaz (panel otomatik küçültür).' });

@@ -15,9 +15,9 @@ try:
 except Exception:   # pragma: no cover
     B = None
 
-TIPLER = ["ozel", "resim", "kanca", "ekstruder", "sicak_uc", "katman", "tikanma", "ilk_katman", "sogutma", "nem", "stringing", "warping",
+TIPLER = ["ozel", "resim", "vitrin", "kanca", "ekstruder", "sicak_uc", "katman", "tikanma", "ilk_katman", "sogutma", "nem", "stringing", "warping",
           "karsilastir", "sayi", "kontrol_listesi", "dolgu", "hiz", "destek", "kapanis"]
-EN_AZ_SURE = {"resim": 3.6, "ozel": 4.2, "tikanma": 5.0, "katman": 4.6, "sicak_uc": 4.0, "ilk_katman": 4.0, "sogutma": 4.0, "nem": 4.0, "stringing": 4.4, "warping": 4.4, "destek": 4.2,
+EN_AZ_SURE = {"vitrin": 4.0, "resim": 3.6, "ozel": 4.2, "tikanma": 5.0, "katman": 4.6, "sicak_uc": 4.0, "ilk_katman": 4.0, "sogutma": 4.0, "nem": 4.0, "stringing": 4.4, "warping": 4.4, "destek": 4.2,
               "karsilastir": 3.6, "sayi": 3.4, "kontrol_listesi": 4.0, "dolgu": 3.6, "hiz": 3.8, "ekstruder": 3.4, "kanca": 3.0, "kapanis": 3.4}
 
 ISTEM = """3D yazıcı ve 3D baskı konusunda, YouTube Shorts / Instagram Reels için ~50-60 saniyelik, ANİMASYONLU ve görsel olarak ÇEŞİTLİ, TÜRKÇE bir bilgi videosunun HİKÂYE TAHTASINI yaz.
@@ -93,7 +93,7 @@ RESIMLI_TIPLER = ["resim", "sayi", "karsilastir", "kontrol_listesi", "kapanis"]
 HAREKETLER = ("yakin", "uzak", "sol", "sag", "yukari", "asagi")
 TURLER = {"dikdortgen", "daire", "cizgi", "ok", "yazi", "ikon", "parcacik", "elips", "yol", "yay", "grup"}
 OZELLIKLER = {"x", "y", "olcek", "donus", "opaklik", "w", "h", "doluluk", "cizim", "r", "x1", "y1", "x2", "y2", "boyut", "kalinlik", "rx", "ry", "a0", "a1"}
-YEDEKLER = [t for t in TIPLER if t not in ("ozel", "resim", "kanca", "kapanis")]
+YEDEKLER = [t for t in TIPLER if t not in ("ozel", "resim", "vitrin", "kanca", "kapanis")]
 
 
 def _renk(v, varsayilan="beyaz"):
@@ -208,6 +208,10 @@ def params_temizle(tip, p):
             r["odak2"] = [_sayi(p["odak2"][0], 0.5, 0.15, 0.85), _sayi(p["odak2"][1], 0.45, 0.2, 0.75)]
         r["katman_notu"] = _kisa(p.get("katman_notu"), 240)
         return r
+    if tip == "vitrin":
+        ad = re.sub(r"[^A-Za-z0-9_.-]", "", str(p.get("model") or ""))[:60]
+        renk = str(p.get("renk") or "")
+        return {"model": ad, "kamera": p.get("kamera") if p.get("kamera") in ("don", "yaklas", "detay", "ust") else "don", "renk": renk if re.fullmatch(r"#[0-9a-fA-F]{6}", renk) else "#ff3d8f"}
     if tip in ("kanca", "kapanis"):
         return {"ikon": p["ikon"]} if p.get("ikon") in IKONLAR else {}
     if tip == "sicak_uc":
@@ -251,10 +255,10 @@ def dogrula(s, temizle=lambda x: x, gecmis=(), serbest=False, resimli=False, bag
         tip = x.get("tip")
         if tip not in (RESIMLI_TIPLER if resimli else SERBEST_TIPLER if serbest else TIPLER):
             raise ValueError(f"{i + 1}. sahne tipi geçersiz: {tip}" + (" (bu modda yalnızca " + ", ".join(RESIMLI_TIPLER if resimli else SERBEST_TIPLER) + " kullanılır)" if (serbest or resimli) else ""))
-        if tip == onceki and not (resimli and tip == "resim"):
+        if tip == onceki and not ((resimli and tip == "resim") or (bagli and tip == "vitrin")):
             raise ValueError(f"{i + 1}. sahne bir öncekiyle aynı tip ({tip}); çeşitlilik gerekli")
         sayac[tip] = sayac.get(tip, 0) + 1
-        if sayac[tip] > (10 if (resimli and tip == "resim") else (6 if serbest else 3) if tip == "ozel" else 2):
+        if sayac[tip] > (10 if (resimli and tip == "resim") else 4 if (bagli and tip == "vitrin") else (6 if serbest else 3) if tip == "ozel" else 2):
             raise ValueError(f"'{tip}' tipi çok fazla kullanılmış")
         onceki = tip
         kel, bayrak = isaretle(" ".join(str(x.get("anlati") or "").split()))
@@ -264,7 +268,7 @@ def dogrula(s, temizle=lambda x: x, gecmis=(), serbest=False, resimli=False, bag
         nokta = _kisa(x.get("nokta"), 70) or " ".join(kel[:7])
         temiz.append({"tip": tip, "anlati": " ".join(kel), "isaret": bayrak, "nokta": nokta, "params": (serbest_ozel_params(x.get("params")) if ((serbest or bagli) and tip == "ozel") else params_temizle(tip, x.get("params"))), "etiketler": et,
                       "bolum": _kisa(temizle(str(x.get("bolum") or "")), 28) if i > 0 and tip != "kanca" else "", "baslik": _kisa(temizle(str(x.get("baslik") or "")), 10) if tip != "kanca" else ""})
-    if temiz[0]["tip"] != ("resim" if resimli else "kanca"):
+    if temiz[0]["tip"] != ("resim" if resimli else "kanca") and not (bagli and temiz[0]["tip"] == "vitrin"):
         raise ValueError("ilk sahne '" + ("resim" if resimli else "kanca") + "' olmalı")
     if temiz[-1]["tip"] != "kapanis":
         raise ValueError("son sahne 'kapanis' olmalı")
@@ -441,8 +445,8 @@ Konu: {konu}
 SENARYO SAHNELERİ (sırayla; her biri: seslendirme | ekranda yazı | görsel tarifi):
 {betik}
 
-""" + _TIP_BLOK + """- ozel: konuya özel çizilecek detaylı sahne (YALNIZCA hazır tipler sahneyi anlatmaya yetmiyorsa; en çok 2 tane; tahtadaki nesneyi/olayı gösteren sahne). params: {{"yedek": "kontrol_listesi", "tema": "mavi|mor|yesil|turuncu|gri", "tasarim_notu": "sahnede NE görünecek: mekân/nesneler, hareket sırası, etiketler (3-5 cümle)"}}
+""" + _TIP_BLOK + """{vitrin}- ozel: konuya özel çizilecek detaylı sahne (YALNIZCA hazır tipler sahneyi anlatmaya yetmiyorsa; en çok 2 tane; tahtadaki nesneyi/olayı gösteren sahne). params: {{"yedek": "kontrol_listesi", "tema": "mavi|mor|yesil|turuncu|gri", "tasarim_notu": "sahnede NE görünecek: mekân/nesneler, hareket sırası, etiketler (3-5 cümle)"}}
 
-KURALLAR: Tam olarak {n} sahne döndür, senaryo sırasıyla (1. sahne "kanca", son sahne "kapanis"). Aynı tip arka arkaya gelmesin, bir tip en çok 2 kez, en az 3 farklı tip. Sahnenin seslendirmesine ve görsel tarifine UYAN tipi seç; uymayan şablonu zorla koyma (ör. konuşulan şey nem değilse "nem" seçme; ürün/parça tanıtımı ise "ozel" ya da "sayi"/"karsilastir"/"kontrol_listesi" kullan). Sayısal params'ı (derece, sayı) seslendirmede geçen değerlerle uyumlu yaz; emin değilsen tipik değer kullan.
+KURALLAR: Tam olarak {n} sahne döndür, senaryo sırasıyla (1. sahne "kanca"{ilk_vitrin}, son sahne "kapanis"). Aynı tip arka arkaya gelmesin, bir tip en çok 2 kez, en az 3 farklı tip. Sahnenin seslendirmesine ve görsel tarifine UYAN tipi seç; uymayan şablonu zorla koyma (ör. konuşulan şey nem değilse "nem" seçme; ürün/parça tanıtımı ise "ozel" ya da "sayi"/"karsilastir"/"kontrol_listesi" kullan). Sayısal params'ı (derece, sayı) seslendirmede geçen değerlerle uyumlu yaz; emin değilsen tipik değer kullan.
 Her sahne için: "nokta" (o sahnede anlatılan TEK bilgi, 3-8 kelime), "vurgu" (seslendirmeden en çok 2 KELİMEYİ AYNEN seç; ekranda renkle vurgulanır; yoksa boş liste), isteğe bağlı "bolum" (yeni bölüm başlığı, en çok 28 harf; ilk sahnede olmasın), "baslik" (zıplayan TEK kısa kelime, en çok 10 harf, tüm videoda en çok 2 sahnede), "etiketler" (sahnedeki parçalara en çok 2 kısa etiket).
 YALNIZCA JSON: {{"sahneler":[{{"tip":"kanca","nokta":"...","vurgu":[],"bolum":"","baslik":"","etiketler":[],"params":{{}}}}]}}"""

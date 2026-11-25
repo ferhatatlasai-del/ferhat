@@ -142,6 +142,7 @@
     A.gorseller = await Promise.all((p.sahneler || []).map(async function (s) {   // 'resim' sahneleri için yapay zekâ görselleri
       if (!(s.params && s.params.gorsel)) return null; const im = new Image(); im.src = s.params.gorsel; try { await im.decode(); return im; } catch (e) { console.error('görsel yüklenemedi: ' + s.params.gorsel); return null; }
     }));
+    if (A.vitrinHazirla) await A.vitrinHazirla(p, olcek);   // 'vitrin' sahneleri: STL modelleri ve 3D sahneler
     ciz(0);
   };
   window.kare = function (t, q) { ciz(t); return cv.toDataURL('image/jpeg', q || 0.9).split(',')[1]; };
