@@ -4204,7 +4204,7 @@ async function netGo(create) {
 }
 /* ---------- rooms with a short code (PeerJS): the host's browser is the room, friends type its 6-character code ---------- */
 const newRoomCode = () => Array.from({ length: 6 }, () => CODE_CH[Math.floor(Math.random() * CODE_CH.length)]).join('');
-const peerOpen = (peer, ms) => new Promise((ok, no) => { const t = setTimeout(() => no(new Error('Tanıştırma sunucusuna ulaşılamadı. Başka bir ağ ya da "Kodla bağlan" bölümünü dene.')), ms); peer.on('open', () => { clearTimeout(t); ok(); }); peer.on('error', e => { clearTimeout(t); no(e); }); });
+const peerOpen = (peer, ms) => new Promise((ok, no) => { const t = setTimeout(() => no(new Error('Tanıştırma sunucusuna ulaşılamadı. Başka bir ağ ya da "Kodla bağlan" bölümünü dene.')), ms); peer.on('open', () => { clearTimeout(t); ok(); }); peer.on('error', e => { clearTimeout(t); no(e && /^(network|server-error|socket-error|socket-closed)$/.test(e.type) ? new Error('Tanıştırma sunucusuna ulaşılamadı. Başka bir ağ ya da "Kodla bağlan" bölümünü dene.') : e); }); });
 function bindPeer(conn) {
   const c = { connected: true, pfName: 'peer', publish: (t, p) => { if (conn.open) { try { conn.send([t, String(p)]); } catch (e) {} } }, on() {}, end() { try { conn.close(); } catch (e) {} } };
   net.mqs.push(c);
@@ -4217,7 +4217,7 @@ async function goPeer(create, codeIn) {
   if (!create) {
     const code = String(codeIn || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
     if (code.length !== 6) throw new Error('Oda kodu 6 harf ya da rakamdır. Arkadaşının verdiği kodu yaz.');
-    const peer = new window.Peer(opts); net.peer = peer;
+    const peer = new window.Peer('pofuduk-g' + Math.random().toString(36).slice(2, 10), opts); net.peer = peer; // our own id: no extra request to the server
     await peerOpen(peer, 12000);
     const conn = peer.connect('pofuduk-' + code, { serialization: 'json', reliable: true });
     await new Promise((ok, no) => {
@@ -4234,7 +4234,7 @@ async function goPeer(create, codeIn) {
     try { await peerOpen(peer, 12000); break; } catch (e) { try { peer.destroy(); } catch (x) {} peer = null; if (!(e && e.type === 'unavailable-id')) throw e; }
   }
   if (!peer) throw new Error('Oda kodu alınamadı, tekrar dene.');
-  await goRelay(code, 'x', true); net.peer = peer; net.roomCode = code;
+  net.roomCode = code; await goRelay(code, 'x', true); net.peer = peer; renderNet();
   peer.on('connection', conn => { conn.on('open', () => bindPeer(conn)); });
   peer.on('error', () => {});
   netMsg('Oda kuruldu! Kod: ' + code + ' — arkadaşların "Odaya katıl"a bu kodu yazsın. Sen oyunda kaldıkça oda açık kalır.', true);
