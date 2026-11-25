@@ -12,6 +12,9 @@ on:
       zincir:
         description: "İçerik ajanının Reels senaryosunun kimliği (c20261119-065113 gibi): seslendirme aynen kullanılır, 3D baskı animasyonları seçilir"
         default: ""
+      model:
+        description: "--zincir ile: ürün 3D modeli (modeller/ornek_kup.stl gibi); verilirse senaryoda dönen 3D ürün (vitrin) sahneleri kullanılabilir"
+        default: ""
       hemen:
         description: "EVET yazarsan taslak limiti dolu olsa bile bir kez üretir"
         default: "HAYIR"
@@ -60,10 +63,14 @@ jobs:
           BICIM: ${{ inputs.bicim }}
           KONU_TURU: ${{ inputs.konu_turu }}
           ZINCIR: ${{ inputs.zincir }}
+          MODEL: ${{ inputs.model }}
         run: |
           ARG=""
           if [ "$HEMEN" = "EVET" ]; then ARG="$ARG --hemen"; fi
           if [ "$BICIM" = "anlat" ] || [ "$BICIM" = "liste" ] || [ "$BICIM" = "3d" ]; then ARG="$ARG --bicim $BICIM"; fi
           if [ "$KONU_TURU" = "3d" ] || [ "$KONU_TURU" = "serbest" ] || [ "$KONU_TURU" = "resimli" ]; then ARG="$ARG --konu-turu $KONU_TURU"; fi
-          if echo "$ZINCIR" | grep -Eq '^c[0-9]{8}-[0-9]{6}$'; then python3 ajan/viral_video.py --git $ARG --zincir "$ZINCIR"; exit $?; fi
+          if echo "$ZINCIR" | grep -Eq '^c[0-9]{8}-[0-9]{6}$'; then
+            if echo "$MODEL" | grep -Eq '^modeller/[A-Za-z0-9_.-]+\.stl$'; then ARG="$ARG --model $MODEL"; fi
+            python3 ajan/viral_video.py --git $ARG --zincir "$ZINCIR"; exit $?
+          fi
           if [ -n "$KONU" ]; then python3 ajan/viral_video.py --git $ARG --konu "$KONU"; else python3 ajan/viral_video.py --git $ARG; fi

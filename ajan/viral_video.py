@@ -350,6 +350,7 @@ def liste_senaryo_sec(a):
     return None, "kullanılmamış liste konusu kalmadı (video/liste_konulari.json'a yeni konu ekle)"
 
 
+VITRIN_DOC = """- vitrin: ürünün (3D baskı modelinin) GERÇEK 3D vitrini: model yumuşak ışık ve gölgeyle döner. Ürünü tanıtan, parçasını/şeklini/çalışmasını anlatan sahnelerde kullan (2-4 sahne, art arda olabilir; her birinde FARKLI kamera). params: {{"kamera": "don" (yavaş tur) | "yaklas" (uzaktan yaklaşır) | "detay" (yakın çekim, yukarı süzülür) | "ust" (yukarıdan bakış)}}\n"""
 MAKS_SURE = 59.5   # videolar en çok bu kadar sürer (Instagram hikâye/Reels, Shorts: 60 sn)
 HIZ = {"f": 1.0}
 RESIM_SAYISI = {"adet": 0, "kalite": ""}
@@ -404,7 +405,7 @@ def anlat_senaryo_uret(konu, ipucu):
     return None
 
 
-def zincir_senaryosu(kimlik):
+def zincir_senaryosu(kimlik, model=None):
     """İçerik ajanının senaryosunu (zincir/<kimlik>_taslak.json) AYNEN anlatı yaparak anlat biçimine çevirir: yapay zekâ yalnızca sahne tiplerini/parametrelerini seçer. Dönen: doğrulanmış senaryo ya da None (SON_HATA dolu)."""
     global SON_HATA
     SON_HATA = ""
@@ -424,7 +425,8 @@ def zincir_senaryosu(kimlik):
     satirlar = "\n".join(f"{i + 1}) {betik[i]} | {str(s.get('ekran_yazisi') or '')[:80]} | {str(s.get('gorsel') or '')[:140]}" for i, s in enumerate(sah))
     govde = {"model": MODEL, "response_format": {"type": "json_object"}, "temperature": 0.4,
              "messages": [{"role": "system", "content": "Sen 3D baskı eğitim videolarında hazır bir senaryoya uygun animasyon sahneleri seçen bir yönetmensin. Anlatıyı değiştirmezsin. Yalnızca geçerli JSON döndür."},
-                          {"role": "user", "content": AN.ISTEM_BAGLI.format(konu=str(d.get("konu") or "")[:120], betik=satirlar, n=len(betik))}]}
+                          {"role": "user", "content": AN.ISTEM_BAGLI.format(konu=str(d.get("konu") or "")[:120], betik=satirlar, n=len(betik),
+                                                                              vitrin=(VITRIN_DOC if model else ""), ilk_vitrin=(" ya da ürün tanıtımıysa \"vitrin\"" if model else ""))}]}
     etiketler = [re.sub(r"[^a-z0-9ığüşöç]", "", str(h).lower().lstrip("#")) for h in (d.get("hashtagler") or [])][:8]
     baslik = U.yazi_temizle(str(d.get("youtube_baslik") or d.get("konu") or ""))[:90]
     aciklama = "\n".join(" ".join(w for w in l.split() if not w.startswith("#")) for l in str(d.get("instagram_caption") or d.get("youtube_aciklama") or "").splitlines()).strip()
@@ -443,7 +445,13 @@ def zincir_senaryosu(kimlik):
                     if v and v in metin.split() and f"*{v}*" not in metin:
                         metin = re.sub(r"(?<!\S)" + re.escape(v) + r"(?!\S)", f"*{v}*", metin, count=1)
                 sahneler.append({**{k: x.get(k) for k in ("tip", "nokta", "bolum", "baslik", "etiketler", "params")}, "anlati": metin})
-            return AN.dogrula({"konu": str(d.get("konu") or "")[:140], "baslik": baslik, "aciklama": aciklama or baslik, "etiketler": etiketler, "sahneler": sahneler}, U.yazi_temizle, (), bagli=True)
+            if not model and any(x["tip"] == "vitrin" for x in sahneler):
+                raise ValueError("model verilmedi: 'vitrin' sahnesi kullanılamaz")
+            sonuc = AN.dogrula({"konu": str(d.get("konu") or "")[:140], "baslik": baslik, "aciklama": aciklama or baslik, "etiketler": etiketler, "sahneler": sahneler}, U.yazi_temizle, (), bagli=True)
+            for sh in sonuc["sahneler"]:
+                if sh["tip"] == "vitrin":
+                    sh["params"]["model"] = pathlib.Path(model).stem[:60]
+            return sonuc
         except Exception as e:
             SON_HATA = f"senaryo animasyona çevrilemedi: {type(e).__name__}: {str(e)[:110]}"
             print(f"UYARI: senaryodan animasyon sahneleri seçilemedi ({deneme + 1}/3): {type(e).__name__}: {str(e)[:160]}")
@@ -456,7 +464,7 @@ def anlat_senaryo_sec(a):
     kullanilan = set(json_oku(KULLANILAN, []))
     if a.zincir:
         SECIM.update(tur="zincir", zincir=a.zincir)
-        s = zincir_senaryosu(a.zincir)
+        s = zincir_senaryosu(a.zincir, a.model)
         return (s, "zincir-" + a.zincir) if s else (None, SON_HATA or "senaryo animasyona çevrilemedi")
     if a.senaryo:
         SECIM.update(tur="elle")
@@ -1356,6 +1364,12 @@ def calis(a):
     elif senaryo.get("bicim") == "anlat":
         plan, parcalar = anlat_cizelge_kur(senaryo, sesler)
         plan.update(sayfa="anlat.html", bicim="anlat", tohum=int(hashlib.md5(senaryo["konu"].encode()).hexdigest()[:6], 16))
+        if a.model:   # ürün vitrini: STL modeli sayfaya dosya yoluyla verilir
+            mp = (KOK / a.model).resolve()
+            if not str(mp).startswith(str(KOK / "modeller")) or not mp.exists():
+                return hata("model bulunamadı (modeller/ klasöründe .stl olmalı): " + a.model)
+            plan["modeller"] = {mp.stem[:60]: "file://" + str(mp)}
+            plan["ton"], plan["tema_kaydir"] = 0, 0   # ürünün gerçek rengi renk tonu kaymasıyla bozulmasın
         if SERBEST:   # gerçekçi renkler (tavuk, çim, gökyüzü) renk tonu kaymasıyla bozulmasın
             plan["ton"], plan["tema_kaydir"] = 0, 0
     else:
@@ -1445,6 +1459,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--konu", help="belirli bir konu (hazır senaryo yoksa yapay zekâ yazar)")
     ap.add_argument("--senaryo", help="senaryo JSON dosyası")
+    ap.add_argument("--model", help="--zincir ile: ürün 3D modeli (modeller/<ad>.stl); verilirse senaryoda 'vitrin' (dönen 3D ürün) sahneleri kullanılabilir")
     ap.add_argument("--zincir", help="içerik ajanının Reels senaryosunun kimliği (zincir/<kimlik>_taslak.json): seslendirme AYNEN kullanılır, 3D baskı animasyonları seçilir (ucuz: yalnızca metin)")
     ap.add_argument("--konu-turu", dest="konu_turu", choices=["otomatik", "3d", "serbest", "resimli"], help="elle yazılan konunun türü: otomatik (3D baskı sözcükleri varsa 3d, yoksa serbest), 3d, serbest (3D baskı dışı animasyon) ya da resimli (yapay zekâ resimleri + sinematik hareket, her konu)")
     ap.add_argument("--hemen", action="store_true", help="kapalı ya da taslak limiti dolu olsa bile bir kez üret")
