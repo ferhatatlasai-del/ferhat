@@ -337,6 +337,29 @@
         "Son 5 otomatik hat sonucunun tamamı reddedilmiş görünüyor; yayın kalitesi düşmüş olabilir."
       ],
       "eylem_sayisi": 0
+    },
+    {
+      "zaman": "2026-11-25 08:30",
+      "kademe": 2,
+      "model": "OpenAI (gpt-5.4)",
+      "rapor": [
+        "Acil: otomatik hat açık ama son 5 turun 4’ü art arda reddedilmiş; bugün henüz tur görünmüyor, kalite veya üretim akışında sorun olabilir.",
+        "Sağlık tarafında genel durum iyi görünüyor; Instagram, YouTube, OpenAI ve ofis sunucusu çalışıyor.",
+        "Son 24 saatte Nöbetçi bir kez başarısız olmuş; sebebi burada görünmüyor, bu yüzden tekrar kontrol ettirdim.",
+        "Hikâye düzeni şu an hedefinle uyumlu: günlük 6 ve kuyrukta 6 planlı hikâye var; değişiklik yapmadım.",
+        "Onay bekleyen yeni taslaklardan yalnızca 'Çoklu 3D üretim' olanı dikkat çekiyor; son video noktalarıyla aynı konuya çok yakın olduğu için inceleme notu düştüm.",
+        "Yorum modu otomatik görünüyor; bu sınırın dışında olduğu için değiştirmedim, sadece dikkatine bırakıyorum."
+      ],
+      "oneriler": [
+        "Otomatik hat art arda ret verdiği için panelde üretim promptu veya kaynak akışını gözden geçirmen iyi olur; ben modu değiştiremiyorum.",
+        "Bambu Lab A1 odaklı içeriklerde marka bağlantısı izlenimi olmaması için açıklamada bağımsızlık notunu standartlaştırmanı öneririm.",
+        "Bugünkü 10:05 turundan sonra yine ret gelirse otomatik hattı panelden deneme moduna almayı değerlendir; önce kaliteyi toparlamak daha güvenli olabilir."
+      ],
+      "uyarilar": [
+        "Yorum modu 'otomatik' görünüyor; sahibinin sınırlarına göre bunu ben değiştiremem.",
+        "Otomatik hat bugün 10:05/15:05/20:05 üretim yapacak şekilde çalışır; art arda ret sürerse yayın akışı aksayabilir."
+      ],
+      "eylem_sayisi": 2
     }
   ],
   "defter": [
@@ -486,6 +509,30 @@
       "neden": "En çok izlenenlerde stringing/nem teması var; benzer kalıpta ama yeni ve temel bir konu.",
       "durum": "yapildi",
       "ayrinti": "PETG neden ipliklenir, nasıl azaltılır?"
+    },
+    {
+      "zaman": "2026-11-25 08:30",
+      "kademe": 2,
+      "eylem": "workflow_tetikle",
+      "params": {
+        "akis": "nobetci.yml"
+      },
+      "neden": "Son 24 saatte Nöbetçi başarısız göründüğü için servis/bağlantı sağlığını yeniden kontrol etmek gerekli.",
+      "durum": "yapildi",
+      "ayrinti": "nobetci.yml tetiklendi"
+    },
+    {
+      "zaman": "2026-11-25 08:30",
+      "kademe": 2,
+      "eylem": "taslak_isaretle",
+      "params": {
+        "id": "s20261124-213842",
+        "oneri": "incele",
+        "not": "Son video noktalarındaki 'Çoklu 3D üretim' ile çok benzer; tekrar riski var."
+      },
+      "neden": "Çeşitlilik ve tekrar etmeme önceliği.",
+      "durum": "yapildi",
+      "ayrinti": "s20261124-213842: incele önerisi"
     }
   ]
 }
