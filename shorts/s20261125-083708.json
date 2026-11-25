@@ -1,0 +1,61 @@
+{
+  "id": "s20261125-083708",
+  "olusturma": "2026-11-25T08:37:08Z",
+  "durum": "onay_bekliyor",
+  "tur": "viral",
+  "video": "videolar/yukleme_20261125083708.mp4",
+  "sure": 52.5,
+  "baslik": "Nozzle tıkanmadan temizle: 3 kısa işaret",
+  "aciklama": "Nozzle tıkanması çoğu zaman küçük birikimden başlar.\nDoğru işaretleri erken görürsen baskı kurtulur.\nYorum yaz: sen en çok hangi belirtide fark ediyorsun?\n\nSeslendirme yapay zekâ (Google) ile üretilmiştir. Animasyon ve ses tasarımı yapay zekâ ile kodla üretilmiştir.\n\n#3dprinting #3dbaski #nozzle #bakim #3dyazici #reels #shorts",
+  "muzik": "Sentez (kodla üretildi)",
+  "konu": "3D yazıcı nozzle temizliği",
+  "tasarimlar": [],
+  "hikayeler": [],
+  "secim": {
+    "tur": "elle"
+  },
+  "zamanlama": [
+    {
+      "tip": "kanca",
+      "t0": 0.0,
+      "t1": 7.48,
+      "ses_son": 6.98
+    },
+    {
+      "tip": "ozel",
+      "t0": 7.48,
+      "t1": 16.28,
+      "ses_son": 15.78
+    },
+    {
+      "tip": "sicak_uc",
+      "t0": 16.28,
+      "t1": 23.89,
+      "ses_son": 23.39
+    },
+    {
+      "tip": "tikanma",
+      "t0": 23.89,
+      "t1": 31.12,
+      "ses_son": 30.62
+    },
+    {
+      "tip": "sayi",
+      "t0": 31.12,
+      "t1": 38.83,
+      "ses_son": 38.33
+    },
+    {
+      "tip": "kontrol_listesi",
+      "t0": 38.83,
+      "t1": 44.96,
+      "ses_son": 44.46
+    },
+    {
+      "tip": "kapanis",
+      "t0": 44.96,
+      "t1": 52.48,
+      "ses_son": 50.08
+    }
+  ]
+}

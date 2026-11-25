@@ -117,7 +117,20 @@
         "başta yerleşim kontrol edilir",
         "yorum ve takip çağrısı"
       ]
+    },
+    {
+      "id": "s20261125-083708",
+      "konu": "3D yazıcı nozzle temizliği",
+      "noktalar": [
+        "akıș kesilmesi tıkanma işareti",
+        "birikim akışı önce yavaşlatır",
+        "yanık tortu ucu kaplayabilir",
+        "zorlamak ucu daha çok yorar",
+        "siyah parçalar kir belirtisi",
+        "kısa kontrol baskıyı kurtarır",
+        "yorum yaz takip et"
+      ]
     }
   ],
-  "son_ton": 150
+  "son_ton": 0
 }
