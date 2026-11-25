@@ -1,7 +1,7 @@
 {
   "id": "h20261124-053833-b0i",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-24T05:38:33.000Z",
   "gorsel": "hikaye/gorseller/h20261124-053833-b0i.mp4",
   "baslik": "Trek Bike GoPro Mount Base",
@@ -21,7 +21,9 @@
     "sorunlar": []
   },
   "yayin": {
-    "tarih": "2026-11-25T14:25:41Z"
+    "tarih": "2026-11-25T14:26:58Z",
+    "medya_kimligi": "18137069581741034",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4038248701959887505"
   },
   "hata": "",
   "deneme": 0,
