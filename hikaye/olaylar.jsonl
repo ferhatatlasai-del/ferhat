@@ -193,3 +193,9 @@
 {"t": "2026-11-25T05:22:44Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
 {"t": "2026-11-25T05:23:00Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
 {"t": "2026-11-25T05:23:10Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-25T10:21:07Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 8.0, "site": "printables.com"}
+{"t": "2026-11-25T10:21:14Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 8.0}
+{"t": "2026-11-25T10:21:25Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 9.0, "site": "printables.com", "sorunlar": ["Arka planda monitör üzerinde okunabilir olmayan yazı/logo benzeri baskı var.", "Referansla genel şekil, kapak ve sap detayı uyumlu."]}
+{"t": "2026-11-25T10:21:34Z", "tur": "denetim", "gecti": false, "deneme": 2, "puan": 9.0, "site": "printables.com", "sorunlar": ["Referans görselindeki baskı tablası ve 3D yazıcı ekranı görünmüyor; ancak ana nesne uyumlu", "Üzerindeki yazı/marka izleri baskı tablası üzerinde görünüyor."]}
+{"t": "2026-11-25T10:21:45Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-25T10:21:53Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
