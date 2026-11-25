@@ -1,17 +1,17 @@
 {
- "tarih": "2026-11-25T12:00:38Z",
- "tr_saat": "25.11.2026 15:00",
+ "tarih": "2026-11-25T15:00:44Z",
+ "tr_saat": "25.11.2026 18:00",
  "toplam": {
-  "reels": 19998,
+  "reels": 20023,
   "gonderi": 0,
-  "short": 11653,
+  "short": 11669,
   "youtube_video": 0,
-  "hikaye": 1207,
-  "toplam": 32858,
+  "hikaye": 1238,
+  "toplam": 32930,
   "begeni": 320,
   "yorum": 31
  },
- "fark": 225,
+ "fark": 72,
  "instagram": {
   "durum": "tamam",
   "izin": true,
@@ -26,8 +26,8 @@
     "begeni": 1,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgKJINptUAu/",
-    "izlenme": 138,
-    "erisim": 135
+    "izlenme": 157,
+    "erisim": 150
    },
    {
     "id": "18150949246585180",
@@ -59,8 +59,8 @@
     "begeni": 5,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/DgDWYKBE8DF/",
-    "izlenme": 1431,
-    "erisim": 1271
+    "izlenme": 1433,
+    "erisim": 1273
    },
    {
     "id": "18362708170216349",
@@ -70,8 +70,8 @@
     "begeni": 10,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/DgCmX1zj1CJ/",
-    "izlenme": 1287,
-    "erisim": 1159
+    "izlenme": 1288,
+    "erisim": 1161
    },
    {
     "id": "17945283843388099",
@@ -114,7 +114,7 @@
     "begeni": 6,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/Df_9WXhAUi5/",
-    "izlenme": 1583,
+    "izlenme": 1584,
     "erisim": 1462
    },
    {
@@ -136,8 +136,8 @@
     "begeni": 31,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": 4212,
-    "erisim": 3732
+    "izlenme": 4214,
+    "erisim": 3739
    },
    {
     "id": "18289759651292671",
@@ -363,11 +363,28 @@
  "hikaye_izin": true,
  "hikayeler": [
   {
+   "id": "18137069581741034",
+   "tarih": "2026-11-25T14:26:58Z",
+   "baslik": "Trek Bike GoPro Mount Base",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
+   "id": "17895554790685215",
+   "tarih": "2026-11-25T12:06:52Z",
+   "baslik": "Quad Lock compatible Mounting Bracket Base for Bicycle Bike",
+   "izlenme": 7,
+   "erisim": 7,
+   "okundu": true,
+   "yanit": 0
+  },
+  {
    "id": "18343824202272064",
    "tarih": "2026-11-25T08:51:47Z",
    "baslik": "Video hikayesi",
-   "izlenme": 9,
-   "erisim": 9,
+   "izlenme": 15,
+   "erisim": 15,
    "okundu": true,
    "yanit": 0
   },
@@ -375,8 +392,8 @@
    "id": "18455197594122303",
    "tarih": "2026-11-25T07:27:39Z",
    "baslik": "Suction Cup Shower Soap / Phone Holder Tray",
-   "izlenme": 11,
-   "erisim": 9,
+   "izlenme": 17,
+   "erisim": 15,
    "okundu": true,
    "yanit": 0
   },
@@ -384,8 +401,8 @@
    "id": "17973842393962383",
    "tarih": "2026-11-25T05:06:46Z",
    "baslik": "Suction Cup Soap Tray",
-   "izlenme": 15,
-   "erisim": 13,
+   "izlenme": 21,
+   "erisim": 19,
    "okundu": true,
    "yanit": 0
   },
@@ -393,8 +410,8 @@
    "id": "18091176149300791",
    "tarih": "2026-11-24T16:46:44Z",
    "baslik": "9 Sided Drip Tray for 9 Sided Twisted Planter",
-   "izlenme": 23,
-   "erisim": 20,
+   "izlenme": 29,
+   "erisim": 26,
    "okundu": true,
    "yanit": 0
   },
@@ -703,24 +720,6 @@
    "erisim": 31,
    "okundu": true,
    "yanit": 0
-  },
-  {
-   "id": "18130975696857932",
-   "tarih": "2026-11-21T12:06:27Z",
-   "baslik": "drill press depth stop",
-   "izlenme": 40,
-   "erisim": 34,
-   "okundu": true,
-   "yanit": 0
-  },
-  {
-   "id": "17880984465567168",
-   "tarih": "2026-11-21T11:36:39Z",
-   "baslik": "Drill Bit Depth Stop w/ Spacers",
-   "izlenme": 40,
-   "erisim": 33,
-   "okundu": true,
-   "yanit": 0
   }
  ],
  "youtube": {
@@ -732,7 +731,7 @@
     "tur": "Short",
     "tarih": "2026-11-25T08:52:19",
     "baslik": "Nozzle tıkanmadan temizle: 3 kısa işaret",
-    "izlenme": 34,
+    "izlenme": 35,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=YBNIDKMia3Y"
@@ -752,7 +751,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T23:17:16",
     "baslik": "Bambu Lab A1 Combo AMS lite filament değişim sorunları",
-    "izlenme": 174,
+    "izlenme": 188,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=Vt_lyaaFBOo"
@@ -812,7 +811,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T14:12:38",
     "baslik": "3D baskıda stringing nasıl azalır?",
-    "izlenme": 1210,
+    "izlenme": 1211,
     "begeni": 11,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=ZzZkzgV1eL4"
@@ -922,7 +921,7 @@
  },
  "eksikler": [],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 15:00",
-  "govde": "Toplam 32.858 (+225) · Reels 19.998 · Short 11.653 · Hikaye 1.207 (3 bugün) · Takipçi 433 · En iyi Reels: Baskın tabladan kalkı 4.212"
+  "baslik": "📊 İzlenme raporu 18:00",
+  "govde": "Toplam 32.930 (+72) · Reels 20.023 · Short 11.669 · Hikaye 1.238 (5 bugün) · Takipçi 433 · En iyi Reels: Baskın tabladan kalkı 4.214"
  }
 }
