@@ -4148,10 +4148,11 @@ function myStateBase() {
 // remote players: keep only well-formed values
 function takePlayer(id, st) {
   if (!st || typeof st !== 'object') return;
-  const old = net.players.get(id) || { id };
+  const old = net.players.get(id) || { id }, px0 = old.x, pz0 = old.z, pt0 = old.tt;
   const p = Object.assign(old, { n: clip(st.n, 14) || 'Ayı', c: clip(st.c, 6).toUpperCase(), lv: clip(st.lv, 8), x: num(st.x), y: num(st.y), z: num(st.z), yw: num(st.yw, 100),
     sp: num(st.sp, 40), air: !!st.air, fl: num(st.fl, 60), at: !!st.at, g: st.g === 'girl' ? 'girl' : 'boy', s: clip(st.s, 12), o: clip(st.o, 12), av: clip(st.av, 4), ag: Math.max(0, Math.min(99, Math.round(num(st.ag, 99)))), a: Math.max(0, Math.min(AXES.length - 1, Math.round(num(st.a, 9)))), seen: Date.now() });
   p.h = st.h ? 1 : 0;
+  { const now = Date.now(); if (pt0 && px0 !== undefined) { const dt = (now - pt0) / 1000; if (dt > 0.01 && dt < 0.6) { p.vx = Math.max(-30, Math.min(30, (p.x - px0) / dt)); p.vz = Math.max(-30, Math.min(30, (p.z - pz0) / dt)); } } p.tt = now; }
   if (p.h && Number.isFinite(+st.ck) && +st.ck >= 0 && +st.ck < CYC + 1) net.hostClock = { ck: +st.ck, t: Date.now(), id }; // the founder's time of day
   p.sc = heightScale(p.ag);
   if (Array.isArray(st.hm) && st.hm.length === 3) { // this player's house
@@ -4184,7 +4185,7 @@ async function getLobby() {
   }
   return net.lobby;
 }
-function startTicker(send) { clearInterval(net.timer); net.timer = setInterval(() => { try { send(); } catch (e) {} for (const [id, p] of net.players) if (Date.now() - p.seen > 10000) dropPlayer(id); if (!pNet.hidden && net.on) { $('nRoomTitle').textContent = 'Oda: ' + net.room + ' · ' + (net.players.size + 1) + ' oyuncu'; renderPlayers(); } }, 100); }
+function startTicker(send) { clearInterval(net.timer); net.timer = setInterval(() => { try { send(); } catch (e) {} for (const [id, p] of net.players) if (Date.now() - p.seen > 10000) dropPlayer(id); if (!pNet.hidden && net.on && (net.tk = (net.tk || 0) + 1) % 3 === 0) { $('nRoomTitle').textContent = 'Oda: ' + net.room + ' · ' + (net.players.size + 1) + ' oyuncu'; renderPlayers(); } }, 40); }
 async function netGo(create) {
   if (net.on) return;
   lastFullState = 0;
@@ -4274,7 +4275,7 @@ async function goRelay(roomTxt, pass, create) { // a room without any outside se
   let last = 0;
   const send = () => {
     const live = net.mqs.filter(c => c.connected); if (!live.length) return;
-    const t = Date.now(); if (t - last < 180) return; last = t;
+    const t = Date.now(); if (t - last < 50) return; last = t; // about 20 updates a second
     const body = JSON.stringify(Object.assign(myState(), { h: net.host ? 1 : 0 }));
     for (const c of live) c.publish(myTopic, body);
   };
@@ -4418,7 +4419,8 @@ function drawRemote(dtMs) {
     if (!p.mesh) continue;
     p.mesh.visible = show; if (!show) continue;
     if (Math.hypot(p.x - p.rx, p.z - p.rz) > 8) { p.rx = p.x; p.ry = p.y; p.rz = p.z; }
-    p.rx += (p.x - p.rx) * k; p.ry += (p.y - p.ry) * k; p.rz += (p.z - p.rz) * k; p.ryw += angDiff(p.yw, p.ryw) * k;
+    const ag = Math.min(0.12, (Date.now() - (p.tt || 0)) / 1000), tx = p.x + (p.vx || 0) * ag, tz = p.z + (p.vz || 0) * ag; // aim slightly ahead of the last update
+    p.rx += (tx - p.rx) * k; p.ry += (p.y - p.ry) * k; p.rz += (tz - p.rz) * k; p.ryw += angDiff(p.yw, p.ryw) * k;
     p.ph += (dtMs || 16.7) / 1000 * Math.min(12, p.sp * 2.2);
     const pp = p.mesh.userData.parts; p.mesh.position.set(p.rx, p.ry, p.rz); p.mesh.scale.setScalar(p.sc || 1);
     pp.flip.rotation.set(p.fl > 0 ? (1 - p.fl / 30) * Math.PI * 2 : 0, p.ryw, 0, 'YXZ');
