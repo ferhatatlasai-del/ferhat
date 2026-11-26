@@ -1,5 +1,5 @@
 {
-  "tarih": "2026-11-26T09:11:04Z",
+  "tarih": "2026-11-26T13:10:21Z",
   "kontroller": [
     {
       "ad": "Instagram",
@@ -23,8 +23,8 @@
     },
     {
       "ad": "Hikaye kuyruğu",
-      "durum": "iyi",
-      "not": "Kuyrukta 6 planlı hikaye var"
+      "durum": "sorun",
+      "not": "Hikaye kuyruğu azaldı (4 planlı hikaye kaldı, günlük 6). Yeni fotoğraf ekle."
     },
     {
       "ad": "Hikaye ajanı",
