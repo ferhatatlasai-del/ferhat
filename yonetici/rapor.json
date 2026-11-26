@@ -452,6 +452,30 @@
         "Son 24 saatte Nöbetçi ve Trend ajanında başarısız iş akışı kaydı var; şu an sağlık iyi görünse de tekrar ederse manuel inceleme gerekebilir."
       ],
       "eylem_sayisi": 0
+    },
+    {
+      "zaman": "2026-11-26 08:31",
+      "kademe": 2,
+      "model": "OpenAI (gpt-5.4)",
+      "rapor": [
+        "Acil: otomatik hat açık ama son 5 turda art arda ret var; bugün henüz tur görünmüyor, modu ben değiştiremiyorum.",
+        "Sağlık tarafında ana servisler iyi görünüyor; Instagram, YouTube, OpenAI ve ofis sunucusunda şu an açık bir arıza işareti yok.",
+        "Hikâye akışı aktif; günlük sayı 6 ve kuyrukta 6 planlı hikâye var. Bu hedefinle uyumlu, değişiklik yapmadım.",
+        "Onay bekleyen iki taslak zaten daha önce 'incele' notu almış; aynı taslağa tekrar not düşmedim.",
+        "Video çeşitliliğinde risk var: iki bekleyen taslak aynı başlık ve aynı konuya dayanıyor; tekrar hissi sürüyor.",
+        "Son 24 saatte Nöbetçi için 1 başarısız iş akışı kaydı var; sağlık iyi görünse de bunu izlemek gerekiyor."
+      ],
+      "oneriler": [
+        "Otomatik hatta art arda retlerin nedeni için bugün ilk üretilen videolarda özellikle teknik doğruluk, tekrar ve marka bağlantısı riskini kontrol etmeni öneririm.",
+        "Bekleyen öncelikli konular hazır olduğu için yeni konu eklemek yerine önce bunlardan üretim denemek daha güvenli görünüyor: ilk katman yüksekliği, warping/brim, PETG ipliklenme.",
+        "Bambu Lab geçen retlerde sık geçtiği için, bağımsızlık notu yoksa marka odaklı anlatımı azaltıp daha genel 3D baskı problemlerine dönmek iyi olabilir.",
+        "Nöbetçi son 24 saatte bir kez başarısız olduğu için, yeni hata görürsek tekrar tetiklemeyi değerlendirelim; şu an veri sınırlı."
+      ],
+      "uyarilar": [
+        "Yorum modu otomatik görünüyor; bu modu ben değiştirmem. Hakaret, siyaset, sağlık-hukuk içeren yanıtlarda ayrıca dikkat et.",
+        "Otomatik hat modu panelden yönetiliyor; ben değiştiremem. Art arda ret sürerse yayın kalitesi ve kota açısından risk büyür."
+      ],
+      "eylem_sayisi": 0
     }
   ],
   "defter": [
