@@ -500,6 +500,30 @@
         "Yorum modunun otomatik olması, sahip yönergesindeki sınırla çelişiyor olabilir; veri var ama nedeni yok."
       ],
       "eylem_sayisi": 0
+    },
+    {
+      "zaman": "2026-11-26 18:31",
+      "kademe": 2,
+      "model": "OpenAI (gpt-5.4)",
+      "rapor": [
+        "Acil: otomatik hat açık ama bugün tur görünmüyor; ayrıca son 5 turun 4’ü reddedilmiş. Modu değiştiremiyorum, bu yüzden yalnızca risk olarak raporluyorum.",
+        "Hikâye tarafında kuyruk zayıf: 3 planlı hikâye kalmış, günlük hedef 6. Günlük sayıyı şimdi düşürmedim; önce kuyruğu yeniletmek daha doğru.",
+        "Sağlıkta ana servisler iyi görünüyor; ancak Nöbetçi son 24 saatte 3 kez başarısız olmuş. Bağlantı sorunu erken yakalamak için tekrar kontrol istedim.",
+        "Video taslaklarında aynı konu ve çok benzer başlık tekrar ediyor; iki taslakta da zaten not var, bu yüzden yeniden işaretleme yapmadım.",
+        "Öncelikli konu listesi dolu görünüyor (3 konu var); bu yüzden yeni konu eklemedim, gereksiz üretim istemedim.",
+        "Yorum modu otomatik görünüyor; bu senin sınırına aykırı bir alan olabilir ama ben değiştirmedim, sadece dikkatine bırakıyorum."
+      ],
+      "oneriler": [
+        "Otomatik hattın bugün neden çalışmadığını panel/log tarafında kontrol et; art arda ret ve boş gün birlikte kalite ya da akış sorunu işareti olabilir.",
+        "Hikâye kuyruğu sık sık azaluyorsa, hikâye üretim zamanlamasını veya kaynak akışını gözden geçir; günlük 6 hedefi şu an sınırda.",
+        "Yeni video seçiminde ilk katman, warping ve PETG ipliklenme konularına öncelik ver; son başarılı içerik kalıbına daha yakınlar.",
+        "Aynı gün içinde aynı konu/başlık tekrarını azalt; dönen mini küp konusu şu an fazla benzer görünüyor."
+      ],
+      "uyarilar": [
+        "Otomatik hat açıkken bugün tur görünmemesi ve son turlarda yüksek ret oranı acil izleme gerektiriyor.",
+        "Nöbetçi iş akışının son 24 saatte 3 kez başarısız olması sistem sağlığı açısından riskli."
+      ],
+      "eylem_sayisi": 1
     }
   ],
   "defter": [
@@ -730,6 +754,17 @@
         "akis": "nobetci.yml"
       },
       "neden": "Son 24 saatte Nöbetçi başarısızlığı ve otomatik hatta olası aksama var; servis/bağlantı kontrolü gerekli.",
+      "durum": "yapildi",
+      "ayrinti": "nobetci.yml tetiklendi"
+    },
+    {
+      "zaman": "2026-11-26 18:31",
+      "kademe": 2,
+      "eylem": "workflow_tetikle",
+      "params": {
+        "akis": "nobetci.yml"
+      },
+      "neden": "Nöbetçi son 24 saatte 3 kez başarısız; servis/anahtar sağlığını yeniden yoklamak gerekli.",
       "durum": "yapildi",
       "ayrinti": "nobetci.yml tetiklendi"
     }
