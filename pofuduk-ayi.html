@@ -514,6 +514,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
       <div class="box">
         <h3>Lobi</h3>
         <p class="small" id="admState"></p>
+        <p class="msg" id="admNote" role="status"></p>
         <input id="admMsg" maxlength="90" placeholder="Mesaj (uyarı, duyuru ya da sebep)" aria-label="Mesaj" autocomplete="off">
         <div class="fr2"><input id="admDur" type="number" min="1" max="99999" value="30" aria-label="Süre"><select id="admUnit" aria-label="Süre birimi"><option value="60000">dakika</option><option value="3600000">saat</option><option value="86400000">gün</option></select></div>
         <p class="small">Süreli ban ve susturma için yukarıdaki süreyi kullanır.</p>
@@ -4344,11 +4345,12 @@ function admApply(o, mine) {
   else if (o.cmd === 'unmute') dropFrom(MUTE_KEY, o);
   else if (o.cmd === 'close') { if (!G.admin) { G.noAuto = true; netReset(); notice('Lobi kapatıldı', 'Yönetici lobiyi kapattı.'); } }
 }
+const admNote = (t, ok) => { const m = $('admNote'); m.textContent = t; m.className = 'msg' + (ok ? ' ok' : ''); };
 function admSend(cmd, extra) {
-  if (!G.admin || !net.on || !net.mqTopic) return netMsg('Önce lobiye bağlan.');
+  if (!G.admin || !net.on || !net.mqTopic) { admNote('Önce lobiye bağlan: şu an bir lobide değilsin, kimseye ulaşamaz.'); return false; }
   const o = admSign(Object.assign({ cmd }, extra || {})), base = net.mqTopic.slice(0, net.mqTopic.lastIndexOf('/')), body = JSON.stringify(o);
   for (const c of net.mqs) if (c.connected) c.publish(base + '/adm', body);
-  admApply(o, true);
+  admApply(o, true); return true;
 }
 // while the lobby is closed the administrator's browser answers at a special address; everyone else checks it before joining
 async function lobbyClosed(opts) {
@@ -4389,12 +4391,12 @@ function renderAdm() {
     const row = el('div', null, 'admrow'); row.append(el('b', `${pl.av ? pl.av + ' ' : ''}${pl.n}`), el('span', `${pl.ag ? pl.ag + ' yaş' : 'yaş ?'} · kod ${pl.c} · ${lvName(pl.lv)}`, 'small'));
     const bt = el('div', null, 'bt'), who = { code: pl.c, name: pl.n };
     bt.append(
-      btn('Uyar', () => admSend('warn', Object.assign({ msg: msg() }, who)), true),
-      btn('Sustur (süreli)', () => admSend('mute', Object.assign({ until: until(), msg: msg() }, who)), true),
-      btn('At', () => admSend('kick', Object.assign({ msg: msg() }, who))),
-      btn('Öldür', () => admSend('kill', Object.assign({ msg: msg() }, who))),
-      btn('Ban (kalıcı)', () => admSend('ban', Object.assign({ until: Date.now() + FOREVER, msg: msg() }, who))),
-      btn('Süreli ban', () => admSend('ban', Object.assign({ until: until(), msg: msg() }, who))));
+      btn('Uyar', () => { if (admSend('warn', Object.assign({ msg: msg() }, who))) admNote(`${pl.n} uyarıldı.`, true); }, true),
+      btn('Sustur (süreli)', () => { if (admSend('mute', Object.assign({ until: until(), msg: msg() }, who))) admNote(`${pl.n} ${durTxt()} susturuldu.`, true); }, true),
+      btn('At', () => { if (admSend('kick', Object.assign({ msg: msg() }, who))) admNote(`${pl.n} lobiden atıldı.`, true); }),
+      btn('Öldür', () => { if (admSend('kill', Object.assign({ msg: msg() }, who))) admNote(`${pl.n} öldürüldü.`, true); }),
+      btn('Ban (kalıcı)', () => { if (admSend('ban', Object.assign({ until: Date.now() + FOREVER, msg: msg() }, who))) admNote(`${pl.n} kalıcı olarak banlandı.`, true); }),
+      btn('Süreli ban', () => { if (admSend('ban', Object.assign({ until: until(), msg: msg() }, who))) admNote(`${pl.n} ${durTxt()} banlandı.`, true); }));
     row.append(bt); box.append(row);
   }
   const bb = $('admBans'); bb.innerHTML = ''; const bans = readList(BAN_KEY).map(b => Object.assign({ kind: 'ban' }, b)).concat(readList(MUTE_KEY).map(b => Object.assign({ kind: 'mute' }, b)));
@@ -4407,11 +4409,11 @@ function renderAdm() {
   const ac = $('admAccs'); ac.innerHTML = ''; const accs = readAccounts();
   for (const k of Object.keys(accs)) { const a = accs[k]; ac.append(el('div', `${a.av || ''} ${a.name} · ${a.age ? a.age + ' yaş' : 'yaş yok'}`)); }
   if (!Object.keys(accs).length) ac.textContent = 'Hesap yok.';
-  void durTxt;
 }
+pAdm.querySelectorAll('input, select').forEach(i => i.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Escape') closeAdm(); if (e.key === 'Enter' && i.id === 'admMsg') $('admSay').click(); }));
 $('admBtn').onclick = () => { if (pAdm.hidden) openAdm(); else closeAdm(); };
 $('admX').onclick = closeAdm;
-$('admSay').onclick = () => { const m = $('admMsg').value.trim(); if (!m) return netMsg('Önce mesajı yaz.'); admSend('say', { msg: m }); notice('Duyuru gönderildi', m); };
+$('admSay').onclick = () => { const m = $('admMsg').value.trim(); if (!m) return admNote('Önce yukarıdaki kutuya duyuruyu yaz.'); if (admSend('say', { msg: m })) { admNote(`Duyuru ${net.players.size} oyuncuya gönderildi: ${m}`, true); notice('Duyuru gönderildi', m); $('admMsg').value = ''; } };
 $('admClose').onclick = () => {
   if (!G.admin) return;
   if (!save.lobbyClosedByMe) { save.lobbyClosedByMe = true; saveGame(); admSend('close', {}); holdBeacon(); G.noAuto = true; setTimeout(() => netReset(), 400); }
