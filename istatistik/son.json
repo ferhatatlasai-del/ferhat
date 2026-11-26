@@ -1,17 +1,17 @@
 {
- "tarih": "2026-11-26T06:00:55Z",
- "tr_saat": "26.11.2026 09:00",
+ "tarih": "2026-11-26T09:01:00Z",
+ "tr_saat": "26.11.2026 12:01",
  "toplam": {
-  "reels": 20087,
+  "reels": 20098,
   "gonderi": 0,
-  "short": 11758,
+  "short": 11761,
   "youtube_video": 0,
-  "hikaye": 1352,
-  "toplam": 33197,
+  "hikaye": 1373,
+  "toplam": 33232,
   "begeni": 323,
   "yorum": 31
  },
- "fark": 173,
+ "fark": 35,
  "instagram": {
   "durum": "tamam",
   "izin": true,
@@ -26,8 +26,8 @@
     "begeni": 1,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgKJINptUAu/",
-    "izlenme": 184,
-    "erisim": 175
+    "izlenme": 188,
+    "erisim": 178
    },
    {
     "id": "18150949246585180",
@@ -136,7 +136,7 @@
     "begeni": 33,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": 4246,
+    "izlenme": 4253,
     "erisim": 3789
    },
    {
@@ -363,19 +363,28 @@
  "hikaye_izin": true,
  "hikayeler": [
   {
-   "id": "18024238988731807",
-   "tarih": "2026-11-26T05:07:09Z",
-   "baslik": "Dog Poop Bag Holder",
+   "id": "18348548860252951",
+   "tarih": "2026-11-26T07:27:05Z",
+   "baslik": "Flexi Dog Leash compatable poop bag holder",
    "izlenme": 0,
    "erisim": 0,
    "okundu": false
   },
   {
+   "id": "18024238988731807",
+   "tarih": "2026-11-26T05:07:09Z",
+   "baslik": "Dog Poop Bag Holder",
+   "izlenme": 12,
+   "erisim": 11,
+   "okundu": true,
+   "yanit": 0
+  },
+  {
    "id": "17987120012900517",
    "tarih": "2026-11-25T16:47:02Z",
    "baslik": "Snap-fit Bike Mount Base - Remix - One Part",
-   "izlenme": 20,
-   "erisim": 19,
+   "izlenme": 23,
+   "erisim": 22,
    "okundu": true,
    "yanit": 0
   },
@@ -383,8 +392,8 @@
    "id": "18137069581741034",
    "tarih": "2026-11-25T14:26:58Z",
    "baslik": "Trek Bike GoPro Mount Base",
-   "izlenme": 24,
-   "erisim": 23,
+   "izlenme": 27,
+   "erisim": 26,
    "okundu": true,
    "yanit": 0
   },
@@ -392,8 +401,8 @@
    "id": "17895554790685215",
    "tarih": "2026-11-25T12:06:52Z",
    "baslik": "Quad Lock compatible Mounting Bracket Base for Bicycle Bike",
-   "izlenme": 32,
-   "erisim": 29,
+   "izlenme": 35,
+   "erisim": 32,
    "okundu": true,
    "yanit": 0
   },
@@ -711,15 +720,6 @@
    "erisim": 27,
    "okundu": true,
    "yanit": 0
-  },
-  {
-   "id": "18110376599347393",
-   "tarih": "2026-11-21T13:06:44Z",
-   "baslik": "Nissan Leaf bag hook",
-   "izlenme": 30,
-   "erisim": 28,
-   "okundu": true,
-   "yanit": 0
   }
  ],
  "youtube": {
@@ -731,7 +731,7 @@
     "tur": "Short",
     "tarih": "2026-11-25T08:52:19",
     "baslik": "Nozzle tıkanmadan temizle: 3 kısa işaret",
-    "izlenme": 51,
+    "izlenme": 52,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=YBNIDKMia3Y"
@@ -801,7 +801,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T15:26:52",
     "baslik": "Isıya en dayanıklı 5 filament | 3D baskı",
-    "izlenme": 376,
+    "izlenme": 377,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=TXcpwaFMx1U"
@@ -831,7 +831,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T23:23:12",
     "baslik": "İlk katman neden bozuluyor? 5 hızlı kontrol",
-    "izlenme": 1134,
+    "izlenme": 1135,
     "begeni": 11,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=JFRO2uhYfwQ"
@@ -921,7 +921,7 @@
  },
  "eksikler": [],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 09:00",
-  "govde": "Toplam 33.197 (+173) · Reels 20.087 · Short 11.758 · Hikaye 1.352 (1 bugün) · Takipçi 433 · En iyi Reels: Baskın tabladan kalkı 4.246"
+  "baslik": "📊 İzlenme raporu 12:01",
+  "govde": "Toplam 33.232 (+35) · Reels 20.098 · Short 11.761 · Hikaye 1.373 (2 bugün) · Takipçi 433 · En iyi Reels: Baskın tabladan kalkı 4.253"
  }
 }
