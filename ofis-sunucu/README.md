@@ -390,3 +390,7 @@ Panel → Senaryo hazırla → bir Reels senaryosunu aç → **"🎬 Bu senaryod
 - **Motor:** `video/anlat_vitrin.js` (three.js r128, yazılım WebGL): STL okuyucu (açıya göre yumuşatılmış normaller, keskin kenarlar korunur), model ortalanır/tabana oturtulur, 4 ışık (anahtar, dolgu, arka kontur, gökyüzü), yumuşak gölge, ACES ton eşleme. Renk `params.renk` (varsayılan `#ff3d8f`); video renk tonu kayması bu modda kapalıdır.
 - **Maliyet:** ek maliyet yok (yalnızca metin çağrısı; render GitHub'da ücretsiz). 30 sn'lik videoda render ~3-5 dk.
 - Sınırlar: tek renkli model (STL renk taşımaz), ortam yansıması yok (Picsart'a göre daha sade bir görünüm), çok yüksek üçgenli (>400k) modellerde düz gölgelendirme.
+
+## Video biçimi seçici (panel)
+
+Üret → "Şimdi viral video üret" satırında **Biçim** seçici: *çeşitli animasyon sahneleri* (varsayılan, `anlat`), *3D sahneler (ilk dönem)* (`3d`), *geri sayım + gerçekçi görseller* (`liste`). Seçim `/api/viral-calistir` → iş akışı girdisi `bicim` → `viral_video.py --bicim`. Serbest konu ve Resimli anlatım türlerinde seçici yok sayılır (her zaman anlat motoru); "senaryodan video" düğmesi de her zaman anlat motorunu kullanır. Not: `liste` biçimi yapay zekâ görseli üretir (video başına yaklaşık 0,2-0,5 $), `3d` ve `anlat` yalnızca metin harcar.
