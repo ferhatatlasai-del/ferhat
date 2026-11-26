@@ -212,7 +212,8 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
   width: 42px; height: 42px; border-radius: 12px; border: 3px solid var(--bark); background: var(--cream); color: var(--bark); font-family: var(--display); font-size: 1.15rem; cursor: pointer; }
 #netBtn:focus-visible { outline: 3px solid var(--leaf); outline-offset: 2px; }
 #netBtn.live { background: #c9f2c0; }
-.net { display: grid; gap: 12px; text-align: left; max-height: min(64vh, 34rem); overflow-y: auto; padding-right: 4px; }
+.net { display: grid; grid-auto-rows: max-content; align-content: start; gap: 12px; text-align: left; max-height: min(64vh, 34rem); overflow-y: auto; padding-right: 4px; }
+.net > *, .net .box > * { min-height: min-content; }
 .net h3 { margin: 0; font-family: var(--display); color: var(--honey-deep); font-size: 1.15rem; }
 .net .box { border: 3px solid #e3d3b8; border-radius: 14px; padding: 10px 12px; display: grid; gap: 8px; }
 .net .fr { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; }
@@ -225,7 +226,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 .net .who2 small { opacity: .75; }
 .net .dot2 { width: 10px; height: 10px; border-radius: 50%; background: #bbb; flex: none; }
 .net .dot2.on { background: #3fae4a; }
-.net .msg { font-weight: 800; color: #b5452f; min-height: 1.2em; }
+.net .msg { font-weight: 800; color: #b5452f; min-height: 1.2em; margin: 0; overflow-wrap: anywhere; }
 .net .msg.ok { color: #2f7f2a; }
 .net .code { font-family: var(--display); font-size: 1.4rem; letter-spacing: .12em; color: var(--bark); }
 #nameErr { color: #b5452f; font-weight: 800; margin: 4px 0 0; }
