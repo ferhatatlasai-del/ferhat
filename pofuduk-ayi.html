@@ -4304,7 +4304,7 @@ async function lobbyClosed(opts) {
   const peer = new window.Peer('pofuduk-g' + Math.random().toString(36).slice(2, 10), opts);
   try { await peerOpen(peer, 8000); } catch (e) { try { peer.destroy(); } catch (x) {} return false; }
   const r = await new Promise(res => {
-    const t = setTimeout(() => res(false), 4000), c = peer.connect('pofuduk-kapali', { serialization: 'json' });
+    const t = setTimeout(() => res(false), 9000), c = peer.connect('pofuduk-kapali', { serialization: 'json' });
     c.on('open', () => { clearTimeout(t); res(true); }); c.on('error', () => { clearTimeout(t); res(false); }); peer.on('error', () => { clearTimeout(t); res(false); });
   });
   try { peer.destroy(); } catch (e) {}
