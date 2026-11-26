@@ -476,6 +476,30 @@
         "Otomatik hat modu panelden yönetiliyor; ben değiştiremem. Art arda ret sürerse yayın kalitesi ve kota açısından risk büyür."
       ],
       "eylem_sayisi": 0
+    },
+    {
+      "zaman": "2026-11-26 18:30",
+      "kademe": 2,
+      "model": "OpenAI (gpt-5.4)",
+      "rapor": [
+        "Acil: otomatik hat açık ama son 5 turun 4’ü reddedilmiş görünüyor; bugün tur kaydı da yok. Modu değiştiremiyorum, ama bu durum yayın akışında aksama riski demek.",
+        "Hikâye tarafında kuyruk zayıf: yalnızca 3 planlı hikâye kaldı, günlük hedefin 6. Hikâye ajanı iyi görünüyor ama besleme yetişmeyebilir.",
+        "Sağlıkta ana servisler iyi görünüyor; yine de son 24 saatte Nöbetçi akışı 3 kez başarısız olmuş. Bu, sistem sağlığı açısından takip edilmeli.",
+        "Video taslaklarında iki küp videosu zaten aynı konu ve benzer başlıkla bekliyor; ikisine de daha önce incele notu düşülmüş, tekrar işlem yapmadım.",
+        "Öncelikli video konusu kuyruğunda 3 konu var; sınır dolu olduğu için yeni konu eklemedim.",
+        "Yorum modu otomatik görünüyor; bu ayar senin sınırlarında ‘otomatiğe alma’ olarak yasaklı. Ben değiştirmedim, sadece farkı raporluyorum."
+      ],
+      "oneriler": [
+        "Otomatik hatta art arda retlerin nedeni için üretim promptu ve özellikle Bambu Lab odaklı anlatımları gözden geçir; marka bağlantısı izlenimi ve tekrar riski yüksek.",
+        "Hikâye kuyruğu azaldığı için, panelden ya hikâye üretimini kontrol et ya da kısa süreliğine günlük sayıyı manuel planla destekle.",
+        "Nöbetçi akışının neden 3 kez başarısız olduğuna loglardan bak; servisler iyi görünse de izleme katmanında sorun olabilir.",
+        "Yeni video seçiminde ilk katman, warping ve PETG ipliklenme konularını öne al; bunlar hem sırada var hem de geçmişte iyi izlenen kalıba yakın."
+      ],
+      "uyarilar": [
+        "Otomatik hat açıkken bugün tur görünmemesi ve son turlarda yoğun ret olması, yayın sürekliliğini bozabilir.",
+        "Yorum modunun otomatik olması, sahip yönergesindeki sınırla çelişiyor olabilir; veri var ama nedeni yok."
+      ],
+      "eylem_sayisi": 0
     }
   ],
   "defter": [
