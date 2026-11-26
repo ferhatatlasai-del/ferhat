@@ -430,6 +430,28 @@
         "Otomatik hattın bugünkü kayıtları boş; veri eksikliği ya da çalışmama ihtimali var, kesin konuşamıyorum."
       ],
       "eylem_sayisi": 1
+    },
+    {
+      "zaman": "2026-11-26 08:31",
+      "kademe": 2,
+      "model": "OpenAI (gpt-5.4)",
+      "rapor": [
+        "Acil: otomatik hat açık ama son 5 turda art arda 4 ret görünüyor; bugün henüz tur kaydı yok, bu yüzden sabah 10:05 öncesi hattı yakından izlemeni öneriyorum.",
+        "Sağlık tarafında ana servisler iyi görünüyor; Instagram, YouTube, OpenAI ve ofis sunucusunda şu an belirgin arıza işareti yok.",
+        "Dün iki aynı konulu taslak için zaten 'incele' notu düşülmüş; tekrar işlem yapmadım.",
+        "Hikâye düzeni hedefinle uyumlu: günlük sayı 6 ve kuyrukta 6 planlı hikâye var; bugün 7 görsel üretilmiş, ek değişiklik yapmadım.",
+        "Yorum modu otomatikte çalışıyor; bu senin 'asla' sınırınla çelişebileceği için ben modda değişiklik yapmadım, sadece dikkatine bırakıyorum.",
+        "Öncelikli konu listesi dolu görünüyor (3 konu var); bu yüzden yeni konu eklemedim ve gereksiz maliyet oluşturmadım."
+      ],
+      "oneriler": [
+        "10:05 turu da reddedilirse otomatik hattın üretim kalıbını gözden geçir; özellikle Bambu Lab odaklı ve tekrar eden başlıklar sorun çıkarıyor olabilir.",
+        "Otomatik hat retlerinin nedeni veri yok ama son kayıtlarda marka bağlantısı izlenimi ve tekrar riski yüksek görünüyor; bağımsızlık notu ve daha genel anlatım şablonu düşün.",
+        "Yorum modunun otomatikte kalmasını özellikle sen tekrar doğrula; ben bu modu değiştiremem ve sınırlarınla uyumunu netleştirmek iyi olur."
+      ],
+      "uyarilar": [
+        "Son 24 saatte Nöbetçi ve Trend ajanında başarısız iş akışı kaydı var; şu an sağlık iyi görünse de tekrar ederse manuel inceleme gerekebilir."
+      ],
+      "eylem_sayisi": 0
     }
   ],
   "defter": [
