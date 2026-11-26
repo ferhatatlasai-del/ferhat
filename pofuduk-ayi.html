@@ -503,6 +503,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
       <label for="setSfxVol"><span>Efekt sesleri <span class="val" id="vSfx"></span></span><input type="range" id="setSfxVol" min="0" max="100" step="5"></label>
       <label for="setView"><span>Görüş uzaklığı <span class="val" id="vView"></span></span><input type="range" id="setView" min="50" max="250" step="10"></label>
       <label for="setQual"><span>Grafik kalitesi</span><select id="setQual"><option value="auto">Otomatik</option><option value="low">Düşük</option><option value="med">Orta</option><option value="high">Yüksek</option></select></label>
+      <label for="setLobby"><span>Köye girince lobiye bağlan</span><select id="setLobby"><option value="1">Açık</option><option value="0">Kapalı</option></select></label>
       <label for="setCam"><span>Kamera dönüş hızı <span class="val" id="vCam"></span></span><input type="range" id="setCam" min="30" max="200" step="10"></label>
     </div>
     <p class="small">Klavyede M tuşu bütün sesleri bir anda susturur.</p>
@@ -1050,6 +1051,7 @@ function drawHud() {
   txt('× ' + lives, hx + 16, 42, 26);
   const so = Math.max(0, Math.round(66 / Math.max(0.3, (glc.clientWidth || VW) / VW)) - 60); // on small screens the round buttons are bigger than the picture: keep these texts below them
   txt(L.hub ? 'Bal Köyü' : L.tut ? 'Öğretici' : `${lvlIdx + 1}/${LEVELS.length}`, VW - 14, 78 + so, 22, '#fff4dc', 'right');
+  if (L.hub && net.on && net.lobbyMode) txt(`🌍 Lobi · ${net.players.size + 1} oyuncu`, VW - 14, 126 + so, 18, '#9fd0ff', 'right');
   if (L.hub) txt(isNight() ? `☾ Gece · sabaha ${mmss(clockLeft() * 1000)}${clockTag()}` : `☀ Gündüz · geceye ${mmss(clockLeft() * 1000)}${clockTag()}`, VW - 14, 102 + so, 18, isNight() ? '#c9d6ff' : '#fff27a', 'right');
   const b = L.boss;
   if (b && b.active && !b.defeated) {
@@ -2886,6 +2888,7 @@ const mmss = ms => { const t = Math.ceil(ms / 1000); return Math.floor(t / 60) +
 function openChest(key) { (save.chestT = save.chestT || {})[key] = Date.now() + CHEST_MS; bump('chest'); }
 function hubStep() {
   if (net.homesDirty) { rebuildHub(); return; }
+  if (!G.lobbyTried && activeId && !net.on) { G.lobbyTried = true; if (save.autoLobby !== false) setTimeout(goLobby, 1500); }
   turtleStep(); rabbitStep(); wolfStep(); sleepStep(); doorStep();
   save.peaks = save.peaks || {};
   for (const m of L.mts) {
@@ -4172,7 +4175,7 @@ function netReset() {
   try { if (net.nroom) net.nroom.leave(); } catch (e) {}
   try { if (net.peer) net.peer.destroy(); } catch (e) {}
   net.tok = null; for (const c of net.mqs || []) { try { if (c.connected && net.mqTopic) c.publish(net.mqTopic, 'bye'); c.end(true); } catch (e) {} }
-  Object.assign(net, { on: false, mode: null, room: '', roomCode: null, host: false, peer: null, conn: null, nroom: null, mqs: [], mqTopic: null, lostMsg: 0, hostClock: null }); net.conns = new Set();
+  Object.assign(net, { on: false, mode: null, lobbyMode: false, room: '', roomCode: null, host: false, peer: null, conn: null, nroom: null, mqs: [], mqTopic: null, lostMsg: 0, hostClock: null }); net.conns = new Set();
   if (net.lobby) net.lobby.presence({ c: save.code, n: save.name, r: null }).catch(() => {});
   renderNet();
 }
@@ -4210,7 +4213,54 @@ function bindPeer(conn) {
   const c = { connected: true, pfName: 'peer', publish: (t, p) => { if (conn.open) { try { conn.send([t, String(p)]); } catch (e) {} } }, on() {}, end() { try { conn.close(); } catch (e) {} } };
   net.mqs.push(c);
   conn.on('data', m => { if (!Array.isArray(m) || typeof m[0] !== 'string') return; if (net.wire) net.wire(m[0], m[1]); if (net.host) for (const o of net.mqs) if (o !== c && o.connected) o.publish(m[0], m[1]); });
-  conn.on('close', () => { c.connected = false; net.mqs = (net.mqs || []).filter(x => x !== c); if (!net.host && net.on) { netReset(); netMsg('Kurucu odadan ayrıldı.'); } });
+  conn.on('close', () => { c.connected = false; net.mqs = (net.mqs || []).filter(x => x !== c); if (!net.host && net.on) { const lob = net.lobbyMode; netReset(); if (lob && !G.noAuto) { netMsg('Lobi yeniden kuruluyor...', true); setTimeout(goLobby, 800 + Math.random() * 2500); } else netMsg('Kurucu odadan ayrıldı.'); } });
+}
+/* ---------- the village lobby: everyone who enters the game lands in the same Bal Köyü ---------- */
+const LOBBY_MAX = 9; // guests per lobby; the next player starts lobby 2, and so on
+let lobbyBusy = false;
+async function tryJoinLobby(hostId, opts) {
+  const peer = new window.Peer('pofuduk-g' + Math.random().toString(36).slice(2, 10), opts);
+  try { await peerOpen(peer, 9000); } catch (e) { try { peer.destroy(); } catch (x) {} throw e; } // the meeting server cannot be reached: give up quietly
+  return await new Promise(res => {
+    let done = false; const t = setTimeout(() => fin('none'), 6000);
+    const fin = v => { if (done) return; done = true; clearTimeout(t); if (v !== 'joined') { try { peer.destroy(); } catch (e) {} } res(v); };
+    const conn = peer.connect(hostId, { serialization: 'json', reliable: true });
+    peer.on('error', () => fin('none')); conn.on('error', () => fin('none'));
+    conn.on('data', m => { if (Array.isArray(m) && m[0] === 'full') { fin('full'); try { conn.close(); } catch (e) {} } });
+    conn.on('open', async () => {
+      await wait(700); // a full lobby says so right away
+      if (done || net.on) return fin('none');
+      try { await goRelay('Bal Köyü Lobisi', 'x', false); } catch (e) { return fin('none'); }
+      net.peer = peer; net.lobbyMode = true; bindPeer(conn); netMsg('Bal Köyü lobisine girdin!', true); renderNet(); fin('joined');
+    });
+  });
+}
+async function tryHostLobby(hostId, opts) {
+  const peer = new window.Peer(hostId, opts);
+  try { await peerOpen(peer, 9000); } catch (e) { try { peer.destroy(); } catch (x) {} return false; }
+  if (net.on) { try { peer.destroy(); } catch (x) {} return true; }
+  await goRelay('Bal Köyü Lobisi', 'x', true); net.peer = peer; net.lobbyMode = true;
+  peer.on('connection', conn => conn.on('open', () => {
+    if (net.mqs.filter(c => c.connected).length >= LOBBY_MAX) { try { conn.send(['full', '1']); } catch (e) {} setTimeout(() => { try { conn.close(); } catch (e) {} }, 300); }
+    else bindPeer(conn);
+  }));
+  peer.on('error', () => {});
+  netMsg('Bal Köyü lobisi açıldı. Köye gelen herkes seninle buluşur.', true); renderNet();
+  return true;
+}
+async function goLobby() {
+  if (net.on || lobbyBusy || !window.Peer || G.noAuto) return;
+  lobbyBusy = true; const opts = window.PEER_OPTS || {};
+  try {
+    for (let n = 1; n <= 5 && !net.on; n++) {
+      const hostId = 'pofuduk-lobi' + n, r = await tryJoinLobby(hostId, opts);
+      if (r === 'joined' || net.on) return;
+      if (r === 'full') continue;
+      if (await tryHostLobby(hostId, opts)) return;
+      if (await tryJoinLobby(hostId, opts) === 'joined') return; // somebody else opened it a moment earlier
+    }
+  } catch (e) { /* no meeting server on this network: play alone, nothing to show */ }
+  finally { lobbyBusy = false; }
 }
 async function goPeer(create, codeIn) {
   if (!window.Peer) throw new Error('Bağlantı kütüphanesi çalışmadı. Sayfayı yenile.');
@@ -4403,7 +4453,7 @@ $('netBtn').onclick = () => { if (pNet.hidden) openNet(); else closeNet(); };
 $('netClose').onclick = closeNet;
 $('nCreate').onclick = () => netGo(true);
 $('nJoin').onclick = () => netGo(false);
-$('nLeave').onclick = () => { netReset(); netMsg('Odadan çıktın.', true); };
+$('nLeave').onclick = () => { G.noAuto = true; netReset(); netMsg('Odadan çıktın.', true); };
 $('nShare').onclick = shareInvite;
 $('nAddFriend').onclick = () => { addFriend($('nFriendCode').value.trim()); $('nFriendCode').value = ''; };
 pNet.querySelectorAll('input').forEach(i => i.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Escape') closeNet(); if (e.key === 'Enter') { if (i.id === 'nRoomC' || i.id === 'nPassC') netGo(true); else if (i.id === 'nRoomJ' || i.id === 'nPassJ') netGo(false); else if (i.id === 'nFriendCode') $('nAddFriend').click(); } }));
@@ -4475,7 +4525,7 @@ function syncSettings() {
   $('setMusicVol').value = Math.round((save.musicVol ?? 1) * 100); $('vMusic').textContent = $('setMusicVol').value + '%';
   $('setSfxVol').value = Math.round((save.sfxVol ?? 1) * 100); $('vSfx').textContent = $('setSfxVol').value + '%';
   $('setView').value = Math.round((save.viewDist || 1) * 100); $('vView').textContent = viewWord(save.viewDist || 1) + ' · ' + $('setView').value + '%';
-  $('setQual').value = save.quality || 'high'; $('setAge').value = save.age || ''; $('vAge').textContent = save.age ? `· boy ${heightCm(save.age)} cm` : '';
+  $('setLobby').value = save.autoLobby === false ? '0' : '1'; $('setQual').value = save.quality || 'high'; $('setAge').value = save.age || ''; $('vAge').textContent = save.age ? `· boy ${heightCm(save.age)} cm` : '';
   $('setCam').value = Math.round((save.camSens || 1) * 100); $('vCam').textContent = $('setCam').value + '%';
 }
 function openSettings() {
@@ -4504,6 +4554,7 @@ $('setAge').oninput = e => {
   if (activeId) { const accs = readAccounts(); if (accs[activeId]) { accs[activeId].age = a; writeAccounts(accs); } }
   saveGame();
 };
+$('setLobby').onchange = e => { save.autoLobby = e.target.value === '1'; if (!save.autoLobby) G.noAuto = true; else { G.noAuto = false; setTimeout(goLobby, 300); } saveGame(); };
 $('setQual').onchange = e => { save.quality = e.target.value; G.autoQ = null; perfSlow = 0; applyQuality(); saveGame(); };
 $('setCam').oninput = e => { save.camSens = e.target.value / 100; $('vCam').textContent = e.target.value + '%'; };
 function goHub() { saveGame(); honey = 0; lives = 3; loadLevel(-1); setPlaying(); }
