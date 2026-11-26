@@ -1,0 +1,31 @@
+{
+  "id": "h20261126-052150-c7l",
+  "kaynak": "uretim",
+  "durum": "planli",
+  "olusturma": "2026-11-26T05:21:50.000Z",
+  "gorsel": "hikaye/gorseller/h20261126-052150-c7l.mp4",
+  "baslik": "Hole Measuring Gauge for Calipers",
+  "atif": {
+    "ad": "Hole Measuring Gauge for Calipers",
+    "tasarimci": "Chris Long",
+    "lisans": "CC BY",
+    "url": "https://www.printables.com/model/1102641-hole-measuring-gauge-for-calipers",
+    "site": "printables.com",
+    "lisans_teyit": true,
+    "referansli": true
+  },
+  "trend": "Katlanır nozul/filament ölçüm mastarı",
+  "kontrol": {
+    "puan": 9.0,
+    "deneme": 1,
+    "sorunlar": []
+  },
+  "yayin": null,
+  "hata": "",
+  "deneme": 0,
+  "tur": "video",
+  "muzik": "Sentezlenmiş müzik: Vibrafon gece (telifsiz, kodla üretildi)",
+  "muzik_sira": 67,
+  "muzik_stil": "Vibrafon gece",
+  "muzik_ton": 7
+}
