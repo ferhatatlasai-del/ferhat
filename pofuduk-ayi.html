@@ -4316,7 +4316,7 @@ function takeChat(txt) {
   let m; try { m = JSON.parse(txt); } catch (e) { return; }
   if (!m || typeof m !== 'object' || m.id === net.myId) return;
   const code = clip(m.c, 6).toUpperCase(), name = clip(m.n, 16), t = clip(m.t, 80);
-  if (!t || isBanned(code, name) || isMuted(code, name)) return;
+  if (!t || isBanned(code, name) || (isMuted(code, name) && !G.admin)) return; // the administrator still sees what muted players write
   addChat({ n: name || 'Ayı', t, id: clip(m.id, 24), at: Date.now() });
 }
 const chatBar = $('chatBar'), chatIn = $('chatIn');
