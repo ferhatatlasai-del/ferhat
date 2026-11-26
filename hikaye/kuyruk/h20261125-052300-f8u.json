@@ -1,7 +1,7 @@
 {
   "id": "h20261125-052300-f8u",
   "kaynak": "uretim",
-  "durum": "planli",
+  "durum": "yayinlaniyor",
   "olusturma": "2026-11-25T05:23:00.000Z",
   "gorsel": "hikaye/gorseller/h20261125-052300-f8u.mp4",
   "baslik": "Dog Poop Bag Holder for Carabiner Leash",
@@ -20,7 +20,9 @@
     "deneme": 1,
     "sorunlar": []
   },
-  "yayin": null,
+  "yayin": {
+    "tarih": "2026-11-26T14:25:22Z"
+  },
   "hata": "",
   "deneme": 0,
   "tur": "video",
