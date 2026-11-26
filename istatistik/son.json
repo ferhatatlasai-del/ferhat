@@ -1,17 +1,17 @@
 {
- "tarih": "2026-11-26T15:00:26Z",
- "tr_saat": "26.11.2026 18:00",
+ "tarih": "2026-11-26T18:00:32Z",
+ "tr_saat": "26.11.2026 21:00",
  "toplam": {
-  "reels": 20124,
+  "reels": 20127,
   "gonderi": 0,
-  "short": 11776,
+  "short": 11781,
   "youtube_video": 0,
-  "hikaye": 1469,
-  "toplam": 33369,
+  "hikaye": 1543,
+  "toplam": 33451,
   "begeni": 323,
   "yorum": 31
  },
- "fark": 66,
+ "fark": 82,
  "instagram": {
   "durum": "tamam",
   "izin": true,
@@ -136,7 +136,7 @@
     "begeni": 33,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": 4274,
+    "izlenme": 4277,
     "erisim": 3827
    },
    {
@@ -363,19 +363,29 @@
  "hikaye_izin": true,
  "hikayeler": [
   {
+   "id": "17990306057885699",
+   "tarih": "2026-11-26T16:46:39Z",
+   "baslik": "Dog Leash Poo Bag Holder (for used bags)",
+   "izlenme": 8,
+   "erisim": 6,
+   "okundu": true,
+   "yanit": 0
+  },
+  {
    "id": "18103753793428535",
    "tarih": "2026-11-26T14:26:53Z",
    "baslik": "Dog Poop Bag Holder for Carabiner Leash",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 20,
+   "erisim": 17,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "18159643870521552",
    "tarih": "2026-11-26T12:07:49Z",
    "baslik": "Dog Poop Bag Holder",
-   "izlenme": 15,
-   "erisim": 9,
+   "izlenme": 27,
+   "erisim": 23,
    "okundu": true,
    "yanit": 0
   },
@@ -383,8 +393,8 @@
    "id": "18191615326424407",
    "tarih": "2026-11-26T09:47:27Z",
    "baslik": "Dog Poop Bag Holder V3",
-   "izlenme": 15,
-   "erisim": 12,
+   "izlenme": 27,
+   "erisim": 25,
    "okundu": true,
    "yanit": 0
   },
@@ -392,8 +402,8 @@
    "id": "18348548860252951",
    "tarih": "2026-11-26T07:27:05Z",
    "baslik": "Flexi Dog Leash compatable poop bag holder",
-   "izlenme": 23,
-   "erisim": 20,
+   "izlenme": 35,
+   "erisim": 31,
    "okundu": true,
    "yanit": 0
   },
@@ -401,8 +411,8 @@
    "id": "18024238988731807",
    "tarih": "2026-11-26T05:07:09Z",
    "baslik": "Dog Poop Bag Holder",
-   "izlenme": 28,
-   "erisim": 25,
+   "izlenme": 38,
+   "erisim": 36,
    "okundu": true,
    "yanit": 0
   },
@@ -711,15 +721,6 @@
    "erisim": 22,
    "okundu": true,
    "yanit": 0
-  },
-  {
-   "id": "18116034896149730",
-   "tarih": "2026-11-21T14:14:57Z",
-   "baslik": "Video hikayesi",
-   "izlenme": 28,
-   "erisim": 24,
-   "okundu": true,
-   "yanit": 0
   }
  ],
  "youtube": {
@@ -731,7 +732,7 @@
     "tur": "Short",
     "tarih": "2026-11-25T08:52:19",
     "baslik": "Nozzle tıkanmadan temizle: 3 kısa işaret",
-    "izlenme": 54,
+    "izlenme": 56,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=YBNIDKMia3Y"
@@ -751,7 +752,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T23:17:16",
     "baslik": "Bambu Lab A1 Combo AMS lite filament değişim sorunları",
-    "izlenme": 214,
+    "izlenme": 215,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=Vt_lyaaFBOo"
@@ -771,7 +772,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T10:33:51",
     "baslik": "Baskısı en kolay filamentler: 5'ten 1'e",
-    "izlenme": 392,
+    "izlenme": 393,
     "begeni": 4,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=czKPQgTqQrw"
@@ -831,7 +832,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T23:23:12",
     "baslik": "İlk katman neden bozuluyor? 5 hızlı kontrol",
-    "izlenme": 1137,
+    "izlenme": 1138,
     "begeni": 11,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=JFRO2uhYfwQ"
@@ -921,7 +922,7 @@
  },
  "eksikler": [],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 18:00",
-  "govde": "Toplam 33.369 (+66) · Reels 20.124 · Short 11.776 · Hikaye 1.469 (5 bugün) · Takipçi 433 · En iyi Reels: Baskın tabladan kalkı 4.274"
+  "baslik": "📊 İzlenme raporu 21:00",
+  "govde": "Toplam 33.451 (+82) · Reels 20.127 · Short 11.781 · Hikaye 1.543 (6 bugün) · Takipçi 433 · En iyi Reels: Baskın tabladan kalkı 4.277"
  }
 }
