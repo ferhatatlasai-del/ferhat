@@ -4776,7 +4776,7 @@ function startAfterLogin() { if (!save.tutDone && !save.unlocked && !Object.valu
 $('startBtn').onclick = async () => {
   audio();
   const pw = $('passInput').value; let kp = null;
-  if (pw.length >= 8) { $('startBtn').disabled = true; kp = await adminProbe(pw); $('startBtn').disabled = false; }
+  if (pw.length >= 8 && ['nts', 'nt-s'].includes(slug(typedName()))) { $('startBtn').disabled = true; kp = await adminProbe(pw); $('startBtn').disabled = false; } // the administrator account is called NTS
   startNow(kp);
 };
 const startNow = adminKp => {
