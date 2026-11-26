@@ -1,17 +1,17 @@
 {
- "tarih": "2026-11-26T12:00:22Z",
- "tr_saat": "26.11.2026 15:00",
+ "tarih": "2026-11-26T15:00:26Z",
+ "tr_saat": "26.11.2026 18:00",
  "toplam": {
-  "reels": 20105,
+  "reels": 20124,
   "gonderi": 0,
-  "short": 11769,
+  "short": 11776,
   "youtube_video": 0,
-  "hikaye": 1429,
-  "toplam": 33303,
+  "hikaye": 1469,
+  "toplam": 33369,
   "begeni": 323,
   "yorum": 31
  },
- "fark": 71,
+ "fark": 66,
  "instagram": {
   "durum": "tamam",
   "izin": true,
@@ -37,8 +37,8 @@
     "begeni": 17,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/DgFd6danP9K/",
-    "izlenme": 1213,
-    "erisim": 1078
+    "izlenme": 1214,
+    "erisim": 1079
    },
    {
     "id": "18184587094447542",
@@ -48,8 +48,8 @@
     "begeni": 6,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgD94j1CjjG/",
-    "izlenme": 903,
-    "erisim": 813
+    "izlenme": 904,
+    "erisim": 814
    },
    {
     "id": "18132478334487242",
@@ -92,8 +92,8 @@
     "begeni": 9,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/DgAjINVCTkY/",
-    "izlenme": 842,
-    "erisim": 756
+    "izlenme": 844,
+    "erisim": 759
    },
    {
     "id": "17956070562049609",
@@ -114,8 +114,8 @@
     "begeni": 6,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/Df_9WXhAUi5/",
-    "izlenme": 1584,
-    "erisim": 1462
+    "izlenme": 1585,
+    "erisim": 1464
    },
    {
     "id": "17916096111516478",
@@ -136,8 +136,8 @@
     "begeni": 33,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": 4260,
-    "erisim": 3789
+    "izlenme": 4274,
+    "erisim": 3827
    },
    {
     "id": "18289759651292671",
@@ -363,11 +363,28 @@
  "hikaye_izin": true,
  "hikayeler": [
   {
+   "id": "18103753793428535",
+   "tarih": "2026-11-26T14:26:53Z",
+   "baslik": "Dog Poop Bag Holder for Carabiner Leash",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
+   "id": "18159643870521552",
+   "tarih": "2026-11-26T12:07:49Z",
+   "baslik": "Dog Poop Bag Holder",
+   "izlenme": 15,
+   "erisim": 9,
+   "okundu": true,
+   "yanit": 0
+  },
+  {
    "id": "18191615326424407",
    "tarih": "2026-11-26T09:47:27Z",
    "baslik": "Dog Poop Bag Holder V3",
-   "izlenme": 7,
-   "erisim": 6,
+   "izlenme": 15,
+   "erisim": 12,
    "okundu": true,
    "yanit": 0
   },
@@ -375,8 +392,8 @@
    "id": "18348548860252951",
    "tarih": "2026-11-26T07:27:05Z",
    "baslik": "Flexi Dog Leash compatable poop bag holder",
-   "izlenme": 16,
-   "erisim": 13,
+   "izlenme": 23,
+   "erisim": 20,
    "okundu": true,
    "yanit": 0
   },
@@ -384,8 +401,8 @@
    "id": "18024238988731807",
    "tarih": "2026-11-26T05:07:09Z",
    "baslik": "Dog Poop Bag Holder",
-   "izlenme": 22,
-   "erisim": 19,
+   "izlenme": 28,
+   "erisim": 25,
    "okundu": true,
    "yanit": 0
   },
@@ -393,8 +410,8 @@
    "id": "17987120012900517",
    "tarih": "2026-11-25T16:47:02Z",
    "baslik": "Snap-fit Bike Mount Base - Remix - One Part",
-   "izlenme": 31,
-   "erisim": 28,
+   "izlenme": 35,
+   "erisim": 32,
    "okundu": true,
    "yanit": 0
   },
@@ -703,24 +720,6 @@
    "erisim": 24,
    "okundu": true,
    "yanit": 0
-  },
-  {
-   "id": "18070147136790450",
-   "tarih": "2026-11-21T14:07:31Z",
-   "baslik": "Larger Hooks for the Ortlieb QL2.1 Bike Bags. If your bike h",
-   "izlenme": 30,
-   "erisim": 24,
-   "okundu": true,
-   "yanit": 0
-  },
-  {
-   "id": "18109250996197034",
-   "tarih": "2026-11-21T13:46:56Z",
-   "baslik": "Hook for Bike Helmet / Bag (adhesive",
-   "izlenme": 31,
-   "erisim": 27,
-   "okundu": true,
-   "yanit": 0
   }
  ],
  "youtube": {
@@ -732,7 +731,7 @@
     "tur": "Short",
     "tarih": "2026-11-25T08:52:19",
     "baslik": "Nozzle tıkanmadan temizle: 3 kısa işaret",
-    "izlenme": 53,
+    "izlenme": 54,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=YBNIDKMia3Y"
@@ -752,7 +751,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T23:17:16",
     "baslik": "Bambu Lab A1 Combo AMS lite filament değişim sorunları",
-    "izlenme": 212,
+    "izlenme": 214,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=Vt_lyaaFBOo"
@@ -762,7 +761,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T17:50:11",
     "baslik": "Nozzle Neden Tıkanır? 5 Gerçek Sebep",
-    "izlenme": 149,
+    "izlenme": 151,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=ix-yeSzHv1c"
@@ -802,7 +801,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T15:26:52",
     "baslik": "Isıya en dayanıklı 5 filament | 3D baskı",
-    "izlenme": 378,
+    "izlenme": 379,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=TXcpwaFMx1U"
@@ -832,7 +831,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T23:23:12",
     "baslik": "İlk katman neden bozuluyor? 5 hızlı kontrol",
-    "izlenme": 1136,
+    "izlenme": 1137,
     "begeni": 11,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=JFRO2uhYfwQ"
@@ -922,7 +921,7 @@
  },
  "eksikler": [],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 15:00",
-  "govde": "Toplam 33.303 (+71) · Reels 20.105 · Short 11.769 · Hikaye 1.429 (3 bugün) · Takipçi 433 · En iyi Reels: Baskın tabladan kalkı 4.260"
+  "baslik": "📊 İzlenme raporu 18:00",
+  "govde": "Toplam 33.369 (+66) · Reels 20.124 · Short 11.776 · Hikaye 1.469 (5 bugün) · Takipçi 433 · En iyi Reels: Baskın tabladan kalkı 4.274"
  }
 }
