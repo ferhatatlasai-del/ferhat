@@ -1,17 +1,17 @@
 {
- "tarih": "2026-11-25T18:00:55Z",
- "tr_saat": "25.11.2026 21:00",
+ "tarih": "2026-11-26T06:00:55Z",
+ "tr_saat": "26.11.2026 09:00",
  "toplam": {
-  "reels": 20049,
+  "reels": 20087,
   "gonderi": 0,
-  "short": 11682,
+  "short": 11758,
   "youtube_video": 0,
-  "hikaye": 1293,
-  "toplam": 33024,
-  "begeni": 320,
+  "hikaye": 1352,
+  "toplam": 33197,
+  "begeni": 323,
   "yorum": 31
  },
- "fark": 94,
+ "fark": 173,
  "instagram": {
   "durum": "tamam",
   "izin": true,
@@ -26,8 +26,8 @@
     "begeni": 1,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgKJINptUAu/",
-    "izlenme": 172,
-    "erisim": 160
+    "izlenme": 184,
+    "erisim": 175
    },
    {
     "id": "18150949246585180",
@@ -103,8 +103,8 @@
     "begeni": 10,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgAaonlkhF3/",
-    "izlenme": 1686,
-    "erisim": 1520
+    "izlenme": 1687,
+    "erisim": 1522
    },
    {
     "id": "18193230361409051",
@@ -125,7 +125,7 @@
     "begeni": 10,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df-02JrFMVG/",
-    "izlenme": 1739,
+    "izlenme": 1740,
     "erisim": 1580
    },
    {
@@ -133,11 +133,11 @@
     "tur": "Reels",
     "tarih": "2026-11-20T23:05:39",
     "baslik": "Baskın tabladan kalkıyor mu? İlk katman yapışmıyorsa çoğu za",
-    "begeni": 31,
+    "begeni": 33,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": 4222,
-    "erisim": 3751
+    "izlenme": 4246,
+    "erisim": 3789
    },
    {
     "id": "18289759651292671",
@@ -170,7 +170,7 @@
     "yorum": 0,
     "link": "https://www.instagram.com/reel/Df5dfOAjiMp/",
     "izlenme": 195,
-    "erisim": 171
+    "erisim": 172
    },
    {
     "id": "18140690902641017",
@@ -363,11 +363,19 @@
  "hikaye_izin": true,
  "hikayeler": [
   {
+   "id": "18024238988731807",
+   "tarih": "2026-11-26T05:07:09Z",
+   "baslik": "Dog Poop Bag Holder",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
    "id": "17987120012900517",
    "tarih": "2026-11-25T16:47:02Z",
    "baslik": "Snap-fit Bike Mount Base - Remix - One Part",
-   "izlenme": 7,
-   "erisim": 7,
+   "izlenme": 20,
+   "erisim": 19,
    "okundu": true,
    "yanit": 0
   },
@@ -375,8 +383,8 @@
    "id": "18137069581741034",
    "tarih": "2026-11-25T14:26:58Z",
    "baslik": "Trek Bike GoPro Mount Base",
-   "izlenme": 13,
-   "erisim": 11,
+   "izlenme": 24,
+   "erisim": 23,
    "okundu": true,
    "yanit": 0
   },
@@ -384,8 +392,8 @@
    "id": "17895554790685215",
    "tarih": "2026-11-25T12:06:52Z",
    "baslik": "Quad Lock compatible Mounting Bracket Base for Bicycle Bike",
-   "izlenme": 19,
-   "erisim": 17,
+   "izlenme": 32,
+   "erisim": 29,
    "okundu": true,
    "yanit": 0
   },
@@ -393,8 +401,8 @@
    "id": "18343824202272064",
    "tarih": "2026-11-25T08:51:47Z",
    "baslik": "Video hikayesi",
-   "izlenme": 23,
-   "erisim": 21,
+   "izlenme": 34,
+   "erisim": 33,
    "okundu": true,
    "yanit": 0
   },
@@ -402,8 +410,8 @@
    "id": "18455197594122303",
    "tarih": "2026-11-25T07:27:39Z",
    "baslik": "Suction Cup Shower Soap / Phone Holder Tray",
-   "izlenme": 26,
-   "erisim": 22,
+   "izlenme": 37,
+   "erisim": 34,
    "okundu": true,
    "yanit": 0
   },
@@ -712,15 +720,6 @@
    "erisim": 28,
    "okundu": true,
    "yanit": 0
-  },
-  {
-   "id": "18133803535685269",
-   "tarih": "2026-11-21T12:47:23Z",
-   "baslik": "Desk Bag Hook without the hole.",
-   "izlenme": 30,
-   "erisim": 28,
-   "okundu": true,
-   "yanit": 0
   }
  ],
  "youtube": {
@@ -732,7 +731,7 @@
     "tur": "Short",
     "tarih": "2026-11-25T08:52:19",
     "baslik": "Nozzle tıkanmadan temizle: 3 kısa işaret",
-    "izlenme": 41,
+    "izlenme": 51,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=YBNIDKMia3Y"
@@ -742,7 +741,7 @@
     "tur": "Short",
     "tarih": "2026-11-23T13:17:07",
     "baslik": "Şehirde aslan görürsen ne yapmalısın?",
-    "izlenme": 26,
+    "izlenme": 27,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=9sEswOUevrM"
@@ -752,7 +751,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T23:17:16",
     "baslik": "Bambu Lab A1 Combo AMS lite filament değişim sorunları",
-    "izlenme": 190,
+    "izlenme": 209,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=Vt_lyaaFBOo"
@@ -762,7 +761,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T17:50:11",
     "baslik": "Nozzle Neden Tıkanır? 5 Gerçek Sebep",
-    "izlenme": 143,
+    "izlenme": 148,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=ix-yeSzHv1c"
@@ -772,8 +771,8 @@
     "tur": "Short",
     "tarih": "2026-11-22T10:33:51",
     "baslik": "Baskısı en kolay filamentler: 5'ten 1'e",
-    "izlenme": 385,
-    "begeni": 3,
+    "izlenme": 392,
+    "begeni": 4,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=czKPQgTqQrw"
    },
@@ -782,7 +781,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T23:29:15",
     "baslik": "3D baskıda katman kayması neden olur?",
-    "izlenme": 3,
+    "izlenme": 5,
     "begeni": 1,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=bkae5x7GNp4"
@@ -792,7 +791,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T19:16:49",
     "baslik": "3D baskıda katman kayması neden olur?",
-    "izlenme": 1208,
+    "izlenme": 1210,
     "begeni": 5,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=yGVzYJN-m6o"
@@ -802,7 +801,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T15:26:52",
     "baslik": "Isıya en dayanıklı 5 filament | 3D baskı",
-    "izlenme": 372,
+    "izlenme": 376,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=TXcpwaFMx1U"
@@ -822,7 +821,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T09:57:09",
     "baslik": "Filament nem çekerse ne olur? Belirtiler ve çözüm",
-    "izlenme": 1250,
+    "izlenme": 1251,
     "begeni": 7,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=M9tyEIjEeH8"
@@ -832,7 +831,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T23:23:12",
     "baslik": "İlk katman neden bozuluyor? 5 hızlı kontrol",
-    "izlenme": 1126,
+    "izlenme": 1134,
     "begeni": 11,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=JFRO2uhYfwQ"
@@ -842,7 +841,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T22:17:19",
     "baslik": "3D Baskı Tablaya Yapışmıyor mu? 5 Pratik Çözüm",
-    "izlenme": 1265,
+    "izlenme": 1270,
     "begeni": 18,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=qcWHhTeaEHs"
@@ -852,7 +851,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T21:56:57",
     "baslik": "3D Baskı ile Araba İçi Pratik Aksesuarlar",
-    "izlenme": 176,
+    "izlenme": 177,
     "begeni": 0,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=DevZ1m13Ku4"
@@ -862,7 +861,7 @@
     "tur": "Short",
     "tarih": "2026-11-19T21:59:26",
     "baslik": "Dr. Filament ile 3D Yazıcılar Nasıl Çalışır? | gurtech3d",
-    "izlenme": 1120,
+    "izlenme": 1125,
     "begeni": 5,
     "yorum": 1,
     "link": "https://www.youtube.com/watch?v=MGVp8xfBUtc"
@@ -892,7 +891,7 @@
     "tur": "Short",
     "tarih": "2026-11-18T12:58:52",
     "baslik": "3D baskı ile pratik tasarımlar",
-    "izlenme": 1038,
+    "izlenme": 1041,
     "begeni": 7,
     "yorum": 1,
     "link": "https://www.youtube.com/watch?v=Z3j4VTqgSFM"
@@ -902,7 +901,7 @@
     "tur": "Short",
     "tarih": "2026-11-16T21:09:30",
     "baslik": "Kablolar neden karışıyor. Dr Filament çözüm bulsun",
-    "izlenme": 695,
+    "izlenme": 697,
     "begeni": 8,
     "yorum": 6,
     "link": "https://www.youtube.com/watch?v=aM1LRQ48pSQ"
@@ -912,7 +911,7 @@
     "tur": "Short",
     "tarih": "2026-11-16T07:00:16",
     "baslik": "Doktor Filament ile Tanışın: 3D Baskıyı Katman Katman Anlatı",
-    "izlenme": 1404,
+    "izlenme": 1405,
     "begeni": 12,
     "yorum": 1,
     "link": "https://www.youtube.com/watch?v=q3Un0K1sjbE"
@@ -922,7 +921,7 @@
  },
  "eksikler": [],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 21:00",
-  "govde": "Toplam 33.024 (+94) · Reels 20.049 · Short 11.682 · Hikaye 1.293 (6 bugün) · Takipçi 433 · En iyi Reels: Baskın tabladan kalkı 4.222"
+  "baslik": "📊 İzlenme raporu 09:00",
+  "govde": "Toplam 33.197 (+173) · Reels 20.087 · Short 11.758 · Hikaye 1.352 (1 bugün) · Takipçi 433 · En iyi Reels: Baskın tabladan kalkı 4.246"
  }
 }
