@@ -2094,7 +2094,7 @@ function buildLevel(n) {
 }
 const HUB = { name: 'Bal Köyü', sky: ['#7fd3ff', '#d9f3ff'], far: '#8fc5a8', mid: '#5aa65e', grass: '#5cc04a', grassDark: '#3f9b37', dirt: '#9a6234', dirtDot: '#7b4a24', tree: 'round', friction: 0.78, sun: '#fff1a8' };
 function buildHub() {
-  const R = 104, boxes = [{ x0: -R, y0: -3, z0: -R, x1: R, y1: 0, z1: R, kind: 'ground', on: true }], trees = [], paths = [];
+  const R = 150, boxes = [{ x0: -R, y0: -3, z0: -R, x1: R, y1: 0, z1: R, kind: 'ground', on: true }], trees = [], paths = [];
   const rnd = rng(9);
   // each portal sits on a patch of its own region, scattered around the village
   const spots = [{ x: -28, y: 0, z: 10 }, { x: 32, y: 0, z: 1 }, { x: -46, y: 1.5, z: -32 }, { x: 46, y: 0, z: -41 }, { x: -10, y: 0, z: -57 }, { x: 32, y: 4.5, z: -62 }, { x: -59, y: 0, z: -6 }, { x: 59, y: 0, z: -9 }, { x: -52, y: 0, z: -59 }, { x: 12, y: 0, z: -68 }, { x: 62, y: 0, z: -58 }, { x: -64, y: 0, z: 28 }];
@@ -2147,7 +2147,7 @@ function buildHub() {
   const clearOf = (x, z, need) => spots.every(sp => Math.hypot(x - sp.x, z - sp.z) > need + 6) && parks.every(pk => Math.hypot(x - pk.cx, z - pk.cz) > need + pk.rad + 3)
     && [shop, ward, goal, smith].every(o => Math.hypot(x - o.x, z - o.z) > need + 5) && Math.hypot(x, z - 50) > need + 6 && mts.every(m => Math.hypot(x - m.cx, z - m.cz) > need + m.r + 6);
   for (let k = 0; mts.length < 11 && k < 1500; k++) {
-    const a = rnd() * Math.PI * 2, rad = 50 + rnd() * 42, cx = Math.sin(a) * rad, cz = Math.cos(a) * rad, r = 8 + rnd() * 3, h = 18 + rnd() * 8;
+    const a = rnd() * Math.PI * 2, rad = 50 + rnd() * 88, cx = Math.sin(a) * rad, cz = Math.cos(a) * rad, r = 8 + rnd() * 3, h = 18 + rnd() * 8;
     if (Math.abs(cx) + r + 2.5 > R || Math.abs(cz) + r + 2.5 > R || !clearOf(cx, cz, r + 2)) continue;
     mts.push({ cx, cz, r, h });
   }
@@ -2173,7 +2173,7 @@ function buildHub() {
   const houses = [];
   const nearAny = (x, z) => mts.some(m => Math.hypot(x - m.cx, z - m.cz) < m.r + 6) || spots.some(sp => Math.hypot(x - sp.x, z - sp.z) < 9.5) || Math.hypot(x - shop.x, z - shop.z) < 7 || Math.hypot(x - ward.x, z - ward.z) < 6 || Math.hypot(x - goal.x, z - goal.z) < 7
     || Math.hypot(x - smith.x, z - smith.z) < 7 || parks.some(pk => Math.hypot(x - pk.cx, z - pk.cz) < pk.rad + 4.5) || Math.hypot(x, z - 50) < 8 || Math.abs(x) < 4;
-  for (let k = 0; houses.length < 36 && k < 3000; k++) {
+  for (let k = 0; houses.length < 56 && k < 6000; k++) {
     const x = (rnd() - 0.5) * 2 * (R - 6), z = (rnd() - 0.5) * 2 * (R - 6);
     if (nearAny(x, z) || houses.some(h => Math.hypot(x - h.x, z - h.z) < 10.5)) continue;
     const raw = Math.atan2(-x, 20 - z), dir = ((Math.round(raw / (Math.PI / 2)) % 4) + 4) % 4;
@@ -2269,7 +2269,7 @@ function buildHub() {
   const clear = (x, z) => !nearAny(x, z) && houses.every(h => Math.hypot(x - h.x, z - h.z) > 5.8);
   const segD = (x, z, pa) => { const dx = pa.x1 - pa.x0, dz = pa.z1 - pa.z0, t = Math.max(0, Math.min(1, ((x - pa.x0) * dx + (z - pa.z0) * dz) / (dx * dx + dz * dz))); return Math.hypot(x - pa.x0 - dx * t, z - pa.z0 - dz * t); };
   const offPath = (x, z) => paths.every(pa => segD(x, z, pa) > 2.4) && Math.hypot(x - tutGate.x, z - tutGate.z) > 4 && Math.hypot(x - roomHub.x, z - roomHub.z) > 5;
-  for (let i = 0; i < 620; i++) { const x = (rnd() - 0.5) * 2 * (R - 2), z = (rnd() - 0.5) * 2 * (R - 2); if (clear(x, z) && offPath(x, z)) trees.push({ x, y: 0, z, s: 0.7 + rnd() * 0.5 }); }
+  for (let i = 0; i < 1150; i++) { const x = (rnd() - 0.5) * 2 * (R - 2), z = (rnd() - 0.5) * 2 * (R - 2); if (clear(x, z) && offPath(x, z)) trees.push({ x, y: 0, z, s: 0.7 + rnd() * 0.5 }); }
   const offMan = (x, z) => (!mansion || Math.hypot(x - mansion.x, z - mansion.z) > Math.hypot(MAN.hw, MAN.hd) + 5) && remotes.every(rm => Math.hypot(x - rm.x, z - rm.z) > MR + 5) && stores.every(s => Math.hypot(x - s.x, z - s.z) > SR + 5.5); // a clear yard all around
   for (const t of trees) if (!offMan(t.x, t.z)) t.gone = true;
   // the shops move into their buildings now that the trees are placed (the trees still grow where they always did)
@@ -2289,7 +2289,7 @@ function buildHub() {
   }
   solidTrees(trees, boxes, hitems, HUB, true);
   const turtles = [];
-  for (let i = 0; turtles.length < 14 && i < 600; i++) {
+  for (let i = 0; turtles.length < 20 && i < 900; i++) {
     const x = (rnd() - 0.5) * 2 * (R - 8), z = (rnd() - 0.5) * 2 * (R - 8);
     if (clear(x, z) && offMan(x, z)) turtles.push({ id: turtles.length, x, z, yaw: rnd() * 6.28, t: rnd() * 5, next: 2 + rnd() * 3, s: 0.8 + rnd() * 0.45, hue: ['#3f9b4a', '#5aa65e', '#7a9b3a', '#4f8f6a'][turtles.length % 4], petT: 0, hop: 0 });
   }
@@ -2301,7 +2301,7 @@ function buildHub() {
   burrow.yaw = Math.atan2(0 - burrow.x, 48 - burrow.z);
   boxes.push({ x0: burrow.x - 0.9, x1: burrow.x + 0.9, z0: burrow.z - 0.9, z1: burrow.z + 0.9, y0: 0, y1: 0.55, kind: 'deco', on: true });
   const rabbits = [], babies = [], home = (save.stats || {}).bunny || [];
-  for (let i = 0; rabbits.length < 16 && i < 800; i++) {
+  for (let i = 0; rabbits.length < 22 && i < 1200; i++) {
     const x = (rr2() - 0.5) * 2 * (R - 10), z = (rr2() - 0.5) * 2 * (R - 10);
     if (clear(x, z) && freeOf(x, z, 1.6) && rabbits.every(r => Math.hypot(x - r.x, z - r.z) > 12)) rabbits.push({ id: rabbits.length, x, y: 0, z, yaw: rr2() * 6.28, hop: 0, hopLen: 0.4, wait: rr2() * 2, fast: false, caughtT: 0, s: 0.9 + rr2() * 0.25, fur: ['#c9a27a', '#a07850', '#eadfce', '#8f8a84'][rabbits.length % 4] });
   }
@@ -4188,7 +4188,7 @@ async function getLobby() {
   }
   return net.lobby;
 }
-function startTicker(send) { clearInterval(net.timer); net.timer = setInterval(() => { try { send(); } catch (e) {} for (const [id, p] of net.players) if (Date.now() - p.seen > 10000) dropPlayer(id); if (!pNet.hidden && net.on && (net.tk = (net.tk || 0) + 1) % 3 === 0) { $('nRoomTitle').textContent = 'Oda: ' + net.room + ' · ' + (net.players.size + 1) + ' oyuncu'; renderPlayers(); } }, 40); }
+function startTicker(send) { clearInterval(net.timer); net.timer = setInterval(() => { try { send(); } catch (e) {} for (const [id, p] of net.players) if (Date.now() - p.seen > 10000) dropPlayer(id); if (net.on && net.lobbyMode && !net.host && Date.now() - (net.lastWire || 0) > 12000) { netReset(); netMsg('Lobi yeniden kuruluyor...', true); if (!G.noAuto) setTimeout(goLobby, 800 + Math.random() * 2500); return; } if (!pNet.hidden && net.on && (net.tk = (net.tk || 0) + 1) % 3 === 0) { $('nRoomTitle').textContent = 'Oda: ' + net.room + ' · ' + (net.players.size + 1) + ' oyuncu'; renderPlayers(); } }, 40); }
 async function netGo(create) {
   if (net.on) return;
   lastFullState = 0;
@@ -4211,8 +4211,8 @@ const newRoomCode = () => Array.from({ length: 6 }, () => CODE_CH[Math.floor(Mat
 const peerOpen = (peer, ms) => new Promise((ok, no) => { const t = setTimeout(() => no(new Error('Tanıştırma sunucusuna ulaşılamadı. Başka bir ağ ya da "Kodla bağlan" bölümünü dene.')), ms); peer.on('open', () => { clearTimeout(t); ok(); }); peer.on('error', e => { clearTimeout(t); no(e && /^(network|server-error|socket-error|socket-closed)$/.test(e.type) ? new Error('Tanıştırma sunucusuna ulaşılamadı. Başka bir ağ ya da "Kodla bağlan" bölümünü dene.') : e); }); });
 function bindPeer(conn) {
   const c = { connected: true, pfName: 'peer', publish: (t, p) => { if (conn.open) { try { conn.send([t, String(p)]); } catch (e) {} } }, on() {}, end() { try { conn.close(); } catch (e) {} } };
-  net.mqs.push(c);
-  conn.on('data', m => { if (!Array.isArray(m) || typeof m[0] !== 'string') return; if (net.wire) net.wire(m[0], m[1]); if (net.host) for (const o of net.mqs) if (o !== c && o.connected) o.publish(m[0], m[1]); });
+  net.mqs.push(c); net.lastWire = Date.now();
+  conn.on('data', m => { net.lastWire = Date.now(); if (!Array.isArray(m) || typeof m[0] !== 'string') return; if (net.wire) net.wire(m[0], m[1]); if (net.host) for (const o of net.mqs) if (o !== c && o.connected) o.publish(m[0], m[1]); });
   conn.on('close', () => { c.connected = false; net.mqs = (net.mqs || []).filter(x => x !== c); if (!net.host && net.on) { const lob = net.lobbyMode; netReset(); if (lob && !G.noAuto) { netMsg('Lobi yeniden kuruluyor...', true); setTimeout(goLobby, 800 + Math.random() * 2500); } else netMsg('Kurucu odadan ayrıldı.'); } });
 }
 /* ---------- the village lobby: everyone who enters the game lands in the same Bal Köyü ---------- */
