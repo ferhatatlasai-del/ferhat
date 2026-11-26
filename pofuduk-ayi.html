@@ -516,8 +516,9 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
         <p class="small" id="admState"></p>
         <p class="msg" id="admNote" role="status"></p>
         <input id="admMsg" maxlength="90" placeholder="Mesaj (uyarı, duyuru ya da sebep)" aria-label="Mesaj" autocomplete="off">
-        <div class="fr2"><input id="admDur" type="number" min="1" max="99999" value="30" aria-label="Süre"><select id="admUnit" aria-label="Süre birimi"><option value="60000">dakika</option><option value="3600000">saat</option><option value="86400000">gün</option></select></div>
-        <p class="small">Süreli ban ve susturma için yukarıdaki süreyi kullanır.</p>
+        <div class="fr2"><input id="admDur" type="number" min="1" max="99999" value="30" aria-label="Süre"><select id="admUnit" aria-label="Süre birimi"><option value="1000">saniye</option><option value="60000" selected>dakika</option><option value="3600000">saat</option><option value="86400000">gün</option></select></div>
+        <p class="small">Süreli kilit, sayaçlı ceza, susturma ve hediye için yukarıdaki süreyi kullanır (saniye, dakika, saat, gün).</p>
+        <div class="fr2"><button class="btn" id="admGift" type="button">Herkese sınırsız para + bal ver</button><button class="btn alt" id="admGiftEnd" type="button">Hediyeyi bitir</button></div>
         <div class="fr2"><button class="btn" id="admSay" type="button">Herkese duyuru</button><button class="btn alt" id="admClose" type="button">Lobiyi kapat</button></div>
       </div>
       <div class="box"><h3>Lobideki oyuncular</h3><div id="admPlayers" class="net"></div></div>
@@ -548,6 +549,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
       <label for="setSfxVol"><span>Efekt sesleri <span class="val" id="vSfx"></span></span><input type="range" id="setSfxVol" min="0" max="100" step="5"></label>
       <label for="setView"><span>Görüş uzaklığı <span class="val" id="vView"></span></span><input type="range" id="setView" min="50" max="250" step="10"></label>
       <label for="setQual"><span>Grafik kalitesi</span><select id="setQual"><option value="auto">Otomatik</option><option value="low">Düşük</option><option value="med">Orta</option><option value="high">Yüksek</option></select></label>
+      <label for="setFly" id="setFlyRow" hidden><span>Uçma (yönetici)</span><select id="setFly"><option value="0">Kapalı</option><option value="1">Açık: Boşluk yukarı, Shift aşağı</option></select></label>
       <label for="setLobby"><span>Köye girince lobiye bağlan</span><select id="setLobby"><option value="1">Açık</option><option value="0">Kapalı</option></select></label>
       <label for="setCam"><span>Kamera dönüş hızı <span class="val" id="vCam"></span></span><input type="range" id="setCam" min="30" max="200" step="10"></label>
     </div>
@@ -606,7 +608,15 @@ const migrateSave = s => { if (s.axe >= 3 && !s.axeV) s.axe++; s.axeV = 2; retur
 let legacySave = null;
 try { const s = JSON.parse(localStorage.getItem('pofuduk-save') || 'null'); if (s && typeof s === 'object' && !Object.keys(readAccounts()).length) legacySave = s; } catch (e) {}
 if (legacySave) save = migrateSave(Object.assign(defaultSave(), legacySave));
-function saveGame() { if (!activeId) return; try { localStorage.setItem(accSaveKey(activeId), JSON.stringify(save)); } catch (e) {} }
+function saveGame() {
+  if (!activeId) return;
+  try {
+    const gift = G.gift && !G.admin, c = save.coins, b = save.bal;
+    if (gift) { save.coins = G.gift.coins; save.bal = G.gift.bal; } // the gift is never saved
+    localStorage.setItem(accSaveKey(activeId), JSON.stringify(save));
+    if (gift) { save.coins = c; save.bal = b; }
+  } catch (e) {}
+}
 
 /* ---------- sound ---------- */
 let ac = null, muted = false;
@@ -1147,6 +1157,8 @@ function drawHud() {
   { const now = Date.now(), lines = chatLog.filter(m => now - m.at < 14000).slice(-6);
     lines.forEach((m, i) => { ctx.globalAlpha = Math.min(1, (14000 - (now - m.at)) / 2000); txt(`${m.n}: ${m.t}`, 14, 292 + i * 22, 17, m.self ? '#ffe9a0' : '#ffffff', 'left'); }); ctx.globalAlpha = 1; }
   if (G.mySay && Date.now() < G.mySay.until && state === 'play' && !P.dead) { const q = scr(P.x, P.y + 2.6, P.z); if (q) { const w = ctx.measureText(G.mySay.t).width + 24; ctx.fillStyle = 'rgba(255,255,255,0.92)'; rr(q.x - w / 2, q.y - 22, w, 30, 12); ctx.fill(); txt(G.mySay.t, q.x, q.y - 1, 17, '#4a2c17', 'center'); } }
+  if (G.gift && !G.admin) txt(`🎁 Sınırsız para ve bal: ${mmss(G.gift.until - Date.now())}`, VW / 2, 34, 22, '#ffd23f', 'center');
+  if (G.freezeUntil > Date.now()) { ctx.fillStyle = 'rgba(120,20,20,0.82)'; rr(VW / 2 - 190, 170, 380, 96, 18); ctx.fill(); txt('CEZALISIN', VW / 2, 202, 26, '#ffd9d4', 'center'); txt(mmss(G.freezeUntil - Date.now()), VW / 2, 245, 40, '#ffffff', 'center'); }
   if (noticeT > 0) { noticeT--; ctx.globalAlpha = Math.min(1, noticeT / 30); const w2 = 640, x2 = VW / 2 - w2 / 2; ctx.fillStyle = 'rgba(74,44,23,0.92)'; rr(x2, 64, w2, 92, 16); ctx.fill(); ctx.lineWidth = 4; ctx.strokeStyle = '#ffd23f'; ctx.stroke(); txt(noticeTitle, VW / 2, 96, 24, '#ffd23f', 'center'); txt(noticeTxt, VW / 2, 132, 20, '#fff4dc', 'center'); ctx.globalAlpha = 1; }
   if (qualMsg > 0) { qualMsg--; ctx.globalAlpha = Math.min(1, qualMsg / 30); txt(qualTxt, VW / 2, VH - 120, 20, '#ffd23f', 'center'); ctx.globalAlpha = 1; }
   if (L.hub && nightMsg > 0 && banner <= 0) { // waits until the village title has faded
@@ -2460,14 +2472,14 @@ function addHoney(n, x, y, z) {
 }
 function addCoins(n, x, y, z) { save.coins += n; if (x !== undefined) pop('+' + n + ' para', x, y, z, '#fff27a'); }
 function hurt(kx, kz) {
-  if (P.inv > 0 || P.dead) return;
+  if (G.admin || P.inv > 0 || P.dead) return;
   P.hp--; P.inv = 100; shake = 10; sfx.hurt(); P.hang = null; P.hangCd = 30; P.vine = null; P.vineCd = 30;
   const m = Math.hypot(kx, kz) || 1;
   P.vy = 7; P.vx = kx / m * 6; P.vz = kz / m * 6; P.pound = false;
   burst(P.x, P.y + 0.7, P.z, '#ff5a4f', 12);
   if (P.hp <= 0) kill();
 }
-function kill() { if (P.dead) return; P.hang = null; P.vine = null; P.dead = 1; P.vy = 9; P.vx = P.vz = 0; sfx.die(); shake = 14; }
+function kill() { if (P.dead || G.admin) return; P.hang = null; P.vine = null; P.dead = 1; P.vy = 9; P.vx = P.vz = 0; sfx.die(); shake = 14; }
 function ambient() {
   const w = L.def.weather;
   if (w === 'snow' && frame % 3 === 0) ambs.push({ x: Math.random() * (VW + 100), y: -5, vx: -0.4 + Math.random() * 0.3, vy: 1 + Math.random(), color: '#ffffff', r: 1.5 + Math.random() * 1.5 });
@@ -2482,7 +2494,9 @@ function ambient() {
 
 /* ---------- update ---------- */
 function update() {
-  if (G.admin) { if (save.coins < 9e7) save.coins = 99999999; if ((save.bal || 0) < 9e7) save.bal = 99999999; }
+  if (G.admin) { if (save.coins < 9e7) save.coins = 99999999; if ((save.bal || 0) < 9e7) save.bal = 99999999; if (P && !P.dead) P.hp = save.maxHp; lives = Math.max(lives, 9); }
+  else if (G.gift) { if (Date.now() >= G.gift.until) endGift(); else { if (save.coins < 9e7) save.coins = 99999999; if ((save.bal || 0) < 9e7) save.bal = 99999999; } }
+  if (G.freezeUntil > Date.now() && P && !P.dead) { keys.left = keys.right = keys.fwd = keys.back = keys.jump = keys.pound = false; stick.x = stick.y = 0; jumpPressed = poundPressed = false; P.vx = P.vz = 0; } // the punishment: stand still until the counter ends
   P.ox = P.x; P.oy = P.y; P.oz = P.z; P.oyaw = P.yaw; P.oanim = P.anim; P.osq = P.squash; G.oCamYaw = G.camYaw;
   frame++;
   if (banner > 0) banner--;
@@ -2544,7 +2558,8 @@ function update() {
   if (!keys.jump && P.vy > 4.5 && !P.spin) P.vy = 4.5;
   if (poundPressed && !P.onGround && !P.pound) { P.pound = true; P.vx = P.vz = 0; P.vy = 4; P.spin = 0; }
   jumpPressed = poundPressed = false;
-  P.vy -= (P.pound ? 55 : 30) * DT; P.vy = Math.max(P.vy, P.pound ? -24 : -20);
+  if (G.admin && save.fly) { P.vy = keys.jump ? 9 : keys.pound ? -9 : 0; P.pound = false; } // the administrator can fly (set in Settings)
+  else { P.vy -= (P.pound ? 55 : 30) * DT; P.vy = Math.max(P.vy, P.pound ? -24 : -20); }
   if (P.spin > 0) P.spin--;
 
   moveAxis(P, 'x', P.vx * DT);
@@ -2585,7 +2600,7 @@ function update() {
   if (P.inv > 0) P.inv--;
 
   for (const b of L.boxes) if (b.kind === 'spike' && b.on && hits(P, b)) hurt(P.x - (b.x0 + b.x1) / 2, P.z - (b.z0 + b.z1) / 2);
-  if (P.y < L.killY) { if (L.hub) { P = newPlayer(L.start); G.ct = null; return; } P.hp = 0; kill(); return; }
+  if (P.y < L.killY) { if (L.hub || G.admin) { P = newPlayer(L.start); G.ct = null; return; } P.hp = 0; kill(); return; }
 
   for (const h of L.items) {
     if (h.got) continue;
@@ -4327,6 +4342,7 @@ chatIn.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'En
 $('chatBtn').onclick = () => { if (chatBar.hidden) openChat(); else closeChat(); };
 let noticeT = 0, noticeTitle = '', noticeTxt = '';
 const notice = (title, txt) => { noticeT = 420; noticeTitle = title; noticeTxt = String(txt || '').slice(0, 120); };
+function endGift() { if (!G.gift) return; save.coins = G.gift.coins; save.bal = G.gift.bal; G.gift = null; saveGame(); notice('Hediye bitti', 'Paran ve balın eski haline döndü.'); }
 function admApply(o, mine) {
   const me = !G.admin && !mine && ((o.code && o.code === save.code) || (!o.code && o.name && slug(o.name) === slug(save.name)));
   const left = ms => ms > 3 * 365 * 864e5 ? 'kalıcı olarak' : (ms >= 864e5 ? Math.round(ms / 864e5) + ' gün' : ms >= 36e5 ? Math.round(ms / 36e5) + ' saat' : Math.max(1, Math.round(ms / 6e4)) + ' dakika');
@@ -4337,12 +4353,15 @@ function admApply(o, mine) {
   else if (o.cmd === 'kill') { if (me && P && !P.dead) { P.hp = 0; kill(); notice('Yönetici seni öldürdü', o.msg); } }
   else if (o.cmd === 'ban') {
     addTo(BAN_KEY, o);
-    if (me) { G.noAuto = true; netReset(); notice(dur === 'kalıcı olarak' ? 'Lobiden kalıcı olarak banlandın' : `Lobiden ${dur} banlandın`, o.msg); }
+    if (me) { G.noAuto = true; netReset(); notice(dur === 'kalıcı olarak' ? 'Kendi dünyana kalıcı olarak kilitlendin' : `${dur} kendi dünyana kilitlendin`, o.msg); }
     else if (net.on) for (const [id, pl] of [...net.players]) if (pl.c === o.code) dropPlayer(id);
   }
   else if (o.cmd === 'unban') dropFrom(BAN_KEY, o);
   else if (o.cmd === 'mute') { addTo(MUTE_KEY, o); if (me) notice(dur === 'kalıcı olarak' ? 'Kalıcı olarak susturuldun' : `${dur} susturuldun`, o.msg); }
   else if (o.cmd === 'unmute') dropFrom(MUTE_KEY, o);
+  else if (o.cmd === 'freeze') { G.frozen = G.frozen || {}; G.frozen[o.code] = { until: +o.until || 0, name: o.name || '' }; if (me) { G.freezeUntil = +o.until || 0; notice('Sayaçlı ceza', o.msg || 'Süre dolana kadar yerinde bekle.'); } }
+  else if (o.cmd === 'unfreeze') { if (G.frozen) delete G.frozen[o.code]; if (me) G.freezeUntil = 0; }
+  else if (o.cmd === 'gift') { if (!G.admin) { const u = +o.until || 0; if (u > Date.now()) { if (!G.gift) G.gift = { coins: save.coins, bal: save.bal || 0 }; G.gift.until = u; notice('Yönetici hediyesi', 'Sınırsız para ve bal!'); } else if (G.gift) endGift(); } }
   else if (o.cmd === 'close') { if (!G.admin) { G.noAuto = true; netReset(); notice('Lobi kapatıldı', 'Yönetici lobiyi kapattı.'); } }
 }
 const admNote = (t, ok) => { const m = $('admNote'); m.textContent = t; m.className = 'msg' + (ok ? ' ok' : ''); };
@@ -4368,7 +4387,7 @@ function holdBeacon() {
   try { const b = new window.Peer('pofuduk-kapali', window.PEER_OPTS || {}); G.beacon = b; b.on('connection', c => c.on('open', () => setTimeout(() => { try { c.close(); } catch (e) {} }, 300))); b.on('error', () => {}); } catch (e) {}
 }
 const dropBeacon = () => { try { if (G.beacon) G.beacon.destroy(); } catch (e) {} G.beacon = null; };
-function admSetup() { $('admBtn').hidden = false; if (save.lobbyClosedByMe) { holdBeacon(); G.noAuto = true; } }
+function admSetup() { $('admBtn').hidden = false; $('setFlyRow').hidden = false; $('setFly').value = save.fly ? '1' : '0'; if (save.lobbyClosedByMe) { holdBeacon(); G.noAuto = true; } }
 const pAdm = $('pAdm'); let admPaused = false, admTimer = 0;
 function openAdm() {
   if (!G.admin) return; audio(); unlockMouse();
@@ -4395,16 +4414,18 @@ function renderAdm() {
       btn('Sustur (süreli)', () => { if (admSend('mute', Object.assign({ until: until(), msg: msg() }, who))) admNote(`${pl.n} ${durTxt()} susturuldu.`, true); }, true),
       btn('At', () => { if (admSend('kick', Object.assign({ msg: msg() }, who))) admNote(`${pl.n} lobiden atıldı.`, true); }),
       btn('Öldür', () => { if (admSend('kill', Object.assign({ msg: msg() }, who))) admNote(`${pl.n} öldürüldü.`, true); }),
-      btn('Ban (kalıcı)', () => { if (admSend('ban', Object.assign({ until: Date.now() + FOREVER, msg: msg() }, who))) admNote(`${pl.n} kalıcı olarak banlandı.`, true); }),
-      btn('Süreli ban', () => { if (admSend('ban', Object.assign({ until: until(), msg: msg() }, who))) admNote(`${pl.n} ${durTxt()} banlandı.`, true); }));
+      btn('Kendi dünyasına kilitle (süreli)', () => { if (admSend('ban', Object.assign({ until: until(), msg: msg() }, who))) admNote(`${pl.n} ${durTxt()} kendi dünyasına kilitlendi.`, true); }),
+      btn('Kalıcı kilitle', () => { if (admSend('ban', Object.assign({ until: Date.now() + FOREVER, msg: msg() }, who))) admNote(`${pl.n} kalıcı olarak kendi dünyasına kilitlendi.`, true); }),
+      btn('Sayaçlı ceza (dondur)', () => { if (admSend('freeze', Object.assign({ until: until(), msg: msg() }, who))) admNote(`${pl.n} ${durTxt()} donduruldu, ekranında sayaç var.`, true); }));
     row.append(bt); box.append(row);
   }
-  const bb = $('admBans'); bb.innerHTML = ''; const bans = readList(BAN_KEY).map(b => Object.assign({ kind: 'ban' }, b)).concat(readList(MUTE_KEY).map(b => Object.assign({ kind: 'mute' }, b)));
-  if (!bans.length) bb.append(el('p', 'Ban ya da susturma yok.', 'small'));
+  const bb = $('admBans'); bb.innerHTML = ''; const frozen = Object.entries(G.frozen || {}).filter(([c, v]) => v.until > Date.now()); const bans = readList(BAN_KEY).map(b => Object.assign({ kind: 'ban' }, b)).concat(readList(MUTE_KEY).map(b => Object.assign({ kind: 'mute' }, b)));
+  if (!bans.length && !frozen.length) bb.append(el('p', 'Kilit, ceza ya da susturma yok.', 'small'));
+  for (const [c, v] of frozen) { const row = el('div', null, 'admrow'); row.append(el('span', `Sayaçlı ceza · ${v.name || '?'} · kod ${c} · ${mmss(v.until - Date.now())}`, 'small')); const bt = el('div', null, 'bt'); bt.append(btn('Cezayı bitir', () => { admSend('unfreeze', { code: c, name: v.name }); }, true)); row.append(bt); bb.append(row); }
   for (const b of bans) {
     const row = el('div', null, 'admrow'), ms = b.until - Date.now(), t = ms > 3 * 365 * 864e5 ? 'kalıcı' : ms >= 864e5 ? Math.round(ms / 864e5) + ' gün kaldı' : ms >= 36e5 ? Math.round(ms / 36e5) + ' saat kaldı' : Math.max(1, Math.round(ms / 6e4)) + ' dk kaldı';
-    row.append(el('span', `${b.kind === 'ban' ? 'BAN' : 'Susturma'} · ${b.name || '?'} · kod ${b.code || '-'} · ${t}`, 'small')); const bt = el('div', null, 'bt');
-    bt.append(btn(b.kind === 'ban' ? 'Banı kaldır' : 'Susturmayı kaldır', () => { dropFrom(b.kind === 'ban' ? BAN_KEY : MUTE_KEY, b); if (net.on) admSend(b.kind === 'ban' ? 'unban' : 'unmute', { code: b.code, name: b.name }); }, true)); row.append(bt); bb.append(row);
+    row.append(el('span', `${b.kind === 'ban' ? 'Kilitli (kendi dünyasında)' : 'Susturma'} · ${b.name || '?'} · kod ${b.code || '-'} · ${t}`, 'small')); const bt = el('div', null, 'bt');
+    bt.append(btn(b.kind === 'ban' ? 'Kilidi kaldır' : 'Susturmayı kaldır', () => { dropFrom(b.kind === 'ban' ? BAN_KEY : MUTE_KEY, b); if (net.on) admSend(b.kind === 'ban' ? 'unban' : 'unmute', { code: b.code, name: b.name }); }, true)); row.append(bt); bb.append(row);
   }
   const ac = $('admAccs'); ac.innerHTML = ''; const accs = readAccounts();
   for (const k of Object.keys(accs)) { const a = accs[k]; ac.append(el('div', `${a.av || ''} ${a.name} · ${a.age ? a.age + ' yaş' : 'yaş yok'}`)); }
@@ -4413,6 +4434,8 @@ function renderAdm() {
 pAdm.querySelectorAll('input, select').forEach(i => i.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Escape') closeAdm(); if (e.key === 'Enter' && i.id === 'admMsg') $('admSay').click(); }));
 $('admBtn').onclick = () => { if (pAdm.hidden) openAdm(); else closeAdm(); };
 $('admX').onclick = closeAdm;
+$('admGift').onclick = () => { const ms = Math.max(1, Math.min(99999, Math.round(+$('admDur').value || 1))) * (+$('admUnit').value || 6e4); if (admSend('gift', { until: Date.now() + ms })) admNote(`Herkes ${$('admDur').value} ${$('admUnit').selectedOptions[0].textContent} boyunca sınırsız para ve bala sahip.`, true); };
+$('admGiftEnd').onclick = () => { if (admSend('gift', { until: 0 })) admNote('Hediye bitirildi.', true); };
 $('admSay').onclick = () => { const m = $('admMsg').value.trim(); if (!m) return admNote('Önce yukarıdaki kutuya duyuruyu yaz.'); if (admSend('say', { msg: m })) { admNote(`Duyuru ${net.players.size} oyuncuya gönderildi: ${m}`, true); notice('Duyuru gönderildi', m); $('admMsg').value = ''; } };
 $('admClose').onclick = () => {
   if (!G.admin) return;
@@ -4701,6 +4724,7 @@ function drawRemoteTags() {
     const q = scr(p.rx, p.ry + 2.15 * (p.sc || 1), p.rz); if (!q) continue;
     const fr = save.friends.some(f => f.code === p.c);
     txt(p.n + (fr ? ' ★' : ''), q.x, q.y, 18, fr ? '#9dffb0' : '#ffffff', 'center');
+    if (G.frozen && G.frozen[p.c] && G.frozen[p.c].until > Date.now()) txt('⏳ ' + mmss(G.frozen[p.c].until - Date.now()), q.x, q.y - 24, 20, '#ff8a80', 'center');
     if (p.say && Date.now() < p.say.until) { ctx.font = '17px "Nunito", sans-serif'; const w = ctx.measureText(p.say.t).width + 24; ctx.fillStyle = 'rgba(255,255,255,0.92)'; rr(q.x - w / 2, q.y - 52, w, 30, 12); ctx.fill(); txt(p.say.t, q.x, q.y - 31, 17, '#4a2c17', 'center'); }
   }
   txt(`👥 ${net.room} · ${net.players.size + 1} oyuncu`, 24, 84, 18, '#c9f2c0');
@@ -4769,6 +4793,7 @@ $('setAge').oninput = e => {
   if (activeId) { const accs = readAccounts(); if (accs[activeId]) { accs[activeId].age = a; writeAccounts(accs); } }
   saveGame();
 };
+$('setFly').onchange = e => { save.fly = e.target.value === '1'; saveGame(); };
 $('setLobby').onchange = e => { save.autoLobby = e.target.value === '1'; if (!save.autoLobby) G.noAuto = true; else { G.noAuto = false; setTimeout(goLobby, 300); } saveGame(); };
 $('setQual').onchange = e => { save.quality = e.target.value; G.autoQ = null; perfSlow = 0; applyQuality(); saveGame(); };
 $('setCam').oninput = e => { save.camSens = e.target.value / 100; $('vCam').textContent = e.target.value + '%'; };
