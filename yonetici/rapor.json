@@ -594,6 +594,29 @@
         "Son 5 otomatik hat kaydında çok sayıda ret var; bu, çeşitlilikten çok kalite/doğruluk tarafında sistematik bir soruna işaret edebilir."
       ],
       "eylem_sayisi": 0
+    },
+    {
+      "zaman": "2026-11-27 18:31",
+      "kademe": 3,
+      "model": "OpenAI (gpt-5.4)",
+      "rapor": [
+        "Acil: otomatik hat bugün art arda 2 video reddetmiş; 15:05 turunda kalite/okunurluk ve teknik kesinlik sorunları var.",
+        "Otomatik hat modu açık; bunu değiştirmedim. Bu akşam 20:05 turunda da benzer hata riski var, özellikle karşılaştırma ve sayı içeren anlatılarda.",
+        "Hikâye tarafında kuyruk düşük görünüyor: 3 planlı hikâye kalmış, günlük hedef 6. Hikâye ajanı çalışıyor ama yarın için açık oluşabilir.",
+        "Sağlık genel olarak iyi görünüyor; anahtarlar ve platform izinleri çalışıyor. Son 24 saatte Nöbetçi akışında 3 başarısız kayıt var ama mevcut sağlık özetinde aktif arıza görünmüyor.",
+        "Yorum kuyruğunda onay bekleyen yanıt yok; bu turda yorum onayı yapmadım.",
+        "Yeni öncelikli konu listesi boş. Son iyi performans temaları ilk katman, yapışma, stringing ve nem etrafında toplanıyor; tekrar etmeyen yakın konular eklenebilir."
+      ],
+      "oneriler": [
+        "20:05 otomatik turundan çıkacak videoda özellikle küçük altyazı, tekrar eden sahne ve tek/kesin sıcaklık-dayanım sayıları için sıkı kontrol yap.",
+        "Karşılaştırma videolarını bir süre azaltıp tek kavramlı, kontrol listeli konulara dönmen daha güvenli olabilir; bugün iki ret de anlatımın fazla kesinleştiği yerlerden gelmiş.",
+        "Hikâye kuyruğu yarın aksamasın diye panelden hikâye üretim planını kontrol etmeni öneririm; ben günlük sayıyı değiştirmedim çünkü sorun sayıdan çok kuyruk azlığı gibi görünüyor."
+      ],
+      "uyarilar": [
+        "Otomatik hat açıkken art arda ret sürerse günlük yayın sayısı düşebilir; bu durumda panel ayarını senin gözden geçirmen gerekir.",
+        "Bambu/marka adı geçen içeriklerde bağımsızlık notu unutulursa red riski var; özellikle otomatik üretimde dikkat edilmeli."
+      ],
+      "eylem_sayisi": 3
     }
   ],
   "defter": [
@@ -848,6 +871,41 @@
       "neden": "Nöbetçi son 24 saatte başarısız göründüğü için sağlık kontrolünü yeniden tetiklemek gerekli.",
       "durum": "yapildi",
       "ayrinti": "nobetci.yml tetiklendi"
+    },
+    {
+      "zaman": "2026-11-27 18:31",
+      "kademe": 3,
+      "eylem": "workflow_tetikle",
+      "params": {
+        "akis": "nobetci.yml"
+      },
+      "neden": "Son 24 saatte Nöbetçi başarısız kayıtları var; sistem sağlığını yeniden doğrulamak için gerekli.",
+      "durum": "yapildi",
+      "ayrinti": "nobetci.yml tetiklendi"
+    },
+    {
+      "zaman": "2026-11-27 18:31",
+      "kademe": 3,
+      "eylem": "konu_oncelik_ekle",
+      "params": {
+        "konu": "Tabla temizliği neden yapışmayı bu kadar etkiler?",
+        "ipucu": "Yeni başlayanlara sade anlat; yağ/toz etkisi, ilk katman bağlantısı, abartısız kontrol listesi. İlk katman/yapışma temasına yakın ama tekrar etmeyen sahneler kullan."
+      },
+      "neden": "En çok izlenen içeriklerle uyumlu, yeni başlayan için faydalı ve mevcut öncelik listesi boş.",
+      "durum": "yapildi",
+      "ayrinti": "Tabla temizliği neden yapışmayı bu kadar etkiler?"
+    },
+    {
+      "zaman": "2026-11-27 18:31",
+      "kademe": 3,
+      "eylem": "konu_oncelik_ekle",
+      "params": {
+        "konu": "Nozul çapı 0.4 mm neyi değiştirir?",
+        "ipucu": "Hız, detay ve katman ilişkisini genel anlat; kesin vaat verme, marka/model detayı uydurma. Basit görsel karşılaştırma öner."
+      },
+      "neden": "Çeşitlilik sağlar; teknik ama başlangıç seviyesine uygun, önceki son konularla çakışmıyor.",
+      "durum": "yapildi",
+      "ayrinti": "Nozul çapı 0.4 mm neyi değiştirir?"
     }
   ]
 }
