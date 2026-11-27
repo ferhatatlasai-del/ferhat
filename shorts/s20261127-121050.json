@@ -1,0 +1,63 @@
+{
+  "id": "s20261127-121050",
+  "olusturma": "2026-11-27T12:10:50Z",
+  "durum": "otomatik",
+  "tur": "viral",
+  "video": "",
+  "sure": 46.1,
+  "baslik": "PETG ipliklenmesi neden olur, nasıl azalır?",
+  "aciklama": "PETG’de ipliklenme çoğu zaman ısı, geri çekme ve nemle artar.\nBirkaç ayarla bunu belirgin biçimde azaltabilirsin.\nYorumda kendi ayarını yaz, takip et.\n\nSeslendirme yapay zekâ (Google) ile üretilmiştir. Animasyon ve ses tasarımı yapay zekâ ile kodla üretilmiştir.\n\n#3dprinting #3dbaski #petg #retraction #stringing #filament #shorts",
+  "muzik": "Sentez (kodla üretildi)",
+  "konu": "PETG neden ipliklenir, nasıl azaltılır?",
+  "tasarimlar": [],
+  "hikayeler": [],
+  "secim": {
+    "tur": "seri"
+  },
+  "zamanlama": [
+    {
+      "tip": "kanca",
+      "t0": 0.0,
+      "t1": 6.47,
+      "ses_son": 5.97
+    },
+    {
+      "tip": "sogutma",
+      "t0": 6.47,
+      "t1": 12.35,
+      "ses_son": 11.85
+    },
+    {
+      "tip": "ekstruder",
+      "t0": 12.35,
+      "t1": 18.67,
+      "ses_son": 18.17
+    },
+    {
+      "tip": "stringing",
+      "t0": 18.67,
+      "t1": 24.81,
+      "ses_son": 24.31
+    },
+    {
+      "tip": "nem",
+      "t0": 24.81,
+      "t1": 31.35,
+      "ses_son": 30.85
+    },
+    {
+      "tip": "kontrol_listesi",
+      "t0": 31.35,
+      "t1": 37.67,
+      "ses_son": 37.17
+    },
+    {
+      "tip": "kapanis",
+      "t0": 37.67,
+      "t1": 46.061,
+      "ses_son": 43.661
+    }
+  ],
+  "otomatik": true,
+  "anlati": "PETG baskında neden ince iplikler görüyorsun? En sık suçlu ısı ve geri çekme ayarı. Nozul çok sıcak kalırsa filament akmaya devam eder. Sıcaklık düşünce iplikler de azalır. Burada asıl mesele, nozulun geç sönmesi. Isı düşse bile eriyik uçta uzamaya devam eder. Sonra retraction çok kısa kalırsa, nozul gezinti sırasında ip çekebilir. Küçük artışlar dene. PETG nem çekince nozulda çıtırtı ve buhar görebilirsin. Kuru saklamak bu yüzden işe yarar. Kısaca: ısıyı biraz indir, retractionı artır, filamenti kuru tut. Sonra küçük bir test baskısı yap. İstersen bir sonraki videoda PETG için başlangıç ayarlarını da anlatayım. Yorum yaz ve takip et."
+}

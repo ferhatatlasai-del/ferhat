@@ -184,7 +184,20 @@
         "temizlik, ısı, brim birlikte bakılır",
         "yorum yaz, takip et"
       ]
+    },
+    {
+      "id": "s20261127-121050",
+      "konu": "PETG neden ipliklenir, nasıl azaltılır?",
+      "noktalar": [
+        "ipliklenme genelde ayar kaynaklıdır",
+        "yüksek ısı akışı sürdürür",
+        "geciken eriyik iplik yapar",
+        "kısa geri çekme ip bırakır",
+        "nem buhar ve çıtırtı yapar",
+        "üç küçük ayar ipliği azaltır",
+        "yorum ve takip çağrısı"
+      ]
     }
   ],
-  "son_ton": 305
+  "son_ton": -32
 }
