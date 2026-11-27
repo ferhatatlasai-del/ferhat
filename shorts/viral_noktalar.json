@@ -197,7 +197,24 @@
         "üç küçük ayar ipliği azaltır",
         "yorum ve takip çağrısı"
       ]
+    },
+    {
+      "id": "s20261127-121724",
+      "konu": "PLA mı PETG mi: hangisini seçmeli",
+      "noktalar": [
+        "yanlış filament baskıyı etkiler",
+        "kullanım alanı seçimi belirler",
+        "PLA daha kolay yazdırılır",
+        "PETG daha yüksek ısı ister",
+        "PLA daha çok soğutma sever",
+        "PETG sıcak ortamda daha dayanıklı",
+        "PETG tabla ayarına hassas",
+        "PETG daha tok esner",
+        "nem PETG’de daha sorunlu",
+        "ihtiyaca göre filament seç",
+        "yorum yaz ve takip et"
+      ]
     }
   ],
-  "son_ton": -32
+  "son_ton": 72
 }
