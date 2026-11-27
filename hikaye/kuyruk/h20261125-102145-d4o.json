@@ -1,7 +1,7 @@
 {
   "id": "h20261125-102145-d4o",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-25T10:21:45.000Z",
   "gorsel": "hikaye/gorseller/h20261125-102145-d4o.mp4",
   "baslik": "Wall mounted cat litter/dog poop bag holder",
@@ -21,7 +21,9 @@
     "sorunlar": []
   },
   "yayin": {
-    "tarih": "2026-11-27T05:05:42Z"
+    "tarih": "2026-11-27T05:07:00Z",
+    "medya_kimligi": "18122897930517792",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4039416419936826692"
   },
   "hata": "",
   "deneme": 0,
