@@ -4499,14 +4499,14 @@ $('admClose').onclick = () => {
 /* ---------- the village lobby: everyone who enters the game lands in the same Bal Köyü ---------- */
 const LOBBY_MAX = 9; // guests per lobby; the next player starts lobby 2, and so on
 G.lobbyBusy = false;
-async function tryJoinLobby(hostId, opts) {
+async function tryJoinLobby(hostId, opts, ms) {
   const peer = new window.Peer('pofuduk-g' + Math.random().toString(36).slice(2, 10), opts);
   try { await peerOpen(peer, 9000); } catch (e) { try { peer.destroy(); } catch (x) {} throw e; } // the meeting server cannot be reached: give up quietly
   return await new Promise(res => {
-    let done = false; const t = setTimeout(() => fin('none'), 6000);
+    let done = false; const t = setTimeout(() => fin('slow'), ms || 10000); // 'slow': somebody may be there, the connection is just late
     const fin = v => { if (done) return; done = true; clearTimeout(t); if (v !== 'joined') { try { peer.destroy(); } catch (e) {} } res(v); };
     const conn = peer.connect(hostId, { serialization: 'json', reliable: true });
-    peer.on('error', () => fin('none')); conn.on('error', () => fin('none'));
+    peer.on('error', e => fin(e && e.type === 'peer-unavailable' ? 'none' : 'slow')); conn.on('error', () => fin('slow'));
     conn.on('data', m => { if (Array.isArray(m) && m[0] === 'full') { fin('full'); try { conn.close(); } catch (e) {} } });
     conn.on('open', async () => {
       await wait(700); // a full lobby says so right away
@@ -4536,11 +4536,12 @@ async function goLobby() {
   try {
     if (!G.admin && await lobbyClosed(opts)) { G.lobbyStatus = 'closed'; G.nextTry = Date.now() + 30000; netMsg('Lobi şu an kapalı.', true); renderNet(); return; }
     for (let n = 1; n <= 5 && !net.on; n++) {
-      const hostId = 'pofuduk-lobi' + n, r = await tryJoinLobby(hostId, opts);
+      const hostId = 'pofuduk-lobi' + n; let r = await tryJoinLobby(hostId, opts, 10000);
       if (r === 'joined' || net.on) return;
+      if (r === 'slow') { r = await tryJoinLobby(hostId, opts, 20000); if (r === 'joined' || net.on) return; if (r === 'slow') return; } // never open a second lobby next to one that exists: try again later
       if (r === 'full') continue;
       if (await tryHostLobby(hostId, opts)) return;
-      if (await tryJoinLobby(hostId, opts) === 'joined') return; // somebody else opened it a moment earlier
+      if (await tryJoinLobby(hostId, opts, 15000) === 'joined') return; // somebody else opened it a moment earlier
     }
   } catch (e) { G.nextTry = Date.now() + 20000; /* no meeting server on this network: play alone, try again later */ }
   finally { G.lobbyBusy = false; }
