@@ -1,7 +1,7 @@
 {
   "id": "s20261127-063014",
   "olusturma": "2026-11-27T06:30:14Z",
-  "durum": "onay_bekliyor",
+  "durum": "yayinlandi",
   "tur": "viral",
   "video": "videolar/yukleme_20261127063014.mp4",
   "sure": 59,
@@ -71,8 +71,9 @@
     }
   ],
   "yayinlanan": [
-    "instagram"
+    "instagram",
+    "youtube"
   ],
-  "yayin_tarihi": "2026-11-27T06:51:39.365Z",
+  "yayin_tarihi": "2026-11-27T06:51:58.178Z",
   "hikaye_tarihi": "2026-11-27T06:51:50.066Z"
 }
