@@ -548,6 +548,30 @@
         "Otomatik hat bugün de düşük kalite üretirse gereksiz maliyet oluşabilir."
       ],
       "eylem_sayisi": 1
+    },
+    {
+      "zaman": "2026-11-27 08:30",
+      "kademe": 2,
+      "model": "OpenAI (gpt-5.4)",
+      "rapor": [
+        "Acil: Hikâye kuyruğu boş görünüyor; günlük sayı 6 iken 0 planlı hikâye kalmış.",
+        "Otomatik hat açık ama son 5 turun 4’ü reddedilmiş; bu kalite/konu kalıbı sorunu olabilir.",
+        "Bugün otomatik hatta henüz tur görünmüyor; 10:05 turunu özellikle izlemeni öneririm.",
+        "Nöbetçi son 24 saatte 3 kez başarısız olmuş; bugün tekrar tetiklemedim çünkü zaten art arda denenmiş ve sağlıkta ana servisler iyi görünüyor.",
+        "Video taslaklarında aynı konu ve aynı başlıkla iki içerik var; ikisine de daha önce incele notu düşülmüş, tekrar işlem yapmadım.",
+        "Öncelikli konu listesi dolu görünüyor (3 konu var); bu yüzden yeni konu eklemedim."
+      ],
+      "oneriler": [
+        "Hikâye ajanının neden kuyruk doldurmadığını panelden kontrol et; gerekirse manuel üretim akışını ayrıca planla.",
+        "Otomatik hatta art arda retler için özellikle Bambu Lab başlıklarında marka-bağlantı izlenimi ve tekrar eden anlatı kalıbını gözden geçir.",
+        "10:05 turu da zayıf gelirse otomatik hat modunu panelden denemeye almayı değerlendirebilirsin; ben mod değiştiremiyorum.",
+        "Yorum modu otomatik görünüyor; riskli konular için örneklem kontrolü yapman iyi olur."
+      ],
+      "uyarilar": [
+        "Hikâye kuyruğu boş kaldığı için bugün hikâye hedefi kaçabilir.",
+        "Otomatik hatta art arda ret sürerse günlük video çıkışı aksayabilir."
+      ],
+      "eylem_sayisi": 0
     }
   ],
   "defter": [
