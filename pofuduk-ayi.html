@@ -948,6 +948,7 @@ const SPECIES = {
   polar: { name: 'Kutup Ayısı', fur: '#eef4fa', limb: '#c9d6e3', earIn: '#c9d6e3', muzzle: '#ffffff', belly: '#ffffff' },
   sun: { name: 'Güneş Ayısı', fur: '#3b2b22', limb: '#24180f', earIn: '#6b4a35', muzzle: '#e8b56a', belly: '#f3b45a', ring: true },
 };
+const WOLF = { name: 'Kurt', fur: '#707a86', limb: '#4b525d', ear: '#707a86', earIn: '#d9a7a7', muzzle: '#b9bfc8', belly: '#cfd4db', wolf: true }; // the administrator's look
 const OUTFITS = [
   { id: 'none', name: 'Sadece atkı', price: 0 },
   { id: 'cap', name: 'Beyzbol şapkası', price: 15 },
@@ -1847,7 +1848,7 @@ function hogModel() {
   return g;
 }
 function bearModel(o) {
-  const sp = SPECIES[o.species] || SPECIES.brown, of = o.outfit || 'none';
+  const sp = o.species === 'wolf' ? WOLF : (SPECIES[o.species] || SPECIES.brown), of = o.outfit || 'none';
   const fur = o.girl && sp.furG ? sp.furG : sp.fur, ear = sp.ear || fur, arms = sp.arm || fur;
   const scarf = o.girl ? '#ff5fa2' : '#e63946';
   const root = new THREE.Group(), fp = grp(root, 0, 0.75, 0), m = grp(fp, 0, -0.75, 0); m.scale.setScalar(1 / 36);
@@ -1868,11 +1869,11 @@ function bearModel(o) {
   }
   mk('sph', fur, [13, 12.5, 12], [0, 36, 0], m);
   for (const s of [-1, 1]) {
-    mk('sph', ear, [5.6, 5.6, 4.6], [s * 9.5, 46, -1], m);
-    mk('sph', sp.earIn, [3, 3, 1.2], [s * 9.5, 46, 2.6], m);
+    if (sp.wolf) { mk('cone', ear, [4.6, 12, 3.8], [s * 8.5, 50, -1], m); mk('cone', sp.earIn, [2.5, 8, 1.2], [s * 8.5, 49, 1.6], m); } // pointed ears
+    else { mk('sph', ear, [5.6, 5.6, 4.6], [s * 9.5, 46, -1], m); mk('sph', sp.earIn, [3, 3, 1.2], [s * 9.5, 46, 2.6], m); }
   }
-  mk('sph', sp.muzzle, [6.6, 5, 5], [0, 32, 10], m);
-  mk('sph', '#22160c', [2.7, 2, 2], [0, 34, 14.6], m);
+  if (sp.wolf) { mk('sph', sp.muzzle, [5.2, 4.2, 8.5], [0, 31.5, 13], m); mk('sph', '#22160c', [2.4, 1.8, 1.8], [0, 33.3, 20.6], m); } // a long snout
+  else { mk('sph', sp.muzzle, [6.6, 5, 5], [0, 32, 10], m); mk('sph', '#22160c', [2.7, 2, 2], [0, 34, 14.6], m); }
   for (const s of [-1, 1]) {
     if (sp.patch) {
       const pt = mk('sph', '#26221f', [3.9, 3.2, 1.6], [s * 5.2, 39, 10.3], m); pt.rotation.z = s * 0.5;
@@ -1880,7 +1881,7 @@ function bearModel(o) {
       mk('sph', '#22160c', [1.2, 1.2, 0.8], [s * 5.2, 39.2, 12.5], m);
     } else {
       if (sp.ring) mk('sph', '#f3e3c8', [3, 3.2, 1.2], [s * 5, 39, 10.6], m);
-      mk('sph', '#22160c', [2.2, 2.5, 1.5], [s * 5, 39, 11.4], m);
+      mk('sph', sp.wolf ? '#f2c230' : '#22160c', [2.2, 2.5, 1.5], [s * 5, 39, 11.4], m);
       mk('sph', '#ffffff', [0.8, 0.8, 0.5], [s * 5 + 0.8, 40, 12.7], m);
     }
     if (o.girl) {
@@ -1890,7 +1891,7 @@ function bearModel(o) {
     mk('sph', o.girl ? '#ff8fb8' : '#f08a8a', [2.6, 2.2, 1], [s * 8.6, 33, 9.4], m);
   }
   const sc = mk('torus', scarf, [11.4, 11.4, 11.4], [0, 27.5, 0], m); sc.rotation.x = Math.PI / 2;
-  const tail = grp(m, -4, 27.5, -9.5); mk('box', scarf, [4.2, 12, 1.6], [0, -5.5, 0], tail); parts.tail = tail;
+  const tail = grp(m, -4, 27.5, -9.5); if (sp.wolf) { const tl = mk('cone', fur, [3.8, 15, 3.8], [0, -7.5, -1], tail); tl.rotation.z = Math.PI; } else mk('box', scarf, [4.2, 12, 1.6], [0, -5.5, 0], tail); parts.tail = tail; // a bushy wolf tail
   if (o.girl && !HATS.has(of)) {
     const bw = grp(m, 3, 49, 2); bw.rotation.z = -0.25;
     mk('sph', '#ff5fa2', [4.6, 3.2, 2], [-4, 0, 0], bw); mk('sph', '#ff5fa2', [4.6, 3.2, 2], [4, 0, 0], bw);
@@ -3730,7 +3731,7 @@ function drawWolves() {
   }
   L.wolves = L.wolves.filter(w => !w.gone || w.mesh);
 }
-function lookKey() { return save.species + save.outfit + save.gender + save.axe; }
+function lookKey() { return (G.admin ? 'wolf' : save.species) + save.outfit + save.gender + save.axe; }
 function render3D(alpha = 1, dtMs = 16.667) {
   perfTick(dtMs);
   if (G.forestGroup && P) { const px = P.x, pz = P.z; for (const m of G.forestGroup.children) { const s = m.geometry.boundingSphere; m.visible = Math.hypot(s.center.x - px, s.center.z - pz) - s.radius < 150; } } // forest chunks beyond the fog are not drawn
@@ -3909,7 +3910,7 @@ function render3D(alpha = 1, dtMs = 16.667) {
   const k = lookKey();
   if (G.bearKey !== k) {
     if (G.bear) G.scene.remove(G.bear);
-    G.bear = bearModel({ girl: save.gender === 'girl', species: save.species, outfit: save.outfit, axe: save.axe });
+    G.bear = bearModel({ girl: save.gender === 'girl', species: G.admin ? 'wolf' : save.species, outfit: save.outfit, axe: save.axe });
     G.scene.add(G.bear); G.bearKey = k;
   }
   const br = G.bear, pp = br.userData.parts;
@@ -4278,14 +4279,14 @@ const lvName = k => k === 'hub' ? 'Bal Köyü' : k === 'tut' ? 'Öğretici' : /^
 let lastFullState = 0;
 function myState() { // the house and the wardrobe are sent only every couple of seconds
   const st = myStateBase(), now = Date.now();
-  if (save.homePos && now - lastFullState > 2000) { lastFullState = now; st.pk = MY_PK; st.hm = save.homePos; st.dc = (save.decor || []).join(','); st.ow = (save.owned || []).filter(o => o !== 'none').join(','); }
+  if (save.homePos && now - lastFullState > 2000) { lastFullState = now; st.pk = MY_PK; if (G.admin && net.myId) { if (G.lookFor !== net.myId) { const ts = Date.now(); G.look = { ts, sig: u8b64(nacl.sign.detached(new TextEncoder().encode('look|' + net.myId + '|' + ts), G.admin.sk)) }; G.lookFor = net.myId; } st.as = G.look; } st.hm = save.homePos; st.dc = (save.decor || []).join(','); st.ow = (save.owned || []).filter(o => o !== 'none').join(','); }
   return st;
 }
 function myStateBase() {
   const r2 = v => Math.round(v * 100) / 100;
   return { n: save.name, c: save.code, lv: state === 'title' ? '' : lvKey(), x: P ? r2(P.x) : 0, y: P ? r2(P.y) : 0, z: P ? r2(P.z) : 0, yw: P ? r2(P.yaw) : 0,
     sp: P ? r2(Math.hypot(P.vx, P.vz)) : 0, air: P ? (P.onGround ? 0 : 1) : 0, fl: P ? Math.round(P.spin || 0) : 0, at: P && P.atkT > 0 ? 1 : 0,
-    g: save.gender, s: save.species, o: save.outfit, a: save.axe, av: avatar.sel || '', ag: save.age || 0, ck: net.host ? Math.round((save.clock || 0) * 10) / 10 : undefined };
+    g: save.gender, s: G.admin ? 'wolf' : save.species, o: save.outfit, a: save.axe, av: avatar.sel || '', ag: save.age || 0, ck: net.host ? Math.round((save.clock || 0) * 10) / 10 : undefined };
 }
 // remote players: keep only well-formed values
 function takePlayer(id, st) {
@@ -4301,7 +4302,8 @@ function takePlayer(id, st) {
     const hx = num(st.hm[0], 200), hz = num(st.hm[1], 200), hd2 = Math.max(0, Math.min(3, Math.round(num(st.hm[2], 3)))), dc = clip(st.dc, 90), ow = clip(st.ow, 140), sig = [hx, hz, hd2, dc, ow].join('|');
     if (sig !== p.hsig) { p.hsig = sig; p.hm = { x: hx, z: hz, dir: hd2 }; p.dc = dc; p.ow = ow; net.homesDirty = true; }
   }
-  if (!SPECIES[p.s]) p.s = 'brown';
+  if (st.as && typeof st.as.sig === 'string' && p.asig !== st.as.sig) { p.asig = st.as.sig; p.adminOk = (() => { try { return Number.isFinite(st.as.ts) && Math.abs(Date.now() - st.as.ts) < 12 * 3600 * 1000 && nacl.sign.detached.verify(new TextEncoder().encode('look|' + id + '|' + st.as.ts), b64u8(st.as.sig), b64u8(ADMIN_PK)); } catch (e) { return false; } })(); } // only the real administrator can look like a wolf
+  if (p.s === 'wolf') { if (!p.adminOk) p.s = 'brown'; } else if (!SPECIES[p.s]) p.s = 'brown';
   net.players.set(id, p);
   const f = save.friends.find(f => f.code === p.c); if (f && f.name !== p.n) { f.name = p.n; saveGame(); }
   if (p.rx === undefined) { p.rx = p.x; p.ry = p.y; p.rz = p.z; p.ryw = p.yw; p.ph = 0; }
