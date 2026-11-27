@@ -1,21 +1,21 @@
 {
- "tarih": "2026-11-27T15:00:24Z",
- "tr_saat": "27.11.2026 18:00",
+ "tarih": "2026-11-27T18:00:25Z",
+ "tr_saat": "27.11.2026 21:00",
  "toplam": {
-  "reels": 20556,
+  "reels": 20584,
   "gonderi": 0,
-  "short": 11869,
+  "short": 11873,
   "youtube_video": 0,
-  "hikaye": 1658,
-  "toplam": 34083,
+  "hikaye": 1708,
+  "toplam": 34165,
   "begeni": 306,
   "yorum": 28
  },
- "fark": 90,
+ "fark": 82,
  "instagram": {
   "durum": "tamam",
   "izin": true,
-  "takipci": 433,
+  "takipci": 432,
   "hata": "graph.instagram.com profil: HTTP 400 kod=190 tür=OAuthException: Invalid OAuth access token - Cannot parse access token",
   "gonderiler": [
    {
@@ -26,8 +26,8 @@
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgPFB_CMKqM/",
-    "izlenme": 327,
-    "erisim": 295
+    "izlenme": 347,
+    "erisim": 317
    },
    {
     "id": "17914671000663787",
@@ -147,7 +147,7 @@
     "begeni": 34,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": 4373,
+    "izlenme": 4381,
     "erisim": 3900
    },
    {
@@ -363,19 +363,29 @@
  "hikaye_izin": true,
  "hikayeler": [
   {
+   "id": "18131959315854053",
+   "tarih": "2026-11-27T16:47:28Z",
+   "baslik": "Safe Mason Jar Bee Waterer (Open feeder)",
+   "izlenme": 8,
+   "erisim": 7,
+   "okundu": true,
+   "yanit": 0
+  },
+  {
    "id": "18098214542166708",
    "tarih": "2026-11-27T14:26:51Z",
    "baslik": "Bee waterer -/- sugar water floating feeder (for 2 and 5 gal",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 14,
+   "erisim": 10,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "17994889832858473",
    "tarih": "2026-11-27T12:06:52Z",
    "baslik": "Bee Waterer",
-   "izlenme": 7,
-   "erisim": 7,
+   "izlenme": 13,
+   "erisim": 13,
    "okundu": true,
    "yanit": 0
   },
@@ -383,8 +393,8 @@
    "id": "18241345714316810",
    "tarih": "2026-11-27T06:55:47Z",
    "baslik": "Bee Feeder and Waterer / Napáječka pro včely",
-   "izlenme": 9,
-   "erisim": 9,
+   "izlenme": 16,
+   "erisim": 16,
    "okundu": true,
    "yanit": 0
   },
@@ -392,8 +402,8 @@
    "id": "18001464392829419",
    "tarih": "2026-11-27T06:53:40Z",
    "baslik": "Video hikayesi",
-   "izlenme": 11,
-   "erisim": 9,
+   "izlenme": 18,
+   "erisim": 16,
    "okundu": true,
    "yanit": 0
   },
@@ -401,8 +411,8 @@
    "id": "18122897930517792",
    "tarih": "2026-11-27T05:07:00Z",
    "baslik": "Wall mounted cat litter/dog poop bag holder",
-   "izlenme": 13,
-   "erisim": 11,
+   "izlenme": 21,
+   "erisim": 17,
    "okundu": true,
    "yanit": 0
   },
@@ -711,15 +721,6 @@
    "erisim": 20,
    "okundu": true,
    "yanit": 0
-  },
-  {
-   "id": "18081372350749410",
-   "tarih": "2026-11-21T17:06:42Z",
-   "baslik": "Table bag hook",
-   "izlenme": 25,
-   "erisim": 20,
-   "okundu": true,
-   "yanit": 0
   }
  ],
  "youtube": {
@@ -761,7 +762,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T23:17:16",
     "baslik": "Bambu Lab A1 Combo AMS lite filament değişim sorunları",
-    "izlenme": 240,
+    "izlenme": 241,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=Vt_lyaaFBOo"
@@ -781,7 +782,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T10:33:51",
     "baslik": "Baskısı en kolay filamentler: 5'ten 1'e",
-    "izlenme": 396,
+    "izlenme": 398,
     "begeni": 4,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=czKPQgTqQrw"
@@ -851,7 +852,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T22:17:19",
     "baslik": "3D Baskı Tablaya Yapışmıyor mu? 5 Pratik Çözüm",
-    "izlenme": 1278,
+    "izlenme": 1279,
     "begeni": 18,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=qcWHhTeaEHs"
@@ -931,7 +932,7 @@
  },
  "eksikler": [],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 18:00",
-  "govde": "Toplam 34.083 (+90) · Reels 20.556 · Short 11.869 · Hikaye 1.658 (5 bugün) · Takipçi 433 · En iyi Reels: Baskın tabladan kalkı 4.373"
+  "baslik": "📊 İzlenme raporu 21:00",
+  "govde": "Toplam 34.165 (+82) · Reels 20.584 · Short 11.873 · Hikaye 1.708 (6 bugün) · Takipçi 432 (-1) · En iyi Reels: Baskın tabladan kalkı 4.381"
  }
 }
