@@ -1,17 +1,17 @@
 {
- "tarih": "2026-11-26T18:00:32Z",
- "tr_saat": "26.11.2026 21:00",
+ "tarih": "2026-11-27T06:00:12Z",
+ "tr_saat": "27.11.2026 09:00",
  "toplam": {
-  "reels": 20127,
+  "reels": 20166,
   "gonderi": 0,
-  "short": 11781,
+  "short": 11812,
   "youtube_video": 0,
-  "hikaye": 1543,
-  "toplam": 33451,
-  "begeni": 323,
+  "hikaye": 1600,
+  "toplam": 33578,
+  "begeni": 324,
   "yorum": 31
  },
- "fark": 82,
+ "fark": 127,
  "instagram": {
   "durum": "tamam",
   "izin": true,
@@ -103,7 +103,7 @@
     "begeni": 10,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgAaonlkhF3/",
-    "izlenme": 1687,
+    "izlenme": 1688,
     "erisim": 1522
    },
    {
@@ -133,11 +133,11 @@
     "tur": "Reels",
     "tarih": "2026-11-20T23:05:39",
     "baslik": "Baskın tabladan kalkıyor mu? İlk katman yapışmıyorsa çoğu za",
-    "begeni": 33,
+    "begeni": 34,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": 4277,
-    "erisim": 3827
+    "izlenme": 4315,
+    "erisim": 3854
    },
    {
     "id": "18289759651292671",
@@ -363,11 +363,19 @@
  "hikaye_izin": true,
  "hikayeler": [
   {
+   "id": "18122897930517792",
+   "tarih": "2026-11-27T05:07:00Z",
+   "baslik": "Wall mounted cat litter/dog poop bag holder",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
    "id": "17990306057885699",
    "tarih": "2026-11-26T16:46:39Z",
    "baslik": "Dog Leash Poo Bag Holder (for used bags)",
-   "izlenme": 8,
-   "erisim": 6,
+   "izlenme": 22,
+   "erisim": 18,
    "okundu": true,
    "yanit": 0
   },
@@ -375,26 +383,26 @@
    "id": "18103753793428535",
    "tarih": "2026-11-26T14:26:53Z",
    "baslik": "Dog Poop Bag Holder for Carabiner Leash",
-   "izlenme": 20,
-   "erisim": 17,
+   "izlenme": 31,
+   "erisim": 27,
    "okundu": true,
-   "yanit": 0
+   "yanit": 1
   },
   {
    "id": "18159643870521552",
    "tarih": "2026-11-26T12:07:49Z",
    "baslik": "Dog Poop Bag Holder",
-   "izlenme": 27,
-   "erisim": 23,
+   "izlenme": 38,
+   "erisim": 34,
    "okundu": true,
-   "yanit": 0
+   "yanit": 1
   },
   {
    "id": "18191615326424407",
    "tarih": "2026-11-26T09:47:27Z",
    "baslik": "Dog Poop Bag Holder V3",
-   "izlenme": 27,
-   "erisim": 25,
+   "izlenme": 37,
+   "erisim": 36,
    "okundu": true,
    "yanit": 0
   },
@@ -402,8 +410,8 @@
    "id": "18348548860252951",
    "tarih": "2026-11-26T07:27:05Z",
    "baslik": "Flexi Dog Leash compatable poop bag holder",
-   "izlenme": 35,
-   "erisim": 31,
+   "izlenme": 46,
+   "erisim": 42,
    "okundu": true,
    "yanit": 0
   },
@@ -712,15 +720,6 @@
    "erisim": 22,
    "okundu": true,
    "yanit": 0
-  },
-  {
-   "id": "17972032542195687",
-   "tarih": "2026-11-21T14:46:57Z",
-   "baslik": "Grocery store bag hooks for using as a trash bin",
-   "izlenme": 28,
-   "erisim": 22,
-   "okundu": true,
-   "yanit": 0
   }
  ],
  "youtube": {
@@ -732,7 +731,7 @@
     "tur": "Short",
     "tarih": "2026-11-25T08:52:19",
     "baslik": "Nozzle tıkanmadan temizle: 3 kısa işaret",
-    "izlenme": 56,
+    "izlenme": 57,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=YBNIDKMia3Y"
@@ -742,7 +741,7 @@
     "tur": "Short",
     "tarih": "2026-11-23T13:17:07",
     "baslik": "Şehirde aslan görürsen ne yapmalısın?",
-    "izlenme": 27,
+    "izlenme": 28,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=9sEswOUevrM"
@@ -752,7 +751,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T23:17:16",
     "baslik": "Bambu Lab A1 Combo AMS lite filament değişim sorunları",
-    "izlenme": 215,
+    "izlenme": 230,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=Vt_lyaaFBOo"
@@ -762,7 +761,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T17:50:11",
     "baslik": "Nozzle Neden Tıkanır? 5 Gerçek Sebep",
-    "izlenme": 151,
+    "izlenme": 152,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=ix-yeSzHv1c"
@@ -772,7 +771,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T10:33:51",
     "baslik": "Baskısı en kolay filamentler: 5'ten 1'e",
-    "izlenme": 393,
+    "izlenme": 394,
     "begeni": 4,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=czKPQgTqQrw"
@@ -802,7 +801,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T15:26:52",
     "baslik": "Isıya en dayanıklı 5 filament | 3D baskı",
-    "izlenme": 379,
+    "izlenme": 382,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=TXcpwaFMx1U"
@@ -832,7 +831,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T23:23:12",
     "baslik": "İlk katman neden bozuluyor? 5 hızlı kontrol",
-    "izlenme": 1138,
+    "izlenme": 1140,
     "begeni": 11,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=JFRO2uhYfwQ"
@@ -842,7 +841,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T22:17:19",
     "baslik": "3D Baskı Tablaya Yapışmıyor mu? 5 Pratik Çözüm",
-    "izlenme": 1271,
+    "izlenme": 1277,
     "begeni": 18,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=qcWHhTeaEHs"
@@ -862,7 +861,7 @@
     "tur": "Short",
     "tarih": "2026-11-19T21:59:26",
     "baslik": "Dr. Filament ile 3D Yazıcılar Nasıl Çalışır? | gurtech3d",
-    "izlenme": 1125,
+    "izlenme": 1126,
     "begeni": 5,
     "yorum": 1,
     "link": "https://www.youtube.com/watch?v=MGVp8xfBUtc"
@@ -922,7 +921,7 @@
  },
  "eksikler": [],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 21:00",
-  "govde": "Toplam 33.451 (+82) · Reels 20.127 · Short 11.781 · Hikaye 1.543 (6 bugün) · Takipçi 433 · En iyi Reels: Baskın tabladan kalkı 4.277"
+  "baslik": "📊 İzlenme raporu 09:00",
+  "govde": "Toplam 33.578 (+127) · Reels 20.166 · Short 11.812 · Hikaye 1.600 (1 bugün) · Takipçi 433 · En iyi Reels: Baskın tabladan kalkı 4.315"
  }
 }
