@@ -1,17 +1,17 @@
 {
- "tarih": "2026-11-27T12:00:22Z",
- "tr_saat": "27.11.2026 15:00",
+ "tarih": "2026-11-27T15:00:24Z",
+ "tr_saat": "27.11.2026 18:00",
  "toplam": {
-  "reels": 20496,
+  "reels": 20556,
   "gonderi": 0,
-  "short": 11857,
+  "short": 11869,
   "youtube_video": 0,
-  "hikaye": 1640,
-  "toplam": 33993,
-  "begeni": 305,
+  "hikaye": 1658,
+  "toplam": 34083,
+  "begeni": 306,
   "yorum": 28
  },
- "fark": 127,
+ "fark": 90,
  "instagram": {
   "durum": "tamam",
   "izin": true,
@@ -23,11 +23,11 @@
     "tur": "Reels",
     "tarih": "2026-11-27T06:52:34",
     "baslik": "İlk katmanda sorun varsa sebep çoğu zaman tek şeydir: nozzle",
-    "begeni": 1,
+    "begeni": 2,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgPFB_CMKqM/",
-    "izlenme": 283,
-    "erisim": 263
+    "izlenme": 327,
+    "erisim": 295
    },
    {
     "id": "17914671000663787",
@@ -147,8 +147,8 @@
     "begeni": 34,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": 4357,
-    "erisim": 3887
+    "izlenme": 4373,
+    "erisim": 3900
    },
    {
     "id": "18289759651292671",
@@ -363,11 +363,28 @@
  "hikaye_izin": true,
  "hikayeler": [
   {
+   "id": "18098214542166708",
+   "tarih": "2026-11-27T14:26:51Z",
+   "baslik": "Bee waterer -/- sugar water floating feeder (for 2 and 5 gal",
+   "izlenme": 0,
+   "erisim": 0,
+   "okundu": false
+  },
+  {
+   "id": "17994889832858473",
+   "tarih": "2026-11-27T12:06:52Z",
+   "baslik": "Bee Waterer",
+   "izlenme": 7,
+   "erisim": 7,
+   "okundu": true,
+   "yanit": 0
+  },
+  {
    "id": "18241345714316810",
    "tarih": "2026-11-27T06:55:47Z",
    "baslik": "Bee Feeder and Waterer / Napáječka pro včely",
-   "izlenme": 6,
-   "erisim": 5,
+   "izlenme": 9,
+   "erisim": 9,
    "okundu": true,
    "yanit": 0
   },
@@ -375,8 +392,8 @@
    "id": "18001464392829419",
    "tarih": "2026-11-27T06:53:40Z",
    "baslik": "Video hikayesi",
-   "izlenme": 9,
-   "erisim": 6,
+   "izlenme": 11,
+   "erisim": 9,
    "okundu": true,
    "yanit": 0
   },
@@ -384,8 +401,8 @@
    "id": "18122897930517792",
    "tarih": "2026-11-27T05:07:00Z",
    "baslik": "Wall mounted cat litter/dog poop bag holder",
-   "izlenme": 11,
-   "erisim": 8,
+   "izlenme": 13,
+   "erisim": 11,
    "okundu": true,
    "yanit": 0
   },
@@ -393,8 +410,8 @@
    "id": "17990306057885699",
    "tarih": "2026-11-26T16:46:39Z",
    "baslik": "Dog Leash Poo Bag Holder (for used bags)",
-   "izlenme": 27,
-   "erisim": 22,
+   "izlenme": 31,
+   "erisim": 25,
    "okundu": true,
    "yanit": 0
   },
@@ -703,24 +720,6 @@
    "erisim": 20,
    "okundu": true,
    "yanit": 0
-  },
-  {
-   "id": "18025038785955858",
-   "tarih": "2026-11-21T16:26:39Z",
-   "baslik": "Bag hook for car trunk",
-   "izlenme": 29,
-   "erisim": 21,
-   "okundu": true,
-   "yanit": 0
-  },
-  {
-   "id": "18078108707591628",
-   "tarih": "2026-11-21T15:46:41Z",
-   "baslik": "VW Hook for shopping bags in trunk, Haken für VW Passat Koff",
-   "izlenme": 27,
-   "erisim": 22,
-   "okundu": true,
-   "yanit": 0
   }
  ],
  "youtube": {
@@ -732,7 +731,7 @@
     "tur": "Short",
     "tarih": "2026-11-27T06:52:49",
     "baslik": "İlk katman neden fazla yassı ya da yüksek olur?",
-    "izlenme": 33,
+    "izlenme": 39,
     "begeni": 0,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=YXBs4l1GFrs"
@@ -742,7 +741,7 @@
     "tur": "Short",
     "tarih": "2026-11-25T08:52:19",
     "baslik": "Nozzle tıkanmadan temizle: 3 kısa işaret",
-    "izlenme": 57,
+    "izlenme": 58,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=YBNIDKMia3Y"
@@ -762,7 +761,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T23:17:16",
     "baslik": "Bambu Lab A1 Combo AMS lite filament değişim sorunları",
-    "izlenme": 238,
+    "izlenme": 240,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=Vt_lyaaFBOo"
@@ -782,7 +781,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T10:33:51",
     "baslik": "Baskısı en kolay filamentler: 5'ten 1'e",
-    "izlenme": 394,
+    "izlenme": 396,
     "begeni": 4,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=czKPQgTqQrw"
@@ -812,7 +811,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T15:26:52",
     "baslik": "Isıya en dayanıklı 5 filament | 3D baskı",
-    "izlenme": 383,
+    "izlenme": 384,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=TXcpwaFMx1U"
@@ -932,7 +931,7 @@
  },
  "eksikler": [],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 15:00",
-  "govde": "Toplam 33.993 (+127) · Reels 20.496 · Short 11.857 · Hikaye 1.640 (3 bugün) · Takipçi 433 · En iyi Reels: Baskın tabladan kalkı 4.357"
+  "baslik": "📊 İzlenme raporu 18:00",
+  "govde": "Toplam 34.083 (+90) · Reels 20.556 · Short 11.869 · Hikaye 1.658 (5 bugün) · Takipçi 433 · En iyi Reels: Baskın tabladan kalkı 4.373"
  }
 }
