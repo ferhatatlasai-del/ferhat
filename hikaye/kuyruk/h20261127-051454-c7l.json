@@ -1,7 +1,7 @@
 {
   "id": "h20261127-051454-c7l",
   "kaynak": "uretim",
-  "durum": "planli",
+  "durum": "yayinlaniyor",
   "olusturma": "2026-11-27T05:14:54.000Z",
   "gorsel": "hikaye/gorseller/h20261127-051454-c7l.mp4",
   "baslik": "Bee Waterer",
@@ -20,7 +20,9 @@
     "deneme": 1,
     "sorunlar": []
   },
-  "yayin": null,
+  "yayin": {
+    "tarih": "2026-11-27T12:05:19Z"
+  },
   "hata": "",
   "deneme": 0,
   "tur": "video",
