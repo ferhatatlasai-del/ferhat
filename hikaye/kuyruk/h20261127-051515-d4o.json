@@ -1,7 +1,7 @@
 {
   "id": "h20261127-051515-d4o",
   "kaynak": "uretim",
-  "durum": "planli",
+  "durum": "yayinlaniyor",
   "olusturma": "2026-11-27T05:15:16.000Z",
   "gorsel": "hikaye/gorseller/h20261127-051515-d4o.mp4",
   "baslik": "Bee waterer -/- sugar water floating feeder (for 2 and 5 gallon buckets)",
@@ -20,7 +20,9 @@
     "deneme": 1,
     "sorunlar": []
   },
-  "yayin": null,
+  "yayin": {
+    "tarih": "2026-11-27T14:25:22Z"
+  },
   "hata": "",
   "deneme": 0,
   "tur": "video",
