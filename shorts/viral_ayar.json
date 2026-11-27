@@ -45,6 +45,10 @@
     {
       "konu": "Tabla temizliği neden yapışmayı bu kadar etkiler?",
       "ipucu": "Yeni başlayanlara sade anlat; yağ/toz etkisi, ilk katman bağlantısı, abartısız kontrol listesi. İlk katman/yapışma temasına yakın ama tekrar etmeyen sahneler kullan."
+    },
+    {
+      "konu": "Nozul çapı 0.4 mm neyi değiştirir?",
+      "ipucu": "Hız, detay ve katman ilişkisini genel anlat; kesin vaat verme, marka/model detayı uydurma. Basit görsel karşılaştırma öner."
     }
   ]
 }
