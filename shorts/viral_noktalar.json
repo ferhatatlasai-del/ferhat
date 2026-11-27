@@ -154,7 +154,22 @@
         "Tamamlanmış küp elde ve masada",
         "Yorum isteğiyle kapanış"
       ]
+    },
+    {
+      "id": "s20261127-063014",
+      "konu": "İlk katman neden fazla yassı ya da fazla yüksek olur?",
+      "noktalar": [
+        "mesafe ilk katmanı belirler",
+        "yakınlık yassılaştırır, uzaklık yükseltir",
+        "düzgün akış çizgiyi toplar",
+        "erken soğuma şekli kilitler",
+        "üç hızlı kontrol yeter",
+        "doğru boşluk çizgiyi oturtur",
+        "köşe kalkması mesafe ipucudur",
+        "ince ve sürekli çizgi iyi işaret",
+        "yorum ve takip çağrısı"
+      ]
     }
   ],
-  "son_ton": 0
+  "son_ton": 72
 }
