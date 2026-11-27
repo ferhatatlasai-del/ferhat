@@ -572,6 +572,28 @@
         "Otomatik hatta art arda ret sürerse günlük video çıkışı aksayabilir."
       ],
       "eylem_sayisi": 0
+    },
+    {
+      "zaman": "2026-11-27 18:30",
+      "kademe": 3,
+      "model": "OpenAI (gpt-5.4)",
+      "rapor": [
+        "Acil: otomatik hat açıkken bugün art arda 2 video reddedilmiş; 20:05 turunda benzer kalite sorunu çıkarsa yayın akışı zayıflayabilir.",
+        "Hikâye tarafında kuyruk düşük görünüyor: 3 planlı hikâye kalmış, günlük hedef 6; şu an sayı ayarını değiştirmedim çünkü sorun üretim kapasitesi değil kuyruk doluluğu gibi görünüyor.",
+        "Sağlık özetinde ana servisler iyi; ancak son 24 saatte Nöbetçi iş akışı 3 kez başarısız olmuş. Nedeni veri yok, bu yüzden yalnızca dikkatine bırakıyorum.",
+        "Onay bekleyen tek taslak warping/brim konusu; başlık ve konu kanal çizgisine uygun görünüyor, eldeki meta veriye göre somut bir red nedeni göremedim, bu yüzden not düşmedim.",
+        "Yorum tarafında bekleyen yanıt yok; otomatik mod çalışmış ve bugün 6 yanıt gönderilmiş, ek işlem yapmadım."
+      ],
+      "oneriler": [
+        "20:05 otomatik turu da reddedilirse otomatik hat çıktılarında altyazı okunurluğu ve sahne tekrarı için üretim şablonunu gözden geçirmeni öneririm.",
+        "Hikâye kuyruğu yarın da düşük kalırsa, video üretimine dokunmadan hikâye ajanı akışını ve planlama sıklığını kontrol etmeni öneririm.",
+        "Nöbetçi'nin son başarısızlık kayıtlarını panelden incelemeni öneririm; aynı hata sürerse ben tekrar tetiklemeyi ancak gerçekten gerekirse düşünürüm."
+      ],
+      "uyarilar": [
+        "Otomatik hat modunu ben değiştiremem; art arda ret sayısı artarsa manuel inceleme ihtiyacı doğabilir.",
+        "Son 5 otomatik hat kaydında çok sayıda ret var; bu, çeşitlilikten çok kalite/doğruluk tarafında sistematik bir soruna işaret edebilir."
+      ],
+      "eylem_sayisi": 0
     }
   ],
   "defter": [
