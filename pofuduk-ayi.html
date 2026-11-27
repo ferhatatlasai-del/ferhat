@@ -1186,7 +1186,7 @@ function drawHud() {
     txt(BOSS_HINT[b.type], VW / 2, 232, 24, '#fff4dc', 'center');
     ctx.globalAlpha = 1;
   }
-  if (Date.now() < (G.scareUntil || 0)) { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, VW, VH); txt('ŞAKAAA! 😜', VW / 2, VH / 2 + 20, 72, '#ffffff', 'center'); } // the prank: black screen for 5 seconds
+  { const left = (G.scareUntil || 0) - Date.now(); if (left > 0) { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, VW, VH); if (left <= 3000) txt('ADMİN ŞAKASI 😜', VW / 2, VH / 2 + 20, 64, '#ffffff', 'center'); } } // the prank: 5 seconds of black, then 3 seconds with the words, then back to the game
 }
 /* ---------- 3D renderer (Three.js) ---------- */
 const glc = document.getElementById('gl');
@@ -4438,7 +4438,7 @@ function admApply(o, mine) {
   else if (o.cmd === 'unmute') dropFrom(MUTE_KEY, o);
   else if (o.cmd === 'freeze') { G.frozen = G.frozen || {}; G.frozen[o.code] = { until: +o.until || 0, name: o.name || '' }; if (me) { G.freezeUntil = +o.until || 0; notice('Sayaçlı ceza', o.msg || 'Süre dolana kadar yerinde bekle.'); } }
   else if (o.cmd === 'revoke') { delete G.mods[o.code]; G.revoked.add(o.code); if (me && G.mod) { G.mod = null; $('admBtn').hidden = true; closeAdm(); notice('Yetkin alındı', 'Artık moderatör değilsin.'); } }
-  else if (o.cmd === 'scare') { if (me) { G.scareUntil = Date.now() + 5000; try { sfx.howl(); } catch (e) {} } }
+  else if (o.cmd === 'scare') { if (me) { G.scareUntil = Date.now() + 8000; try { sfx.howl(); } catch (e) {} } }
   else if (o.cmd === 'unfreeze') { if (G.frozen) delete G.frozen[o.code]; if (me) G.freezeUntil = 0; }
   else if (o.cmd === 'gift') { if (!G.admin) { const u = +o.until || 0; if (u > Date.now()) { if (!G.gift) G.gift = { coins: save.coins, bal: save.bal || 0 }; G.gift.until = u; notice('Yönetici hediyesi', 'Sınırsız para ve bal!'); } else if (G.gift) endGift(); } }
   else if (o.cmd === 'allowleave') { if (me) { G.leaveUntil = +o.until || 0; notice('Çıkış izni verildi', `Lobiden çıkabilirsin (${dur}).`); renderNet(); } }
@@ -4508,7 +4508,7 @@ function renderAdm() {
     add('ban', btn('Kendi dünyasına kilitle (süreli)', () => { if (admSend('ban', Object.assign({ until: until(), msg: msg() }, who))) admNote(`${pl.n} ${durTxt()} kendi dünyasına kilitlendi.`, true); }));
     add('ban', btn('Kalıcı kilitle', () => { if (admSend('ban', Object.assign({ until: Date.now() + FOREVER, msg: msg() }, who))) admNote(`${pl.n} kalıcı olarak kendi dünyasına kilitlendi.`, true); }));
     add('freeze', btn('Sayaçlı ceza (dondur)', () => { if (admSend('freeze', Object.assign({ until: until(), msg: msg() }, who))) admNote(`${pl.n} ${durTxt()} donduruldu, ekranında sayaç var.`, true); }));
-    add('scare', btn('Korkut (5 sn karartma)', () => { if (admSend('scare', Object.assign({ msg: '' }, who))) admNote(`${pl.n} korkutuldu.`, true); }));
+    add('scare', btn('Korkut (8 sn)', () => { if (admSend('scare', Object.assign({ msg: '' }, who))) admNote(`${pl.n} korkutuldu: 5 sn karanlık, 3 sn şaka yazısı.`, true); }));
     if (G.admin) { if (G.mods[pl.c] && G.mods[pl.c].until > Date.now()) bt.append(btn('Yetkiyi al', () => { if (admSend('revoke', who)) admNote(`${pl.n} artık moderatör değil.`, true); }, true)); else bt.append(btn('Yetki ver (moderatör)', () => { if (admGrant(pl, dur())) admNote(`${pl.n} ${durTxt()} moderatör oldu: uyarabilir, susturabilir, atabilir, dondurabilir.`, true); }, true)); }
     row.append(bt); box.append(row);
   }
@@ -4527,7 +4527,7 @@ function renderAdm() {
 pAdm.querySelectorAll('input, select').forEach(i => i.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Escape') closeAdm(); if (e.key === 'Enter' && i.id === 'admMsg') $('admSay').click(); }));
 $('admBtn').onclick = () => { if (pAdm.hidden) openAdm(); else closeAdm(); };
 $('admX').onclick = closeAdm;
-$('admScareAll').onclick = () => { if (admSend('scare', { code: '*', msg: '' })) admNote('Herkes korkutuldu (5 saniye karartma).', true); };
+$('admScareAll').onclick = () => { if (admSend('scare', { code: '*', msg: '' })) admNote('Herkes korkutuldu: 5 saniye karanlık, 3 saniye şaka yazısı, sonra oyun.', true); };
 $('admGift').onclick = () => { const ms = Math.max(1, Math.min(99999, Math.round(+$('admDur').value || 1))) * (+$('admUnit').value || 6e4); if (admSend('gift', { until: Date.now() + ms })) admNote(`Herkes ${$('admDur').value} ${$('admUnit').selectedOptions[0].textContent} boyunca sınırsız para ve bala sahip.`, true); };
 $('admGiftEnd').onclick = () => { if (admSend('gift', { until: 0 })) admNote('Hediye bitirildi.', true); };
 $('admSay').onclick = () => { const m = $('admMsg').value.trim(); if (!m) return admNote('Önce yukarıdaki kutuya duyuruyu yaz.'); if (admSend('say', { msg: m })) { admNote(`Duyuru ${net.players.size} oyuncuya gönderildi: ${m}`, true); notice('Duyuru gönderildi', m); $('admMsg').value = ''; } };
