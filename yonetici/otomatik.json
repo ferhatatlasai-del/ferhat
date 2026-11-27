@@ -157,6 +157,37 @@
       },
       "mod": "acik",
       "durum": "reddedildi"
+    },
+    {
+      "zaman": "2026-11-27 15:24",
+      "id": "s20261127-121724",
+      "konu": "PLA mı PETG mi: hangisini seçmeli",
+      "baslik": "PLA mı PETG mi? Hangi filament sana uygun",
+      "inceleme": {
+        "karar": "reddet",
+        "puan": 5.0,
+        "sorunlar": [
+          "Sıcak uç sahnesinde 240 °C etiketi PLA/PETG karşılaştırmasını bulanık ve kısmen yanlış gösteriyor",
+          "Dayanım grafiğinde 60 °C PLA ve 80 °C PETG tek ve kesin değer gibi sunulmuş; malzemeye ve koşula göre fazla kesin",
+          "Kapanışta iki çok benzer 'TAKİP ET' sahnesi art arda geliyor; gereksiz tekrar var",
+          "Bazı alt yazılar/küçük etiketler çok küçük ve kısmen kesik görünüyor",
+          "Son kontrol listesi maddeleri sağdan taşmış ve tam okunmuyor"
+        ],
+        "gerekce": "Genel anlatı büyük ölçüde doğru olsa da sıcaklık görselleştirmesindeki belirsiz/yanlış sayı kullanımı ve okunurluk sorunları güvenilirlik standardını düşürüyor.",
+        "model": "OpenAI (gpt-5.4)",
+        "iddialar": [
+          "PLA daha kolay basılır → doğru",
+          "PETG biraz daha yüksek nozul sıcaklığı ister → doğru",
+          "PLA genelde 210 °C civarı → doğru (tipik aralık içinde)",
+          "PETG çoğu zaman daha sıcak ister → doğru",
+          "PLA daha fazla soğutma ile temiz detay verir → doğru",
+          "PETG’de fazla fan katman yapışmasını zayıflatabilir → doğru",
+          "PETG sıcaklığa dayanımda PLA’dan genelde öndedir → doğru",
+          "PLA sıcak ortamda daha çabuk yumuşar → doğru"
+        ]
+      },
+      "mod": "acik",
+      "durum": "reddedildi"
     }
   ]
 }
