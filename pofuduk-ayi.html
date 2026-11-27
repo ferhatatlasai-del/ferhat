@@ -1,5 +1,8 @@
 <title>Pofuduk'un Bal Macerası</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>/* fonts embedded: Lilita One, Montserrat, Nunito (SIL Open Font License) */
 @font-face {
   font-family: 'Lilita One';
@@ -208,10 +211,13 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 #setBtn { position: fixed; z-index: 5; top: calc(10px + env(safe-area-inset-top, 0px)); right: calc(max(12px, env(safe-area-inset-right, 0px)) + 52px);
   width: 42px; height: 42px; border-radius: 12px; border: 3px solid var(--bark); background: var(--cream); color: var(--bark); font-family: var(--display); font-size: 1.25rem; cursor: pointer; }
 #pSettings, #pQuests, #pMap, #pNet, #pAdm { z-index: 7; }
-#admBtn { position: fixed; z-index: 5; top: calc(126px + env(safe-area-inset-top, 0px)); left: max(12px, env(safe-area-inset-left, 0px));
+#admBtn { position: fixed; z-index: 5; top: calc(40% + env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px));
   width: 42px; height: 42px; border-radius: 12px; border: 3px solid var(--bark); background: #ffd9d4; color: var(--bark); font-size: 1.15rem; cursor: pointer; }
 #admBtn[hidden], #chatBtn[hidden] { display: none; }
-#chatBtn { position: fixed; z-index: 5; top: calc(176px + env(safe-area-inset-top, 0px)); left: max(12px, env(safe-area-inset-left, 0px));
+#fsBtn { position: fixed; z-index: 5; top: calc(40% - 52px + env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px));
+  width: 42px; height: 42px; border-radius: 12px; border: 3px solid var(--bark); background: var(--cream); color: var(--bark); font-size: 1.25rem; cursor: pointer; }
+#fsBtn:focus-visible { outline: 3px solid var(--leaf); outline-offset: 2px; }
+#chatBtn { position: fixed; z-index: 5; top: calc(40% + 52px + env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px));
   width: 42px; height: 42px; border-radius: 12px; border: 3px solid var(--bark); background: #d9ecff; color: var(--bark); font-size: 1.15rem; cursor: pointer; }
 #chatBar { position: fixed; z-index: 6; left: 50%; transform: translateX(-50%); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); width: min(520px, 92vw); }
 #chatBar[hidden] { display: none; }
@@ -332,6 +338,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 <button id="pauseBtn" type="button" aria-label="Duraklat" hidden>II</button>
 <div id="chatBar" hidden><input id="chatIn" maxlength="80" placeholder="Mesaj yaz, Enter ile gönder" aria-label="Sohbet mesajı" autocomplete="off"></div>
 <button id="chatBtn" type="button" aria-label="Sohbet (Enter)" hidden>&#128172;&#xFE0E;</button>
+<button id="fsBtn" type="button" aria-label="Tam ekran (L)">&#9974;&#xFE0E;</button>
 <button id="admBtn" type="button" aria-label="Yönetici paneli (J)" hidden>&#128737;&#xFE0E;</button>
 <button id="setBtn" type="button" aria-label="Ayarlar">&#9881;&#xFE0E;</button>
 <button id="netBtn" type="button" aria-label="Birlikte oyna (O)">&#128101;&#xFE0E;</button>
@@ -839,6 +846,7 @@ addEventListener('keydown', e => {
   if (!pMap.hidden) { if (e.code === 'Escape' || e.code === 'KeyH') closeMap(); return; }
   if (!pAdm.hidden) { if (e.code === 'Escape' || e.code === 'KeyJ') closeAdm(); return; }
   if (!pNet.hidden) { if (e.code === 'Escape' || e.code === 'KeyO') closeNet(); return; }
+  if (e.code === 'KeyL' && splashDone && !e.repeat && (state === 'play' || state === 'pause')) { toggleFullscreen(); return; }
   if (e.code === 'KeyJ' && splashDone && (G.admin || G.mod) && (state === 'play' || state === 'pause') && pSet.hidden && pQuest.hidden && pMap.hidden && pNet.hidden) { if (pAdm.hidden) openAdm(); else closeAdm(); return; }
   if (e.code === 'KeyO' && splashDone && (state === 'play' || state === 'pause')) { openNet(); return; }
   if (e.code === 'KeyH' && splashDone && (state === 'play' || state === 'pause')) { openMap(); return; }
@@ -4479,6 +4487,16 @@ function holdBeacon() {
 }
 const dropBeacon = () => { try { if (G.beacon) G.beacon.destroy(); } catch (e) {} G.beacon = null; };
 function admSetup() { $('admBtn').hidden = false; $('setFlyRow').hidden = false; $('setFly').value = save.fly ? '1' : '0'; if (save.lobbyClosedByMe) { holdBeacon(); G.noAuto = true; } }
+function toggleFullscreen() { // L, or the button: works on computers, tablets and Android phones; iPhone cannot do it, so it gets a hint
+  const d = document, el = d.documentElement, on = d.fullscreenElement || d.webkitFullscreenElement;
+  try {
+    if (on) (d.exitFullscreen || d.webkitExitFullscreen).call(d);
+    else if (el.requestFullscreen) el.requestFullscreen({ navigationUI: 'hide' }).catch(() => notice('Tam ekran', 'Bu tarayıcı tam ekrana izin vermedi.'));
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    else notice('Tam ekran', 'Bu cihaz tam ekranı desteklemiyor. iPhone: Paylaş → Ana Ekrana Ekle ile tam ekran açılır.');
+  } catch (e) { notice('Tam ekran', 'Tam ekran açılamadı.'); }
+}
+$('fsBtn').onclick = toggleFullscreen;
 const pAdm = $('pAdm'); let admPaused = false, admTimer = 0;
 function openAdm() {
   if (!G.admin && !G.mod) return; audio(); unlockMouse();
