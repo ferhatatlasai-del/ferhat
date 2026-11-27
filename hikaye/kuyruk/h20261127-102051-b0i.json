@@ -1,0 +1,31 @@
+{
+  "id": "h20261127-102051-b0i",
+  "kaynak": "uretim",
+  "durum": "planli",
+  "olusturma": "2026-11-27T10:20:51.000Z",
+  "gorsel": "hikaye/gorseller/h20261127-102051-b0i.mp4",
+  "baslik": "Safe Mason Jar Bee Waterer (Open feeder)",
+  "atif": {
+    "ad": "Safe Mason Jar Bee Waterer (Open feeder)",
+    "tasarimci": "Ian Foulds",
+    "lisans": "CC BY",
+    "url": "https://www.printables.com/model/1242258-safe-mason-jar-bee-waterer-open-feeder",
+    "site": "printables.com",
+    "lisans_teyit": true,
+    "referansli": true
+  },
+  "trend": "Arı sulama mini istasyonu",
+  "kontrol": {
+    "puan": 9.0,
+    "deneme": 1,
+    "sorunlar": []
+  },
+  "yayin": null,
+  "hata": "",
+  "deneme": 0,
+  "tur": "video",
+  "muzik": "Sentezlenmiş müzik: Yaylı ve celesta (telifsiz, kodla üretildi)",
+  "muzik_sira": 70,
+  "muzik_stil": "Yaylı ve celesta",
+  "muzik_ton": 7
+}
