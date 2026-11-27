@@ -169,7 +169,22 @@
         "ince ve sürekli çizgi iyi işaret",
         "yorum ve takip çağrısı"
       ]
+    },
+    {
+      "id": "s20261127-081251",
+      "konu": "Warping neden olur, brim ne zaman işe yarar?",
+      "noktalar": [
+        "köşe kalkması en başta başlar",
+        "soğuma çekmesi köşeyi kaldırır",
+        "temizlik ve sıcaklık birlikte etkiler",
+        "hızlı soğutma çekmeyi artırabilir",
+        "kapalı kabin ısıyı dengeler",
+        "ilk katman yüksekliği kritik",
+        "brim çevre alanı büyütür",
+        "temizlik, ısı, brim birlikte bakılır",
+        "yorum yaz, takip et"
+      ]
     }
   ],
-  "son_ton": 72
+  "son_ton": 305
 }
