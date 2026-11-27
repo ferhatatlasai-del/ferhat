@@ -1,7 +1,7 @@
 {
   "id": "s20261127-121724",
   "olusturma": "2026-11-27T12:17:24Z",
-  "durum": "otomatik",
+  "durum": "reddedildi",
   "tur": "viral",
   "video": "",
   "sure": 59.0,
@@ -83,5 +83,29 @@
     }
   ],
   "otomatik": true,
-  "anlati": "PLA mı PETG mi? Yanlış seçim, baskıyı baştan bozabilir. Senin işin masaüstü parça mı, yoksa ısı gören bir parça mı? PLA daha kolay başlar; PETG biraz daha nazlıdır. PLA genelde iki yüz on derece civarı; PETG çoğu zaman biraz daha sıcak ister. PLA, soğutma ile daha temiz detay verir. PETG’de fazla fan, katmanı zayıflatabilir. Sıcaklığa dayanımda PETG öne çıkar; PLA ise sıcak ortamda daha çabuk yumuşar. Köşe kalkması PLA’da daha az görülür; PETG’de tabla ayarı daha dikkat ister. Esneklik istiyorsan PETG biraz daha tok davranır; PLA daha sert ve kırılgandır. Filament nemliyse ikisi de sorun çıkarır; PETG bunu daha çabuk belli eder. Kısaca bak: kolay baskı için PLA, ısı dayanımı için PETG seç. Sen hangi işte kullanacaksın? Yoruma yaz, takip et; bir sonraki seçimi beraber yapalım."
+  "anlati": "PLA mı PETG mi? Yanlış seçim, baskıyı baştan bozabilir. Senin işin masaüstü parça mı, yoksa ısı gören bir parça mı? PLA daha kolay başlar; PETG biraz daha nazlıdır. PLA genelde iki yüz on derece civarı; PETG çoğu zaman biraz daha sıcak ister. PLA, soğutma ile daha temiz detay verir. PETG’de fazla fan, katmanı zayıflatabilir. Sıcaklığa dayanımda PETG öne çıkar; PLA ise sıcak ortamda daha çabuk yumuşar. Köşe kalkması PLA’da daha az görülür; PETG’de tabla ayarı daha dikkat ister. Esneklik istiyorsan PETG biraz daha tok davranır; PLA daha sert ve kırılgandır. Filament nemliyse ikisi de sorun çıkarır; PETG bunu daha çabuk belli eder. Kısaca bak: kolay baskı için PLA, ısı dayanımı için PETG seç. Sen hangi işte kullanacaksın? Yoruma yaz, takip et; bir sonraki seçimi beraber yapalım.",
+  "red_tarihi": "2026-11-27T12:24:54.000Z",
+  "admin_inceleme": {
+    "karar": "reddet",
+    "puan": 5.0,
+    "sorunlar": [
+      "Sıcak uç sahnesinde 240 °C etiketi PLA/PETG karşılaştırmasını bulanık ve kısmen yanlış gösteriyor",
+      "Dayanım grafiğinde 60 °C PLA ve 80 °C PETG tek ve kesin değer gibi sunulmuş; malzemeye ve koşula göre fazla kesin",
+      "Kapanışta iki çok benzer 'TAKİP ET' sahnesi art arda geliyor; gereksiz tekrar var",
+      "Bazı alt yazılar/küçük etiketler çok küçük ve kısmen kesik görünüyor",
+      "Son kontrol listesi maddeleri sağdan taşmış ve tam okunmuyor"
+    ],
+    "gerekce": "Genel anlatı büyük ölçüde doğru olsa da sıcaklık görselleştirmesindeki belirsiz/yanlış sayı kullanımı ve okunurluk sorunları güvenilirlik standardını düşürüyor.",
+    "model": "OpenAI (gpt-5.4)",
+    "iddialar": [
+      "PLA daha kolay basılır → doğru",
+      "PETG biraz daha yüksek nozul sıcaklığı ister → doğru",
+      "PLA genelde 210 °C civarı → doğru (tipik aralık içinde)",
+      "PETG çoğu zaman daha sıcak ister → doğru",
+      "PLA daha fazla soğutma ile temiz detay verir → doğru",
+      "PETG’de fazla fan katman yapışmasını zayıflatabilir → doğru",
+      "PETG sıcaklığa dayanımda PLA’dan genelde öndedir → doğru",
+      "PLA sıcak ortamda daha çabuk yumuşar → doğru"
+    ]
+  }
 }
