@@ -212,3 +212,9 @@
 {"t": "2026-11-26T10:20:48Z", "tur": "denetim", "gecti": false, "deneme": 2, "puan": 8.0, "site": "printables.com", "sorunlar": ["Cihaz üzerinde okunabilir marka/yazılar var", "Referansla genel şekil büyük ölçüde uyumlu olsa da baskı ürünü üzerinde yerleşik yazılar/l"]}
 {"t": "2026-11-26T10:20:57Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 8.0, "site": "printables.com", "sorunlar": ["Üzerinde yazı bulunuyor", "Referans görseldeki gibi renkli ölçü işaretleri görünmüyor", "Hafif açı/fotoğraf tarzı farkı var"]}
 {"t": "2026-11-26T10:21:07Z", "tur": "denetim", "gecti": false, "deneme": 2, "puan": 8.0, "site": "printables.com", "sorunlar": ["Üzerinde okunabilir yazı var", "Referans görselde mavi ölçü/metin bulunuyor, üretilen görselde yok", "Ana form benzer olsa da referanstaki belirgin yazı detayı eksik"]}
+{"t": "2026-11-27T05:14:31Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-27T05:14:40Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-27T05:14:54Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-27T05:15:03Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-27T05:15:15Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-27T05:15:26Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
