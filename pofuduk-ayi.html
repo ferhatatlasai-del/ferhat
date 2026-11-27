@@ -332,7 +332,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 <button id="pauseBtn" type="button" aria-label="Duraklat" hidden>II</button>
 <div id="chatBar" hidden><input id="chatIn" maxlength="80" placeholder="Mesaj yaz, Enter ile gönder" aria-label="Sohbet mesajı" autocomplete="off"></div>
 <button id="chatBtn" type="button" aria-label="Sohbet (Enter)" hidden>&#128172;&#xFE0E;</button>
-<button id="admBtn" type="button" aria-label="Yönetici paneli" hidden>&#128737;&#xFE0E;</button>
+<button id="admBtn" type="button" aria-label="Yönetici paneli (J)" hidden>&#128737;&#xFE0E;</button>
 <button id="setBtn" type="button" aria-label="Ayarlar">&#9881;&#xFE0E;</button>
 <button id="netBtn" type="button" aria-label="Birlikte oyna (O)">&#128101;&#xFE0E;</button>
 <button id="homeBtn" type="button" hidden></button>
@@ -519,11 +519,11 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
         <div class="fr2"><input id="admDur" type="number" min="1" max="99999" value="30" aria-label="Süre"><select id="admUnit" aria-label="Süre birimi"><option value="1000">saniye</option><option value="60000" selected>dakika</option><option value="3600000">saat</option><option value="86400000">gün</option></select></div>
         <p class="small">Süreli kilit, sayaçlı ceza, susturma ve hediye için yukarıdaki süreyi kullanır (saniye, dakika, saat, gün).</p>
         <div class="fr2"><button class="btn" id="admGift" type="button">Herkese sınırsız para + bal ver</button><button class="btn alt" id="admGiftEnd" type="button">Hediyeyi bitir</button></div>
-        <div class="fr2"><button class="btn" id="admSay" type="button">Herkese duyuru</button><button class="btn alt" id="admClose" type="button">Lobiyi kapat</button></div>
+        <div class="fr2"><button class="btn" id="admSay" type="button">Herkese duyuru</button><button class="btn" id="admScareAll" type="button">Herkese korku</button><button class="btn alt" id="admClose" type="button">Lobiyi kapat</button></div>
       </div>
       <div class="box"><h3>Lobideki oyuncular</h3><div id="admPlayers" class="net"></div></div>
       <div class="box"><h3>Banlılar ve susturulanlar</h3><div id="admBans" class="net"></div></div>
-      <div class="box"><h3>Bu cihazdaki hesaplar</h3><div id="admAccs" class="small"></div></div>
+      <div class="box" id="admAccsBox"><h3>Bu cihazdaki hesaplar</h3><div id="admAccs" class="small"></div></div>
     </div>
     <button class="btn primary" id="admX" type="button">Kapat</button>
   </div>
@@ -550,7 +550,6 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
       <label for="setView"><span>Görüş uzaklığı <span class="val" id="vView"></span></span><input type="range" id="setView" min="50" max="250" step="10"></label>
       <label for="setQual"><span>Grafik kalitesi</span><select id="setQual"><option value="auto">Otomatik</option><option value="low">Düşük</option><option value="med">Orta</option><option value="high">Yüksek</option></select></label>
       <label for="setFly" id="setFlyRow" hidden><span>Uçma (yönetici)</span><select id="setFly"><option value="0">Kapalı</option><option value="1">Açık: Boşluk yukarı, Shift aşağı</option></select></label>
-      <label for="setLobby"><span>Köye girince lobiye bağlan</span><select id="setLobby"><option value="1">Açık</option><option value="0">Kapalı</option></select></label>
       <label for="setCam"><span>Kamera dönüş hızı <span class="val" id="vCam"></span></span><input type="range" id="setCam" min="30" max="200" step="10"></label>
     </div>
     <p class="small">Klavyede M tuşu bütün sesleri bir anda susturur.</p>
@@ -576,7 +575,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 const cv = document.getElementById('c'), ctx = cv.getContext('2d');
 window.open = () => null; // the game never opens another tab or site
 document.addEventListener('click', e => { const a = e.target && e.target.closest && e.target.closest('a[href]'); if (a && /^(https?:)?\/\//.test(a.getAttribute('href') || '')) e.preventDefault(); }, true);
-const ADMIN_PK = 'dsjJKUANSJpf+6+V5lLsI+TpErx4jUQC+SLTXJLkXLY='; // the administrator's public key. The password itself is nowhere in the game.
+const ADMIN_PK = 'LNnb6wkF37q0wYELeCgqyiYtEAQJ6IBrqSHs/dptUJI='; // the administrator's public key. The password itself is nowhere in the game.
 const b64u8 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0)), u8b64 = u => btoa(String.fromCharCode(...u));
 async function adminProbe(pass) { // the key pair when the password is the administrator's, otherwise null
   try {
@@ -838,7 +837,9 @@ addEventListener('keydown', e => {
   if (!pQuest.hidden) { if (e.code === 'Escape' || e.code === 'KeyG') closeQuests(); return; }
   if (e.code === 'KeyG' && splashDone) { openQuests(); return; }
   if (!pMap.hidden) { if (e.code === 'Escape' || e.code === 'KeyH') closeMap(); return; }
+  if (!pAdm.hidden) { if (e.code === 'Escape' || e.code === 'KeyJ') closeAdm(); return; }
   if (!pNet.hidden) { if (e.code === 'Escape' || e.code === 'KeyO') closeNet(); return; }
+  if (e.code === 'KeyJ' && splashDone && (G.admin || G.mod) && (state === 'play' || state === 'pause') && pSet.hidden && pQuest.hidden && pMap.hidden && pNet.hidden) { if (pAdm.hidden) openAdm(); else closeAdm(); return; }
   if (e.code === 'KeyO' && splashDone && (state === 'play' || state === 'pause')) { openNet(); return; }
   if (e.code === 'KeyH' && splashDone && (state === 'play' || state === 'pause')) { openMap(); return; }
   if (e.code === 'KeyB' && state === 'play' && !homeBtn.hidden) { homeBtn.click(); return; }
@@ -1104,6 +1105,7 @@ function drawHeart(x, y, full) {
   ctx.fillStyle = full ? '#e63946' : '#a58b6e'; heartPath(x, y - 0.5, 6); ctx.fill();
   if (full) { ctx.fillStyle = 'rgba(255,255,255,0.75)'; ctx.beginPath(); ctx.ellipse(x - 5.5, y - 2.5, 2.4, 1.6, -0.6, 0, 7); ctx.fill(); }
 }
+const bigNum = n => n >= 9e7 ? '∞' : '' + n; // unlimited money would not fit
 function drawHud() {
   drawRemoteTags(); syncHomeBtn();
   for (let i = 0; i < save.maxHp; i++) drawHeart(30 + i * 34, 28, i < P.hp);
@@ -1111,8 +1113,8 @@ function drawHud() {
     const im = avatar.photo && avImage(avatar.photo); if (im) ctx.drawImage(im, cx - r, cy - r, 2 * r, 2 * r); else { ctx.font = '22px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#000'; ctx.fillText(avatar.sel || '🐻', cx, cy + 1); } ctx.restore();
     txt(save.name, 72, 83, 20, '#fff4dc'); if (save.age) txt(`${save.age} yaş · ${heightCm(save.age)} cm`, 72, 101, 14, '#ffe8bf'); }
   let hx = 30 + save.maxHp * 34 + 4;
-  drawHoneyJar(hx, 33, 1.15); txt('' + (L.hub ? save.bal || 0 : honey), hx + 16, 42, 26); hx += 70;
-  drawCoin(hx, 32, 1.1); txt('' + save.coins, hx + 16, 42, 26); hx += 80;
+  drawHoneyJar(hx, 33, 1.15); txt(bigNum(L.hub ? save.bal || 0 : honey), hx + 16, 42, 26); hx += 70;
+  drawCoin(hx, 32, 1.1); txt(bigNum(save.coins), hx + 16, 42, 26); hx += 80;
   ctx.fillStyle = (SPECIES[save.species] || SPECIES.brown).fur; ctx.beginPath(); ctx.arc(hx - 8, 22, 5, 0, 7); ctx.arc(hx + 8, 22, 5, 0, 7); ctx.arc(hx, 32, 11, 0, 7); ctx.fill();
   ctx.fillStyle = '#d9a066'; ctx.beginPath(); ctx.ellipse(hx, 36, 6, 4, 0, 0, 7); ctx.fill();
   txt('× ' + lives, hx + 16, 42, 26);
@@ -1184,6 +1186,7 @@ function drawHud() {
     txt(BOSS_HINT[b.type], VW / 2, 232, 24, '#fff4dc', 'center');
     ctx.globalAlpha = 1;
   }
+  if (Date.now() < (G.scareUntil || 0)) { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, VW, VH); txt('ŞAKAAA! 😜', VW / 2, VH / 2 + 20, 72, '#ffffff', 'center'); } // the prank: black screen for 5 seconds
 }
 /* ---------- 3D renderer (Three.js) ---------- */
 const glc = document.getElementById('gl');
@@ -1939,6 +1942,11 @@ function treeModel(kind, parent, x, y, z, s, rnd) {
     mk('cyl', '#5b4030', [0.2, 1.4, 0.2], [0, 0.7, 0], t);
     for (let k = 0; k < 3; k++) mk('cone', '#2e6a5a', [1.25 - k * 0.3, 1.5, 1.25 - k * 0.3], [0, 1.6 + k * 0.85, 0], t);
     mk('cone', '#ffffff', [0.35, 0.5, 0.35], [0, 3.75, 0], t);
+  } else if (kind === 'forest') { // a cheap fir for the big forests: few triangles
+    mk('box', '#5b4030', [0.3, 1.4, 0.3], [0, 0.7, 0], t);
+    mk('coneLow', ['#2f7a3f', '#2a6e3a', '#37843f'][Math.floor(rnd() * 3)], [1.35, 2.2, 1.35], [0, 2.2, 0], t);
+    mk('coneLow', '#3a8a45', [1.0, 1.8, 1.0], [0, 3.5, 0], t);
+    mk('coneLow', '#43944d', [0.65, 1.4, 0.65], [0, 4.6, 0], t);
   } else if (kind === 'cactus') {
     mk('cyl', '#5f8f4a', [0.32, 2.4, 0.32], [0, 1.2, 0], t);
     mk('sph', '#5f8f4a', [0.32, 0.32, 0.32], [0, 2.4, 0], t);
@@ -2167,6 +2175,7 @@ function buildLevel(n) {
 }
 const HUB = { name: 'Bal Köyü', sky: ['#7fd3ff', '#d9f3ff'], far: '#8fc5a8', mid: '#5aa65e', grass: '#5cc04a', grassDark: '#3f9b37', dirt: '#9a6234', dirtDot: '#7b4a24', tree: 'round', friction: 0.78, sun: '#fff1a8' };
 function buildHub() {
+  const FB = 30; // depth of the forest band along each edge
   const R = 150, boxes = [{ x0: -R, y0: -3, z0: -R, x1: R, y1: 0, z1: R, kind: 'ground', on: true }], trees = [], paths = [];
   const rnd = rng(9);
   // each portal sits on a patch of its own region, scattered around the village
@@ -2221,7 +2230,7 @@ function buildHub() {
     && [shop, ward, goal, smith].every(o => Math.hypot(x - o.x, z - o.z) > need + 5) && Math.hypot(x, z - 50) > need + 6 && mts.every(m => Math.hypot(x - m.cx, z - m.cz) > need + m.r + 6);
   for (let k = 0; mts.length < 11 && k < 1500; k++) {
     const a = rnd() * Math.PI * 2, rad = 50 + rnd() * 88, cx = Math.sin(a) * rad, cz = Math.cos(a) * rad, r = 8 + rnd() * 3, h = 18 + rnd() * 8;
-    if (Math.abs(cx) + r + 2.5 > R || Math.abs(cz) + r + 2.5 > R || !clearOf(cx, cz, r + 2)) continue;
+    if (Math.max(Math.abs(cx), Math.abs(cz)) + r + 2.5 > R - FB || !clearOf(cx, cz, r + 2)) continue;
     mts.push({ cx, cz, r, h });
   }
   mts.forEach((m, id) => {
@@ -2245,7 +2254,7 @@ function buildHub() {
   });
   const houses = [];
   const nearAny = (x, z) => mts.some(m => Math.hypot(x - m.cx, z - m.cz) < m.r + 6) || spots.some(sp => Math.hypot(x - sp.x, z - sp.z) < 9.5) || Math.hypot(x - shop.x, z - shop.z) < 7 || Math.hypot(x - ward.x, z - ward.z) < 6 || Math.hypot(x - goal.x, z - goal.z) < 7
-    || Math.hypot(x - smith.x, z - smith.z) < 7 || parks.some(pk => Math.hypot(x - pk.cx, z - pk.cz) < pk.rad + 4.5) || Math.hypot(x, z - 50) < 8 || Math.abs(x) < 4;
+    || Math.hypot(x - smith.x, z - smith.z) < 7 || parks.some(pk => Math.hypot(x - pk.cx, z - pk.cz) < pk.rad + 4.5) || Math.hypot(x, z - 50) < 8 || Math.abs(x) < 4 || Math.max(Math.abs(x), Math.abs(z)) > R - FB;
   for (let k = 0; houses.length < 56 && k < 6000; k++) {
     const x = (rnd() - 0.5) * 2 * (R - 6), z = (rnd() - 0.5) * 2 * (R - 6);
     if (nearAny(x, z) || houses.some(h => Math.hypot(x - h.x, z - h.z) < 10.5)) continue;
@@ -2262,7 +2271,7 @@ function buildHub() {
       const n = r ? Math.ceil(r * 2.4) : 1;
       for (let a = 0; a < n; a++) {
         const x = px + Math.sin(a / n * 6.283) * r, z = pz + Math.cos(a / n * 6.283) * r;
-        if (Math.abs(x) > R - rad - 1 || Math.abs(z) > R - rad - 1) continue;
+        if (Math.max(Math.abs(x), Math.abs(z)) > R - FB - rad) continue;
         if (mts.some(m => Math.hypot(x - m.cx, z - m.cz) < m.r + rad + 1) || spots.some(sp => Math.hypot(x - sp.x, z - sp.z) < rad + 8)) continue;
         if (parks.some(pk => Math.hypot(x - pk.cx, z - pk.cz) < pk.rad + rad + 2.5)) continue;
         if ([goal, board, tutGate, roomHub, { x: 0, z: 50 }, { x: 0, z: 32 }].some(o => Math.hypot(x - o.x, z - o.z) < rad + 4)) continue;
@@ -2290,7 +2299,7 @@ function buildHub() {
       const n = r ? Math.ceil(r * 2.4) : 1;
       for (let a = 0; a < n; a++) {
         const x = mine.x + Math.sin(a / n * 6.283) * r, z = mine.z + Math.cos(a / n * 6.283) * r;
-        if (Math.abs(x) > R - rad - 1 || Math.abs(z) > R - rad - 1) continue;
+        if (Math.max(Math.abs(x), Math.abs(z)) > R - FB - rad) continue;
         if (mts.some(m => Math.hypot(x - m.cx, z - m.cz) < m.r + rad + 1) || spots.some(sp => Math.hypot(x - sp.x, z - sp.z) < rad + 8)) continue;
         if (parks.some(pk => Math.hypot(x - pk.cx, z - pk.cz) < pk.rad + rad + 2.5)) continue;
         if ([goal, board, tutGate, roomHub, { x: 0, z: 50 }, { x: 0, z: 32 }].some(o => Math.hypot(x - o.x, z - o.z) < rad + 4) || stores.some(s => Math.hypot(x - s.x, z - s.z) < rad + SR + 2)) continue;
@@ -2361,6 +2370,16 @@ function buildHub() {
     const [tx, tz] = T(0, -hd + wt + 2.8 * SC); s.tx = tx; s.tz = tz; // stand at the counter to shop
   }
   solidTrees(trees, boxes, hitems, HUB, true);
+  { // forests all around the village: dense trees along the four edges and a wall of boxes so nobody walks through them
+    const fr = rng(31337), step = 5.4;
+    for (let gx = -R + 6; gx < R - 5; gx += step) for (let gz = -R + 6; gz < R - 5; gz += step) {
+      const x = gx + (fr() - 0.5) * 3.6, z = gz + (fr() - 0.5) * 3.6, e = Math.max(Math.abs(x), Math.abs(z));
+      if (e < R - FB + 2 || e > R - 4 || mts.some(m => Math.hypot(x - m.cx, z - m.cz) < m.r + 3)) continue;
+      trees.push({ x, y: 0, z, s: 1.15 + fr() * 0.9, forest: true, kind: 'forest' });
+    }
+    const W0 = R - FB + 4;
+    for (const b of [[-R, -R, R, -W0], [-R, W0, R, R], [-R, -W0, -W0, W0], [W0, -W0, R, W0]]) boxes.push({ x0: b[0], z0: b[1], x1: b[2], z1: b[3], y0: 0, y1: 22, kind: 'deco', on: true });
+  }
   const turtles = [];
   for (let i = 0; turtles.length < 20 && i < 900; i++) {
     const x = (rnd() - 0.5) * 2 * (R - 8), z = (rnd() - 0.5) * 2 * (R - 8);
@@ -2494,6 +2513,7 @@ function ambient() {
 
 /* ---------- update ---------- */
 function update() {
+  if (G.mod && G.mod.cert.until < Date.now()) { G.mod = null; $('admBtn').hidden = true; closeAdm(); notice('Yetkin bitti', 'Moderatör süren doldu.'); }
   if (G.admin) { if (save.coins < 9e7) save.coins = 99999999; if ((save.bal || 0) < 9e7) save.bal = 99999999; if (P && !P.dead) P.hp = save.maxHp; lives = Math.max(lives, 9); }
   else if (G.gift) { if (Date.now() >= G.gift.until) endGift(); else { if (save.coins < 9e7) save.coins = 99999999; if ((save.bal || 0) < 9e7) save.bal = 99999999; } }
   if (G.freezeUntil > Date.now() && P && !P.dead) { keys.left = keys.right = keys.fwd = keys.back = keys.jump = keys.pound = false; stick.x = stick.y = 0; jumpPressed = poundPressed = false; P.vx = P.vz = 0; } // the punishment: stand still until the counter ends
@@ -2965,7 +2985,8 @@ const mmss = ms => { const t = Math.ceil(ms / 1000); return Math.floor(t / 60) +
 function openChest(key) { (save.chestT = save.chestT || {})[key] = Date.now() + CHEST_MS; bump('chest'); }
 function hubStep() {
   if (net.homesDirty) { rebuildHub(); return; }
-  if (!G.lobbyTried && activeId && !net.on) { G.lobbyTried = true; if (save.autoLobby !== false) setTimeout(goLobby, 1500); }
+  if (activeId && !G.nextTry) G.nextTry = Date.now() + 1500;
+  if (activeId && !net.on && !G.lobbyBusy && !G.noAuto && Date.now() > (G.nextTry || 0) && !(G.leaveUntil > Date.now())) { G.nextTry = Date.now() + 6000; goLobby(); } // the lobby is compulsory
   turtleStep(); rabbitStep(); wolfStep(); sleepStep(); doorStep();
   save.peaks = save.peaks || {};
   for (const m of L.mts) {
@@ -3417,7 +3438,7 @@ function buildScene() {
     }
     if (m) G.boxMeshes.set(b, m);
   }
-  for (const t of L.trees) if (!t.gone) treeModel(t.kind || th.tree, W, t.x, t.y, t.z, t.s, rnd);
+  for (const t of L.trees) if (!t.gone) { const tg = treeModel(t.kind || th.tree, W, t.x, t.y, t.z, t.s, rnd); if (t.forest) tg.traverse(o => { if (o.isMesh) o.castShadow = false; }); } // the forest casts no shadows: far cheaper
   if (L.signs) for (const sg of L.signs) {
     const g4 = grp(W, sg.x, sg.y, sg.z); g4.rotation.y = sg.x < 0 ? 0.35 : -0.35; // face the path, which runs toward -z
     mk('cyl', '#6b4220', [0.09, 1.25, 0.09], [0, 0.62, 0], g4);
@@ -4216,7 +4237,7 @@ const lvName = k => k === 'hub' ? 'Bal Köyü' : k === 'tut' ? 'Öğretici' : /^
 let lastFullState = 0;
 function myState() { // the house and the wardrobe are sent only every couple of seconds
   const st = myStateBase(), now = Date.now();
-  if (save.homePos && now - lastFullState > 2000) { lastFullState = now; st.hm = save.homePos; st.dc = (save.decor || []).join(','); st.ow = (save.owned || []).filter(o => o !== 'none').join(','); }
+  if (save.homePos && now - lastFullState > 2000) { lastFullState = now; st.pk = MY_PK; st.hm = save.homePos; st.dc = (save.decor || []).join(','); st.ow = (save.owned || []).filter(o => o !== 'none').join(','); }
   return st;
 }
 function myStateBase() {
@@ -4231,7 +4252,7 @@ function takePlayer(id, st) {
   const old = net.players.get(id) || { id }, px0 = old.x, pz0 = old.z, pt0 = old.tt;
   const p = Object.assign(old, { n: clip(st.n, 14) || 'Ayı', c: clip(st.c, 6).toUpperCase(), lv: clip(st.lv, 8), x: num(st.x), y: num(st.y), z: num(st.z), yw: num(st.yw, 100),
     sp: num(st.sp, 40), air: !!st.air, fl: num(st.fl, 60), at: !!st.at, g: st.g === 'girl' ? 'girl' : 'boy', s: clip(st.s, 12), o: clip(st.o, 12), av: clip(st.av, 4), ag: Math.max(0, Math.min(99, Math.round(num(st.ag, 99)))), a: Math.max(0, Math.min(AXES.length - 1, Math.round(num(st.a, 9)))), seen: Date.now() });
-  p.h = st.h ? 1 : 0;
+  p.h = st.h ? 1 : 0; if (st.pk) p.pk = clip(st.pk, 44);
   { const now = Date.now(); if (pt0 && px0 !== undefined) { const dt = (now - pt0) / 1000; if (dt > 0.01 && dt < 0.6) { p.vx = Math.max(-30, Math.min(30, (p.x - px0) / dt)); p.vz = Math.max(-30, Math.min(30, (p.z - pz0) / dt)); } } p.tt = now; }
   if (p.h && Number.isFinite(+st.ck) && +st.ck >= 0 && +st.ck < CYC + 1) net.hostClock = { ck: +st.ck, t: Date.now(), id }; // the founder's time of day
   p.sc = heightScale(p.ag);
@@ -4294,13 +4315,27 @@ function bindPeer(conn) {
 }
 /* ---------- administrator: signed commands, bans, closing the lobby ---------- */
 const seenNonce = new Set(), BAN_KEY = 'pofuduk-bans';
+G.mods = {}; G.mod = null; G.revoked = new Set(); // moderators: people the administrator trusted for a while
+const myKp = window.nacl ? nacl.sign.keyPair() : null, MY_PK = myKp ? u8b64(myKp.publicKey) : '';
+const MOD_PERMS = 'warn,say,mute,unmute,kick,freeze,unfreeze';
+const certText = c => ['grant', c.code, c.pk, c.perms, c.until, c.ts, c.nonce].map(String).join('|');
+function certValid(c) { try { return !!c && typeof c === 'object' && typeof c.sig === 'string' && typeof c.perms === 'string' && typeof c.pk === 'string' && +c.until > Date.now() && nacl.sign.detached.verify(new TextEncoder().encode(certText(c)), b64u8(c.sig), b64u8(ADMIN_PK)); } catch (e) { return false; } }
+const modCan = cmd => !!(G.mod && G.mod.cert.until > Date.now() && G.mod.cert.perms.split(',').includes(cmd));
+const admCan = cmd => !!G.admin || modCan(cmd);
+function applyCert(c) {
+  G.mods[c.code] = c; G.revoked.delete(c.code);
+  if (!G.admin && c.code === save.code && c.pk === MY_PK) { G.mod = { cert: c }; $('admBtn').hidden = false; notice('Yetki verildi', 'Moderatör oldun. J tuşuyla paneli aç.'); }
+}
 const admText = o => [o.cmd, o.code || '', o.name || '', o.until || 0, o.msg || '', o.ts, o.nonce].map(String).join('|');
-const admSign = o => { o.ts = Date.now(); o.nonce = Math.random().toString(36).slice(2, 10); o.sig = u8b64(nacl.sign.detached(new TextEncoder().encode(admText(o)), G.admin.sk)); return o; };
+const admSign = (o, sk) => { o.ts = Date.now(); o.nonce = Math.random().toString(36).slice(2, 10); o.sig = u8b64(nacl.sign.detached(new TextEncoder().encode(admText(o)), sk)); return o; };
 function admVerify(o) {
   try {
     if (!o || typeof o !== 'object' || !window.nacl || typeof o.sig !== 'string' || typeof o.nonce !== 'string' || seenNonce.has(o.nonce)) return false;
     if (!Number.isFinite(o.ts) || Math.abs(Date.now() - o.ts) > 12 * 3600 * 1000) return false;
-    if (!nacl.sign.detached.verify(new TextEncoder().encode(admText(o)), b64u8(o.sig), b64u8(ADMIN_PK))) return false;
+    const text = new TextEncoder().encode(admText(o)); let ok;
+    if (o.cert) { const c = o.cert; if (!certValid(c) || c.code !== o.by || G.revoked.has(c.code) || !c.perms.split(',').includes(o.cmd)) return false; ok = nacl.sign.detached.verify(text, b64u8(o.sig), b64u8(c.pk)); }
+    else ok = nacl.sign.detached.verify(text, b64u8(o.sig), b64u8(ADMIN_PK));
+    if (!ok) return false;
     seenNonce.add(o.nonce); return true;
   } catch (e) { return false; }
 }
@@ -4344,7 +4379,8 @@ let noticeT = 0, noticeTitle = '', noticeTxt = '';
 const notice = (title, txt) => { noticeT = 420; noticeTitle = title; noticeTxt = String(txt || '').slice(0, 120); };
 function endGift() { if (!G.gift) return; save.coins = G.gift.coins; save.bal = G.gift.bal; G.gift = null; saveGame(); notice('Hediye bitti', 'Paran ve balın eski haline döndü.'); }
 function admApply(o, mine) {
-  const me = !G.admin && !mine && ((o.code && o.code === save.code) || (!o.code && o.name && slug(o.name) === slug(save.name)));
+  if (o.cert && o.code && G.mods && G.mods[o.code]) return; // a moderator cannot act on another moderator
+  const all = o.code === '*', me = !G.admin && !mine && (all || (o.code && o.code === save.code) || (!o.code && o.name && slug(o.name) === slug(save.name)));
   const left = ms => ms > 3 * 365 * 864e5 ? 'kalıcı olarak' : (ms >= 864e5 ? Math.round(ms / 864e5) + ' gün' : ms >= 36e5 ? Math.round(ms / 36e5) + ' saat' : Math.max(1, Math.round(ms / 6e4)) + ' dakika');
   const dur = left((+o.until || 0) - Date.now());
   if (o.cmd === 'warn') { if (me) notice('Yönetici uyarısı', o.msg || 'Lütfen kurallara uy.'); }
@@ -4360,16 +4396,28 @@ function admApply(o, mine) {
   else if (o.cmd === 'mute') { addTo(MUTE_KEY, o); if (me) notice(dur === 'kalıcı olarak' ? 'Kalıcı olarak susturuldun' : `${dur} susturuldun`, o.msg); }
   else if (o.cmd === 'unmute') dropFrom(MUTE_KEY, o);
   else if (o.cmd === 'freeze') { G.frozen = G.frozen || {}; G.frozen[o.code] = { until: +o.until || 0, name: o.name || '' }; if (me) { G.freezeUntil = +o.until || 0; notice('Sayaçlı ceza', o.msg || 'Süre dolana kadar yerinde bekle.'); } }
+  else if (o.cmd === 'revoke') { delete G.mods[o.code]; G.revoked.add(o.code); if (me && G.mod) { G.mod = null; $('admBtn').hidden = true; closeAdm(); notice('Yetkin alındı', 'Artık moderatör değilsin.'); } }
+  else if (o.cmd === 'scare') { if (me) { G.scareUntil = Date.now() + 5000; try { sfx.howl(); } catch (e) {} } }
   else if (o.cmd === 'unfreeze') { if (G.frozen) delete G.frozen[o.code]; if (me) G.freezeUntil = 0; }
   else if (o.cmd === 'gift') { if (!G.admin) { const u = +o.until || 0; if (u > Date.now()) { if (!G.gift) G.gift = { coins: save.coins, bal: save.bal || 0 }; G.gift.until = u; notice('Yönetici hediyesi', 'Sınırsız para ve bal!'); } else if (G.gift) endGift(); } }
-  else if (o.cmd === 'close') { if (!G.admin) { G.noAuto = true; netReset(); notice('Lobi kapatıldı', 'Yönetici lobiyi kapattı.'); } }
+  else if (o.cmd === 'allowleave') { if (me) { G.leaveUntil = +o.until || 0; notice('Çıkış izni verildi', `Lobiden çıkabilirsin (${dur}).`); renderNet(); } }
+  else if (o.cmd === 'close') { if (!G.admin) { netReset(); G.nextTry = Date.now() + 30000; notice('Lobi kapatıldı', 'Yönetici lobiyi kapattı.'); } }
 }
 const admNote = (t, ok) => { const m = $('admNote'); m.textContent = t; m.className = 'msg' + (ok ? ' ok' : ''); };
+function admBroadcast(o) { const base = net.mqTopic.slice(0, net.mqTopic.lastIndexOf('/')), body = JSON.stringify(o); for (const c of net.mqs) if (c.connected) c.publish(base + '/adm', body); }
 function admSend(cmd, extra) {
-  if (!G.admin || !net.on || !net.mqTopic) { admNote('Önce lobiye bağlan: şu an bir lobide değilsin, kimseye ulaşamaz.'); return false; }
-  const o = admSign(Object.assign({ cmd }, extra || {})), base = net.mqTopic.slice(0, net.mqTopic.lastIndexOf('/')), body = JSON.stringify(o);
-  for (const c of net.mqs) if (c.connected) c.publish(base + '/adm', body);
-  admApply(o, true); return true;
+  if (!admCan(cmd)) { admNote('Bu işlem için yetkin yok.'); return false; }
+  if (!net.on || !net.mqTopic) { admNote('Önce lobiye bağlan: şu an bir lobide değilsin, kimseye ulaşamaz.'); return false; }
+  const o = Object.assign({ cmd }, extra || {});
+  if (G.admin) admSign(o, G.admin.sk); else { o.by = save.code; o.cert = G.mod.cert; admSign(o, myKp.secretKey); }
+  admBroadcast(o); admApply(o, true); return true;
+}
+function admGrant(pl, ms) {
+  if (!G.admin) return false; if (!pl.pk) { admNote('Oyuncunun anahtarı henüz gelmedi. Birkaç saniye sonra yeniden dene.'); return false; }
+  if (!net.on || !net.mqTopic) { admNote('Önce lobiye bağlan.'); return false; }
+  const c = { code: pl.c, pk: pl.pk, perms: MOD_PERMS, until: Date.now() + ms, ts: Date.now(), nonce: Math.random().toString(36).slice(2, 10) };
+  c.sig = u8b64(nacl.sign.detached(new TextEncoder().encode(certText(c)), G.admin.sk));
+  admBroadcast({ cmd: 'grant', cert: c }); applyCert(c); return true;
 }
 // while the lobby is closed the administrator's browser answers at a special address; everyone else checks it before joining
 async function lobbyClosed(opts) {
@@ -4390,7 +4438,7 @@ const dropBeacon = () => { try { if (G.beacon) G.beacon.destroy(); } catch (e) {
 function admSetup() { $('admBtn').hidden = false; $('setFlyRow').hidden = false; $('setFly').value = save.fly ? '1' : '0'; if (save.lobbyClosedByMe) { holdBeacon(); G.noAuto = true; } }
 const pAdm = $('pAdm'); let admPaused = false, admTimer = 0;
 function openAdm() {
-  if (!G.admin) return; audio(); unlockMouse();
+  if (!G.admin && !G.mod) return; audio(); unlockMouse();
   if (state === 'play') { state = 'pause'; admPaused = true; for (const k in keys) keys[k] = false; stick.x = stick.y = 0; }
   renderAdm(); pAdm.hidden = false; clearInterval(admTimer); admTimer = setInterval(() => { if (!pAdm.hidden) renderAdm(); }, 1500);
 }
@@ -4404,19 +4452,23 @@ function renderAdm() {
   const durTxt = () => `${Math.max(1, Math.round(+$('admDur').value || 1))} ${$('admUnit').selectedOptions[0].textContent}`;
   $('admState').textContent = (save.lobbyClosedByMe ? 'Lobi KAPALI (yeni gelenler giremez). ' : 'Lobi açık. ') + (net.on && net.lobbyMode ? `Bağlısın · ${net.players.size + 1} oyuncu.` : 'Şu an lobiye bağlı değilsin.');
   $('admClose').textContent = save.lobbyClosedByMe ? 'Lobiyi aç' : 'Lobiyi kapat';
+  for (const id of ['admGift', 'admGiftEnd', 'admClose', 'admScareAll', 'admAccsBox']) $(id).hidden = !G.admin;
   const box = $('admPlayers'); box.innerHTML = '';
   if (!net.players.size) box.append(el('p', 'Lobide başka oyuncu yok.', 'small'));
   for (const [id, pl] of net.players) {
     const row = el('div', null, 'admrow'); row.append(el('b', `${pl.av ? pl.av + ' ' : ''}${pl.n}`), el('span', `${pl.ag ? pl.ag + ' yaş' : 'yaş ?'} · kod ${pl.c} · ${lvName(pl.lv)}`, 'small'));
     const bt = el('div', null, 'bt'), who = { code: pl.c, name: pl.n };
-    bt.append(
-      btn('Uyar', () => { if (admSend('warn', Object.assign({ msg: msg() }, who))) admNote(`${pl.n} uyarıldı.`, true); }, true),
-      btn('Sustur (süreli)', () => { if (admSend('mute', Object.assign({ until: until(), msg: msg() }, who))) admNote(`${pl.n} ${durTxt()} susturuldu.`, true); }, true),
-      btn('At', () => { if (admSend('kick', Object.assign({ msg: msg() }, who))) admNote(`${pl.n} lobiden atıldı.`, true); }),
-      btn('Öldür', () => { if (admSend('kill', Object.assign({ msg: msg() }, who))) admNote(`${pl.n} öldürüldü.`, true); }),
-      btn('Kendi dünyasına kilitle (süreli)', () => { if (admSend('ban', Object.assign({ until: until(), msg: msg() }, who))) admNote(`${pl.n} ${durTxt()} kendi dünyasına kilitlendi.`, true); }),
-      btn('Kalıcı kilitle', () => { if (admSend('ban', Object.assign({ until: Date.now() + FOREVER, msg: msg() }, who))) admNote(`${pl.n} kalıcı olarak kendi dünyasına kilitlendi.`, true); }),
-      btn('Sayaçlı ceza (dondur)', () => { if (admSend('freeze', Object.assign({ until: until(), msg: msg() }, who))) admNote(`${pl.n} ${durTxt()} donduruldu, ekranında sayaç var.`, true); }));
+    const add = (cmd, b) => { if (admCan(cmd)) bt.append(b); };
+    add('allowleave', btn('Çıkış izni ver', () => { if (admSend('allowleave', Object.assign({ until: until(), msg: msg() }, who))) admNote(`${pl.n} ${durTxt()} lobiden çıkabilir.`, true); }, true));
+    add('warn', btn('Uyar', () => { if (admSend('warn', Object.assign({ msg: msg() }, who))) admNote(`${pl.n} uyarıldı.`, true); }, true));
+    add('mute', btn('Sustur (süreli)', () => { if (admSend('mute', Object.assign({ until: until(), msg: msg() }, who))) admNote(`${pl.n} ${durTxt()} susturuldu.`, true); }, true));
+    add('kick', btn('At', () => { if (admSend('kick', Object.assign({ msg: msg() }, who))) admNote(`${pl.n} lobiden atıldı.`, true); }));
+    add('kill', btn('Öldür', () => { if (admSend('kill', Object.assign({ msg: msg() }, who))) admNote(`${pl.n} öldürüldü.`, true); }));
+    add('ban', btn('Kendi dünyasına kilitle (süreli)', () => { if (admSend('ban', Object.assign({ until: until(), msg: msg() }, who))) admNote(`${pl.n} ${durTxt()} kendi dünyasına kilitlendi.`, true); }));
+    add('ban', btn('Kalıcı kilitle', () => { if (admSend('ban', Object.assign({ until: Date.now() + FOREVER, msg: msg() }, who))) admNote(`${pl.n} kalıcı olarak kendi dünyasına kilitlendi.`, true); }));
+    add('freeze', btn('Sayaçlı ceza (dondur)', () => { if (admSend('freeze', Object.assign({ until: until(), msg: msg() }, who))) admNote(`${pl.n} ${durTxt()} donduruldu, ekranında sayaç var.`, true); }));
+    add('scare', btn('Korkut (5 sn karartma)', () => { if (admSend('scare', Object.assign({ msg: '' }, who))) admNote(`${pl.n} korkutuldu.`, true); }));
+    if (G.admin) { if (G.mods[pl.c] && G.mods[pl.c].until > Date.now()) bt.append(btn('Yetkiyi al', () => { if (admSend('revoke', who)) admNote(`${pl.n} artık moderatör değil.`, true); }, true)); else bt.append(btn('Yetki ver (moderatör)', () => { if (admGrant(pl, dur())) admNote(`${pl.n} ${durTxt()} moderatör oldu: uyarabilir, susturabilir, atabilir, dondurabilir.`, true); }, true)); }
     row.append(bt); box.append(row);
   }
   const bb = $('admBans'); bb.innerHTML = ''; const frozen = Object.entries(G.frozen || {}).filter(([c, v]) => v.until > Date.now()); const bans = readList(BAN_KEY).map(b => Object.assign({ kind: 'ban' }, b)).concat(readList(MUTE_KEY).map(b => Object.assign({ kind: 'mute' }, b)));
@@ -4434,6 +4486,7 @@ function renderAdm() {
 pAdm.querySelectorAll('input, select').forEach(i => i.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Escape') closeAdm(); if (e.key === 'Enter' && i.id === 'admMsg') $('admSay').click(); }));
 $('admBtn').onclick = () => { if (pAdm.hidden) openAdm(); else closeAdm(); };
 $('admX').onclick = closeAdm;
+$('admScareAll').onclick = () => { if (admSend('scare', { code: '*', msg: '' })) admNote('Herkes korkutuldu (5 saniye karartma).', true); };
 $('admGift').onclick = () => { const ms = Math.max(1, Math.min(99999, Math.round(+$('admDur').value || 1))) * (+$('admUnit').value || 6e4); if (admSend('gift', { until: Date.now() + ms })) admNote(`Herkes ${$('admDur').value} ${$('admUnit').selectedOptions[0].textContent} boyunca sınırsız para ve bala sahip.`, true); };
 $('admGiftEnd').onclick = () => { if (admSend('gift', { until: 0 })) admNote('Hediye bitirildi.', true); };
 $('admSay').onclick = () => { const m = $('admMsg').value.trim(); if (!m) return admNote('Önce yukarıdaki kutuya duyuruyu yaz.'); if (admSend('say', { msg: m })) { admNote(`Duyuru ${net.players.size} oyuncuya gönderildi: ${m}`, true); notice('Duyuru gönderildi', m); $('admMsg').value = ''; } };
@@ -4478,10 +4531,10 @@ async function tryHostLobby(hostId, opts) {
 }
 async function goLobby() {
   if (net.on || G.lobbyBusy || !window.Peer || G.noAuto) return;
-  if (isBanned(save.code, save.name)) { G.lobbyStatus = 'banned'; notice('Lobiden yasaklısın', 'Süren dolunca yeniden girebilirsin.'); renderNet(); return; }
+  if (isBanned(save.code, save.name)) { G.nextTry = Date.now() + 60000; G.lobbyStatus = 'banned'; notice('Lobiden yasaklısın', 'Süren dolunca yeniden girebilirsin.'); renderNet(); return; }
   G.lobbyBusy = true; const opts = window.PEER_OPTS || {}; G.lobbyStatus = '';
   try {
-    if (!G.admin && await lobbyClosed(opts)) { G.lobbyStatus = 'closed'; netMsg('Lobi şu an kapalı.', true); renderNet(); return; }
+    if (!G.admin && await lobbyClosed(opts)) { G.lobbyStatus = 'closed'; G.nextTry = Date.now() + 30000; netMsg('Lobi şu an kapalı.', true); renderNet(); return; }
     for (let n = 1; n <= 5 && !net.on; n++) {
       const hostId = 'pofuduk-lobi' + n, r = await tryJoinLobby(hostId, opts);
       if (r === 'joined' || net.on) return;
@@ -4489,7 +4542,7 @@ async function goLobby() {
       if (await tryHostLobby(hostId, opts)) return;
       if (await tryJoinLobby(hostId, opts) === 'joined') return; // somebody else opened it a moment earlier
     }
-  } catch (e) { /* no meeting server on this network: play alone, nothing to show */ }
+  } catch (e) { G.nextTry = Date.now() + 20000; /* no meeting server on this network: play alone, try again later */ }
   finally { G.lobbyBusy = false; }
 }
 async function goPeer(create, codeIn) {
@@ -4546,7 +4599,7 @@ async function goRelay(roomTxt, pass, create) { // a room without any outside se
     const id = clip(topic.slice(base.length + 1), 24); if (!id || id === me) return;
     const txt = String(payload);
     if (id === 'chat') { takeChat(txt); return; }
-    if (id === 'adm') { let o; try { o = JSON.parse(txt); } catch (e) { return; } if (admVerify(o)) admApply(o); return; }
+    if (id === 'adm') { let o; try { o = JSON.parse(txt); } catch (e) { return; } if (o && o.cmd === 'grant') { if (certValid(o.cert)) applyCert(o.cert); return; } if (admVerify(o)) admApply(o); return; }
     if (txt === 'bye') { if (net.players.has(id)) { const pl = net.players.get(id); if (net.on && P && L) pop(`${pl.n} odadan çıktı`, P.x, P.y + 2.4, P.z, '#ffffff', 100); } dropPlayer(id); return; }
     let st; try { st = JSON.parse(txt); } catch (e) { return; }
     if (!st || typeof st !== 'object') return;
@@ -4665,6 +4718,7 @@ function renderNet() {
   $('netBtn').classList.toggle('live', net.on);
   $('nTip').hidden = true;
   $('lobbyState').textContent = net.on && net.lobbyMode ? `Lobidesin · ${net.players.size + 1} oyuncu` : G.lobbyStatus === 'closed' ? 'Lobi şu an kapalı.' : G.lobbyStatus === 'banned' ? 'Lobiden yasaklısın.' : net.on ? 'Bir odadasın.' : 'Lobiye bağlı değilsin.';
+  $('nLeave').hidden = !(G.admin || G.leaveUntil > Date.now());
   $('chatBtn').hidden = !net.on; if (!net.on) chatBar.hidden = true;
   $('lobbyJoin').hidden = net.on || G.lobbyBusy; $('nInvite').parentElement.hidden = !!net.lobbyMode;
   if (net.on) { $('nRoomTitle').textContent = 'Oda: ' + net.room + ' · ' + (net.players.size + 1) + ' oyuncu' + (net.mode === 'claude' ? ' · claude.ai ağı' : ''); $('nInvite').value = inviteText(); renderPlayers(true); }
@@ -4690,7 +4744,7 @@ $('netClose').onclick = closeNet;
 $('nCreate').onclick = () => netGo(true);
 $('nJoin').onclick = () => netGo(false);
 $('lobbyJoin').onclick = () => { G.noAuto = false; G.lobbyStatus = ''; netMsg('Lobiye bağlanılıyor...', true); goLobby().then(renderNet); };
-$('nLeave').onclick = () => { G.noAuto = true; netReset(); netMsg('Odadan çıktın.', true); };
+$('nLeave').onclick = () => { if (!G.admin && !(G.leaveUntil > Date.now())) return notice('Lobiden çıkmak yasak', 'Çıkmak için yöneticiden izin almalısın.'); if (G.admin) G.noAuto = true; netReset(); netMsg('Odadan çıktın.', true); };
 $('nShare').onclick = shareInvite;
 $('nAddFriend').onclick = () => { addFriend($('nFriendCode').value.trim()); $('nFriendCode').value = ''; };
 pNet.querySelectorAll('input').forEach(i => i.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Escape') closeNet(); if (e.key === 'Enter') { if (i.id === 'nRoomC' || i.id === 'nPassC') netGo(true); else if (i.id === 'nRoomJ' || i.id === 'nPassJ') netGo(false); else if (i.id === 'nFriendCode') $('nAddFriend').click(); } }));
@@ -4723,7 +4777,7 @@ function drawRemoteTags() {
     if (!p.mesh || !p.mesh.visible) continue;
     const q = scr(p.rx, p.ry + 2.15 * (p.sc || 1), p.rz); if (!q) continue;
     const fr = save.friends.some(f => f.code === p.c);
-    txt(p.n + (fr ? ' ★' : ''), q.x, q.y, 18, fr ? '#9dffb0' : '#ffffff', 'center');
+    txt(p.n + (fr ? ' ★' : '') + (p.ag ? ' · ' + heightCm(p.ag) + ' cm' : ''), q.x, q.y, 18, fr ? '#9dffb0' : '#ffffff', 'center');
     if (G.frozen && G.frozen[p.c] && G.frozen[p.c].until > Date.now()) txt('⏳ ' + mmss(G.frozen[p.c].until - Date.now()), q.x, q.y - 24, 20, '#ff8a80', 'center');
     if (p.say && Date.now() < p.say.until) { ctx.font = '17px "Nunito", sans-serif'; const w = ctx.measureText(p.say.t).width + 24; ctx.fillStyle = 'rgba(255,255,255,0.92)'; rr(q.x - w / 2, q.y - 52, w, 30, 12); ctx.fill(); txt(p.say.t, q.x, q.y - 31, 17, '#4a2c17', 'center'); }
   }
@@ -4764,7 +4818,7 @@ function syncSettings() {
   $('setMusicVol').value = Math.round((save.musicVol ?? 1) * 100); $('vMusic').textContent = $('setMusicVol').value + '%';
   $('setSfxVol').value = Math.round((save.sfxVol ?? 1) * 100); $('vSfx').textContent = $('setSfxVol').value + '%';
   $('setView').value = Math.round((save.viewDist || 1) * 100); $('vView').textContent = viewWord(save.viewDist || 1) + ' · ' + $('setView').value + '%';
-  $('setLobby').value = save.autoLobby === false ? '0' : '1'; $('setQual').value = save.quality || 'high'; $('setAge').value = save.age || ''; $('vAge').textContent = save.age ? `· boy ${heightCm(save.age)} cm` : '';
+  $('setQual').value = save.quality || 'high'; $('setAge').value = save.age || ''; $('vAge').textContent = save.age ? `· boy ${heightCm(save.age)} cm` : '';
   $('setCam').value = Math.round((save.camSens || 1) * 100); $('vCam').textContent = $('setCam').value + '%';
 }
 function openSettings() {
@@ -4794,7 +4848,6 @@ $('setAge').oninput = e => {
   saveGame();
 };
 $('setFly').onchange = e => { save.fly = e.target.value === '1'; saveGame(); };
-$('setLobby').onchange = e => { save.autoLobby = e.target.value === '1'; if (!save.autoLobby) G.noAuto = true; else { G.noAuto = false; setTimeout(goLobby, 300); } saveGame(); };
 $('setQual').onchange = e => { save.quality = e.target.value; G.autoQ = null; perfSlow = 0; applyQuality(); saveGame(); };
 $('setCam').oninput = e => { save.camSens = e.target.value / 100; $('vCam').textContent = e.target.value + '%'; };
 function goHub() { saveGame(); honey = 0; lives = 3; loadLevel(-1); setPlaying(); }
@@ -4871,7 +4924,7 @@ function startAfterLogin() { if (!save.tutDone && !save.unlocked && !Object.valu
 $('startBtn').onclick = async () => {
   audio();
   const pw = $('passInput').value; let kp = null;
-  if (pw.length >= 8 && ['nts', 'nt-s'].includes(slug(typedName()))) { $('startBtn').disabled = true; kp = await adminProbe(pw); $('startBtn').disabled = false; } // the administrator account is called NTS
+  if (pw.length >= 8 && slug(typedName()) === 'wer57') { $('startBtn').disabled = true; kp = await adminProbe(pw); $('startBtn').disabled = false; } // the administrator account has its own fixed name
   startNow(kp);
 };
 const startNow = adminKp => {
