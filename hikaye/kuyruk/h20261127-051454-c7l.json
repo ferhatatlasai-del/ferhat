@@ -1,7 +1,7 @@
 {
   "id": "h20261127-051454-c7l",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-27T05:14:54.000Z",
   "gorsel": "hikaye/gorseller/h20261127-051454-c7l.mp4",
   "baslik": "Bee Waterer",
@@ -21,7 +21,9 @@
     "sorunlar": []
   },
   "yayin": {
-    "tarih": "2026-11-27T12:05:19Z"
+    "tarih": "2026-11-27T12:06:52Z",
+    "medya_kimligi": "17994889832858473",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4039627769279544400"
   },
   "hata": "",
   "deneme": 0,
