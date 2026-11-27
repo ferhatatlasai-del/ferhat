@@ -1,17 +1,17 @@
 {
- "tarih": "2026-11-27T09:00:15Z",
- "tr_saat": "27.11.2026 12:00",
+ "tarih": "2026-11-27T12:00:22Z",
+ "tr_saat": "27.11.2026 15:00",
  "toplam": {
-  "reels": 20420,
+  "reels": 20496,
   "gonderi": 0,
-  "short": 11827,
+  "short": 11857,
   "youtube_video": 0,
-  "hikaye": 1619,
-  "toplam": 33866,
+  "hikaye": 1640,
+  "toplam": 33993,
   "begeni": 305,
   "yorum": 28
  },
- "fark": 30,
+ "fark": 127,
  "instagram": {
   "durum": "tamam",
   "izin": true,
@@ -26,8 +26,8 @@
     "begeni": 1,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgPFB_CMKqM/",
-    "izlenme": 224,
-    "erisim": 201
+    "izlenme": 283,
+    "erisim": 263
    },
    {
     "id": "17914671000663787",
@@ -48,8 +48,8 @@
     "begeni": 17,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/DgFd6danP9K/",
-    "izlenme": 1215,
-    "erisim": 1081
+    "izlenme": 1216,
+    "erisim": 1083
    },
    {
     "id": "18184587094447542",
@@ -114,7 +114,7 @@
     "begeni": 10,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgAaonlkhF3/",
-    "izlenme": 1688,
+    "izlenme": 1690,
     "erisim": 1522
    },
    {
@@ -147,8 +147,8 @@
     "begeni": 34,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": 4343,
-    "erisim": 3880
+    "izlenme": 4357,
+    "erisim": 3887
    },
    {
     "id": "18289759651292671",
@@ -366,24 +366,26 @@
    "id": "18241345714316810",
    "tarih": "2026-11-27T06:55:47Z",
    "baslik": "Bee Feeder and Waterer / Napáječka pro včely",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 6,
+   "erisim": 5,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "18001464392829419",
    "tarih": "2026-11-27T06:53:40Z",
    "baslik": "Video hikayesi",
-   "izlenme": 0,
-   "erisim": 0,
-   "okundu": false
+   "izlenme": 9,
+   "erisim": 6,
+   "okundu": true,
+   "yanit": 0
   },
   {
    "id": "18122897930517792",
    "tarih": "2026-11-27T05:07:00Z",
    "baslik": "Wall mounted cat litter/dog poop bag holder",
-   "izlenme": 8,
-   "erisim": 5,
+   "izlenme": 11,
+   "erisim": 8,
    "okundu": true,
    "yanit": 0
   },
@@ -391,8 +393,8 @@
    "id": "17990306057885699",
    "tarih": "2026-11-26T16:46:39Z",
    "baslik": "Dog Leash Poo Bag Holder (for used bags)",
-   "izlenme": 25,
-   "erisim": 20,
+   "izlenme": 27,
+   "erisim": 22,
    "okundu": true,
    "yanit": 0
   },
@@ -400,8 +402,8 @@
    "id": "18103753793428535",
    "tarih": "2026-11-26T14:26:53Z",
    "baslik": "Dog Poop Bag Holder for Carabiner Leash",
-   "izlenme": 33,
-   "erisim": 29,
+   "izlenme": 34,
+   "erisim": 30,
    "okundu": true,
    "yanit": 1
   },
@@ -730,7 +732,7 @@
     "tur": "Short",
     "tarih": "2026-11-27T06:52:49",
     "baslik": "İlk katman neden fazla yassı ya da yüksek olur?",
-    "izlenme": 12,
+    "izlenme": 33,
     "begeni": 0,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=YXBs4l1GFrs"
@@ -760,7 +762,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T23:17:16",
     "baslik": "Bambu Lab A1 Combo AMS lite filament değişim sorunları",
-    "izlenme": 233,
+    "izlenme": 238,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=Vt_lyaaFBOo"
@@ -810,7 +812,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T15:26:52",
     "baslik": "Isıya en dayanıklı 5 filament | 3D baskı",
-    "izlenme": 382,
+    "izlenme": 383,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=TXcpwaFMx1U"
@@ -840,7 +842,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T23:23:12",
     "baslik": "İlk katman neden bozuluyor? 5 hızlı kontrol",
-    "izlenme": 1140,
+    "izlenme": 1141,
     "begeni": 11,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=JFRO2uhYfwQ"
@@ -850,7 +852,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T22:17:19",
     "baslik": "3D Baskı Tablaya Yapışmıyor mu? 5 Pratik Çözüm",
-    "izlenme": 1277,
+    "izlenme": 1278,
     "begeni": 18,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=qcWHhTeaEHs"
@@ -860,7 +862,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T21:56:57",
     "baslik": "3D Baskı ile Araba İçi Pratik Aksesuarlar",
-    "izlenme": 177,
+    "izlenme": 178,
     "begeni": 0,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=DevZ1m13Ku4"
@@ -930,7 +932,7 @@
  },
  "eksikler": [],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 12:00",
-  "govde": "Toplam 33.866 (+30) · Reels 20.420 · Short 11.827 · Hikaye 1.619 (3 bugün) · Takipçi 433 · En iyi Reels: Baskın tabladan kalkı 4.343"
+  "baslik": "📊 İzlenme raporu 15:00",
+  "govde": "Toplam 33.993 (+127) · Reels 20.496 · Short 11.857 · Hikaye 1.640 (3 bugün) · Takipçi 433 · En iyi Reels: Baskın tabladan kalkı 4.357"
  }
 }
