@@ -126,6 +126,37 @@
       },
       "mod": "deneme",
       "durum": "reddedildi"
+    },
+    {
+      "zaman": "2026-11-27 15:16",
+      "id": "s20261127-121050",
+      "konu": "PETG neden ipliklenir, nasıl azaltılır?",
+      "baslik": "PETG ipliklenmesi neden olur, nasıl azalır?",
+      "inceleme": {
+        "karar": "reddet",
+        "puan": 5.0,
+        "sorunlar": [
+          "İlk sahnelerde aynı makara görseli gereksiz tekrar ediyor",
+          "Bazı altyazılar çok küçük/parçalı ve okunurluk zayıf",
+          "Görselde 131°C ve 60°C gibi bağlamsız sıcaklıklar gösteriliyor; PETG anlatımında kafa karıştırıcı",
+          "\"Nozulun geç sönmesi\" ifadesi teknik olarak muğlak ve yanıltıcı olabilir",
+          "Rejection/retraction önerisi fazla genel; doğrudan artırmak PETG'de her durumda doğru değildir"
+        ],
+        "gerekce": "Video genel fikri doğru verse de ekrandaki şüpheli sıcaklık sayıları ve muğlak teknik anlatım güvenilirlik standardını düşürdüğü için yayın için uygun değil.",
+        "model": "OpenAI (gpt-5.4)",
+        "iddialar": [
+          "PETG'de ipliklenme çoğu zaman ısı, geri çekme ve nemle artar → doğru",
+          "Nozul çok sıcak kalırsa filament akmaya devam eder → doğru",
+          "Sıcaklık düşünce iplikler de azalır → doğru",
+          "Retraction çok kısa kalırsa gezinti sırasında ipliklenme artabilir → doğru",
+          "PETG nem çekince nozulda çıtırtı ve buhar görülebilir → doğru",
+          "Kuru saklamak/stringing'i azaltmakta işe yarar → doğru",
+          "PETG için ekranda görülen 230°C değeri → doğru (tipik aralık içinde)",
+          "Ekranda görülen 131°C ve 60°C değerleri PETG stringing açıklamasında → şüpheli"
+        ]
+      },
+      "mod": "acik",
+      "durum": "reddedildi"
     }
   ]
 }
