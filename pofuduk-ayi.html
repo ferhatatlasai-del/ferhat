@@ -1299,7 +1299,7 @@ function mergeStatic(root, keep) { // everything under `root` except the things 
 }
 function mergeHub() {
   if (window.NOMERGE) return;
-  const keep = new Set([G.sunMesh, G.doorGlow, G.blob, G.marker, G.trail, G.stars, G.homeMark].filter(Boolean));
+  const keep = new Set([G.forestGroup, G.sunMesh, G.doorGlow, G.blob, G.marker, G.trail, G.stars, G.homeMark].filter(Boolean));
   for (const c of G.clouds || []) keep.add(c);
   for (const it of L.items || []) if (it.mesh) keep.add(it.mesh);
   for (const o of [...(L.portals || []).map(q => q.disc), ...(L.mts || []).map(q => q.glow), ...(L.parks || []).map(q => q.glow), ...(L.turtles || []).map(q => q.mesh), ...(L.rabbits || []).map(q => q.mesh), ...(L.babies || []).map(q => q.mesh), L.burrow && L.burrow.mesh, ...(L.stores || []).map(q => q.keeper)]) if (o) keep.add(o);
@@ -1935,6 +1935,43 @@ function bearModel(o) {
   root.userData.parts = parts;
   return root;
 }
+function buildForest(W, F) {
+  const grp0 = new THREE.Group(); W.add(grp0); G.forestGroup = grp0;
+  // grass under the forest, outside the village ground
+  const FR = F.FR + 12, a = 150, floor = (cx, cz, w, d) => { const m = mkBase('box', '#2f6b3a', [w, 3, d], [cx, -1.5, cz], W); m.castShadow = false; m.receiveShadow = true; };
+  floor(0, -(a + FR) / 2, 2 * FR, FR - a); floor(0, (a + FR) / 2, 2 * FR, FR - a); floor(-(a + FR) / 2, 0, FR - a, 2 * a); floor((a + FR) / 2, 0, FR - a, 2 * a);
+  // a template fir: trunk and three cones, with vertex colours
+  const parts = [[G.geo.box, '#5b4030', [0.3, 1.4, 0.3], [0, 0.7, 0]], [G.geo.coneLow, '#2f7a3f', [1.35, 2.2, 1.35], [0, 2.2, 0]], [G.geo.coneLow, '#3a8a45', [1.0, 1.8, 1.0], [0, 3.5, 0]], [G.geo.coneLow, '#43944d', [0.65, 1.4, 0.65], [0, 4.6, 0]]];
+  const tp = [], tn = [], tc = [], ti = []; let vo = 0;
+  for (const [g, col, sc, ps] of parts) {
+    const P = g.attributes.position, N = g.attributes.normal, c = new THREE.Color(col);
+    for (let v = 0; v < P.count; v++) {
+      tp.push(P.getX(v) * sc[0] + ps[0], P.getY(v) * sc[1] + ps[1], P.getZ(v) * sc[2] + ps[2]);
+      const nx = N.getX(v) / sc[0], ny = N.getY(v) / sc[1], nz = N.getZ(v) / sc[2], nl = Math.hypot(nx, ny, nz) || 1; tn.push(nx / nl, ny / nl, nz / nl); tc.push(c.r, c.g, c.b);
+    }
+    const I = g.index; for (let t = 0; t < I.count; t++) ti.push(vo + I.getX(t)); vo += P.count;
+  }
+  const nv = tp.length / 3, cells = new Map(), CELL = 60;
+  for (const t of F.pts) { const key = Math.floor(t[0] / CELL) + ',' + Math.floor(t[1] / CELL); let c = cells.get(key); if (!c) cells.set(key, c = []); c.push(t); }
+  const material = new THREE.MeshLambertMaterial({ vertexColors: true });
+  for (const list of cells.values()) {
+    const n = list.length, pos = new Float32Array(n * nv * 3), nor = new Float32Array(n * nv * 3), col = new Float32Array(n * nv * 3), idx = n * nv > 65535 ? new Uint32Array(n * ti.length) : new Uint16Array(n * ti.length);
+    list.forEach(([x, z, s, ang, tint], k) => {
+      const ca = Math.cos(ang), sa = Math.sin(ang), b = k * nv * 3;
+      for (let v = 0; v < nv; v++) {
+        const px = tp[v * 3], py = tp[v * 3 + 1], pz = tp[v * 3 + 2], o = b + v * 3;
+        pos[o] = (px * ca + pz * sa) * s + x; pos[o + 1] = py * s; pos[o + 2] = (-px * sa + pz * ca) * s + z;
+        const nx = tn[v * 3], nz = tn[v * 3 + 2]; nor[o] = nx * ca + nz * sa; nor[o + 1] = tn[v * 3 + 1]; nor[o + 2] = -nx * sa + nz * ca;
+        col[o] = Math.min(1, tc[v * 3] * tint); col[o + 1] = Math.min(1, tc[v * 3 + 1] * tint); col[o + 2] = Math.min(1, tc[v * 3 + 2] * tint);
+      }
+      for (let t = 0; t < ti.length; t++) idx[k * ti.length + t] = k * nv + ti[t];
+    });
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setAttribute('normal', new THREE.BufferAttribute(nor, 3)); geo.setAttribute('color', new THREE.BufferAttribute(col, 3)); geo.setIndex(new THREE.BufferAttribute(idx, 1));
+    geo.computeBoundingSphere();
+    const mesh = new THREE.Mesh(geo, material); mesh.castShadow = false; mesh.receiveShadow = false; mesh.matrixAutoUpdate = false; grp0.add(mesh);
+  }
+}
 function treeModel(kind, parent, x, y, z, s, rnd) {
   const mk = (g, c, sz, p, par, o) => mkBase(g === 'sph' ? 'sphL' : g, c, sz, p, par, Object.assign({ side: 'double' }, o || {})); // filled look from inside too
   const t = grp(parent, x, y, z); t.scale.setScalar(s); t.rotation.y = rnd() * 6;
@@ -2370,15 +2407,17 @@ function buildHub() {
     const [tx, tz] = T(0, -hd + wt + 2.8 * SC); s.tx = tx; s.tz = tz; // stand at the counter to shop
   }
   solidTrees(trees, boxes, hitems, HUB, true);
-  { // forests all around the village: dense trees along the four edges and a wall of boxes so nobody walks through them
-    const fr = rng(31337), step = 5.4;
-    for (let gx = -R + 6; gx < R - 5; gx += step) for (let gz = -R + 6; gz < R - 5; gz += step) {
+  let forestInfo = null;
+  { // a huge forest all around the village: thousands of trees (drawn in merged chunks) and a wall of boxes so nobody walks through it
+    const fr = rng(31337), FR = 230, step = 4.4, pts = [];
+    for (let gx = -FR + 4; gx < FR - 3; gx += step) for (let gz = -FR + 4; gz < FR - 3; gz += step) {
       const x = gx + (fr() - 0.5) * 3.6, z = gz + (fr() - 0.5) * 3.6, e = Math.max(Math.abs(x), Math.abs(z));
-      if (e < R - FB + 2 || e > R - 4 || mts.some(m => Math.hypot(x - m.cx, z - m.cz) < m.r + 3)) continue;
-      trees.push({ x, y: 0, z, s: 1.15 + fr() * 0.9, forest: true, kind: 'forest' });
+      if (e < R - FB + 2 || e > FR - 3) continue;
+      pts.push([x, z, 1.25 + fr() * 1.15, fr() * 6.283, 0.82 + fr() * 0.32]);
     }
+    forestInfo = { pts, FR };
     const W0 = R - FB + 4;
-    for (const b of [[-R, -R, R, -W0], [-R, W0, R, R], [-R, -W0, -W0, W0], [W0, -W0, R, W0]]) boxes.push({ x0: b[0], z0: b[1], x1: b[2], z1: b[3], y0: 0, y1: 22, kind: 'deco', on: true });
+    for (const b of [[-FR, -FR, FR, -W0], [-FR, W0, FR, FR], [-FR, -W0, -W0, W0], [W0, -W0, FR, W0]]) boxes.push({ x0: b[0], z0: b[1], x1: b[2], z1: b[3], y0: 0, y1: 14, kind: 'deco', on: true });
   }
   const turtles = [];
   for (let i = 0; turtles.length < 20 && i < 900; i++) {
@@ -2403,7 +2442,7 @@ function buildHub() {
     const a = burrow.yaw + (id - 2) * 0.62, hx = burrow.x + Math.sin(a) * 2.1, hz = burrow.z + Math.cos(a) * 2.1, ok = home.includes(id);
     babies.push({ id, lx: x, lz: z, hx, hz, x: ok ? hx : x, y: 0, z: ok ? hz : z, yaw: ok ? a : rr2() * 6.28, st: ok ? 'home' : 'lost', t: rr2() * 5, hop: 0 });
   }
-  return { def: HUB, hub: true, R, boxes, items: hitems, enemies: [], trees, paths, start: { x: 0, y: 0, z: 50 }, checkpoints: [], cpActive: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, ward, smith, board, tutGate, roomHub, houses, turtles, parks, mts, burrow, rabbits, babies, mansion, remotes, stores, honeyShop };
+  return { def: HUB, hub: true, forest: forestInfo, R, boxes, items: hitems, enemies: [], trees, paths, start: { x: 0, y: 0, z: 50 }, checkpoints: [], cpActive: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, ward, smith, board, tutGate, roomHub, houses, turtles, parks, mts, burrow, rabbits, babies, mansion, remotes, stores, honeyShop };
 }
 function mkBoss(type, c) {
   const base = { type, c, x: c.x, z: c.zc - 3, y: c.y, vx: 0, vz: 0, vy: 0, t: 0, inv: 0, active: false, defeated: false, deadT: 0, yaw: 0, tx: 0, tz: 0, state: type === 'mush' ? 'walk' : type === 'queen' ? 'hover' : 'aim' };
@@ -3438,7 +3477,8 @@ function buildScene() {
     }
     if (m) G.boxMeshes.set(b, m);
   }
-  for (const t of L.trees) if (!t.gone) { const tg = treeModel(t.kind || th.tree, W, t.x, t.y, t.z, t.s, rnd); if (t.forest) tg.traverse(o => { if (o.isMesh) o.castShadow = false; }); } // the forest casts no shadows: far cheaper
+  for (const t of L.trees) if (!t.gone) treeModel(t.kind || th.tree, W, t.x, t.y, t.z, t.s, rnd);
+  G.forestGroup = null; if (L.forest) buildForest(W, L.forest);
   if (L.signs) for (const sg of L.signs) {
     const g4 = grp(W, sg.x, sg.y, sg.z); g4.rotation.y = sg.x < 0 ? 0.35 : -0.35; // face the path, which runs toward -z
     mk('cyl', '#6b4220', [0.09, 1.25, 0.09], [0, 0.62, 0], g4);
@@ -3693,6 +3733,7 @@ function drawWolves() {
 function lookKey() { return save.species + save.outfit + save.gender + save.axe; }
 function render3D(alpha = 1, dtMs = 16.667) {
   perfTick(dtMs);
+  if (G.forestGroup && P) { const px = P.x, pz = P.z; for (const m of G.forestGroup.children) { const s = m.geometry.boundingSphere; m.visible = Math.hypot(s.center.x - px, s.center.z - pz) - s.radius < 150; } } // forest chunks beyond the fog are not drawn
   const ip = (o, n) => o === undefined ? n : o + (n - o) * alpha;
   const fI = frame + (state === 'play' ? alpha : 0), animI = ip(P.oanim, P.anim);
   const PX = ip(P.ox, P.x), PY = ip(P.oy, P.y), PZ = ip(P.oz, P.z), fk = b => 1 - Math.pow(1 - b, dtMs / 16.667);
