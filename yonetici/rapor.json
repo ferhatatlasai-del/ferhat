@@ -1,27 +1,6 @@
 {
   "raporlar": [
     {
-      "zaman": "2026-11-23 00:45",
-      "kademe": 2,
-      "model": "OpenAI (gpt-5.4-mini)",
-      "rapor": [
-        "Senin sistemin genel olarak iyi durumda; Instagram, YouTube, OpenAI ve ofis sunucusu çalışıyor, kritik bir arıza görünmüyor.",
-        "Hikâye kuyruğunda 9 planlı içerik var; günlük hedef 6 olduğu için akış şimdilik yeterli görünüyor.",
-        "Bugün görsel kullanımın 0, aylık 108; bütçe açısından acil bir taşma sinyali yok.",
-        "Onay bekleyen tek video taslağı var: s20261122-185523. Başlık konu olarak uygun görünüyor ama içerik detayını görmeden onaylamıyorum.",
-        "Öncelikli konu listesinde Bambu Lab A1 etrafında tekrar eden ama hâlâ güçlü başlıklar var; çeşitlilik için yeni açı seçmek iyi olur.",
-        "Şu an acil müdahale gerektiren bir sağlık/bağlantı sorunu yok; bu yüzden gereksiz workflow çalıştırmıyorum."
-      ],
-      "oneriler": [
-        "Bu akşam yeni taslak üretirken Bambu Lab A1 çevresinde ama farklı açı seç: örneğin baskı öncesi kontrol listesi veya yeni başlayan hataları.",
-        "Hikâye sayısını şimdilik değiştirme; kuyruk dolu ve günlük hedefe yakınsın.",
-        "Yorumlarda otomatik akış açık kalsın ama hakaret, siyaset, sağlık-hukuk içeren yorumları yine dikkatle ayıkla.",
-        "Yarın sabah raporunda özellikle onay bekleyen taslağın içeriğini kontrol et; başlık iyi olsa da detay doğrulaması önemli."
-      ],
-      "uyarilar": [],
-      "eylem_sayisi": 1
-    },
-    {
       "zaman": "2026-11-23 00:46",
       "kademe": 2,
       "model": "OpenAI (gpt-5.4-mini)",
@@ -687,6 +666,30 @@
         "Nöbetçi’nin son 24 saatte 3 kez başarısız olması sistem sağlığı açısından izlenmeli; nedenine dair veri yok."
       ],
       "eylem_sayisi": 2
+    },
+    {
+      "zaman": "2026-11-28 18:31",
+      "kademe": 3,
+      "model": "OpenAI (gpt-5.4)",
+      "rapor": [
+        "Acil: otomatik hat bugün iki videoyu teknik/doğruluk sorunu yüzünden reddetmiş, 15:10 turu da üretim hatası vermiş; mod açık ama bunu ben değiştiremiyorum.",
+        "Son 5 otomatik hat kaydında art arda ret/hata var; ayrıca son 24 saatte Nöbetçi 3 kez başarısız görünüyor, bu sistem sağlığı açısından risk.",
+        "Hikâye tarafında kuyruk azalmış: 4 planlı hikâye kaldı, günlük hedef 6; bugün 10 görsel üretilmiş ama kuyruk notu sorun gösteriyor.",
+        "Yorum tarafı sakin: onay bekleyen 0, gönderilen 7; bu turda yorum onayı gerekmiyor.",
+        "Video çeşitliliğinde tekrar riski var: son üretilen/reddedilen konular ilk katman, tabla yapışması ve nozul çevresinde kümelenmiş görünüyor.",
+        "Emin olmadığım nokta: 15:10 üretim hatasının kök nedeni veri yok; bu yüzden yalnızca kontrol öneriyorum."
+      ],
+      "oneriler": [
+        "Sen panelden otomatik hat açık kaldığı için bugün 20:05 turunu özellikle izle; aynı sayısal/bağlamsız iddia hataları sürerse üretim promptunu sadeleştirmen iyi olur.",
+        "Hikâye kuyruğu 4'e düştüğü için hikâye ajanı akışını ve kuyruğa yazma adımını kontrol etmeni öneririm; günlük hedef 6 ile açık oluşabilir.",
+        "Reddedilen video kalıplarında sayısal iddia kullanımı riskli görünüyor; özellikle yüzdeler ve mm/s gibi değerleri ya kaldır ya da açık bağlamla sınırla.",
+        "Konu dağılımını biraz genişletmek iyi olabilir: bakım, destek ihtiyacı, warping, cold pull gibi temel ama farklı başlıklara dönmek tekrar hissini azaltır."
+      ],
+      "uyarilar": [
+        "Otomatik hat açıkken bugün art arda 2 ret + 1 üretim hatası var; 20:05 turunda da sorun olursa günlük yayın tamamen aksayabilir.",
+        "Son 24 saatte Nöbetçi 3 kez başarısız görünüyor; anahtarlar şu an iyi görünse de altta yatan servis sorunu olabilir."
+      ],
+      "eylem_sayisi": 2
     }
   ],
   "defter": [
@@ -1010,6 +1013,29 @@
       "neden": "Son başarılı kalıplara yakın ama tekrar etmeyen, pratik ve güvenli bir konu.",
       "durum": "yapildi",
       "ayrinti": "İlk katman neden fazla yassı ya da fazla yüksek görünür?"
+    },
+    {
+      "zaman": "2026-11-28 18:31",
+      "kademe": 3,
+      "eylem": "workflow_tetikle",
+      "params": {
+        "akis": "nobetci.yml"
+      },
+      "neden": "Art arda ret/hata ve son 24 saatte 3 başarısız Nöbetçi kaydı var; servis/bağlantı durumunu yeniden kontrol etmek gerekli.",
+      "durum": "yapildi",
+      "ayrinti": "nobetci.yml tetiklendi"
+    },
+    {
+      "zaman": "2026-11-28 18:31",
+      "kademe": 3,
+      "eylem": "konu_oncelik_ekle",
+      "params": {
+        "konu": "PETG neden ipliklenir, nasıl azaltılır?",
+        "ipucu": "Yeni başlayanlara sade anlat; nem, sıcaklık, geri çekme ve hızın etkisini genel aralıklarla ver; kesin sayı/vaat verme; görselde PETG stringing örneği ile ayar mantığını eşleştir."
+      },
+      "neden": "En çok izlenenlerde ipliklenme ve nem teması çalışmış; mevcut öncelikli konu sayısı düşük ve bu konu başarılı kalıba yakın ama yeni.",
+      "durum": "yapildi",
+      "ayrinti": "PETG neden ipliklenir, nasıl azaltılır?"
     }
   ]
 }
