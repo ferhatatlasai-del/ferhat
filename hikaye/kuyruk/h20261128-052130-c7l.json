@@ -1,7 +1,7 @@
 {
   "id": "h20261128-052130-c7l",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-28T05:21:30.000Z",
   "gorsel": "hikaye/gorseller/h20261128-052130-c7l.mp4",
   "baslik": "Tall Planter with Vertical Lines",
@@ -21,7 +21,9 @@
     "sorunlar": []
   },
   "yayin": {
-    "tarih": "2026-11-28T12:05:16Z"
+    "tarih": "2026-11-28T12:06:36Z",
+    "medya_kimligi": "18133010131867938",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4040352391407372112"
   },
   "hata": "",
   "deneme": 0,
