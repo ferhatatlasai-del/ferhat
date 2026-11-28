@@ -49,6 +49,10 @@
     {
       "konu": "Nozul çapı 0.4 mm neyi değiştirir?",
       "ipucu": "Hız, detay ve katman ilişkisini genel anlat; kesin vaat verme, marka/model detayı uydurma. Basit görsel karşılaştırma öner."
+    },
+    {
+      "konu": "İlk katman neden fazla yassı ya da fazla yüksek görünür?",
+      "ipucu": "Yeni başlayan için sade anlat; nozzle-table mesafesi, ilk çizginin görünümü, çok yassı vs çok yüksek farkı; sayısal iddia verme, kısa kontrol listesi kullan."
     }
   ]
 }
