@@ -4380,10 +4380,11 @@ function myState() { // the house and the wardrobe are sent only every couple of
   return st;
 }
 function myStateBase() {
+  let wv; if (L && L.wolves && ((G.wvTick = (G.wvTick || 0) + 1) & 1)) wv = L.wolves.filter(w => !w.gone && w.hp > 0).slice(0, 4).map(w => [Math.round(w.x * 10) / 10, Math.round(w.z * 10) / 10, Math.round(w.yaw * 10) / 10, w.st === 'chase' ? 1 : 0]); // the wolves chasing me, for the others to see
   const r2 = v => Math.round(v * 100) / 100;
   return { n: save.name, c: save.code, lv: state === 'title' ? '' : lvKey(), x: P ? r2(P.x) : 0, y: P ? r2(P.y) : 0, z: P ? r2(P.z) : 0, yw: P ? r2(P.yaw) : 0,
     sp: P ? r2(Math.hypot(P.vx, P.vz)) : 0, air: P ? (P.onGround ? 0 : 1) : 0, fl: P ? Math.round(P.spin || 0) : 0, at: P && P.atkT > 0 ? 1 : 0,
-    g: save.gender, s: G.admin ? 'wolf' : save.species, o: save.outfit, a: save.axe, av: avatar.sel || '', ag: save.age || 0, ck: net.host ? Math.round((save.clock || 0) * 10) / 10 : undefined };
+    g: save.gender, s: G.admin ? 'wolf' : save.species, o: save.outfit, a: save.axe, av: avatar.sel || '', ag: save.age || 0, wv, ck: net.host ? Math.round((save.clock || 0) * 10) / 10 : undefined };
 }
 // remote players: keep only well-formed values
 function takePlayer(id, st) {
@@ -4392,6 +4393,7 @@ function takePlayer(id, st) {
   const p = Object.assign(old, { n: clip(st.n, 14) || 'Ayı', c: clip(st.c, 6).toUpperCase(), lv: clip(st.lv, 8), x: num(st.x), y: num(st.y), z: num(st.z), yw: num(st.yw, 100),
     sp: num(st.sp, 40), air: !!st.air, fl: num(st.fl, 60), at: !!st.at, g: st.g === 'girl' ? 'girl' : 'boy', s: clip(st.s, 12), o: clip(st.o, 12), av: clip(st.av, 4), ag: Math.max(0, Math.min(99, Math.round(num(st.ag, 99)))), a: Math.max(0, Math.min(AXES.length - 1, Math.round(num(st.a, 9)))), seen: Date.now() });
   p.h = st.h ? 1 : 0; if (st.pk) p.pk = clip(st.pk, 44);
+  if (Array.isArray(st.wv)) { p.wv = st.wv.slice(0, 4).filter(a => Array.isArray(a)).map(a => [num(a[0], 400), num(a[1], 400), num(a[2], 100), a[3] ? 1 : 0]); p.wvT = Date.now(); }
   { const now = Date.now(); if (pt0 && px0 !== undefined) { const dt = (now - pt0) / 1000; if (dt > 0.01 && dt < 0.6) { p.vx = Math.max(-30, Math.min(30, (p.x - px0) / dt)); p.vz = Math.max(-30, Math.min(30, (p.z - pz0) / dt)); } } p.tt = now; }
   if (p.h && Number.isFinite(+st.ck) && +st.ck >= 0 && +st.ck < CYC + 1) net.hostClock = { ck: +st.ck, t: Date.now(), id }; // the founder's time of day
   p.sc = heightScale(p.ag);
@@ -4405,7 +4407,7 @@ function takePlayer(id, st) {
   const f = save.friends.find(f => f.code === p.c); if (f && f.name !== p.n) { f.name = p.n; saveGame(); }
   if (p.rx === undefined) { p.rx = p.x; p.ry = p.y; p.rz = p.z; p.ryw = p.yw; p.ph = 0; }
 }
-function dropPlayer(id) { const p = net.players.get(id); if (p && p.mesh) G.scene.remove(p.mesh); if (p && p.hm) net.homesDirty = true; net.players.delete(id); }
+function dropPlayer(id) { const p = net.players.get(id); if (p && p.mesh) G.scene.remove(p.mesh); if (p && p.gw) for (const g of p.gw) if (g.m.parent) g.m.parent.remove(g.m); if (p && p.hm) net.homesDirty = true; net.players.delete(id); }
 function netMsg(t, ok) { const m = $('nMsg'); m.textContent = t; m.className = 'msg' + (ok ? ' ok' : ''); }
 function netReset() {
   clearInterval(net.timer); net.unsub.forEach(u => { try { u(); } catch (e) {} }); net.unsub = [];
@@ -4902,11 +4904,26 @@ $('nAddFriend').onclick = () => { addFriend($('nFriendCode').value.trim()); $('n
 pNet.querySelectorAll('input').forEach(i => i.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Escape') closeNet(); if (e.key === 'Enter') { if (i.id === 'nRoomC' || i.id === 'nPassC') netGo(true); else if (i.id === 'nRoomJ' || i.id === 'nPassJ') netGo(false); else if (i.id === 'nFriendCode') $('nAddFriend').click(); } }));
 addEventListener('pagehide', () => { try { if (net.peer) net.peer.destroy(); } catch (e) {} });
 // other players' bears, drawn in the same place as on their screen
+function ghostWolves(p, show, k) { // the wolves chasing the other players: you see them too
+  const list = show && p.wv && Date.now() - (p.wvT || 0) < 2500 ? p.wv : [];
+  p.gw = p.gw || [];
+  while (p.gw.length > list.length) { const g = p.gw.pop(); if (g.m.parent) g.m.parent.remove(g.m); }
+  while (p.gw.length < list.length) { const t = list[p.gw.length], m = wolfModel(); G.world.add(m); m.position.set(t[0], 0, t[1]); p.gw.push({ m, x: t[0], z: t[1], yaw: t[2], a: 0 }); }
+  list.forEach((t, i) => {
+    const g = p.gw[i], dx = t[0] - g.x, dz = t[1] - g.z, sp = Math.hypot(dx, dz);
+    if (sp > 12) { g.x = t[0]; g.z = t[1]; } else { g.x += dx * k; g.z += dz * k; }
+    g.yaw += angDiff(t[2], g.yaw) * k; g.a += sp * 0.7 + 0.02; g.m.position.set(g.x, 0, g.z); g.m.rotation.y = g.yaw;
+    const u = g.m.userData, run = Math.min(1, sp * 6);
+    u.legs.forEach((l, j) => { l.rotation.x = Math.sin(g.a * 3 + (j === 0 || j === 3 ? 0 : Math.PI)) * 0.7 * run; });
+    u.tail.rotation.x = 0.5 + (t[3] ? -0.5 : Math.sin(frame * 0.08) * 0.15); u.head.rotation.x = t[3] ? 0.15 : 0;
+  });
+}
 function drawRemote(dtMs) {
   if (!net.players.size) return;
   const here = lvKey(), k = 1 - Math.pow(0.75, (dtMs || 16.7) / 16.667);
   for (const p of net.players.values()) {
     const show = net.on && p.lv === here && state !== 'title';
+    ghostWolves(p, show, k);
     const lk = p.g + p.s + p.o + p.a;
     if (show && (!p.mesh || p.lk !== lk)) { if (p.mesh) G.scene.remove(p.mesh); p.mesh = bearModel({ girl: p.g === 'girl', species: p.s, outfit: p.o, axe: p.a }); p.lk = lk; G.scene.add(p.mesh); }
     if (!p.mesh) continue;
