@@ -664,6 +664,29 @@
         "Yorum modu şu an 'otomatik' görünüyor; ben bunu değiştirmem ve riskli yorum onayı vermem."
       ],
       "eylem_sayisi": 0
+    },
+    {
+      "zaman": "2026-11-28 18:30",
+      "kademe": 3,
+      "model": "OpenAI (gpt-5.4)",
+      "rapor": [
+        "Acil: otomatik hat bugün art arda sorun verdi; 10:11 ve 10:17 videoları teknik/doğruluk ve okunabilirlik nedeniyle reddedilmiş, 15:10 turu ise üretilememiş.",
+        "Senin önceliğine uygun olarak otomatik yayın moduna dokunmadım; bu modu panel belirliyor. Ancak açık modda kalite riski ve boş tur riski sürüyor.",
+        "Hikâye tarafında kuyruk azalmış görünüyor: 4 planlı hikâye kaldı, günlük hedef 6. Hikâye ajanı çalışıyor ama kuyruk bugünü karşılamıyor.",
+        "Sağlık özetinde servis anahtarları iyi görünüyor; buna rağmen son 24 saatte Nöbetçi 3 kez başarısız olmuş. Sorunun kaynağı veri yok, bu yüzden yalnızca kontrol amaçlı yeniden tetiklemeyi seçtim.",
+        "Yorum tarafında onay bekleyen yanıt yok; bu turda yorum onayı gerekmiyor.",
+        "Tekrarı azaltmak için yeni öncelikli konu eklemeyi uygun gördüm; son reddedilen iki konuya benzemeyen, yeni başlayan için faydalı bir konu seçtim."
+      ],
+      "oneriler": [
+        "20:05 turu gelirse özellikle sayısal iddia, bağlamsız hız/değer ve taşan yazı açısından sıkı incele; benzer kusurlar sürerse otomatik hat için panelde deneme modunu sen değerlendir.",
+        "Hikâye kuyruğu 4’te kaldığı için akşam panelden hikâye üretim akışını kontrol etmen iyi olur; günlük 6 hedefi bugün aksayabilir.",
+        "Reddedilen video konularını tamamen bırakmak yerine, kaynaksız sayı ve karışık görsel olmadan yeniden yazdırmak daha doğru olabilir."
+      ],
+      "uyarilar": [
+        "Otomatik hat açıkken bugün şu ana kadar onaylı video görünmüyor; 20:05 turu da başarısız olursa gün videosuz kapanabilir.",
+        "Nöbetçi’nin son 24 saatte 3 kez başarısız olması sistem sağlığı açısından izlenmeli; nedenine dair veri yok."
+      ],
+      "eylem_sayisi": 2
     }
   ],
   "defter": [
@@ -964,6 +987,29 @@
       "neden": "Son 24 saatte Nöbetçi başarısız ve otomatik hatta art arda sorun var; servis/bağlantı kontrolü gerekli.",
       "durum": "yapildi",
       "ayrinti": "nobetci.yml tetiklendi"
+    },
+    {
+      "zaman": "2026-11-28 18:30",
+      "kademe": 3,
+      "eylem": "workflow_tetikle",
+      "params": {
+        "akis": "nobetci.yml"
+      },
+      "neden": "Art arda üretim hatası ve Nöbetçi başarısızlıkları var; servis/bağlantı durumunu yeniden kontrol etmek gerekli.",
+      "durum": "yapildi",
+      "ayrinti": "nobetci.yml tetiklendi"
+    },
+    {
+      "zaman": "2026-11-28 18:30",
+      "kademe": 3,
+      "eylem": "konu_oncelik_ekle",
+      "params": {
+        "konu": "İlk katman neden fazla yassı ya da fazla yüksek görünür?",
+        "ipucu": "Yeni başlayan için sade anlat; nozzle-table mesafesi, ilk çizginin görünümü, çok yassı vs çok yüksek farkı; sayısal iddia verme, kısa kontrol listesi kullan."
+      },
+      "neden": "Son başarılı kalıplara yakın ama tekrar etmeyen, pratik ve güvenli bir konu.",
+      "durum": "yapildi",
+      "ayrinti": "İlk katman neden fazla yassı ya da fazla yüksek görünür?"
     }
   ]
 }
