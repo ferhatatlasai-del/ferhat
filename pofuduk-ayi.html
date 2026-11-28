@@ -2603,6 +2603,7 @@ function ambient() {
 
 /* ---------- update ---------- */
 function update() {
+  if (G.admin && save.axe < AXES.length - 1) save.axe = AXES.length - 1; // the administrator always has the diamond axe
   if (G.mod && G.mod.cert.until < Date.now()) { G.mod = null; $('admBtn').hidden = true; closeAdm(); notice('Yetkin bitti', 'Moderatör süren doldu.'); }
   if (G.admin) { if (save.coins < 9e7) save.coins = 99999999; if ((save.bal || 0) < 9e7) save.bal = 99999999; if (P && !P.dead) P.hp = save.maxHp; lives = Math.max(lives, 9); }
   else if (G.gift) { if (Date.now() >= G.gift.until) endGift(); else { if (save.coins < 9e7) save.coins = 99999999; if ((save.bal || 0) < 9e7) save.bal = 99999999; } }
@@ -5074,7 +5075,7 @@ const startNow = adminKp => {
   if (!age) { er('Yaşını 3 ile 99 arasında bir sayı olarak yaz.'); $('ageInput').focus(); return; }
   if (acc) { if (!acc.age) { acc.age = age; accs[id] = acc; writeAccounts(accs); } loginAccount(id, acc); }
   else { if (!avatar.sel) { er('Hesabın için bir görsel seç.'); return; } createAccount(id, name, ph, age); }
-  $('nameErr').hidden = true; $('passInput').value = ''; G.admin = adminKp ? { sk: adminKp.secretKey } : null; if (G.admin) admSetup(); startAfterLogin();
+  $('nameErr').hidden = true; $('passInput').value = ''; G.admin = adminKp ? { sk: adminKp.secretKey } : null; if (G.admin) admSetup(); if (!save.axe) { save.axe = 1; saveGame(); } /* everybody starts with the wooden axe, so everybody can hit */ if (G.admin) save.axe = AXES.length - 1; startAfterLogin();
 };
 $('passInput').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') $('startBtn').click(); });
 $('passInput').addEventListener('input', () => { $('nameErr').hidden = true; });
