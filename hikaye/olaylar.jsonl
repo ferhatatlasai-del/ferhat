@@ -233,3 +233,10 @@
 {"t": "2026-11-28T05:22:21Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 8.0, "site": "printables.com"}
 {"t": "2026-11-28T05:22:31Z", "tur": "denetim", "gecti": true, "deneme": 2, "puan": 9.0, "site": "printables.com"}
 {"t": "2026-11-28T05:22:41Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 2, "puan": 9.0}
+{"t": "2026-11-28T10:20:40Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-28T10:20:51Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-28T10:21:00Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 8.0, "site": "printables.com", "sorunlar": ["Üzerinde beyaz el yazısı/işaret benzeri izler var.", "Arka plan bulanık; nesne sunumu referans kadar temiz değil."]}
+{"t": "2026-11-28T10:21:08Z", "tur": "denetim", "gecti": true, "deneme": 2, "puan": 8.0, "site": "printables.com"}
+{"t": "2026-11-28T10:21:18Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 2, "puan": 8.0}
+{"t": "2026-11-28T10:21:33Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-28T10:21:42Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
