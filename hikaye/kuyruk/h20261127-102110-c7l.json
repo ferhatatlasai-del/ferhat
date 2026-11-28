@@ -1,7 +1,7 @@
 {
   "id": "h20261127-102110-c7l",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-27T10:21:11.000Z",
   "gorsel": "hikaye/gorseller/h20261127-102110-c7l.mp4",
   "baslik": "Modular Covered Bee Waterer with Honeycomb Landing Insert",
@@ -21,7 +21,9 @@
     "sorunlar": []
   },
   "yayin": {
-    "tarih": "2026-11-28T05:05:31Z"
+    "tarih": "2026-11-28T05:07:46Z",
+    "medya_kimligi": "18124316684057120",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4040141598170097392"
   },
   "hata": "",
   "deneme": 0,
