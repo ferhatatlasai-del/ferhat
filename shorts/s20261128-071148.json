@@ -1,7 +1,7 @@
 {
   "id": "s20261128-071148",
   "olusturma": "2026-11-28T07:11:48Z",
-  "durum": "otomatik",
+  "durum": "reddedildi",
   "tur": "viral",
   "video": "",
   "sure": 54.1,
@@ -59,5 +59,29 @@
     }
   ],
   "otomatik": true,
-  "anlati": "0,4 milimetre nozul her şeyi değiştirir mi? Kısa cevap: biraz. Birlikte hız, detay ve katmanı görelim. Nozul ağzı küçülünce çizgi de daralır. Bu yüzden aynı modelde detay artabilir, ama akış daha hassas olur. Daha dar nozul bazen daha ince ayrıntı verir, ama aynı parçayı yazdırmak daha uzun sürebilir. Çünkü her geçişte daha az malzeme serilir. Katman yüksekliği de buna bağlıdır: genelde katman, nozul çapının küçük bir kısmı seçilir. Çok yüksek katman, çizgiyi oturtmayı zorlaştırır. Kısaca, 0,4 milimetre çoğu iş için iyi bir orta yol olur. Daha büyük nozul hız, daha küçük nozul detay tarafına kayar. Yani önce hedefe bak: hızlı prototip mi, ince detay mı? Sonra nozul, katman ve hız ayarını birlikte düşün. Sen hangi nozul kullanıyorsun? Yorumlara yaz, benzer konular için takip et."
+  "anlati": "0,4 milimetre nozul her şeyi değiştirir mi? Kısa cevap: biraz. Birlikte hız, detay ve katmanı görelim. Nozul ağzı küçülünce çizgi de daralır. Bu yüzden aynı modelde detay artabilir, ama akış daha hassas olur. Daha dar nozul bazen daha ince ayrıntı verir, ama aynı parçayı yazdırmak daha uzun sürebilir. Çünkü her geçişte daha az malzeme serilir. Katman yüksekliği de buna bağlıdır: genelde katman, nozul çapının küçük bir kısmı seçilir. Çok yüksek katman, çizgiyi oturtmayı zorlaştırır. Kısaca, 0,4 milimetre çoğu iş için iyi bir orta yol olur. Daha büyük nozul hız, daha küçük nozul detay tarafına kayar. Yani önce hedefe bak: hızlı prototip mi, ince detay mı? Sonra nozul, katman ve hız ayarını birlikte düşün. Sen hangi nozul kullanıyorsun? Yorumlara yaz, benzer konular için takip et.",
+  "red_tarihi": "2026-11-28T07:17:26.000Z",
+  "admin_inceleme": {
+    "karar": "reddet",
+    "puan": 5.0,
+    "sorunlar": [
+      "Hız sahnesindeki 44/139/220 mm/s sayıları bağlamsız ve yanıltıcı; nozul çapından doğrudan çıkan genel değer gibi sunulmuş",
+      "Anlatıda '0,4 mm nozul' odakken görseller bazen daha küçük nozul etkisini anlatıyor; 0,4 mm ile küçük/büyük nozul karşılaştırması net değil",
+      "Katman yüksekliği için yalnızca 'nozul çapının küçük bir kısmı' denmiş; görselde de sınır belirsiz, öğretici netlik zayıf",
+      "Bazı karelerde altyazı/yazı kesiliyor veya soluk kalıyor ('Bu', 'uzun', 'için takip et')",
+      "Son kısımda tekrar eden takip ekranı var; gereksiz tekrar hissi veriyor"
+    ],
+    "gerekce": "Ana fikir büyük ölçüde doğru olsa da bağlamsız sayısal hız iddiaları ve anlatı-görsel netlik sorunları yeni başlayanlar için yanıltıcı olduğundan yayın için yeterince güvenli değil.",
+    "model": "OpenAI (gpt-5.4)",
+    "iddialar": [
+      "'0,4 mm nozul her şeyi değiştirir mi? Kısa cevap: biraz.' → doğru",
+      "'Nozul ağzı küçülünce çizgi de daralır.' → doğru",
+      "'Daha dar nozul bazen daha ince ayrıntı verir.' → doğru",
+      "'Aynı parçayı yazdırmak daha uzun sürebilir.' → doğru",
+      "'Çünkü her geçişte daha az malzeme serilir.' → doğru",
+      "'Katman yüksekliği genelde nozul çapının küçük bir kısmı seçilir.' → doğru (genel ifade, ama fazla muğlak)",
+      "'Çok yüksek katman, çizgiyi oturtmayı zorlaştırır.' → doğru",
+      "'0,4 milimetre çoğu iş için iyi bir orta yol olur.' → doğru"
+    ]
+  }
 }
