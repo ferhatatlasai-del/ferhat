@@ -193,6 +193,37 @@
       "zaman": "2026-11-27 20:06",
       "durum": "hata",
       "ayrinti": "video üretilemedi (çıkış kodu 0)"
+    },
+    {
+      "zaman": "2026-11-28 10:11",
+      "id": "s20261128-070622",
+      "konu": "Tabla temizliği neden yapışmayı bu kadar etkiler?",
+      "baslik": "Tabla temizliği yapışmayı neden bu kadar etkiler?",
+      "inceleme": {
+        "karar": "reddet",
+        "puan": 5.0,
+        "sorunlar": [
+          "'65% yüzey hassasiyeti' sayısal iddiası kaynaksız ve uydurma görünüyor",
+          "Kontak karelerde bazı yazılar kesik/taşmış ve tam okunmuyor",
+          "Bazı sahneler fazla boş ve tekrar hissi veriyor",
+          "Anlatıdaki 'alkolle son geçiş' önerisi genel olarak makul ama yüzey türüne göre değişebileceği notu yok",
+          "Önceki videolardaki yapışma/warping temasıyla kısmi tekrar var"
+        ],
+        "gerekce": "Ana fikir teknik olarak büyük ölçüde doğru olsa da videodaki kaynaksız sayısal gösterge ve zayıf yazı/sahne kalitesi güvenilirlik standardını düşürdüğü için yayın için uygun değil.",
+        "model": "OpenAI (gpt-5.4)",
+        "iddialar": [
+          "Yağ ve toz ilk katman tutunmasını zayıflatır → doğru",
+          "İlk çizgi biraz kayarsa üst katmanlar da bunu takip eder → doğru",
+          "Parmak izi kadar yağ bile yapışmayı etkileyebilir → doğru",
+          "Toz çizginin altına girerse tutunma düşer → doğru",
+          "Kirli tabla köşelerin kalkmasını kolaylaştırır → doğru",
+          "Temiz yüzeyde ilk katman daha eşit yayılır → doğru",
+          "Mikrofiberle silip alkolle son geçiş yapmak faydalıdır → doğru ama yüzeye bağlı",
+          "'65% yüzey hassasiyeti' → şüpheli"
+        ]
+      },
+      "mod": "acik",
+      "durum": "reddedildi"
     }
   ]
 }
