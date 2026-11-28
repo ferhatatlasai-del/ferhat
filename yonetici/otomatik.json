@@ -255,6 +255,11 @@
       },
       "mod": "acik",
       "durum": "reddedildi"
+    },
+    {
+      "zaman": "2026-11-28 15:10",
+      "durum": "hata",
+      "ayrinti": "video üretilemedi (çıkış kodu 1)"
     }
   ]
 }
