@@ -255,7 +255,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 #mapBtn { position: fixed; z-index: 5; top: calc(10px + env(safe-area-inset-top, 0px)); right: calc(max(12px, env(safe-area-inset-right, 0px)) + 156px);
   width: 42px; height: 42px; border-radius: 12px; border: 3px solid var(--bark); background: var(--cream); color: var(--bark); font-family: var(--display); font-size: 1.15rem; cursor: pointer; }
 #mapBtn:focus-visible { outline: 3px solid var(--leaf); outline-offset: 2px; }
-#mapCv { display: block; width: min(78vw, 62vh, 30rem); height: auto; aspect-ratio: 1; margin: 4px auto 8px; border-radius: 14px; border: 3px solid var(--bark); background: #3d7a3a; }
+#mapCv { display: block; width: min(92vw, 62vh, 46rem); height: auto; aspect-ratio: 1; margin: 4px auto 8px; border-radius: 14px; border: 3px solid var(--bark); background: #3d7a3a; }
 .mapKey { display: flex; flex-wrap: wrap; gap: 4px 12px; justify-content: center; font-size: 0.85rem; margin-bottom: 8px; }
 .mapKey i { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; border: 1px solid #0004; }
 #pShop .shop { border-top: 0; padding-top: 0; }
@@ -508,7 +508,7 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 <div class="panel" id="pMap" hidden>
   <div class="card wide">
     <h2 id="mapTitle">Harita</h2>
-    <canvas id="mapCv" width="600" height="600" role="img" aria-label="Haritada ayının yeri"></canvas>
+    <canvas id="mapCv" width="1000" height="1000" role="img" aria-label="Haritada ayının yeri"></canvas>
     <div class="mapKey" id="mapKey"></div>
     <button class="btn primary" id="mapClose" type="button">Kapat</button>
   </div>
@@ -2461,8 +2461,8 @@ function buildHub() {
       pts.push([x, z, 1.25 + fr() * 1.15, fr() * 6.283, 0.82 + fr() * 0.32]);
     }
     forestInfo = { pts, FR };
-    const W0 = R - FB + 4;
-    for (const b of [[-FR, -FR, FR, -W0], [-FR, W0, FR, FR], [-FR, -W0, -W0, W0], [W0, -W0, FR, W0]]) boxes.push({ x0: b[0], z0: b[1], x1: b[2], z1: b[3], y0: 0, y1: 14, kind: 'deco', on: true });
+    const FL = FR + 12; // solid ground under the forest (the green slabs are drawn separately)
+    for (const b of [[-FL, -FL, FL, -R], [-FL, R, FL, FL], [-FL, -R, -R, R], [R, -R, FL, R]]) boxes.push({ x0: b[0], z0: b[1], x1: b[2], z1: b[3], y0: -3, y1: 0, kind: 'deco', on: true });
   }
   const turtles = [];
   for (let i = 0; turtles.length < 20 && i < 900; i++) {
@@ -2487,7 +2487,7 @@ function buildHub() {
     const a = burrow.yaw + (id - 2) * 0.62, hx = burrow.x + Math.sin(a) * 2.1, hz = burrow.z + Math.cos(a) * 2.1, ok = home.includes(id);
     babies.push({ id, lx: x, lz: z, hx, hz, x: ok ? hx : x, y: 0, z: ok ? hz : z, yaw: ok ? a : rr2() * 6.28, st: ok ? 'home' : 'lost', t: rr2() * 5, hop: 0 });
   }
-  return { def: HUB, hub: true, forest: forestInfo, R, boxes, items: hitems, enemies: [], trees, paths, start: { x: 0, y: 0, z: 50 }, checkpoints: [], cpActive: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, ward, smith, board, tutGate, roomHub, houses, turtles, parks, mts, burrow, rabbits, babies, mansion, remotes, stores, honeyShop };
+  return { def: HUB, hub: true, forest: forestInfo, RB: forestInfo.FR - 6, R, boxes, items: hitems, enemies: [], trees, paths, start: { x: 0, y: 0, z: 50 }, checkpoints: [], cpActive: null, goal, boss: null, bossCp: null, arena: null, shots: [], killY: -14, portals, shop, ward, smith, board, tutGate, roomHub, houses, turtles, parks, mts, burrow, rabbits, babies, mansion, remotes, stores, honeyShop };
 }
 function mkBoss(type, c) {
   const base = { type, c, x: c.x, z: c.zc - 3, y: c.y, vx: 0, vz: 0, vy: 0, t: 0, inv: 0, active: false, defeated: false, deadT: 0, yaw: 0, tx: 0, tz: 0, state: type === 'mush' ? 'walk' : type === 'queen' ? 'hover' : 'aim' };
@@ -2624,6 +2624,7 @@ function update() {
   if (G.manualT > 0) G.manualT--;
 
   clockStep();
+  if (L.hub && L.forest) forestPush(P);
   if (P.dead) {
     P.dead++; P.vy -= 30 * DT; P.y += P.vy * DT;
     if (P.dead > 100 && L.hub) { respawn(); pop('Evinde dinlendin', P.x, P.y + 2.4, P.z, '#ffffff', 120); jumpPressed = poundPressed = false; return; } // no lives lost in the village
@@ -2642,10 +2643,10 @@ function update() {
   if (P.hang) { hangStep(wx, wz); break phys; }
   if (P.vine) { vineStep(wx, wz); break phys; }
   P.sprint = ((sprint && keys.fwd) || touchRun) && wm > 0.3;
-  const ice = L.def.friction > 0.9, max = P.sprint ? 10.5 : 6.5;
+  const ice = L.def.friction > 0.9, max = G.admin && save.fly ? 28 : (P.sprint ? 10.5 : 6.5);
   if (P.sprint && P.onGround && frame % 5 === 0) burst(P.x - Math.sin(P.yaw) * 0.4, P.y + 0.1, P.z - Math.cos(P.yaw) * 0.4, '#e8dcc0', 2, 1.2);
   if (!P.pound) {
-    const k = P.onGround ? (ice ? 3 : 12) : 4.5;
+    const k = P.onGround ? (ice ? 3 : 12) : (G.admin && save.fly ? 12 : 4.5);
     P.vx += (wx * max - P.vx) * Math.min(1, k * DT);
     P.vz += (wz * max - P.vz) * Math.min(1, k * DT);
     if (wm > 0.1) P.yaw += angDiff(Math.atan2(wx, wz), P.yaw) * Math.min(1, 14 * DT);
@@ -2662,7 +2663,7 @@ function update() {
   if (!keys.jump && P.vy > 4.5 && !P.spin) P.vy = 4.5;
   if (poundPressed && !P.onGround && !P.pound) { P.pound = true; P.vx = P.vz = 0; P.vy = 4; P.spin = 0; }
   jumpPressed = poundPressed = false;
-  if (G.admin && save.fly) { P.vy = keys.jump ? 9 : keys.pound ? -9 : 0; P.pound = false; } // the administrator can fly (set in Settings)
+  if (G.admin && save.fly) { P.vy = keys.jump ? 18 : keys.pound ? -18 : 0; P.pound = false; } // the administrator can fly (set in Settings)
   else { P.vy -= (P.pound ? 55 : 30) * DT; P.vy = Math.max(P.vy, P.pound ? -24 : -20); }
   if (P.spin > 0) P.spin--;
 
@@ -2871,7 +2872,18 @@ function turtleStep() {
     else { t.x = nx; t.z = nz; }
   }
 }
-const hubBlocked = (nx, nz, pad) => Math.abs(nx) > L.R - 4 || Math.abs(nz) > L.R - 4 || L.boxes.some(b => b.kind !== 'ground' && b.kind !== 'vine' && b.y1 > 0.3 && b.y0 < 1.2 && nx > b.x0 - pad && nx < b.x1 + pad && nz > b.z0 - pad && nz < b.z1 + pad)
+function forestPush(P) { // the trunks of the forest are solid; the edge of the world stops you
+  const F = L.forest, RB = L.RB;
+  P.x = Math.max(-RB, Math.min(RB, P.x)); P.z = Math.max(-RB, Math.min(RB, P.z));
+  if (Math.max(Math.abs(P.x), Math.abs(P.z)) < 118 || P.y > 7) return;
+  if (!F.grid) { F.grid = new Map(); F.pts.forEach((t, i) => { const k = Math.floor(t[0] / 8) + ',' + Math.floor(t[1] / 8); let a = F.grid.get(k); if (!a) F.grid.set(k, a = []); a.push(i); }); }
+  const cx = Math.floor(P.x / 8), cz = Math.floor(P.z / 8);
+  for (let i = cx - 1; i <= cx + 1; i++) for (let j = cz - 1; j <= cz + 1; j++) {
+    const a = F.grid.get(i + ',' + j); if (!a) continue;
+    for (const n of a) { const t = F.pts[n], dx = P.x - t[0], dz = P.z - t[1], r = 0.5 * t[2] + 0.45, d = Math.hypot(dx, dz); if (d < r) { const k = (r - d) / (d || 1); P.x += (dx || 0.01) * k; P.z += dz * k; } }
+  }
+}
+const hubBlocked = (nx, nz, pad) => Math.abs(nx) > (L.RB || L.R) - 4 || Math.abs(nz) > (L.RB || L.R) - 4 || L.boxes.some(b => b.kind !== 'ground' && b.kind !== 'vine' && b.y1 > 0.3 && b.y0 < 1.2 && nx > b.x0 - pad && nx < b.x1 + pad && nz > b.z0 - pad && nz < b.z1 + pad)
   || L.portals.some(p => Math.hypot(nx - p.x, nz - p.z) < 5.2);
 function rabbitStep() {
   const caught = (save.stats || {}).rabbit || [];
@@ -3141,6 +3153,18 @@ function damageEnemy(e, dmg, kx, kz) {
   if (m > 0.01 && e.type === 'mush') { e.x = Math.max(e.b.x0, Math.min(e.b.x1, e.x + kx / m * 0.9)); e.z = Math.max(e.b.z0, Math.min(e.b.z1, e.z + kz / m * 0.9)); }
   if (e.hp <= 0) squashEnemy(e); else { sfx.stomp(); burst(e.x, e.y + 0.6, e.z, '#ffffff', 8, 2); }
 }
+const hitCd = {};
+function sendHit(id, kx, kz) {
+  const now = Date.now(); if (now - (hitCd[id] || 0) < 700) return; hitCd[id] = now;
+  const base = net.mqTopic.slice(0, net.mqTopic.lastIndexOf('/')), body = JSON.stringify({ to: id, kx: Math.round(kx * 100) / 100, kz: Math.round(kz * 100) / 100, n: save.name });
+  for (const c of net.mqs) if (c.connected) c.publish(base + '/hit', body);
+}
+function takeHit(txt) {
+  let m; try { m = JSON.parse(txt); } catch (e) { return; }
+  if (!m || typeof m !== 'object' || m.to !== net.myId || !P || P.dead || G.admin || state !== 'play') return;
+  hurt(num(m.kx, 30), num(m.kz, 30));
+  pop(`${clip(m.n, 14) || 'Biri'} sana vurdu!`, P.x, P.y + 2.4, P.z, '#ff8a80', 90);
+}
 function axeHit() {
   const a = AXES[save.axe], full = P.combo === 4, dmg = (P.combo === 3 ? 2 : 1) + (a.dmg || 0);
   const range = a.range + (P.combo === 3 ? 0.3 : 0) + (full ? 0.2 : 0) + (a.glow ? (a.diamond ? 1.3 : 0.9) : 0);
@@ -3149,6 +3173,10 @@ function axeHit() {
   let hit = false;
   for (const e of L.enemies) if (e.alive && inArc(e.x, e.z, e.y, e.r)) { damageEnemy(e, dmg, e.x - P.x, e.z - P.z); hit = true; }
   for (const w of L.wolves || []) if (!w.gone && w.hp > 0 && inArc(w.x, w.z, w.y, 0.6)) { hitWolf(w, dmg, w.x - P.x, w.z - P.z); hit = true; }
+  if (net.on && net.mqTopic) for (const [id, pl] of net.players) { // hitting each other
+    if (pl.lv !== lvKey() || pl.rx === undefined) continue;
+    if (inArc(pl.rx, pl.rz, pl.ry, 0.5)) { sendHit(id, pl.rx - P.x, pl.rz - P.z); hit = true; }
+  }
   const b = L.boss;
   if (b && b.active && !b.defeated && inArc(b.x, b.z, b.y, b.r)) {
     if (b.inv === 0 && (b.type === 'mush' || b.state === 'stunned')) hitBoss(b); else sfx.clank();
@@ -4222,6 +4250,7 @@ $('smithBuy').onclick = () => {
 function drawMap(c, w, h, opt = {}) {
   let x0 = 1e9, x1 = -1e9, z0 = 1e9, z1 = -1e9;
   for (const b of L.boxes) if (b.kind === 'ground' || b.kind === 'plat' || b.kind === 'move' || b.kind === 'cloud') { x0 = Math.min(x0, b.x0); x1 = Math.max(x1, b.x1); z0 = Math.min(z0, b.z0); z1 = Math.max(z1, b.z1); }
+  if (L.hub && L.RB) { x0 = -L.RB; x1 = L.RB; z0 = -L.RB; z1 = L.RB; } // the map shows the forests too
   c.fillStyle = L.def.sky[0]; c.fillRect(0, 0, w, h);
   const me = opt.board ? { x: L.start.x, z: L.start.z, yaw: Math.PI } : { x: P.x, z: P.z, yaw: P.yaw };
   if (L.hub) { mapView(c, { x0, x1, z0, z1 }, [0, 0, w, h], false, me, opt, w / 25); return; }
@@ -4246,6 +4275,7 @@ function mapView(c, bb, [vx, vy, vw, vh], side, me, opt, fs) {
     for (const [ox, oy] of cand) { const r = { x0: px + ox - tw / 2, x1: px + ox + tw / 2, y0: py + oy - th / 2, y1: py + oy + th / 2 }; if (used.some(u => r.x0 < u.x1 && r.x1 > u.x0 && r.y0 < u.y1 && r.y1 > u.y0)) continue; used.push(r); c.textAlign = 'center'; c.textBaseline = 'middle'; c.lineWidth = Math.max(3, size / 5); c.strokeStyle = '#3d2a1a'; c.strokeText(t, px + ox, py + oy); c.fillStyle = col; c.fillText(t, px + ox, py + oy); return; }
   };
   if (!opt.strip) { const [sx, sz] = T(me.x, me.z), sw = fs * (opt.board ? 1.1 : 0.9) * 3, sy = sz - (opt.strip ? fs * 0.45 : fs * 0.6) * 2.6; used.push({ x0: sx - sw / 2, x1: sx + sw / 2, y0: sy - fs * 0.6, y1: sy + fs * 0.6 }); } // 'Sen' keeps its place
+  if (L.hub && L.RB) rect({ x0: -L.RB, x1: L.RB, z0: -L.RB, z1: L.RB }, '#2f6b3a'); // the forest
   const ground = L.boxes.filter(b => b.kind === 'ground').sort((a, b) => (b.x1 - b.x0) * (b.z1 - b.z0) - (a.x1 - a.x0) * (a.z1 - a.z0));
   for (const b of ground) rect(b, (b.theme || L.def).grass);
   if (L.paths) { c.strokeStyle = '#d9b27a'; c.lineCap = 'round'; c.lineWidth = Math.max(2, 1.7 * sc); for (const pa of L.paths) { const [ax, ay] = T(pa.x0, pa.z0), [bx, by] = T(pa.x1, pa.z1); c.beginPath(); c.moveTo(ax, ay); c.lineTo(bx, by); c.stroke(); } }
@@ -4697,6 +4727,7 @@ async function goRelay(roomTxt, pass, create) { // a room without any outside se
     const id = clip(topic.slice(base.length + 1), 24); if (!id || id === me) return;
     const txt = String(payload);
     if (id === 'chat') { takeChat(txt); return; }
+    if (id === 'hit') { takeHit(txt); return; }
     if (id === 'adm') { let o; try { o = JSON.parse(txt); } catch (e) { return; } if (o && o.cmd === 'grant') { if (certValid(o.cert)) applyCert(o.cert); return; } if (admVerify(o)) admApply(o); return; }
     if (txt === 'bye') { if (net.players.has(id)) { const pl = net.players.get(id); if (net.on && P && L) pop(`${pl.n} odadan çıktı`, P.x, P.y + 2.4, P.z, '#ffffff', 100); } dropPlayer(id); return; }
     let st; try { st = JSON.parse(txt); } catch (e) { return; }
