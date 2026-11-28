@@ -617,6 +617,29 @@
         "Bambu/marka adı geçen içeriklerde bağımsızlık notu unutulursa red riski var; özellikle otomatik üretimde dikkat edilmeli."
       ],
       "eylem_sayisi": 3
+    },
+    {
+      "zaman": "2026-11-28 08:30",
+      "kademe": 3,
+      "model": "OpenAI (gpt-5.4)",
+      "rapor": [
+        "Acil: otomatik hat açık ama son 5 turda 4 başarısızlık var; 2 video reddedilmiş, 1 üretim hata vermiş, bugün tur görünmüyor.",
+        "Hikâye tarafında kuyruk zayıf: yalnızca 1 planlı hikâye kaldı, günlük hedef 6; bu yüzden hikâye akışını izlemek önemli.",
+        "Sağlıkta ana servisler iyi görünüyor; Instagram, YouTube, OpenAI ve ofis sunucusu çalışıyor.",
+        "Yorum tarafında bekleyen onay yok; otomatik modda 6 yanıt gönderilmiş, bu turda müdahale gerekmedi.",
+        "Video konu kuyruğunda öncelikli 2 konu var; yeni konu eklemedim çünkü 3'ten az olsa da önce otomatik hat ve hikâye kuyruğu sorunu daha acil.",
+        "Son 24 saatte Nöbetçi 3 kez başarısız olmuş; sistem sağlığı için tekrar kontrol istemek mantıklı görünüyor."
+      ],
+      "oneriler": [
+        "Sen panelden otomatik hattın son hata kaydını kontrol et; özellikle 2026-11-27 20:06 üretilemedi hatasının nedenini görmek iyi olur.",
+        "Hikâye kuyruğu 1'e düştüğü için hikâye ajanı üretiminde tıkanma olup olmadığını kontrol et; gerekirse içerik planını sadeleştir.",
+        "Reddedilen video başlıkları peş peşe benzer teknik eksene gidiyor; yeni üretimlerde tekrar riskini azaltmak için konu çeşitliliğini artırman iyi olur."
+      ],
+      "uyarilar": [
+        "Otomatik hat modunu ben değiştiremem; açık modda art arda ret/hata sürerse gereksiz üretim maliyeti doğurabilir.",
+        "Hikâye kuyruğu bugünkü hedefe göre yetersiz; gün içinde boşluk oluşabilir."
+      ],
+      "eylem_sayisi": 1
     }
   ],
   "defter": [
@@ -906,6 +929,17 @@
       "neden": "Çeşitlilik sağlar; teknik ama başlangıç seviyesine uygun, önceki son konularla çakışmıyor.",
       "durum": "yapildi",
       "ayrinti": "Nozul çapı 0.4 mm neyi değiştirir?"
+    },
+    {
+      "zaman": "2026-11-28 08:30",
+      "kademe": 3,
+      "eylem": "workflow_tetikle",
+      "params": {
+        "akis": "nobetci.yml"
+      },
+      "neden": "Son 24 saatte Nöbetçi başarısız ve otomatik hatta art arda sorun var; servis/bağlantı kontrolü gerekli.",
+      "durum": "yapildi",
+      "ayrinti": "nobetci.yml tetiklendi"
     }
   ]
 }
