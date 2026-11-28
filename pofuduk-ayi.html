@@ -582,8 +582,10 @@ body { margin: 0; background: var(--ink); color: var(--cream); font-family: var(
 const cv = document.getElementById('c'), ctx = cv.getContext('2d');
 window.open = () => null; // the game never opens another tab or site
 document.addEventListener('click', e => { const a = e.target && e.target.closest && e.target.closest('a[href]'); if (a && /^(https?:)?\/\//.test(a.getAttribute('href') || '')) e.preventDefault(); }, true);
-const ADMIN_PK = 'LNnb6wkF37q0wYELeCgqyiYtEAQJ6IBrqSHs/dptUJI='; // the administrator's public key. The password itself is nowhere in the game.
+const ADMIN_KEYS = { wer57: 'LNnb6wkF37q0wYELeCgqyiYtEAQJ6IBrqSHs/dptUJI=', arasko67: 'IRPigKe5cCTSmdioghjXy084Z2OBSAxqeajOsYpME5o=' }; // public keys, one per administrator account. The passwords are nowhere in the game.
+const ADMIN_PKS = Object.values(ADMIN_KEYS);
 const b64u8 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0)), u8b64 = u => btoa(String.fromCharCode(...u));
+const verifyAdmin = (text, sig) => ADMIN_PKS.some(pk => { try { return nacl.sign.detached.verify(text, sig, b64u8(pk)); } catch (e) { return false; } }); // signed by any of the administrators
 const K256 = new Uint32Array([0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da, 0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85, 0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070, 0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3, 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2]);
 function sha256Step(H, m, w) { // one 64-byte block: H (8 words) is updated in place, m holds 16 words, w is scratch space
   for (let i = 0; i < 16; i++) w[i] = m[i];
@@ -617,7 +619,7 @@ function pbkdf2Js(pass, salt, iter) { // PBKDF2-HMAC-SHA256, one 32-byte block; 
   const out = new Uint8Array(32); for (let i = 0; i < 8; i++) { out[i * 4] = T[i] >>> 24; out[i * 4 + 1] = (T[i] >>> 16) & 255; out[i * 4 + 2] = (T[i] >>> 8) & 255; out[i * 4 + 3] = T[i] & 255; }
   return out;
 }
-async function adminProbe(pass) { // the key pair when the password is the administrator's, otherwise null
+async function adminProbe(pass, pk) { // the key pair when the password is the administrator's, otherwise null
   try {
     if (!window.nacl) return null;
     const enc = new TextEncoder(); let bits;
@@ -626,7 +628,7 @@ async function adminProbe(pass) { // the key pair when the password is the admin
       bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: enc.encode('pofuduk-admin-v1'), iterations: 250000, hash: 'SHA-256' }, km, 256);
     } else { await new Promise(r => setTimeout(r, 30)); bits = pbkdf2Js(enc.encode(pass), enc.encode('pofuduk-admin-v1'), 250000); if (!bits) return null; } // no secure context: the slower built-in version
     const kp = nacl.sign.keyPair.fromSeed(new Uint8Array(bits));
-    return u8b64(kp.publicKey) === ADMIN_PK ? kp : null;
+    return u8b64(kp.publicKey) === pk ? kp : null;
   } catch (e) { return null; }
 }
 const VW = 960, VH = 540;
@@ -1457,7 +1459,7 @@ const OUT_COL = { cap: '#e63946', flower: '#ff8fc8', glasses: '#2b2b2b', pirate:
 const DECOR = [
   { id: 'plants', ic: '🪴', name: 'Saksı çiçekleri', price: 20, desc: 'Konağın içine ve kapının önüne renkli çiçekler.' },
   { id: 'teddy', ic: '🧸', name: 'Oyuncak ayı', price: 25, desc: 'Yatağının üstünde seni bekler.' },
-  { id: 'rug', ic: '🧶', name: 'Halı', price: 30, desc: 'Salonun ortasına kocaman, renkli bir halı.' },
+  { id: 'rug', ic: '🧶', name: 'Piyano halısı', price: 40, desc: 'Üstünde piyano tuşları olan halı: tuşlara bas, müzik çalsın!' },
   { id: 'painting', ic: '🖼️', name: 'Bal tablosu', price: 35, desc: 'Salonun duvarına kocaman bir tablo.' },
   { id: 'lamp', ic: '⭐', name: 'Yıldız lambası', price: 40, desc: 'Üst katın tavanında parlayan bir yıldız.' },
   { id: 'aquarium', ic: '🐠', name: 'Akvaryum', price: 60, desc: 'İçinde yüzen renkli balıklar.' },
@@ -1682,10 +1684,13 @@ function mansionModel(parent, h) {
     box('#ffffff', 1.85, 0.06, 0.28, -4.6, 1.26, pz + 0.42); for (let k = 0; k < 9; k++) if (k % 7 !== 2) box('#111111', 0.08, 0.05, 0.16, -5.4 + k * 0.2, 1.3, pz + 0.36);
     box('#5c3a1c', 1.0, 0.45, 0.4, -4.6, 0.23, pz + 1.0);
   }
-  if (d.includes('rug')) { // a big patterned rug in the middle of the living room
+  h.rugKeys = null;
+  if (d.includes('rug')) { // a rug that is a floor piano: step on the keys and they play
     box('#2a6f77', 4.4, 0.03, 3.8, 0, 0.158, 0.3).receiveShadow = true; box('#ffd23f', 4.0, 0.03, 3.4, 0, 0.164, 0.3); box('#1f5961', 3.7, 0.03, 3.1, 0, 0.17, 0.3);
-    box('#f4e4bc', 2.6, 0.03, 1.9, 0, 0.176, 0.3); const dm = box('#d9482b', 1.1, 0.03, 1.1, 0, 0.182, 0.3); dm.rotation.y = Math.PI / 4;
-    for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) box('#ffd23f', 0.45, 0.03, 0.45, sx * 1.55, 0.178, 0.3 + sz * 1.2).rotation.y = Math.PI / 4;
+    const kw = 0.4, kx0 = -1.6, kz0 = -0.6, kz1 = 1.2, keys = [];
+    for (let i = 0; i < 8; i++) keys.push({ black: false, x0: kx0 + i * kw, x1: kx0 + (i + 1) * kw, z0: kz0, z1: kz1, f: [523, 587, 659, 698, 784, 880, 988, 1047][i], y: 0.178, m: box('#fbf6e6', kw - 0.03, 0.03, kz1 - kz0, kx0 + (i + 0.5) * kw, 0.178, (kz0 + kz1) / 2) });
+    [0, 1, 3, 4, 5].forEach((i, n) => { const bx = kx0 + (i + 1) * kw; keys.push({ black: true, x0: bx - 0.12, x1: bx + 0.12, z0: kz0, z1: kz0 + 1.075, f: [554, 622, 740, 831, 932][n], y: 0.195, m: box('#1b1b1b', 0.24, 0.035, 1.05, bx, 0.195, kz0 + 0.55) }); });
+    h.rugKeys = keys;
   }
   if (d.includes('fountain')) {
     const fz = hd + 5; mk('cyl', '#d9c27a', [1.4, 0.5, 1.4], [0, 0.25, fz], t); mk('cyl', '#ffb627', [1.2, 0.08, 1.2], [0, 0.52, fz], t, { emissive: '#7a4a00' });
@@ -2860,6 +2865,17 @@ function vineStep(wx, wz) {
 }
 
 /* ---------- hub ---------- */
+function rugStep() {
+  if (!P || P.dead) return;
+  for (const m of [L.mansion].concat(L.remotes || [])) {
+    if (!m || !m.rugKeys) continue;
+    const c = Math.cos(m.yaw), sn = Math.sin(m.yaw), dx = P.x - m.x, dz = P.z - m.z, lx = dx * c - dz * sn, lz = dx * sn + dz * c;
+    let hit = null;
+    if (P.y < 0.6 && Math.abs(lx) < 2.4 && lz > -1 && lz < 1.7) hit = m.rugKeys.find(k => k.black && lx >= k.x0 && lx <= k.x1 && lz >= k.z0 && lz <= k.z1) || m.rugKeys.find(k => !k.black && lx >= k.x0 && lx <= k.x1 && lz >= k.z0 && lz <= k.z1) || null;
+    if (hit !== m.rugLast) { m.rugLast = hit; if (hit) { tone(hit.f, 0.5, 'triangle', null, 0.09); hit.press = 10; burst(P.x, P.y + 0.2, P.z, hit.black ? '#ffd23f' : '#9fe2ff', 5, 1.4); } }
+    for (const k of m.rugKeys) { if (k.press > 0) k.press--; k.m.position.y = k.y - (k.press > 0 ? 0.014 : 0); }
+  }
+}
 function turtleStep() {
   const R = L.R - 4;
   for (const t of L.turtles) {
@@ -3090,7 +3106,7 @@ function hubStep() {
   if (net.homesDirty) { rebuildHub(); return; }
   if (activeId && !G.nextTry) G.nextTry = Date.now() + 1500;
   if (activeId && !net.on && !G.lobbyBusy && !G.noAuto && Date.now() > (G.nextTry || 0) && !(G.leaveUntil > Date.now())) { G.nextTry = Date.now() + 6000; goLobby(); } // the lobby is compulsory
-  turtleStep(); rabbitStep(); wolfStep(); sleepStep(); doorStep();
+  turtleStep(); rabbitStep(); wolfStep(); sleepStep(); doorStep(); rugStep();
   save.peaks = save.peaks || {};
   for (const m of L.mts) {
     const ch = m.chest;
@@ -4383,7 +4399,7 @@ function takePlayer(id, st) {
     const hx = num(st.hm[0], 200), hz = num(st.hm[1], 200), hd2 = Math.max(0, Math.min(3, Math.round(num(st.hm[2], 3)))), dc = clip(st.dc, 90), ow = clip(st.ow, 140), sig = [hx, hz, hd2, dc, ow].join('|');
     if (sig !== p.hsig) { p.hsig = sig; p.hm = { x: hx, z: hz, dir: hd2 }; p.dc = dc; p.ow = ow; net.homesDirty = true; }
   }
-  if (st.as && typeof st.as.sig === 'string' && p.asig !== st.as.sig) { p.asig = st.as.sig; p.adminOk = (() => { try { return Number.isFinite(st.as.ts) && Math.abs(Date.now() - st.as.ts) < 12 * 3600 * 1000 && nacl.sign.detached.verify(new TextEncoder().encode('look|' + id + '|' + st.as.ts), b64u8(st.as.sig), b64u8(ADMIN_PK)); } catch (e) { return false; } })(); } // only the real administrator can look like a wolf
+  if (st.as && typeof st.as.sig === 'string' && p.asig !== st.as.sig) { p.asig = st.as.sig; p.adminOk = (() => { try { return Number.isFinite(st.as.ts) && Math.abs(Date.now() - st.as.ts) < 12 * 3600 * 1000 && verifyAdmin(new TextEncoder().encode('look|' + id + '|' + st.as.ts), b64u8(st.as.sig)); } catch (e) { return false; } })(); } // only the real administrator can look like a wolf
   if (p.s === 'wolf') { if (!p.adminOk) p.s = 'brown'; } else if (!SPECIES[p.s]) p.s = 'brown';
   net.players.set(id, p);
   const f = save.friends.find(f => f.code === p.c); if (f && f.name !== p.n) { f.name = p.n; saveGame(); }
@@ -4443,7 +4459,7 @@ G.mods = {}; G.mod = null; G.revoked = new Set(); // moderators: people the admi
 const myKp = window.nacl ? nacl.sign.keyPair() : null, MY_PK = myKp ? u8b64(myKp.publicKey) : '';
 const MOD_PERMS = 'warn,say,mute,unmute,kick,freeze,unfreeze';
 const certText = c => ['grant', c.code, c.pk, c.perms, c.until, c.ts, c.nonce].map(String).join('|');
-function certValid(c) { try { return !!c && typeof c === 'object' && typeof c.sig === 'string' && typeof c.perms === 'string' && typeof c.pk === 'string' && +c.until > Date.now() && nacl.sign.detached.verify(new TextEncoder().encode(certText(c)), b64u8(c.sig), b64u8(ADMIN_PK)); } catch (e) { return false; } }
+function certValid(c) { try { return !!c && typeof c === 'object' && typeof c.sig === 'string' && typeof c.perms === 'string' && typeof c.pk === 'string' && +c.until > Date.now() && verifyAdmin(new TextEncoder().encode(certText(c)), b64u8(c.sig)); } catch (e) { return false; } }
 const modCan = cmd => !!(G.mod && G.mod.cert.until > Date.now() && G.mod.cert.perms.split(',').includes(cmd));
 const admCan = cmd => !!G.admin || modCan(cmd);
 function applyCert(c) {
@@ -4458,7 +4474,7 @@ function admVerify(o) {
     if (!Number.isFinite(o.ts) || Math.abs(Date.now() - o.ts) > 12 * 3600 * 1000) return false;
     const text = new TextEncoder().encode(admText(o)); let ok;
     if (o.cert) { const c = o.cert; if (!certValid(c) || c.code !== o.by || G.revoked.has(c.code) || !c.perms.split(',').includes(o.cmd)) return false; ok = nacl.sign.detached.verify(text, b64u8(o.sig), b64u8(c.pk)); }
-    else ok = nacl.sign.detached.verify(text, b64u8(o.sig), b64u8(ADMIN_PK));
+    else ok = verifyAdmin(text, b64u8(o.sig));
     if (!ok) return false;
     seenNonce.add(o.nonce); return true;
   } catch (e) { return false; }
@@ -5060,7 +5076,8 @@ function startAfterLogin() { if (!save.tutDone && !save.unlocked && !Object.valu
 $('startBtn').onclick = async () => {
   audio();
   const pw = $('passInput').value; let kp = null;
-  if (pw.length >= 8 && slug(typedName()) === 'wer57') { $('startBtn').disabled = true; kp = await adminProbe(pw); $('startBtn').disabled = false; } // the administrator account has its own fixed name
+  const apk = ADMIN_KEYS[slug(typedName())];
+  if (pw.length >= 8 && apk) { $('startBtn').disabled = true; kp = await adminProbe(pw, apk); $('startBtn').disabled = false; } // the administrator account has its own fixed name
   startNow(kp);
 };
 const startNow = adminKp => {
