@@ -1,17 +1,17 @@
 {
- "tarih": "2026-11-28T06:00:34Z",
- "tr_saat": "28.11.2026 09:00",
+ "tarih": "2026-11-28T09:00:12Z",
+ "tr_saat": "28.11.2026 12:00",
  "toplam": {
-  "reels": 20795,
+  "reels": 20870,
   "gonderi": 0,
-  "short": 11895,
+  "short": 11926,
   "youtube_video": 0,
-  "hikaye": 1722,
-  "toplam": 34412,
-  "begeni": 308,
+  "hikaye": 1738,
+  "toplam": 34534,
+  "begeni": 309,
   "yorum": 28
  },
- "fark": 247,
+ "fark": 122,
  "instagram": {
   "durum": "tamam",
   "izin": true,
@@ -26,8 +26,8 @@
     "begeni": 3,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgPFB_CMKqM/",
-    "izlenme": 537,
-    "erisim": 479
+    "izlenme": 608,
+    "erisim": 550
    },
    {
     "id": "17914671000663787",
@@ -144,11 +144,11 @@
     "tur": "Reels",
     "tarih": "2026-11-20T23:05:39",
     "baslik": "Baskın tabladan kalkıyor mu? İlk katman yapışmıyorsa çoğu za",
-    "begeni": 34,
+    "begeni": 35,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": 4400,
-    "erisim": 3907
+    "izlenme": 4404,
+    "erisim": 3913
    },
    {
     "id": "18289759651292671",
@@ -363,19 +363,28 @@
  "hikaye_izin": true,
  "hikayeler": [
   {
-   "id": "18124316684057120",
-   "tarih": "2026-11-28T05:07:46Z",
-   "baslik": "Modular Covered Bee Waterer with Honeycomb Landing Insert",
+   "id": "18136203434505383",
+   "tarih": "2026-11-28T07:26:29Z",
+   "baslik": "Vertical garden planter",
    "izlenme": 0,
    "erisim": 0,
    "okundu": false
   },
   {
+   "id": "18124316684057120",
+   "tarih": "2026-11-28T05:07:46Z",
+   "baslik": "Modular Covered Bee Waterer with Honeycomb Landing Insert",
+   "izlenme": 7,
+   "erisim": 6,
+   "okundu": true,
+   "yanit": 0
+  },
+  {
    "id": "18131959315854053",
    "tarih": "2026-11-27T16:47:28Z",
    "baslik": "Safe Mason Jar Bee Waterer (Open feeder)",
-   "izlenme": 13,
-   "erisim": 13,
+   "izlenme": 16,
+   "erisim": 15,
    "okundu": true,
    "yanit": 0
   },
@@ -383,8 +392,8 @@
    "id": "18098214542166708",
    "tarih": "2026-11-27T14:26:51Z",
    "baslik": "Bee waterer -/- sugar water floating feeder (for 2 and 5 gal",
-   "izlenme": 17,
-   "erisim": 15,
+   "izlenme": 20,
+   "erisim": 18,
    "okundu": true,
    "yanit": 0
   },
@@ -392,8 +401,8 @@
    "id": "17994889832858473",
    "tarih": "2026-11-27T12:06:52Z",
    "baslik": "Bee Waterer",
-   "izlenme": 15,
-   "erisim": 15,
+   "izlenme": 18,
+   "erisim": 18,
    "okundu": true,
    "yanit": 0
   },
@@ -711,15 +720,6 @@
    "erisim": 19,
    "okundu": true,
    "yanit": 0
-  },
-  {
-   "id": "18456328711123952",
-   "tarih": "2026-11-21T18:26:46Z",
-   "baslik": "Under-mount handled bag hook",
-   "izlenme": 28,
-   "erisim": 22,
-   "okundu": true,
-   "yanit": 0
   }
  ],
  "youtube": {
@@ -731,7 +731,7 @@
     "tur": "Short",
     "tarih": "2026-11-27T06:52:49",
     "baslik": "İlk katman neden fazla yassı ya da yüksek olur?",
-    "izlenme": 40,
+    "izlenme": 69,
     "begeni": 0,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=YXBs4l1GFrs"
@@ -851,7 +851,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T22:17:19",
     "baslik": "3D Baskı Tablaya Yapışmıyor mu? 5 Pratik Çözüm",
-    "izlenme": 1280,
+    "izlenme": 1282,
     "begeni": 19,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=qcWHhTeaEHs"
@@ -931,7 +931,7 @@
  },
  "eksikler": [],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 09:00",
-  "govde": "Toplam 34.412 (+247) · Reels 20.795 · Short 11.895 · Hikaye 1.722 (1 bugün) · Takipçi 432 · En iyi Reels: Baskın tabladan kalkı 4.400"
+  "baslik": "📊 İzlenme raporu 12:00",
+  "govde": "Toplam 34.534 (+122) · Reels 20.870 · Short 11.926 · Hikaye 1.738 (2 bugün) · Takipçi 432 · En iyi Reels: Baskın tabladan kalkı 4.404"
  }
 }
