@@ -1,7 +1,7 @@
 {
   "id": "h20261128-052231-e1r",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-28T05:22:31.000Z",
   "gorsel": "hikaye/gorseller/h20261128-052231-e1r.mp4",
   "baslik": "Plastic rivets - fastening clips for car",
@@ -21,7 +21,9 @@
     "sorunlar": []
   },
   "yayin": {
-    "tarih": "2026-11-28T14:25:20Z"
+    "tarih": "2026-11-28T14:27:26Z",
+    "medya_kimligi": "18057916592612480",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4040423282476396624"
   },
   "hata": "",
   "deneme": 0,
