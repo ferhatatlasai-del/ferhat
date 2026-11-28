@@ -227,7 +227,20 @@
         "kir köşe kalkmasını kolaylaştırır",
         "yorum yaz ve takip et"
       ]
+    },
+    {
+      "id": "s20261128-071148",
+      "konu": "Nozul çapı 0.4 mm neyi değiştirir?",
+      "noktalar": [
+        "0,4 mm dengeyi değiştirir",
+        "çizgi genişliği nozuldan gelir",
+        "ince çizgi süreyi uzatabilir",
+        "katman yüksekliği sınıra bağlı",
+        "orta yol çoğu işte dengeli",
+        "hedefe göre ayar seç",
+        "yorum yaz, takip et"
+      ]
     }
   ],
-  "son_ton": 250
+  "son_ton": -32
 }
