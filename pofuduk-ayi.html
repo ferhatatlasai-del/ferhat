@@ -2872,7 +2872,7 @@ function rugStep() {
     const c = Math.cos(m.yaw), sn = Math.sin(m.yaw), dx = P.x - m.x, dz = P.z - m.z, lx = dx * c - dz * sn, lz = dx * sn + dz * c;
     let hit = null;
     if (P.y < 0.6 && Math.abs(lx) < 2.4 && lz > -1 && lz < 1.7) hit = m.rugKeys.find(k => k.black && lx >= k.x0 && lx <= k.x1 && lz >= k.z0 && lz <= k.z1) || m.rugKeys.find(k => !k.black && lx >= k.x0 && lx <= k.x1 && lz >= k.z0 && lz <= k.z1) || null;
-    if (hit !== m.rugLast) { m.rugLast = hit; if (hit) { tone(hit.f, 0.5, 'triangle', null, 0.09); hit.press = 10; burst(P.x, P.y + 0.2, P.z, hit.black ? '#ffd23f' : '#9fe2ff', 5, 1.4); } }
+    if (hit !== m.rugLast) { m.rugLast = hit; if (hit) { tone(hit.f, 0.7, 'triangle', null, 0.2); tone(hit.f * 2, 0.5, 'sine', null, 0.06); hit.press = 10; burst(P.x, P.y + 0.2, P.z, hit.black ? '#ffd23f' : '#9fe2ff', 5, 1.4); } }
     for (const k of m.rugKeys) { if (k.press > 0) k.press--; k.m.position.y = k.y - (k.press > 0 ? 0.014 : 0); }
   }
 }
