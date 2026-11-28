@@ -1,7 +1,7 @@
 {
   "id": "h20261127-102130-d4o",
   "kaynak": "uretim",
-  "durum": "yayinlaniyor",
+  "durum": "yayinda",
   "olusturma": "2026-11-27T10:21:30.000Z",
   "gorsel": "hikaye/gorseller/h20261127-102130-d4o.mp4",
   "baslik": "Vertical garden planter",
@@ -25,7 +25,9 @@
     ]
   },
   "yayin": {
-    "tarih": "2026-11-28T07:25:08Z"
+    "tarih": "2026-11-28T07:26:29Z",
+    "medya_kimligi": "18136203434505383",
+    "link": "https://www.instagram.com/stories/gurtechs3d/4040211403968562700"
   },
   "hata": "",
   "deneme": 0,
