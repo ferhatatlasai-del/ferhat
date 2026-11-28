@@ -53,6 +53,10 @@
     {
       "konu": "İlk katman neden fazla yassı ya da fazla yüksek görünür?",
       "ipucu": "Yeni başlayan için sade anlat; nozzle-table mesafesi, ilk çizginin görünümü, çok yassı vs çok yüksek farkı; sayısal iddia verme, kısa kontrol listesi kullan."
+    },
+    {
+      "konu": "PETG neden ipliklenir, nasıl azaltılır?",
+      "ipucu": "Yeni başlayanlara sade anlat; nem, sıcaklık, geri çekme ve hızın etkisini genel aralıklarla ver; kesin sayı/vaat verme; görselde PETG stringing örneği ile ayar mantığını eşleştir."
     }
   ]
 }
