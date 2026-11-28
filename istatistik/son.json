@@ -1,17 +1,17 @@
 {
- "tarih": "2026-11-28T09:00:12Z",
- "tr_saat": "28.11.2026 12:00",
+ "tarih": "2026-11-28T12:00:22Z",
+ "tr_saat": "28.11.2026 15:00",
  "toplam": {
-  "reels": 20870,
+  "reels": 20883,
   "gonderi": 0,
-  "short": 11926,
+  "short": 11958,
   "youtube_video": 0,
-  "hikaye": 1738,
-  "toplam": 34534,
-  "begeni": 309,
+  "hikaye": 1761,
+  "toplam": 34602,
+  "begeni": 310,
   "yorum": 28
  },
- "fark": 122,
+ "fark": 68,
  "instagram": {
   "durum": "tamam",
   "izin": true,
@@ -26,8 +26,8 @@
     "begeni": 3,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgPFB_CMKqM/",
-    "izlenme": 608,
-    "erisim": 550
+    "izlenme": 611,
+    "erisim": 554
    },
    {
     "id": "17914671000663787",
@@ -48,7 +48,7 @@
     "begeni": 17,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/DgFd6danP9K/",
-    "izlenme": 1217,
+    "izlenme": 1218,
     "erisim": 1083
    },
    {
@@ -92,7 +92,7 @@
     "begeni": 10,
     "yorum": 0,
     "link": "https://www.instagram.com/reel/DgAjP11DCGR/",
-    "izlenme": 1540,
+    "izlenme": 1542,
     "erisim": 1438
    },
    {
@@ -125,8 +125,8 @@
     "begeni": 6,
     "yorum": 2,
     "link": "https://www.instagram.com/reel/Df_9WXhAUi5/",
-    "izlenme": 1585,
-    "erisim": 1464
+    "izlenme": 1588,
+    "erisim": 1466
    },
    {
     "id": "17916096111516478",
@@ -147,7 +147,7 @@
     "begeni": 35,
     "yorum": 1,
     "link": "https://www.instagram.com/reel/Df-y0hBDK-1/",
-    "izlenme": 4404,
+    "izlenme": 4408,
     "erisim": 3913
    },
    {
@@ -363,19 +363,28 @@
  "hikaye_izin": true,
  "hikayeler": [
   {
-   "id": "18136203434505383",
-   "tarih": "2026-11-28T07:26:29Z",
-   "baslik": "Vertical garden planter",
+   "id": "18402276619202230",
+   "tarih": "2026-11-28T09:47:25Z",
+   "baslik": "WuuYA Tree - Molds for vertical planters",
    "izlenme": 0,
    "erisim": 0,
    "okundu": false
   },
   {
+   "id": "18136203434505383",
+   "tarih": "2026-11-28T07:26:29Z",
+   "baslik": "Vertical garden planter",
+   "izlenme": 7,
+   "erisim": 5,
+   "okundu": true,
+   "yanit": 0
+  },
+  {
    "id": "18124316684057120",
    "tarih": "2026-11-28T05:07:46Z",
    "baslik": "Modular Covered Bee Waterer with Honeycomb Landing Insert",
-   "izlenme": 7,
-   "erisim": 6,
+   "izlenme": 12,
+   "erisim": 9,
    "okundu": true,
    "yanit": 0
   },
@@ -383,8 +392,8 @@
    "id": "18131959315854053",
    "tarih": "2026-11-27T16:47:28Z",
    "baslik": "Safe Mason Jar Bee Waterer (Open feeder)",
-   "izlenme": 16,
-   "erisim": 15,
+   "izlenme": 18,
+   "erisim": 16,
    "okundu": true,
    "yanit": 0
   },
@@ -392,8 +401,8 @@
    "id": "18098214542166708",
    "tarih": "2026-11-27T14:26:51Z",
    "baslik": "Bee waterer -/- sugar water floating feeder (for 2 and 5 gal",
-   "izlenme": 20,
-   "erisim": 18,
+   "izlenme": 24,
+   "erisim": 21,
    "okundu": true,
    "yanit": 0
   },
@@ -401,8 +410,8 @@
    "id": "17994889832858473",
    "tarih": "2026-11-27T12:06:52Z",
    "baslik": "Bee Waterer",
-   "izlenme": 18,
-   "erisim": 18,
+   "izlenme": 23,
+   "erisim": 21,
    "okundu": true,
    "yanit": 0
   },
@@ -711,15 +720,6 @@
    "erisim": 20,
    "okundu": true,
    "yanit": 0
-  },
-  {
-   "id": "18164781550503882",
-   "tarih": "2026-11-21T23:23:26Z",
-   "baslik": "Video hikayesi",
-   "izlenme": 25,
-   "erisim": 19,
-   "okundu": true,
-   "yanit": 0
   }
  ],
  "youtube": {
@@ -731,7 +731,7 @@
     "tur": "Short",
     "tarih": "2026-11-27T06:52:49",
     "baslik": "İlk katman neden fazla yassı ya da yüksek olur?",
-    "izlenme": 69,
+    "izlenme": 94,
     "begeni": 0,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=YXBs4l1GFrs"
@@ -741,7 +741,7 @@
     "tur": "Short",
     "tarih": "2026-11-25T08:52:19",
     "baslik": "Nozzle tıkanmadan temizle: 3 kısa işaret",
-    "izlenme": 60,
+    "izlenme": 61,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=YBNIDKMia3Y"
@@ -761,7 +761,7 @@
     "tur": "Short",
     "tarih": "2026-11-22T23:17:16",
     "baslik": "Bambu Lab A1 Combo AMS lite filament değişim sorunları",
-    "izlenme": 251,
+    "izlenme": 252,
     "begeni": 2,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=Vt_lyaaFBOo"
@@ -812,7 +812,7 @@
     "tarih": "2026-11-21T15:26:52",
     "baslik": "Isıya en dayanıklı 5 filament | 3D baskı",
     "izlenme": 385,
-    "begeni": 2,
+    "begeni": 3,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=TXcpwaFMx1U"
    },
@@ -831,7 +831,7 @@
     "tur": "Short",
     "tarih": "2026-11-21T09:57:09",
     "baslik": "Filament nem çekerse ne olur? Belirtiler ve çözüm",
-    "izlenme": 1254,
+    "izlenme": 1255,
     "begeni": 7,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=M9tyEIjEeH8"
@@ -851,7 +851,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T22:17:19",
     "baslik": "3D Baskı Tablaya Yapışmıyor mu? 5 Pratik Çözüm",
-    "izlenme": 1282,
+    "izlenme": 1284,
     "begeni": 19,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=qcWHhTeaEHs"
@@ -861,7 +861,7 @@
     "tur": "Short",
     "tarih": "2026-11-20T21:56:57",
     "baslik": "3D Baskı ile Araba İçi Pratik Aksesuarlar",
-    "izlenme": 178,
+    "izlenme": 180,
     "begeni": 0,
     "yorum": 0,
     "link": "https://www.youtube.com/watch?v=DevZ1m13Ku4"
@@ -931,7 +931,7 @@
  },
  "eksikler": [],
  "bildirim": {
-  "baslik": "📊 İzlenme raporu 12:00",
-  "govde": "Toplam 34.534 (+122) · Reels 20.870 · Short 11.926 · Hikaye 1.738 (2 bugün) · Takipçi 432 · En iyi Reels: Baskın tabladan kalkı 4.404"
+  "baslik": "📊 İzlenme raporu 15:00",
+  "govde": "Toplam 34.602 (+68) · Reels 20.883 · Short 11.958 · Hikaye 1.761 (3 bugün) · Takipçi 432 · En iyi Reels: Baskın tabladan kalkı 4.408"
  }
 }
