@@ -214,7 +214,20 @@
         "ihtiyaca göre filament seç",
         "yorum yaz ve takip et"
       ]
+    },
+    {
+      "id": "s20261128-070622",
+      "konu": "Tabla temizliği neden yapışmayı bu kadar etkiler?",
+      "noktalar": [
+        "görünmez kir yapışmayı bozar",
+        "yağ tabakası teması kaydırır",
+        "ilk çizgi bağlantıyı başlatır",
+        "çok az yağ bile etkiler",
+        "toz çizginin altına girer",
+        "kir köşe kalkmasını kolaylaştırır",
+        "yorum yaz ve takip et"
+      ]
     }
   ],
-  "son_ton": 72
+  "son_ton": 250
 }
