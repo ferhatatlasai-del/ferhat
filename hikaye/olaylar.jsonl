@@ -224,3 +224,12 @@
 {"t": "2026-11-27T10:21:18Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
 {"t": "2026-11-27T10:21:30Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 8.0, "site": "printables.com", "sorunlar": ["Ön görsel referansa genel olarak çok benziyor.", "Perspektif ve çevre düzeni referanstan biraz farklı.", "Saksı/planter formu doğru, belirgin ana parça eksik görünmüyor."]}
 {"t": "2026-11-27T10:21:38Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 8.0}
+{"t": "2026-11-28T05:21:07Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-28T05:21:18Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-28T05:21:30Z", "tur": "denetim", "gecti": true, "deneme": 1, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-28T05:21:39Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 1, "puan": 9.0}
+{"t": "2026-11-28T05:22:02Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 9.0, "site": "printables.com", "sorunlar": ["Tanınmış karakter tasarımından esinlenilmiş.", "Yazı veya logo görünmüyor.", "Referansla genel şekil ve detaylar uyumlu."]}
+{"t": "2026-11-28T05:22:12Z", "tur": "denetim", "gecti": false, "deneme": 2, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-28T05:22:21Z", "tur": "denetim", "gecti": false, "deneme": 1, "puan": 8.0, "site": "printables.com"}
+{"t": "2026-11-28T05:22:31Z", "tur": "denetim", "gecti": true, "deneme": 2, "puan": 9.0, "site": "printables.com"}
+{"t": "2026-11-28T05:22:41Z", "tur": "uretildi", "site": "printables.com", "trend": true, "deneme": 2, "puan": 9.0}
